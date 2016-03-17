@@ -2,4 +2,4 @@
 # need to ensure Ansible, OSAD, TaskFlow, SQLAlchemy, misc
 
 # See: https://bugs.launchpad.net/pbr/+bug/1384919 for why this is here...
-pbr>=1.6 # Apache-2.0
+pbr>=1.8.1 # Apache-2.0
