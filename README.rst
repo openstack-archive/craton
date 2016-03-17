@@ -96,7 +96,7 @@ data.
 Secret management
 -----------------
 
-`Barbican http://docs.openstack.org/developer/barbican/api/reference/secrets.html`_
+`Barbican <http://docs.openstack.org/developer/barbican/api/reference/secrets.html>`_
 
 
 REST API
