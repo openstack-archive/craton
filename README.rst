@@ -2,7 +2,7 @@ Minimum viable Craton
 =====================
 
 This is what we should build, as defined by `Eric Ries
-<http://www.startuplessonslearned.com/2009/08/minimum-viable-product-guide.html>`:
+<http://www.startuplessonslearned.com/2009/08/minimum-viable-product-guide.html>`_:
 
     [T]he minimum viable product is that version of a new product
     which allows a team to collect the maximum amount of validated
@@ -17,8 +17,10 @@ Process flow
 
 MVP
 
-- Manage inventory schema, along with corresponding YAML files from GitHub customer repos for config, PEM files/blobs
-- Generate inventory file for Ansible, either for TaskFlow to drive overall; or for Ansible
+- Manage inventory schema, along with corresponding YAML files from
+  GitHub customer repos for config, PEM files/blobs
+- Generate inventory file for Ansible, either for TaskFlow to drive
+  overall; or for Ansible
 - Run playbooks with respect to inventory
 - Ansible callbacks for reachability, other errors
 - TaskFlow notification to Redis
@@ -50,7 +52,7 @@ We will be using Ansible's inventory needs to drive these requirements:
 - Groups, including subgroup relationships
 - Secrets, FK to hosts, stores a PEM encoded blob (possibly other formats)
 - References, FK to groups, to group variable YAML files (using URLs,
-  eg to `GitHub refs <https://developer.github.com/v3/git/refs/>` or
+  eg to `GitHub refs <https://developer.github.com/v3/git/refs/>`_ or
   Swift storage; should we support blobs as well?)
 
 In addition, we will support the following additional schema elements:
@@ -94,9 +96,7 @@ data.
 Secret management
 -----------------
 
-http://docs.openstack.org/developer/barbican/api/reference/secrets.html
-
-
+`Barbican http://docs.openstack.org/developer/barbican/api/reference/secrets.html`_
 
 
 REST API
