@@ -1,0 +1,5 @@
+# we can likely base on https://github.com/openstack/taskflow/blob/master/requirements.txt
+# need to ensure Ansible, OSAD, TaskFlow, SQLAlchemy, misc
+
+# See: https://bugs.launchpad.net/pbr/+bug/1384919 for why this is here...
+pbr>=1.6 # Apache-2.0
