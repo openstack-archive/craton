@@ -1,3 +1,15 @@
+===============================
+craton
+===============================
+
+Fleet management for OpenStack.
+
+* Free software: Apache license
+* Documentation: http://github.com/rackerlabs/craton (TODO)
+* Source: https://github.com/rackerlabs/craton
+* Bugs: http://bugs.launchpad.net/craton
+
+
 Minimum viable Craton
 =====================
 

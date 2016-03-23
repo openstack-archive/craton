@@ -12,8 +12,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import pbr.version
+"""
+test_craton
+----------------------------------
+
+Tests for `craton` module.
+"""
+
+from craton.tests import base
 
 
-__version__ = pbr.version.VersionInfo(
-    'craton').version_string()
+class TestCraton(base.TestCase):
+
+    def test_something(self):
+        pass
