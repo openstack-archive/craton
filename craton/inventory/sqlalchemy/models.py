@@ -2,7 +2,9 @@
 
 from oslo_config import cfg
 from oslo_db.sqlalchemy import models
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, Text
+from sqlalchemy import (
+    Boolean, Column, ForeignKey, Integer, String, Table, Text,
+    UniqueConstraint)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, object_mapper, relationship 
@@ -68,8 +70,11 @@ class Tenant(Base):
     __tablename__ = 'tenants'
     id = Column(UUIDType, primary_key=True)
     name = Column(String(255))
-    # FIXME probably need more columns in this schema, but suffices
-    # for initial multitenancy for now...
+    # FIXME we will surely need to define more columns, but suffices
+    # to define multitenancy for MVP
+
+    hosts = relationship("Host", back_populates="tenant")
+    groups = relationship("Group", back_populates="tenant")
 
 
 # Note that for host variables key/value pairs, we assume bytestring, not Unicode
@@ -97,16 +102,23 @@ class Host(ProxiedDictMixin, Base):
     __tablename__ = 'hosts'
     id = Column(UUIDType, primary_key=True)
     tenant_id = Column(UUIDType, ForeignKey('tenants.id'), index=True, nullable=False)
-    hostname = Column(String(255), nullable=False, unique=True)
-    ip_address = Column(IPAddressType, nullable=False, unique=True)
-    active = Column(Boolean)
+    hostname = Column(String(255), nullable=False)
+    ip_address = Column(IPAddressType, nullable=False)
+    active = Column(Boolean, default=True)
     discovered = Column(JSONType)
+
+    UniqueConstraint(tenant_id, hostname)
+    UniqueConstraint(tenant_id, ip_address)
+
     _repr_columns=[id, hostname]
 
     groups = relationship(
         'Group',
         secondary=host_grouping,
         back_populates='hosts')
+
+    # many-to-one relationship with tenants
+    tenant = relationship("Tenant", back_populates="hosts")
 
     # provide arbitrary K/V mapping to associated HostVariables table
     variables = relationship(
@@ -124,17 +136,19 @@ class Host(ProxiedDictMixin, Base):
 
 
 class Group(Base):
-    """Models a grouping of hosts: Ansible groups, OpenStack regions and cells"""
+    """Models a grouping of hosts, which include Ansible groups; OpenStack regions and cells"""
     __tablename__ = 'groups'
     id = Column(UUIDType, primary_key=True)
+    tenant_id = Column(UUIDType, ForeignKey('tenants.id'), index=True, nullable=False)
     parent_id = Column(UUIDType, ForeignKey('groups.id'))
     name = Column(String(255))
-
     # Our assumption is any config yaml file that needs some sort of include/overlay mechanism
     # will use Ansible includes/roles; or perhaps something similar for YAML include in general.
     # So this means we need just one reference.
     # NOTE we likely need some sort of resolution scheme to handle branches, etc.
     config = Column(URLType)
+
+    UniqueConstraint(tenant_id, name)
 
     _repr_columns = [id, name]
 
@@ -148,3 +162,6 @@ class Group(Base):
         'Host',
         secondary=host_grouping,
         back_populates='groups')
+
+    # many-to-one relationship with tenants
+    tenant = relationship("Tenant", back_populates="groups")
