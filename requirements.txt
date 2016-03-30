@@ -2,4 +2,7 @@
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
 
+oslo.db>=4.1.0 
 pbr>=1.6
+SQLAlchemy>=1.0.10,<1.1.0  # MIT
+sqlalchemy-utils  # BSD License

@@ -1,6 +1,5 @@
 """Models defined using SQLAlchemy ORM"""
 
-from oslo_config import cfg
 from oslo_db.sqlalchemy import models
 from sqlalchemy import (
     Boolean, Column, ForeignKey, Integer, String, Table, Text,
@@ -15,7 +14,6 @@ from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
 from sqlalchemy_utils.types.url import URLType
 from sqlalchemy_utils.types.uuid import UUIDType
-import six.moves.urllib.parse as urlparse
 
 
 # FIXME set up table args for a given database/storage engine, as configured.
@@ -116,8 +114,11 @@ class Host(ProxiedDictMixin, Base):
     secret_id = Column(UUIDType, ForeignKey('secrets.id'))
     hostname = Column(String(255), nullable=False)
     ip_address = Column(IPAddressType, nullable=False)
-    active = Column(Boolean, default=True)  # may or may not be reachable
-    facts = Column(JSONType)  # discovered facts about the host
+    # active hosts for administration; this is not state:
+    # the host may or may not be reachable by Ansible/other tooling
+    active = Column(Boolean, default=True)
+    # discovered facts about the host
+    facts = Column(JSONType)
 
     UniqueConstraint(tenant_id, hostname)
     UniqueConstraint(tenant_id, ip_address)
@@ -207,7 +208,7 @@ class Group(Base):
 class Secret(Base):
     """Represents a secret for accessing a host. It may be shared.
 
-    For now we assume a PEM-encoded certificate that represents the
+    For now we assume a PEM-encoded certificate that wraps the
     private key.
     """
     __tablename__ = 'secrets'
