@@ -14,23 +14,9 @@ produces:
 paths:
   /regions:
     get:
-      summary: Regions
+      summary: Gets all Regions.
       tags:
         - Regions
-      parameters:
-        - name: limit
-          in: query
-          description: number of pets to return
-          type: integer
-          default: 100
-          minimum: 1
-          maximum: 1000
-        - name: name
-          in: query
-          description: name of the region to get
-          type: string
-          default: None
-          
       responses:
         200:
           description: An array of regions
@@ -53,6 +39,10 @@ paths:
       responses:
         200:
           description: OK
+        405:
+          description: Validation Exception
+        400:
+          description: Invalid Request
   /regions/{region-name}: # Should this be region uuid ?
     parameters:
       - name: region-name
@@ -75,35 +65,68 @@ paths:
           schema:
             $ref: "#/definitions/Region"
       responses:
-        "405":
-          description: Validation exception
-        "404":
+        405:
+          description: Validation Exception
+        404:
           description: Region not found
-        "400":
-          description: Invalid ID supplied
+        400:
+          description: Invalid Request
     delete:
-      summary: Delete existing record of region
+      summary: Delete existing record of a region
       operationId: deleteRegion
       responses:
-        "405":
-          description: Validation exception
-        "404":
+        405:
+          description: Validation Exception
+        404:
           description: Region not found
-        "400":
+        400:
+          description: Invalid Request
+  /regions/{region-name}/data:
+    parameters:
+      - name: region-name
+        in: path
+        description: Name of the region to update data
+        type: string
+        required: true
+    put:
+      summary: Update user defined data for the region
+      description: ""
+      operationId: updateRegionData
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: Update Key/Value data for the region
+          required: true
+          schema:
+            $ref: "#/definitions/Data"
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Region not found
+        400:
           description: Invalid ID supplied
+    delete:
+      summary: Delete existing key/value data for the region
+      description: ""
+      operationId: deleteRegionData
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Server not found
+        400:
+          description: Invalid Request
   /cells:
     get:
       summary: Cells
       tags:
         - Cells
       parameters:
-        - name: limit
-          in: query
-          description: number of pets to return
-          type: integer
-          default: 100
-          minimum: 1
-          maximum: 1000
         - name: name
           in: query
           type: string
@@ -114,7 +137,6 @@ paths:
           in: query
           description: name of the region to get cells for
           default: None
-          
       responses:
         200:
           description: An array of cells
@@ -129,7 +151,7 @@ paths:
     post:
       summary: Create a new Cell 
       parameters:
-        - name: body
+        - name: cell
           in: body
           required: true
           schema:
@@ -137,6 +159,8 @@ paths:
       responses:
         200:
           description: OK
+        400:
+          description: Invalid Request
 
   /cells/{cell-name}:
     parameters:
@@ -172,12 +196,52 @@ paths:
       description: ""
       operationId: deleteCell
       responses:
-        "405":
+        405:
           description: Validation exception
-        "404":
+        404:
           description: Cell not found
-        "400":
+        400:
+          description: Invalid Request
+  /cells/{cell-name}/data:
+    parameters:
+      - name: cell-name
+        in: path
+        description: Cell name to update data
+        type: string
+        required: true
+    put:
+      summary: Update user defined data for the cell
+      description: ""
+      operationId: updateCellData
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: Update Key/Value data for the cell
+          required: true
+          schema:
+            $ref: "#/definitions/Data"
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Cell not found
+        400:
           description: Invalid ID supplied
+    delete:
+      summary: Delete existing key/value data for the cell
+      description: ""
+      operationId: deleteCellData
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Cell not found
+        400:
+          description: Invalid Request
     
   /servers:
     get:
@@ -212,11 +276,6 @@ paths:
           in: query
           description: ip_address of the server to get
           default: None
-        - name: openstack_service
-          type: string
-          in: query
-          description: openstack service to which the server belongs
-          default: None    
       responses:
         200:
           description: An array of servers
@@ -231,7 +290,7 @@ paths:
     post:
       summary: Create a new Server 
       parameters:
-        - name: body
+        - name: server
           in: body
           required: true
           schema:
@@ -239,6 +298,13 @@ paths:
       responses:
         200:
           description: OK
+  /servers/{server-hostname}:
+    parameters:
+      - name: server-hostname
+        in: path
+        description: Hostname of the server
+        type: string
+        required: true
     put:
       summary: Update an existing Server
       description: ""
@@ -255,15 +321,67 @@ paths:
           schema:
             $ref: "#/definitions/Server"
       responses:
-        "405":
+        405:
           description: Validation exception
-        "404":
+        404:
           description: Server not found
-        "400":
+        400:
           description: Invalid ID supplied
+    delete:
+      summary: Delete existing record of server
+      description: ""
+      operationId: deleteServer
       responses:
-        "400":
-          description: Invalid pet value
+        405:
+          description: Validation exception
+        404:
+          description: Server not found
+        400:
+          description: Invalid Request
+  /servers/{server-hostname}/data:
+    parameters:
+      - name: server-hostname
+        in: path
+        description: Hostname of the server
+        type: string
+        required: true
+    put:
+      summary: Update user defined data for the server
+      description: ""
+      operationId: updateServerData
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: Update Key/Value data for the server
+          required: true
+          schema:
+            $ref: "#/definitions/Data"
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Server not found
+        400:
+          description: Invalid ID supplied
+    delete:
+      summary: Delete existing key/value data for the server
+      description: ""
+      operationId: deleteServerData
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Server not found
+        400:
+          description: Invalid Request
+
+#################
+## DATA MODELS ##
+#################
 
 definitions:
   Region:
@@ -315,11 +433,14 @@ definitions:
         type: string
       hw_manufacturer:
         type: string
-      type:
-        type: string
-      openstack_service:
-        type: string
       data:
+        type: string
+  Data:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
         type: string
   
   Error:
