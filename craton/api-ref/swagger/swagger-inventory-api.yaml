@@ -1,0 +1,334 @@
+swagger: '2.0'
+info:
+  title: Craton Inventory API
+  description: API for RPC inventory service
+  version: "0.0.1"
+
+# the domain of the service
+host: craton.inventory.com
+schemes:
+  - https
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /regions:
+    get:
+      summary: Regions
+      tags:
+        - Regions
+      parameters:
+        - name: limit
+          in: query
+          description: number of pets to return
+          type: integer
+          default: 100
+          minimum: 1
+          maximum: 1000
+        - name: name
+          in: query
+          description: name of the region to get
+          type: string
+          default: None
+          
+      responses:
+        200:
+          description: An array of regions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Region'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new Region 
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Region'
+      responses:
+        200:
+          description: OK
+  /regions/{region-name}: # Should this be region uuid ?
+    parameters:
+      - name: region-name
+        type: string
+        in: path
+        required: true
+    put:
+      summary: Update an existing Region
+      description: ""
+      operationId: updateRegion
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Region object that needs to be added to the store
+          required: false
+          schema:
+            $ref: "#/definitions/Region"
+      responses:
+        "405":
+          description: Validation exception
+        "404":
+          description: Region not found
+        "400":
+          description: Invalid ID supplied
+    delete:
+      summary: Delete existing record of region
+      operationId: deleteRegion
+      responses:
+        "405":
+          description: Validation exception
+        "404":
+          description: Region not found
+        "400":
+          description: Invalid ID supplied
+  /cells:
+    get:
+      summary: Cells
+      tags:
+        - Cells
+      parameters:
+        - name: limit
+          in: query
+          description: number of pets to return
+          type: integer
+          default: 100
+          minimum: 1
+          maximum: 1000
+        - name: name
+          in: query
+          type: string
+          description: name of the cell to get
+          default: None
+        - name: region
+          type: string
+          in: query
+          description: name of the region to get cells for
+          default: None
+          
+      responses:
+        200:
+          description: An array of cells
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Cell'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new Cell 
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Cell'
+      responses:
+        200:
+          description: OK
+
+  /cells/{cell-name}:
+    parameters:
+      - name: cell-name
+        in: path
+        description: The cell Name
+        type: string
+        required: true
+    put:
+      summary: Update an existing Cell
+      description: ""
+      operationId: updateCell
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: cell
+          description: Cell object that will be updated
+          required: true
+          schema:
+            $ref: "#/definitions/Cell"
+      responses:
+        "405":
+          description: Validation exception
+        "404":
+          description: Cell not found
+        "400":
+          description: Invalid ID supplied
+    delete:
+      summary: Delete an existing record of Cell
+      description: ""
+      operationId: deleteCell
+      responses:
+        "405":
+          description: Validation exception
+        "404":
+          description: Cell not found
+        "400":
+          description: Invalid ID supplied
+    
+  /servers:
+    get:
+      summary: Servers
+      tags:
+        - Servers
+      parameters:
+        - name: limit
+          in: query
+          description: number of servers to return
+          type: integer
+          default: 1000
+          minimum: 1
+          maximum: 10000
+        - name: name
+          in: query
+          type: string
+          description: name of the server to get
+          default: None
+        - name: region
+          type: string
+          in: query
+          description: name of the region to get servers for
+          default: None
+        - name: cell
+          type: string
+          in: query
+          description: name of the cell to get servers for
+          default: None
+        - name: ip_address
+          type: string
+          in: query
+          description: ip_address of the server to get
+          default: None
+        - name: openstack_service
+          type: string
+          in: query
+          description: openstack service to which the server belongs
+          default: None    
+      responses:
+        200:
+          description: An array of servers
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Server'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new Server 
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Server'
+      responses:
+        200:
+          description: OK
+    put:
+      summary: Update an existing Server
+      description: ""
+      operationId: updateServer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Server object that needs to be added to the store
+          required: false
+          schema:
+            $ref: "#/definitions/Server"
+      responses:
+        "405":
+          description: Validation exception
+        "404":
+          description: Server not found
+        "400":
+          description: Invalid ID supplied
+      responses:
+        "400":
+          description: Invalid pet value
+
+definitions:
+  Region:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Unique ID for the region.
+      name:
+        type: string
+        description: Region Name.
+      status:
+        type: string
+        description: Region Status.
+      cells:
+        type: array
+        items:
+          $ref: '#/definitions/Cell'
+        description: List of cells in this region
+      data:
+        type: string
+        description: User defined information
+  Cell:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Unique ID of the cell
+      name:
+        type: string
+      status:
+        type: string
+      region:
+        type: string
+      data:
+        type: string
+  Server:
+    type: object
+    properties:
+      id:
+        type: integer
+      hostname:
+        type: string
+      ip_address:
+        type: string
+      status:
+        type: string
+      cell:
+        type: string
+      hw_manufacturer:
+        type: string
+      type:
+        type: string
+      openstack_service:
+        type: string
+      data:
+        type: string
+  
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
