@@ -31,7 +31,7 @@ paths:
     post:
       summary: Create a new Region 
       parameters:
-        - name: body
+        - name: region
           in: body
           required: true
           schema:
