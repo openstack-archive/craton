@@ -483,7 +483,7 @@ definitions:
           $ref: '#/definitions/Cell'
         description: List of cells in this region
       data:
-        type: string
+        type: object
         description: User defined information
     required:
       - name
@@ -502,7 +502,8 @@ definitions:
       region:
         type: string
       data:
-        type: string
+        type: object
+        description: User defined information
     required:
     - name
     - status
@@ -529,7 +530,8 @@ definitions:
         items:
           type: string
       data:
-        type: string
+        type: object
+        description: User defined information
     required:
     - hostname
     - ip_address
@@ -542,7 +544,7 @@ definitions:
       key:
         type: string
       value:
-        type: string
+        type: object
   
   Error:
     type: object
