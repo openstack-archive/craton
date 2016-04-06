@@ -1,22 +1,44 @@
 swagger: '2.0'
 info:
   title: Craton Inventory API
-  description: API for RPC inventory service
+  description: API for RPC Inventory Service
   version: "0.0.1"
+
+  contact:
+    name: Craton Developers
+    url: https://launchpad.net/~craton
+
+  license:
+    name: Apache License
+    url: https://github.com/rackerlabs/craton/blob/master/LICENSE
 
 # the domain of the service
 host: craton.inventory.com
 schemes:
   - https
 basePath: /v1
+consumes:
+  - application/json
 produces:
   - application/json
+
+security:
+  - ApiKey: []
+
+securityDefinitions:
+  ApiKey:
+    type: apiKey
+    in: header
+    name: api_key
+
 paths:
   /regions:
     get:
-      summary: Gets all Regions.
+      summary: Gets all Regions
       tags:
         - Regions
+      security:
+        - ApiKey: []
       responses:
         200:
           description: An array of regions
@@ -25,7 +47,7 @@ paths:
             items:
               $ref: '#/definitions/Region'
         default:
-          description: Unexpected error
+          description: Unexpected Error
           schema:
             $ref: '#/definitions/Error'
     post:
@@ -43,7 +65,7 @@ paths:
           description: Validation Exception
         400:
           description: Invalid Request
-  /regions/{region-name}: # Should this be region uuid ?
+  /regions/{region-name}:
     parameters:
       - name: region-name
         type: string
@@ -51,7 +73,10 @@ paths:
         required: true
     put:
       summary: Update an existing Region
-      description: ""
+      tags:
+        - Regions
+      security:
+        - ApiKey: []
       operationId: updateRegion
       consumes:
         - application/json
@@ -59,7 +84,7 @@ paths:
         - application/json
       parameters:
         - in: body
-          name: body
+          name: region
           description: Region object that needs to be added to the store
           required: false
           schema:
@@ -90,7 +115,11 @@ paths:
         required: true
     put:
       summary: Update user defined data for the region
-      description: ""
+      tags:
+        - Regions
+        - Data
+      security:
+        - ApiKey: []
       operationId: updateRegionData
       consumes:
         - application/json
@@ -112,7 +141,11 @@ paths:
           description: Invalid ID supplied
     delete:
       summary: Delete existing key/value data for the region
-      description: ""
+      tags:
+        - Regions
+        - Data
+      security:
+        - ApiKey: []
       operationId: deleteRegionData
       responses:
         405:
@@ -123,9 +156,11 @@ paths:
           description: Invalid Request
   /cells:
     get:
-      summary: Cells
+      summary: Get all cells
       tags:
         - Cells
+      security:
+        - ApiKey: []
       parameters:
         - name: name
           in: query
@@ -150,6 +185,10 @@ paths:
             $ref: '#/definitions/Error'
     post:
       summary: Create a new Cell 
+      tags:
+        - Cells
+      security:
+        - ApiKey: []
       parameters:
         - name: cell
           in: body
@@ -171,7 +210,10 @@ paths:
         required: true
     put:
       summary: Update an existing Cell
-      description: ""
+      tags:
+        - Cells
+      security:
+        - ApiKey: []
       operationId: updateCell
       consumes:
         - application/json
@@ -193,7 +235,10 @@ paths:
           description: Invalid ID supplied
     delete:
       summary: Delete an existing record of Cell
-      description: ""
+      tags:
+        - Cells
+      security:
+        - ApiKey: []
       operationId: deleteCell
       responses:
         405:
@@ -211,7 +256,11 @@ paths:
         required: true
     put:
       summary: Update user defined data for the cell
-      description: ""
+      tags:
+        - Cells
+        - Data
+      security:
+        - ApiKey: []
       operationId: updateCellData
       consumes:
         - application/json
@@ -233,7 +282,11 @@ paths:
           description: Invalid ID supplied
     delete:
       summary: Delete existing key/value data for the cell
-      description: ""
+      tags:
+        - Cells
+        - Data
+      security:
+        - ApiKey: []
       operationId: deleteCellData
       responses:
         405:
@@ -243,15 +296,17 @@ paths:
         400:
           description: Invalid Request
     
-  /servers:
+  /hosts:
     get:
-      summary: Servers
+      summary: Get all hosts
       tags:
-        - Servers
+        - Hosts
+      security:
+        - ApiKey: []
       parameters:
         - name: limit
           in: query
-          description: number of servers to return
+          description: number of hosts to return
           type: integer
           default: 1000
           minimum: 1
@@ -259,96 +314,117 @@ paths:
         - name: name
           in: query
           type: string
-          description: name of the server to get
+          description: name of the hosts to get
           default: None
         - name: region
           type: string
           in: query
-          description: name of the region to get servers for
+          description: name of the region to get hosts for
           default: None
         - name: cell
           type: string
           in: query
-          description: name of the cell to get servers for
+          description: name of the cell to get hosts for
           default: None
         - name: ip_address
           type: string
           in: query
-          description: ip_address of the server to get
+          description: ip_address of the hosts to get
           default: None
+        - name: service
+          type: array
+          items:
+            type: string
+          in: query
+          description: Openstack service to query host by
+          default: []
       responses:
         200:
-          description: An array of servers
+          description: An array of hosts
           schema:
             type: array
             items:
-              $ref: '#/definitions/Server'
+              $ref: '#/definitions/Host'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
     post:
-      summary: Create a new Server 
+      summary: Create a new Host
+      tags:
+        - Hosts
+      security:
+        - ApiKey: []
       parameters:
-        - name: server
+        - name: host
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Server'
+            $ref: '#/definitions/Host'
       responses:
         200:
           description: OK
-  /servers/{server-hostname}:
+  /hosts/{hostname}:
     parameters:
-      - name: server-hostname
+      - name: hostname
         in: path
         description: Hostname of the server
         type: string
         required: true
     put:
-      summary: Update an existing Server
-      description: ""
-      operationId: updateServer
+      summary: Update an existing Host
+      tags:
+        - Hosts
+      security:
+        - ApiKey: []
+      operationId: updateHost
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
         - in: body
-          name: body
-          description: Server object that needs to be added to the store
+          name: host
+          description: Host object that needs to be added to the store
           required: false
           schema:
-            $ref: "#/definitions/Server"
+            $ref: "#/definitions/Host"
       responses:
         405:
           description: Validation exception
         404:
-          description: Server not found
+          description: Host not found
         400:
           description: Invalid ID supplied
     delete:
-      summary: Delete existing record of server
-      description: ""
-      operationId: deleteServer
+      summary: Delete existing record of host
+      tags:
+        - Hosts
+      security:
+        - ApiKey: []
+      operationId: deleteHost
       responses:
         405:
           description: Validation exception
         404:
-          description: Server not found
+          description: Host not found
         400:
           description: Invalid Request
-  /servers/{server-hostname}/data:
+  /hosts/{hostname}/data:
     parameters:
-      - name: server-hostname
+      - name: hostname
         in: path
         description: Hostname of the server
         type: string
         required: true
     put:
       summary: Update user defined data for the server
-      description: ""
-      operationId: updateServerData
+      tags:
+        - Hosts
+        - Data
+      security:
+        - ApiKey: []
+      operationId: updateHostData
       consumes:
         - application/json
       produces:
@@ -356,7 +432,7 @@ paths:
       parameters:
         - in: body
           name: data
-          description: Update Key/Value data for the server
+          description: Update Key/Value data for the host
           required: true
           schema:
             $ref: "#/definitions/Data"
@@ -368,14 +444,18 @@ paths:
         400:
           description: Invalid ID supplied
     delete:
-      summary: Delete existing key/value data for the server
-      description: ""
-      operationId: deleteServerData
+      summary: Delete existing key/value data for the host
+      tags:
+        - Hosts
+        - Data
+      security:
+        - ApiKey: []
+      operationId: deleteHostData
       responses:
         405:
           description: Validation exception
         404:
-          description: Server not found
+          description: Host not found
         400:
           description: Invalid Request
 
@@ -386,6 +466,7 @@ paths:
 definitions:
   Region:
     type: object
+    discriminator: name
     properties:
       id:
         type: integer
@@ -404,8 +485,12 @@ definitions:
       data:
         type: string
         description: User defined information
+    required:
+      - name
+      - status
   Cell:
     type: object
+    discriminator: name
     properties:
       id:
         type: integer
@@ -418,8 +503,14 @@ definitions:
         type: string
       data:
         type: string
-  Server:
+    required:
+    - name
+    - status
+    - region
+
+  Host:
     type: object
+    discriminator: name
     properties:
       id:
         type: integer
@@ -433,8 +524,18 @@ definitions:
         type: string
       hw_manufacturer:
         type: string
+      service:
+        type: array
+        items:
+          type: string
       data:
         type: string
+    required:
+    - hostname
+    - ip_address
+    - status
+    - cell
+    - service
   Data:
     type: object
     properties:
