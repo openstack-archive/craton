@@ -31,22 +31,8 @@ securityDefinitions:
     in: header
     name: api_key
 
-
-## Global Parameters ##
-
-parameters:
-  tenant-id:
-    # tenant-id here is uuid
-    name: tenant-id
-    in: path
-    description: Tenant ID
-    type: string
-    required: true
-
 paths:
-  /{tenant-id}/regions:
-    parameters:
-      - $ref: '#/parameters/tenant-id'
+  /regions:
     get:
       summary: Gets all Regions
       tags:
@@ -79,10 +65,9 @@ paths:
           description: Validation Exception
         400:
           description: Invalid Request
-  /{tenant-id}/regions/{region_uuid}:
+  /regions/{id}:
     parameters:
-      - $ref: '#/parameters/tenant-id'
-      - name: region_uuid
+      - name: id
         type: string
         in: path
         required: true
@@ -121,12 +106,11 @@ paths:
           description: Region not found
         400:
           description: Invalid Request
-  /{tenant-id}/regions/{region_uuid}/data:
+  /regions/{id}/data:
     parameters:
-      - $ref: '#/parameters/tenant-id'
-      - name: region_uuid
+      - name: id
         in: path
-        description: UUID of the region to update data
+        description: UUID or name of the region to update data
         type: string
         required: true
     put:
@@ -170,9 +154,7 @@ paths:
           description: Server not found
         400:
           description: Invalid Request
-  /{tenant-id}/cells:
-    parameters:
-      - $ref: '#/parameters/tenant-id'
+  /cells:
     get:
       summary: Get all cells
       tags:
@@ -219,12 +201,11 @@ paths:
         400:
           description: Invalid Request
 
-  /{tenant-id}/cells/{cell_uuid}:
+  /cells/{id}:
     parameters:
-      - $ref: '#/parameters/tenant-id'
-      - name: cell_uuid
+      - name: id
         in: path
-        description: UUID of the cell
+        description: UUID or name of the cell
         type: string
         required: true
     put:
@@ -266,12 +247,11 @@ paths:
           description: Cell not found
         400:
           description: Invalid Request
-  /{tenant-id}/cells/{cell_uuid}/data:
+  /cells/{id}/data:
     parameters:
-      - $ref: '#/parameters/tenant-id'
-      - name: cell_uuid
+      - name: id
         in: path
-        description: UUID of Cell to update
+        description: UUID or name of Cell to update
         type: string
         required: true
     put:
@@ -316,9 +296,7 @@ paths:
         400:
           description: Invalid Request
     
-  /{tenant-id}/hosts:
-    parameters:
-      - $ref: '#/parameters/tenant-id'
+  /hosts:
     get:
       summary: Get all hosts
       tags:
@@ -391,12 +369,11 @@ paths:
       responses:
         200:
           description: OK
-  /{tenant-id}/hosts/{host_uuid}:
+  /hosts/{id}:
     parameters:
-      - $ref: '#/parameters/tenant-id'
-      - name: host_uuid
+      - name: id
         in: path
-        description: UUID of the server
+        description: UUID or hostname of the server
         type: string
         required: true
     put:
@@ -438,12 +415,11 @@ paths:
           description: Host not found
         400:
           description: Invalid Request
-  /{tenant-id}/hosts/{host_uuid}/data:
+  /hosts/{id}/data:
     parameters:
-      - $ref: '#/parameters/tenant-id'
-      - name: host_uuid
+      - name: id
         in: path
-        description: UUID of the server
+        description: UUID or hostname of the server to update
         type: string
         required: true
     put:
