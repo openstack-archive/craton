@@ -1,0 +1,571 @@
+swagger: '2.0'
+info:
+  title: Craton Inventory API
+  description: API for RPC Inventory Service
+  version: "0.0.1"
+
+  contact:
+    name: Craton Developers
+    url: https://launchpad.net/~craton
+
+  license:
+    name: Apache License
+    url: https://github.com/rackerlabs/craton/blob/master/LICENSE
+
+# the domain of the service
+host: craton.inventory.com
+schemes:
+  - https
+basePath: /v1
+consumes:
+  - application/json
+produces:
+  - application/json
+
+security:
+  - ApiKey: []
+
+securityDefinitions:
+  ApiKey:
+    type: apiKey
+    in: header
+    name: api_key
+
+paths:
+  /regions:
+    get:
+      summary: Gets all Regions
+      tags:
+        - Regions
+      security:
+        - ApiKey: []
+      responses:
+        200:
+          description: An array of regions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Region'
+        default:
+          description: Unexpected Error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new Region 
+      parameters:
+        - name: region
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Region'
+      responses:
+        200:
+          description: OK
+        405:
+          description: Validation Exception
+        400:
+          description: Invalid Request
+  /regions/{id}:
+    parameters:
+      - name: id
+        type: string
+        in: path
+        required: true
+    put:
+      summary: Update an existing Region
+      tags:
+        - Regions
+      security:
+        - ApiKey: []
+      operationId: updateRegion
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: region
+          description: Region object that needs to be added to the store
+          required: false
+          schema:
+            $ref: "#/definitions/Region"
+      responses:
+        405:
+          description: Validation Exception
+        404:
+          description: Region not found
+        400:
+          description: Invalid Request
+    delete:
+      summary: Delete existing record of a region
+      operationId: deleteRegion
+      responses:
+        405:
+          description: Validation Exception
+        404:
+          description: Region not found
+        400:
+          description: Invalid Request
+  /regions/{id}/data:
+    parameters:
+      - name: id
+        in: path
+        description: UUID or name of the region to update data
+        type: string
+        required: true
+    put:
+      summary: Update user defined data for the region
+      tags:
+        - Regions
+        - Data
+      security:
+        - ApiKey: []
+      operationId: updateRegionData
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: Update Key/Value data for the region
+          required: true
+          schema:
+            $ref: "#/definitions/Data"
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Region not found
+        400:
+          description: Invalid ID supplied
+    delete:
+      summary: Delete existing key/value data for the region
+      tags:
+        - Regions
+        - Data
+      security:
+        - ApiKey: []
+      operationId: deleteRegionData
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Server not found
+        400:
+          description: Invalid Request
+  /cells:
+    get:
+      summary: Get all cells
+      tags:
+        - Cells
+      security:
+        - ApiKey: []
+      parameters:
+        - name: name
+          in: query
+          type: string
+          description: name of the cell to get
+          default: None
+        - name: region
+          type: string
+          in: query
+          description: name of the region to get cells for
+          default: None
+      responses:
+        200:
+          description: An array of cells
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Cell'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new Cell 
+      tags:
+        - Cells
+      security:
+        - ApiKey: []
+      parameters:
+        - name: cell
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Cell'
+      responses:
+        200:
+          description: OK
+        400:
+          description: Invalid Request
+
+  /cells/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: UUID or name of the cell
+        type: string
+        required: true
+    put:
+      summary: Update an existing Cell
+      tags:
+        - Cells
+      security:
+        - ApiKey: []
+      operationId: updateCell
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: cell
+          description: Cell object that will be updated
+          required: true
+          schema:
+            $ref: "#/definitions/Cell"
+      responses:
+        "405":
+          description: Validation exception
+        "404":
+          description: Cell not found
+        "400":
+          description: Invalid ID supplied
+    delete:
+      summary: Delete an existing record of Cell
+      tags:
+        - Cells
+      security:
+        - ApiKey: []
+      operationId: deleteCell
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Cell not found
+        400:
+          description: Invalid Request
+  /cells/{id}/data:
+    parameters:
+      - name: id
+        in: path
+        description: UUID or name of Cell to update
+        type: string
+        required: true
+    put:
+      summary: Update user defined data for the cell
+      tags:
+        - Cells
+        - Data
+      security:
+        - ApiKey: []
+      operationId: updateCellData
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: Update Key/Value data for the cell
+          required: true
+          schema:
+            $ref: "#/definitions/Data"
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Cell not found
+        400:
+          description: Invalid ID supplied
+    delete:
+      summary: Delete existing key/value data for the cell
+      tags:
+        - Cells
+        - Data
+      security:
+        - ApiKey: []
+      operationId: deleteCellData
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Cell not found
+        400:
+          description: Invalid Request
+    
+  /hosts:
+    get:
+      summary: Get all hosts
+      tags:
+        - Hosts
+      security:
+        - ApiKey: []
+      parameters:
+        - name: limit
+          in: query
+          description: number of hosts to return
+          type: integer
+          default: 1000
+          minimum: 1
+          maximum: 10000
+        - name: name
+          in: query
+          type: string
+          description: name of the hosts to get
+          default: None
+        - name: uuid
+          in: query
+          type: string
+          description: UUID of host to get
+          default: None
+        - name: region
+          type: string
+          in: query
+          description: name of the region to get hosts for
+          default: None
+        - name: cell
+          type: string
+          in: query
+          description: name of the cell to get hosts for
+          default: None
+        - name: ip_address
+          type: string
+          in: query
+          description: ip_address of the hosts to get
+          default: None
+        - name: service
+          type: array
+          items:
+            type: string
+          in: query
+          description: Openstack service to query host by
+          default: []
+      responses:
+        200:
+          description: An array of hosts
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Host'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new Host
+      tags:
+        - Hosts
+      security:
+        - ApiKey: []
+      parameters:
+        - name: host
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Host'
+      responses:
+        200:
+          description: OK
+  /hosts/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: UUID or hostname of the server
+        type: string
+        required: true
+    put:
+      summary: Update an existing Host
+      tags:
+        - Hosts
+      security:
+        - ApiKey: []
+      operationId: updateHost
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: host
+          description: Host object that needs to be added to the store
+          required: false
+          schema:
+            $ref: "#/definitions/Host"
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Host not found
+        400:
+          description: Invalid ID supplied
+    delete:
+      summary: Delete existing record of host
+      tags:
+        - Hosts
+      security:
+        - ApiKey: []
+      operationId: deleteHost
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Host not found
+        400:
+          description: Invalid Request
+  /hosts/{id}/data:
+    parameters:
+      - name: id
+        in: path
+        description: UUID or hostname of the server to update
+        type: string
+        required: true
+    put:
+      summary: Update user defined data for the server
+      tags:
+        - Hosts
+        - Data
+      security:
+        - ApiKey: []
+      operationId: updateHostData
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: data
+          description: Update Key/Value data for the host
+          required: true
+          schema:
+            $ref: "#/definitions/Data"
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Server not found
+        400:
+          description: Invalid ID supplied
+    delete:
+      summary: Delete existing key/value data for the host
+      tags:
+        - Hosts
+        - Data
+      security:
+        - ApiKey: []
+      operationId: deleteHostData
+      responses:
+        405:
+          description: Validation exception
+        404:
+          description: Host not found
+        400:
+          description: Invalid Request
+
+#################
+## DATA MODELS ##
+#################
+
+definitions:
+  Region:
+    type: object
+    discriminator: name
+    properties:
+      id:
+        type: integer
+        description: Unique ID for the region.
+      region_uuid:
+        type: string
+        description: UUID of the region.
+      name:
+        type: string
+        description: Region Name.
+      status:
+        type: string
+        description: Region Status.
+      cells:
+        type: array
+        items:
+          $ref: '#/definitions/Cell'
+        description: List of cells in this region
+      data:
+        type: object
+        description: User defined information
+    required:
+      - name
+      - status
+  Cell:
+    type: object
+    discriminator: name
+    properties:
+      id:
+        type: integer
+        description: Unique ID of the cell
+      cell_uuid:
+        type: string
+        description: UUID of the cell.
+      name:
+        type: string
+      status:
+        type: string
+      region:
+        type: string
+      data:
+        type: object
+        description: User defined information
+    required:
+    - name
+    - status
+    - region
+
+  Host:
+    type: object
+    discriminator: name
+    properties:
+      id:
+        type: integer
+      host_uuid:
+        type: string
+      hostname:
+        type: string
+      ip_address:
+        type: string
+      status:
+        type: string
+      cell:
+        type: string
+      hw_manufacturer:
+        type: string
+      service:
+        type: array
+        items:
+          type: string
+      data:
+        type: object
+        description: User defined information
+    required:
+    - hostname
+    - ip_address
+    - status
+    - cell
+    - service
+  Data:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
+        type: object
+  
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
