@@ -65,9 +65,9 @@ paths:
           description: Validation Exception
         400:
           description: Invalid Request
-  /regions/{region-name}:
+  /regions/{region_uuid}:
     parameters:
-      - name: region-name
+      - name: region_uuid
         type: string
         in: path
         required: true
@@ -106,11 +106,11 @@ paths:
           description: Region not found
         400:
           description: Invalid Request
-  /regions/{region-name}/data:
+  /regions/{region_uuid}/data:
     parameters:
-      - name: region-name
+      - name: region_uuid
         in: path
-        description: Name of the region to update data
+        description: UUID of the region to update data
         type: string
         required: true
     put:
@@ -201,11 +201,11 @@ paths:
         400:
           description: Invalid Request
 
-  /cells/{cell-name}:
+  /cells/{cell_uuid}:
     parameters:
-      - name: cell-name
+      - name: cell_uuid
         in: path
-        description: The cell Name
+        description: UUID of the cell
         type: string
         required: true
     put:
@@ -247,11 +247,11 @@ paths:
           description: Cell not found
         400:
           description: Invalid Request
-  /cells/{cell-name}/data:
+  /cells/{cell_uuid}/data:
     parameters:
-      - name: cell-name
+      - name: cell_uuid
         in: path
-        description: Cell name to update data
+        description: UUID of Cell to update
         type: string
         required: true
     put:
@@ -316,6 +316,11 @@ paths:
           type: string
           description: name of the hosts to get
           default: None
+        - name: uuid
+          in: query
+          type: string
+          description: UUID of host to get
+          default: None
         - name: region
           type: string
           in: query
@@ -364,11 +369,11 @@ paths:
       responses:
         200:
           description: OK
-  /hosts/{hostname}:
+  /hosts/{host_uuid}:
     parameters:
-      - name: hostname
+      - name: host_uuid
         in: path
-        description: Hostname of the server
+        description: UUID of the server
         type: string
         required: true
     put:
@@ -410,11 +415,11 @@ paths:
           description: Host not found
         400:
           description: Invalid Request
-  /hosts/{hostname}/data:
+  /hosts/{host_uuid}/data:
     parameters:
-      - name: hostname
+      - name: host_uuid
         in: path
-        description: Hostname of the server
+        description: UUID of the server to update
         type: string
         required: true
     put:
@@ -471,6 +476,9 @@ definitions:
       id:
         type: integer
         description: Unique ID for the region.
+      region_uuid:
+        type: string
+        description: UUID of the region.
       name:
         type: string
         description: Region Name.
@@ -495,6 +503,9 @@ definitions:
       id:
         type: integer
         description: Unique ID of the cell
+      cell_uuid:
+        type: string
+        description: UUID of the cell.
       name:
         type: string
       status:
@@ -515,6 +526,8 @@ definitions:
     properties:
       id:
         type: integer
+      host_uuid:
+        type: string
       hostname:
         type: string
       ip_address:
