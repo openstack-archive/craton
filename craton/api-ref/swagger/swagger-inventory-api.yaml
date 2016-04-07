@@ -31,8 +31,22 @@ securityDefinitions:
     in: header
     name: api_key
 
+
+## Global Parameters ##
+
+parameters:
+  tenant-id:
+    # tenant-id here is uuid
+    name: tenant-id
+    in: path
+    description: Tenant ID
+    type: string
+    required: true
+
 paths:
-  /regions:
+  /{tenant-id}/regions:
+    parameters:
+      - $ref: '#/parameters/tenant-id'
     get:
       summary: Gets all Regions
       tags:
@@ -65,8 +79,9 @@ paths:
           description: Validation Exception
         400:
           description: Invalid Request
-  /regions/{region_uuid}:
+  /{tenant-id}/regions/{region_uuid}:
     parameters:
+      - $ref: '#/parameters/tenant-id'
       - name: region_uuid
         type: string
         in: path
@@ -106,8 +121,9 @@ paths:
           description: Region not found
         400:
           description: Invalid Request
-  /regions/{region_uuid}/data:
+  /{tenant-id}/regions/{region_uuid}/data:
     parameters:
+      - $ref: '#/parameters/tenant-id'
       - name: region_uuid
         in: path
         description: UUID of the region to update data
@@ -154,7 +170,9 @@ paths:
           description: Server not found
         400:
           description: Invalid Request
-  /cells:
+  /{tenant-id}/cells:
+    parameters:
+      - $ref: '#/parameters/tenant-id'
     get:
       summary: Get all cells
       tags:
@@ -201,8 +219,9 @@ paths:
         400:
           description: Invalid Request
 
-  /cells/{cell_uuid}:
+  /{tenant-id}/cells/{cell_uuid}:
     parameters:
+      - $ref: '#/parameters/tenant-id'
       - name: cell_uuid
         in: path
         description: UUID of the cell
@@ -247,8 +266,9 @@ paths:
           description: Cell not found
         400:
           description: Invalid Request
-  /cells/{cell_uuid}/data:
+  /{tenant-id}/cells/{cell_uuid}/data:
     parameters:
+      - $ref: '#/parameters/tenant-id'
       - name: cell_uuid
         in: path
         description: UUID of Cell to update
@@ -296,7 +316,9 @@ paths:
         400:
           description: Invalid Request
     
-  /hosts:
+  /{tenant-id}/hosts:
+    parameters:
+      - $ref: '#/parameters/tenant-id'
     get:
       summary: Get all hosts
       tags:
@@ -369,8 +391,9 @@ paths:
       responses:
         200:
           description: OK
-  /hosts/{host_uuid}:
+  /{tenant-id}/hosts/{host_uuid}:
     parameters:
+      - $ref: '#/parameters/tenant-id'
       - name: host_uuid
         in: path
         description: UUID of the server
@@ -415,11 +438,12 @@ paths:
           description: Host not found
         400:
           description: Invalid Request
-  /hosts/{host_uuid}/data:
+  /{tenant-id}/hosts/{host_uuid}/data:
     parameters:
+      - $ref: '#/parameters/tenant-id'
       - name: host_uuid
         in: path
-        description: UUID of the server to update
+        description: UUID of the server
         type: string
         required: true
     put:
