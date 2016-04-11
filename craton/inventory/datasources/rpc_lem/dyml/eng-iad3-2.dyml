@@ -1,0 +1,172 @@
+ENG-IAD3-2:
+  account: 2943351
+  availability_type: DEV
+  external_api_endpoint: 72.4.117.94
+  internal_api_endpoint: 172.29.236.49
+  dc: &dc IAD3
+  dc_id: 1
+  first_ip: 4
+  fw_id: 2
+  hw_type: HP
+  is_ha: False
+  is_kickable: False
+  lab_id: 2
+  lab_type: Openstack
+  lb_id: 1
+  nodes: 
+    node1:
+      device: &device1 605095
+      name: !core_query_device [*device1, name]
+      kir_url: !kir_query_url [*dc, *device1]
+      oob_ip: !core_query_device [*device1, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device1, primary_ip_ctk.ip_address]
+      role: storage
+      internal_ip: !core_query_device [*device1, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device1, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device1, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device1, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device1, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node2:
+      device: &device2 605094
+      name: !core_query_device [*device2, name]
+      kir_url: !kir_query_url [*dc, *device2]
+      oob_ip: !core_query_device [*device2, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device2, primary_ip_ctk.ip_address]
+      role: storage
+      internal_ip: !core_query_device [*device2, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device2, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device2, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device2, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device2, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node3:
+      device: &device3 605093
+      name: !core_query_device [*device3, name]
+      kir_url: !kir_query_url [*dc, *device3]
+      oob_ip: !core_query_device [*device3, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device3, primary_ip_ctk.ip_address]
+      role: storage
+      internal_ip: !core_query_device [*device3, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device3, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device3, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device3, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device3, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node4:
+      device: &device4 605086
+      name: !core_query_device [*device4, name]
+      kir_url: !kir_query_url [*dc, *device4]
+      oob_ip: !core_query_device [*device4, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device4, primary_ip_ctk.ip_address]
+      role: infra / deployment
+      internal_ip: !core_query_device [*device4, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device4, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device4, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device4, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device4, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node5:
+      device: &device5 605088
+      name: !core_query_device [*device5, name]
+      kir_url: !kir_query_url [*dc, *device5]
+      oob_ip: !core_query_device [*device5, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device5, primary_ip_ctk.ip_address]
+      role: logging
+      internal_ip: !core_query_device [*device5, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device5, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device5, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device5, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device5, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node6:
+      device: &device6 605087
+      name: !core_query_device [*device6, name]
+      kir_url: !kir_query_url [*dc, *device6]
+      oob_ip: !core_query_device [*device6, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device6, primary_ip_ctk.ip_address]
+      role: infra
+      internal_ip: !core_query_device [*device6, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device6, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device6, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device6, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device6, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node7:
+      device: &device7 605090
+      name: !core_query_device [*device7, name]
+      kir_url: !kir_query_url [*dc, *device7]
+      oob_ip: !core_query_device [*device7, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device7, primary_ip_ctk.ip_address]
+      role: compute
+      internal_ip: !core_query_device [*device7, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device7, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device7, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device7, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device7, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node8:
+      device: &device8 605089
+      name: !core_query_device [*device8, name]
+      kir_url: !kir_query_url [*dc, *device8]
+      oob_ip: !core_query_device [*device8, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device8, primary_ip_ctk.ip_address]
+      role: infra
+      internal_ip: !core_query_device [*device8, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device8, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device8, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device8, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device8, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node9:
+      device: &device9 605092
+      name: !core_query_device [*device9, name]
+      kir_url: !kir_query_url [*dc, *device9]
+      oob_ip: !core_query_device [*device9, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device9, primary_ip_ctk.ip_address]
+      role: storage
+      internal_ip: !core_query_device [*device9, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device9, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device9, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device9, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device9, services_net_ips.netmask]
+      exnet_interface: p4p1
+    node10:
+      device: &device10 605091
+      name: !core_query_device [*device10, name]
+      kir_url: !kir_query_url [*dc, *device10]
+      oob_ip: !core_query_device [*device10, dracnet_ips.ip_address]
+      public_ip: !core_query_device [*device10, primary_ip_ctk.ip_address]
+      role: compute
+      internal_ip: !core_query_device [*device10, primary_ip_ctk.inside_local]
+      internal_netmask: !core_query_device [*device10, primary_ip_ctk.inside_local_netmask]
+      internal_gateway: !core_query_device [*device10, primary_ip_ctk.inside_local_gateway_ip]
+      service_net_ip: !core_query_device [*device10, services_net_ips.ip_address]
+      service_net_netmask: !core_query_device [*device10, services_net_ips.netmask]
+      exnet_interface: p4p1
+  vlans: 
+    container:
+      ip: 172.29.236.0
+      name: 
+      netmask: 255.255.252.0
+      vlan_id: 1468
+    host:
+      ip: 10.240.0.0
+      name: LB-HOST
+      netmask: 255.255.252.0
+      vlan_id: 724
+    storage:
+      ip: 172.29.244.0
+      name: 
+      netmask: 255.255.252.0
+      vlan_id: 1470
+    gateway:
+      ip: 10.239.0.0
+      name: LB-GATEWAY-NET
+      netmask: 255.255.252.0
+      vlan_id: 725
+    vxlan:
+      ip: 172.29.240.0
+      name: 
+      netmask: 255.255.252.0
+      vlan_id: 1469

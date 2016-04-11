@@ -1,0 +1,142 @@
+---
+cidr_networks:
+  container: 172.29.236.0/22
+  tunnel: 172.29.240.0/22
+  storage: 172.29.244.0/22
+
+used_ips:
+  - "172.29.236.1,172.29.236.50"
+  - "172.29.240.1,172.29.240.50"
+  - "172.29.244.1,172.29.244.50"
+  - "172.29.248.1,172.29.248.50"
+
+global_overrides:
+  internal_lb_vip_address: 172.29.236.49
+  external_lb_vip_address: 72.4.117.94
+  tunnel_bridge: "br-vxlan"
+  management_bridge: "br-mgmt"
+  provider_networks:
+    - network:
+        container_bridge: "br-mgmt"
+        container_type: "veth"
+        container_interface: "eth1"
+        ip_from_q: "container"
+        type: "raw"
+        group_binds:
+          - all_containers
+          - hosts
+        is_container_address: true
+        is_ssh_address: true
+    - network:
+        container_bridge: "br-vxlan"
+        container_type: "veth"
+        container_interface: "eth10"
+        ip_from_q: "tunnel"
+        type: "vxlan"
+        range: "1:1000"
+        net_name: "vxlan"
+        group_binds:
+          - neutron_linuxbridge_agent
+    - network:
+        container_bridge: "br-vlan"
+        container_type: "veth"
+        container_interface: "eth11"
+        type: "vlan"
+        range: "1:1"
+        net_name: "vlan"
+        group_binds:
+          - neutron_linuxbridge_agent
+    - network:
+        container_bridge: "br-storage"
+        container_type: "veth"
+        container_interface: "eth2"
+        ip_from_q: "storage"
+        type: "raw"
+        group_binds:
+          - glance_api
+          - cinder_api
+          - cinder_volume
+          - nova_compute
+          - swift_proxy
+
+compute_hosts:
+  605090-compute01:
+    ip: 172.29.236.12
+  605091-compute02:
+    ip: 172.29.236.4
+  605092-compute03:
+    ip: 172.29.236.5
+identity_hosts:
+  605086-infra01:
+    ip: 172.29.236.11
+  605087-infra02:
+    ip: 172.29.236.13
+  605088-infra03:
+    ip: 172.29.236.10
+log_hosts:
+  605089-logging01:
+    ip: 172.29.236.10
+network_hosts:
+  605086-infra01:
+    ip: 172.29.236.11
+  605087-infra02:
+    ip: 172.29.236.13
+  605088-infra03:
+    ip: 172.29.236.10
+os-infra_hosts:
+  605086-infra01:
+    ip: 172.29.236.11
+  605087-infra02:
+    ip: 172.29.236.13
+  605088-infra03:
+    ip: 172.29.236.10
+repo-infra_hosts:
+  605086-infra01:
+    ip: 172.29.236.11
+  605087-infra02:
+    ip: 172.29.236.13
+  605088-infra03:
+    ip: 172.29.236.10
+shared-infra_hosts:
+  605086-infra01:
+    ip: 172.29.236.11
+  605087-infra02:
+    ip: 172.29.236.13
+  605088-infra03:
+    ip: 172.29.236.10
+storage-infra_hosts:
+  605086-infra01:
+    ip: 172.29.236.11
+  605087-infra02:
+    ip: 172.29.236.13
+  605088-infra03:
+    ip: 172.29.236.10
+storage_hosts:
+  605093-storage01:
+    ip: 172.29.236.8
+    container_vars:
+      cinder_backends:
+        limit_container_types: cinder_volume
+        lvm:
+          volume_group: cinder-volumes
+          volume_driver: cinder.volume.drivers.lvm.LVMVolumeDriver
+          volume_backend_name: LVM_iSCSI
+
+  605094-storage02:
+    ip: 172.29.236.9
+    container_vars:
+      cinder_backends:
+        limit_container_types: cinder_volume
+        lvm:
+          volume_group: cinder-volumes
+          volume_driver: cinder.volume.drivers.lvm.LVMVolumeDriver
+          volume_backend_name: LVM_iSCSI
+  605095-storage03:
+    ip: 172.29.236.7
+    container_vars:
+      cinder_backends:
+        limit_container_types: cinder_volume
+        lvm:
+          volume_group: cinder-volumes
+          volume_driver: cinder.volume.drivers.lvm.LVMVolumeDriver
+          volume_backend_name: LVM_iSCSI
