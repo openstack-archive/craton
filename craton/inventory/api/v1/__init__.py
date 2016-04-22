@@ -1,4 +1,3 @@
-
 from flask import Blueprint
 import flask_restful as restful
 
@@ -15,4 +14,3 @@ api = restful.Api(bp, catch_all_404s=True)
 
 for route in routes:
     api.add_resource(route.pop('resource'), *route.pop('urls'), **route)
-
