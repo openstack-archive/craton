@@ -1,6 +1,5 @@
 from flask import request, g
 from craton.inventory.api.v1 import base
-#from . import schemas
 
 
 class Cells(base.Resource):
@@ -23,7 +22,6 @@ class CellsId(base.Resource):
     def put(self, id):
         print "cells id put"
         print g.json
-
         return None, 405, None
 
     def delete(self, id):
