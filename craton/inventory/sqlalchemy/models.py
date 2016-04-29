@@ -1,53 +1,36 @@
-"""Models defined using SQLAlchemy ORM"""
+"""Models inventory, as defined using SQLAlchemy ORM
+
+There are three independent parts to a specific workflow execution:
+
+* configuration, as managed by a GitHub-like versioned set of config
+  files (as used by Ansible and similar systems)
+
+* specific workflow, which is written in Python (eg with TaskFlow)
+
+* inventory of hosts for a given tenant, as organized by region, cell,
+  and group, with overrides on variables; this module models that for
+  SQLAlchemy
+
+In particular, this means that the configuration is used to interpret
+any inventory data.
+"""
 
 from oslo_db.sqlalchemy import models
 from sqlalchemy import (
     Boolean, Column, ForeignKey, Integer, String, Table, Text,
     UniqueConstraint)
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import backref, object_mapper, relationship 
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils import Timestamp
-from sqlalchemy_utils.types.encrypted import EncryptedType
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
-from sqlalchemy_utils.types.url import URLType
 from sqlalchemy_utils.types.uuid import UUIDType
 
 
 # FIXME set up table args for a given database/storage engine, as configured.
 # See https://github.com/rackerlabs/craton/issues/19
-
-
-# Implementation is from the example code in
-# http://docs.sqlalchemy.org/en/latest/_modules/examples/vertical/dictlike.html
-# also see related support in HostVariable, Host
-class ProxiedDictMixin(object):
-    """Adds obj[key] access to a mapped class.
-
-    This class basically proxies dictionary access to an attribute
-    called ``_proxied``.  The class which inherits this class
-    should have an attribute called ``_proxied`` which points to a dictionary.
-    """
-
-    def __len__(self):
-        return len(self._proxied)
-
-    def __iter__(self):
-        return iter(self._proxied)
-
-    def __getitem__(self, key):
-        return self._proxied[key]
-
-    def __contains__(self, key):
-        return key in self._proxied
-
-    def __setitem__(self, key, value):
-        self._proxied[key] = value
-
-    def __delitem__(self, key):
-        del self._proxied[key]
 
 
 class CratonBase(models.ModelBase, Timestamp):
@@ -65,152 +48,185 @@ class CratonBase(models.ModelBase, Timestamp):
 Base = declarative_base(cls=CratonBase)
 
 
+class VariableMixin(object):
+    """Some metaprogramming so we can avoid repeating this construction"""
+
+    @declared_attr
+    def _variables(cls):
+        # Camelcase the tablename to give the Variable inner class
+        # here a specific class name; necessary for reporting on
+        # classes
+        class_name = \
+            "".join(x.title() for x in cls.vars_tablename[:-1].split('_'))
+
+        # Because we are constructing Variable inner class with the
+        # 3-arg `type` function, we need to pull out all SA columns
+        # given that initialization order matters for SA!
+        #
+        # * Defines the primary key with correct ordering
+        # * Captures references, as seen in _repr_columns
+        parent_id = Column(ForeignKey(
+            '%s.id' % cls.__tablename__), primary_key=True)
+        key = Column(String(255), primary_key=True)
+        value = Column(JSONType)
+        Variable = type(class_name, (Base,), {
+            '__tablename__': cls.vars_tablename,
+            'parent_id': parent_id,
+            'key': key,
+            'value': value,
+            '_repr_columns': [key, value]})
+
+        # Need a reference for the association proxy to lookup the
+        # Variable class so it can reference
+        cls.variable_class = Variable
+
+        return relationship(
+            Variable,
+            collection_class=attribute_mapped_collection('key'),
+            cascade='all, delete-orphan')
+
+    @declared_attr
+    def variables(cls):
+        return association_proxy(
+            '_variables', 'value',
+            creator=lambda key, value: cls.variable_class(key=key, value=value))
+
+    @classmethod
+    def with_characteristic(self, key, value):
+        return self._variables.any(key=key, value=value)
+
+
 class Tenant(Base):
     """Supports multitenancy for all other schema elements."""
     __tablename__ = 'tenants'
     id = Column(UUIDType, primary_key=True)
     name = Column(String(255))
+    _repr_columns=[id, name]
+
     # TODO we will surely need to define more columns, but this
     # suffices to define multitenancy for MVP
 
-    hosts = relationship('Host', back_populates='tenant')
-    groups = relationship('Group', back_populates='tenant')
+    # one-to-many relationship with the following objects
+    regions = relationship('Region', back_populates='tenant')
 
 
-# FIXME there are stricter requirements for key names in Ansible (see
-# http://docs.ansible.com/ansible/playbooks_variables.html#what-makes-a-valid-variable-name),
-# and it is not clear what the encoding requirements are for values.
-# We may want to represent these requirements with subclassing on
-# HostVariables.
-
-class HostVariables(Base):
-    """Represents specific key/value bindings for a given host."""
-    __tablename__ = 'host_variables'
-    host_id = Column(ForeignKey('hosts.id'), primary_key=True)
-    key = Column(String(255), primary_key=True)
-    value = Column(Text)
-    _repr_columns = [value]
-
-
-host_grouping = Table(
-    'host_grouping', Base.metadata,
-    Column('host_id', ForeignKey('hosts.id'), primary_key=True),
-    Column('group_id', ForeignKey('groups.id'), primary_key=True))
-                      
-
-# TODO consider using SqlAlchemy's support for inheritance
-# hierarchies, eg ComputeHost < Host but first need to determine what
-# is uniquely required for a ComputeHost; otherwise use an enumerated
-# type to distinguish
-#
-# see http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#single-table-inheritance
-
-class Host(ProxiedDictMixin, Base):
-    """Models descriptive data about a host, including discovered facts"""
-    __tablename__ = 'hosts'
-    id = Column(UUIDType, primary_key=True)
+class Region(Base, VariableMixin):
+    __tablename__ = 'regions'
+    vars_tablename = 'region_variables'
+    id = Column(Integer, primary_key=True)
     tenant_id = Column(
         UUIDType, ForeignKey('tenants.id'), index=True, nullable=False)
-    secret_id = Column(UUIDType, ForeignKey('secrets.id'))
-    hostname = Column(String(255), nullable=False)
-    ip_address = Column(IPAddressType, nullable=False)
-    # active hosts for administration; this is not state:
-    # the host may or may not be reachable by Ansible/other tooling
-    active = Column(Boolean, default=True)
-    # discovered facts about the host
-    facts = Column(JSONType)
-
-    UniqueConstraint(tenant_id, hostname)
-    UniqueConstraint(tenant_id, ip_address)
-
-    _repr_columns=[id, hostname]
-
-    groups = relationship(
-        'Group',
-        secondary=host_grouping,
-        back_populates='hosts')
-
-    # many-to-one relationship with tenants
-    tenant = relationship('Tenant', back_populates='hosts')
-
-    # optional many-to-one relationship with secrets; don't care about
-    # the backref
-    secret = relationship('Secret')
-
-    # provide arbitrary K/V mapping to associated HostVariables table
-    variables = relationship(
-        'HostVariables',
-        collection_class=attribute_mapped_collection('key'))
-
-    # allows access to a host object using dict ops - get/set/del -
-    # using [] indexing
-    _proxied = association_proxy(
-        'variables', 'value',
-        creator=lambda key, value: HostVariables(key=key, value=value))
-
-    @classmethod
-    def with_characteristic(self, key, value):
-        return self.variables.any(key=key, value=value)
-
-
-class Group(Base):
-    """Models a grouping of hosts.
-
-    This includes the following groupings:
-    
-    * Ansible groups
-    * OpenStack regions and cells
-
-    Groups use an adjacency list representation, with possibly some
-    children referring to a given parent.
-    """
-    __tablename__ = 'groups'
-    id = Column(UUIDType, primary_key=True)
-    tenant_id = Column(
-        UUIDType, ForeignKey('tenants.id'), index=True, nullable=False)
-    parent_id = Column(UUIDType, ForeignKey('groups.id'))
     name = Column(String(255))
-    # Our assumption is any config yaml file that needs some sort of
-    # include/overlay mechanism will use Ansible includes/roles; or
-    # perhaps something similar for YAML include in general.  So this
-    # means we need just one reference.
-    #
-    # NOTE but we likely need some sort of resolution scheme to handle
-    # branches, etc.
-    config = Column(URLType)
+    _repr_columns=[id, name]
 
     UniqueConstraint(tenant_id, name)
 
-    _repr_columns = [id, name]
+    tenant = relationship('Tenant', back_populates='regions')
+    cells = relationship('Cell', back_populates='region')
+    hosts = relationship('Host', back_populates='region')
 
-    # self relationship, supporting adjacency list representation
-    children = relationship(
-        'Group',
-        backref=backref('parent', remote_side=[id]))
 
-    # many-to-many relationship with hosts
+class Cell(Base, VariableMixin):
+    __tablename__ = 'cells'
+    vars_tablename = 'cell_variables'
+    id = Column(Integer, primary_key=True)
+    region_id = Column(
+        Integer, ForeignKey('regions.id'), index=True, nullable=False)
+    name = Column(String(255))
+    _repr_columns=[id, name]
+
+    UniqueConstraint(region_id, name)
+
+    region = relationship('Region', back_populates='cells')
+    hosts = relationship('Host', back_populates='cell')
+
+
+# TODO consider using SqlAlchemy's support for inheritance
+# hierarchies, eg ComputeHost < Host but first need to determine what
+# is uniquely required for a ComputeHost; otherwise just use an
+# enumerated type to distinguish
+#
+# see http://docs.sqlalchemy.org/en/latest/orm/inheritance.html#single-table-inheritance
+
+class Host(Base, VariableMixin):
+    """Models descriptive data about a host"""
+    __tablename__ = 'hosts'
+    vars_tablename = 'host_variables'
+    id = Column(Integer, primary_key=True)
+    region_id = Column(Integer, ForeignKey('regions.id'), index=True, nullable=False) 
+    cell_id = Column(Integer, ForeignKey('cells.id'), index=True, nullable=True) 
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    hostname = Column(String(255), nullable=False)
+    ip_address = Column(IPAddressType, nullable=False)
+    # this means the host is "active" for administration; it is explictly not state:
+    # the host may or may not be reachable by Ansible/other tooling
+    active = Column(Boolean, default=True)
+    _repr_columns=[id, hostname]
+
+    UniqueConstraint(region_id, hostname)
+    UniqueConstraint(region_id, ip_address)
+
+    _labels = relationship('Label', secondary=lambda: host_labels, collection_class=set)
+    labels = association_proxy('_labels', 'label')
+
+    # many-to-one relationship to regions and cells
+    region = relationship('Region', back_populates='hosts')
+    cell = relationship('Cell', back_populates='hosts')
+
+    # optional many-to-one relationship to a host-specific secret;
+    access_secret = relationship('AccessSecret', back_populates='hosts')
+
+
+host_labels = Table(
+    'host_labels', Base.metadata,
+    Column('host_id', ForeignKey('hosts.id'), primary_key=True),
+    Column('label_id', ForeignKey('labels.id'), primary_key=True))
+
+
+class Label(Base, VariableMixin):
+    """Models a label on hosts, with a many-to-many relationship.
+
+    Such labels include groupings like Ansible groups; as well as
+    arbitrary other labels.
+
+    Rather than subclassing labels, we can use prefixes such as
+    "group-".
+
+    It is assumed that hierarchies for groups, if any, is represented
+    in an external format, such as a group-of-group inventory in
+    Ansible.
+    """
+    __tablename__ = 'labels'
+    vars_tablename = 'label_variables'
+    id = Column(Integer, primary_key=True)
+    label = Column(String(255), unique=True)
+
+    _repr_columns = [label]
+
+    def __init__(self, label):
+        self.label = label
+
     hosts = relationship(
-        'Host',
-        secondary=host_grouping,
-        back_populates='groups')
-
-    # many-to-one relationship with tenants
-    tenant = relationship('Tenant', back_populates='groups')
+        "Host",
+        secondary=host_labels,
+        back_populates="_labels")
 
 
-# TODO we may want to subclass types of secrets
-
-# TODO should determine integration with systems like Barbican that
-# can provide additional secret data to decrypt encrypted certs -
-# which is presumably what we should be storing. See
-# https://github.com/rackerlabs/craton/issues/7
-
-class Secret(Base):
+class AccessSecret(Base):
     """Represents a secret for accessing a host. It may be shared.
 
-    For now we assume a PEM-encoded certificate that wraps the
-    private key.
+    For now we assume a PEM-encoded certificate that wraps the private
+    key. Such certs may or may not be encrypted; if encrypted, the
+    configuration specifies how to interact with other systems, such
+    as Barbican or Hashicorp Vault, to retrieve secret data to unlock
+    this cert.
+
+    Note that this does not include secrets such as Ansible vault
+    files; those are stored outside the inventory database as part of
+    the configuration.
     """
-    __tablename__ = 'secrets'
-    id = Column(UUIDType, primary_key=True)
+    __tablename__ = 'access_secrets'
+    id = Column(Integer, primary_key=True)
     cert = Column(Text)
+
+    hosts = relationship('Host', back_populates='access_secret')
