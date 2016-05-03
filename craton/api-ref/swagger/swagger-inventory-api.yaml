@@ -46,6 +46,10 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Region'
+        405:
+          description: Validation Exception
+        400:
+          description: Invalid Request
         default:
           description: Unexpected Error
           schema:
@@ -90,6 +94,8 @@ paths:
           schema:
             $ref: "#/definitions/Region"
       responses:
+        200:
+          description: OK
         405:
           description: Validation Exception
         404:
@@ -100,6 +106,8 @@ paths:
       summary: Delete existing record of a region
       operationId: deleteRegion
       responses:
+        200:
+          description: OK
         405:
           description: Validation Exception
         404:
@@ -133,6 +141,8 @@ paths:
           schema:
             $ref: "#/definitions/Data"
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
@@ -148,10 +158,12 @@ paths:
         - ApiKey: []
       operationId: deleteRegionData
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
-          description: Server not found
+          description: Region not found
         400:
           description: Invalid Request
   /cells:
@@ -179,6 +191,12 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Cell'
+        405:
+          description: Validation exception
+        404:
+          description: Cell not found
+        400:
+          description: Invalid Request
         default:
           description: Unexpected error
           schema:
@@ -200,6 +218,8 @@ paths:
           description: OK
         400:
           description: Invalid Request
+        405:
+          description: Validation exception
 
   /cells/{id}:
     parameters:
@@ -227,12 +247,14 @@ paths:
           schema:
             $ref: "#/definitions/Cell"
       responses:
-        "405":
+        200:
+          description: OK
+        405:
           description: Validation exception
-        "404":
+        404:
           description: Cell not found
-        "400":
-          description: Invalid ID supplied
+        400:
+          description: Invalid Request
     delete:
       summary: Delete an existing record of Cell
       tags:
@@ -241,6 +263,8 @@ paths:
         - ApiKey: []
       operationId: deleteCell
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
@@ -274,12 +298,14 @@ paths:
           schema:
             $ref: "#/definitions/Data"
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
           description: Cell not found
         400:
-          description: Invalid ID supplied
+          description: Invalid Request
     delete:
       summary: Delete existing key/value data for the cell
       tags:
@@ -289,6 +315,8 @@ paths:
         - ApiKey: []
       operationId: deleteCellData
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
@@ -350,6 +378,12 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Host'
+        405:
+          description: Validation exception
+        404:
+          description: Host not found
+        400:
+          description: Invalid Request
         default:
           description: Unexpected error
           schema:
@@ -369,6 +403,10 @@ paths:
       responses:
         200:
           description: OK
+        405:
+          description: Validation exception
+        400:
+          description: Invalid Request
   /hosts/{id}:
     parameters:
       - name: id
@@ -395,12 +433,14 @@ paths:
           schema:
             $ref: "#/definitions/Host"
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
           description: Host not found
         400:
-          description: Invalid ID supplied
+          description: Invalid Request
     delete:
       summary: Delete existing record of host
       tags:
@@ -409,6 +449,8 @@ paths:
         - ApiKey: []
       operationId: deleteHost
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
@@ -442,12 +484,14 @@ paths:
           schema:
             $ref: "#/definitions/Data"
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
-          description: Server not found
+          description: Host not found
         400:
-          description: Invalid ID supplied
+          description: Invalid Request
     delete:
       summary: Delete existing key/value data for the host
       tags:
@@ -457,10 +501,12 @@ paths:
         - ApiKey: []
       operationId: deleteHostData
       responses:
+        200:
+          description: OK
         405:
           description: Validation exception
         404:
-          description: Host not found
+          description: Host/data not found
         400:
           description: Invalid Request
 

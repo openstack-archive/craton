@@ -129,73 +129,97 @@ validators = {
 }
 
 filters = {
-    ('hosts_id_data', 'PUT'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('hosts_id_data', 'DELETE'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('hosts_id', 'PUT'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('hosts_id', 'DELETE'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('regions', 'POST'): {
-        200: {'headers': None, 'schema': None},
-        400: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('regions', 'GET'): {
-        200: {'headers': None,
-              'schema': {'items': DefinitionsRegion, 'type': 'array'}}},
-    ('regions_id_data', 'PUT'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('regions_id_data', 'DELETE'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('hosts', 'POST'): {
-        200: {'headers': None, 'schema': None}},
-    ('hosts', 'GET'): {
-        200: {'headers': None,
-              'schema': {'items': DefinitionsHost, 'type': 'array'}}},
-    ('cells_id', 'PUT'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('cells_id', 'DELETE'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('cells', 'POST'): {
-        200: {'headers': None, 'schema': None},
-        400: {'headers': None, 'schema': None}},
-    ('cells', 'GET'): {
-        200: {'headers': None,
-              'schema': {'items': DefinitionsCell, 'type': 'array'}}},
-    ('regions_id', 'PUT'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('regions_id', 'DELETE'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('cells_id_data', 'PUT'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
-    ('cells_id_data', 'DELETE'): {
-        400: {'headers': None, 'schema': None},
-        404: {'headers': None, 'schema': None},
-        405: {'headers': None, 'schema': None}},
+    ('hosts_id_data', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('hosts_id_data', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('hosts_id', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('hosts_id', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions', 'POST'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionsRegion, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions_id_data', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions_id_data', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+            400: {'headers': None, 'schema': None},
+            404: {'headers': None, 'schema': None},
+            405: {'headers': None, 'schema': None}},
+    ('hosts', 'POST'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('hosts', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionsHost, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells_id', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells_id', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells', 'POST'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionsCell, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions_id', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions_id', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells_id_data', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells_id_data', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
 }
+
 
 scopes = {
     ('hosts_id_data', 'PUT'): [],
