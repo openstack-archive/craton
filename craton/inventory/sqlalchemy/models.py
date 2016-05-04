@@ -23,7 +23,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import backref, object_mapper, relationship 
 from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy_utils import Timestamp
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
 from sqlalchemy_utils.types.uuid import UUIDType
@@ -33,7 +32,7 @@ from sqlalchemy_utils.types.uuid import UUIDType
 # See https://github.com/rackerlabs/craton/issues/19
 
 
-class CratonBase(models.ModelBase, Timestamp):
+class CratonBase(models.ModelBase, models.TimestampMixin):
     def __repr__(self):
         mapper = object_mapper(self)
         cols = getattr(self, '_repr_columns',  mapper.primary_key)
