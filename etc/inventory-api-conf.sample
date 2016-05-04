@@ -28,3 +28,12 @@ api_paste_config=/Users/sulochan.acharya/test_craton/craton/etc/inventory-api-pa
 ##user_domain_id = default
 ##memcached_servers = localhost:11211
 ##auth_type = password
+#
+[database]
+sqlite_db = oslo.sqlite
+backend = sqlalchemy
+use_db_reconnect = false
+db_retry_interval = 1
+db_inc_retry_interval = true
+db_max_retry_interval = 10
+db_max_retries = 20
