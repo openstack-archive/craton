@@ -1,0 +1,30 @@
+[defaults]
+# Show more verbose log output
+verbose=True
+# Set Debug level
+debug=True
+# Log file for craton inventory
+log_file=craton-inventory.log
+
+[api]
+# Host IP to use for API service
+host=127.0.0.1
+# Port to use for API service
+port=8080
+# Paste Config file to use
+api_paste_config=/Users/sulochan.acharya/test_craton/craton/etc/inventory-api-paste.ini
+
+
+# Keystone Middlewre settings
+[keystone_authtoken]
+#auth_host = 127.0.0.1
+##auth_port = 35357
+##auth_version = 3
+##auth_protocol = http
+##project_name = service
+##username = designate
+##password = designate
+##project_domain_id = default
+##user_domain_id = default
+##memcached_servers = localhost:11211
+##auth_type = password
