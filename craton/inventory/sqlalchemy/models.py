@@ -7,7 +7,7 @@ There are three independent parts to a specific workflow execution:
 
 * specific workflow, which is written in Python (eg with TaskFlow)
 
-* inventory of hosts for a given tenant, as organized by region, cell,
+* inventory of hosts for a given project, as organized by region, cell,
   and group, with overrides on variables; this module models that for
   SQLAlchemy
 
@@ -32,7 +32,8 @@ from sqlalchemy_utils.types.uuid import UUIDType
 # See https://github.com/rackerlabs/craton/issues/19
 
 
-class CratonBase(models.ModelBase, models.TimestampMixin):
+class CratonBase(models.ModelBase, models.TimestampMixin,
+                 models.SoftDeleteMixin):
     def __repr__(self):
         mapper = object_mapper(self)
         cols = getattr(self, '_repr_columns',  mapper.primary_key)
@@ -95,9 +96,9 @@ class VariableMixin(object):
         return self._variables.any(key=key, value=value)
 
 
-class Tenant(Base):
+class Project(Base):
     """Supports multitenancy for all other schema elements."""
-    __tablename__ = 'tenants'
+    __tablename__ = 'projects'
     id = Column(UUIDType, primary_key=True)
     name = Column(String(255))
     _repr_columns=[id, name]
@@ -106,21 +107,23 @@ class Tenant(Base):
     # suffices to define multitenancy for MVP
 
     # one-to-many relationship with the following objects
-    regions = relationship('Region', back_populates='tenant')
+    regions = relationship('Region', back_populates='project')
+    cells = relationship('Cell', back_populates='project')
+    hosts = relationship('Host', back_populates='project')
 
 
 class Region(Base, VariableMixin):
     __tablename__ = 'regions'
     vars_tablename = 'region_variables'
     id = Column(Integer, primary_key=True)
-    tenant_id = Column(
-        UUIDType, ForeignKey('tenants.id'), index=True, nullable=False)
+    project_id = Column(
+        UUIDType, ForeignKey('projects.id'), index=True, nullable=False)
     name = Column(String(255))
     _repr_columns=[id, name]
 
-    UniqueConstraint(tenant_id, name)
+    UniqueConstraint(project_id, name)
 
-    tenant = relationship('Tenant', back_populates='regions')
+    project = relationship('Project', back_populates='regions')
     cells = relationship('Cell', back_populates='region')
     hosts = relationship('Host', back_populates='region')
 
@@ -131,6 +134,8 @@ class Cell(Base, VariableMixin):
     id = Column(Integer, primary_key=True)
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
+    project_id = Column(
+        UUIDType, ForeignKey('projects.id'), index=True, nullable=False)
     name = Column(String(255))
     _repr_columns=[id, name]
 
@@ -138,6 +143,7 @@ class Cell(Base, VariableMixin):
 
     region = relationship('Region', back_populates='cells')
     hosts = relationship('Host', back_populates='cell')
+    project = relationship('Project', back_populates='cells')
 
 
 # TODO consider using SqlAlchemy's support for inheritance
@@ -152,11 +158,16 @@ class Host(Base, VariableMixin):
     __tablename__ = 'hosts'
     vars_tablename = 'host_variables'
     id = Column(Integer, primary_key=True)
-    region_id = Column(Integer, ForeignKey('regions.id'), index=True, nullable=False) 
-    cell_id = Column(Integer, ForeignKey('cells.id'), index=True, nullable=True) 
-    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
     hostname = Column(String(255), nullable=False)
     ip_address = Column(IPAddressType, nullable=False)
+    region_id = Column(Integer,
+            ForeignKey('regions.id'), index=True, nullable=False)
+    cell_id = Column(Integer,
+            ForeignKey('cells.id'), index=True, nullable=True)
+    project_id = Column(UUIDType,
+            ForeignKey('projects.id'), index=True, nullable=False)
+    access_secret_id = Column(Integer,
+            ForeignKey('access_secrets.id'))
     # this means the host is "active" for administration; it is explictly not state:
     # the host may or may not be reachable by Ansible/other tooling
     active = Column(Boolean, default=True)
@@ -171,6 +182,7 @@ class Host(Base, VariableMixin):
     # many-to-one relationship to regions and cells
     region = relationship('Region', back_populates='hosts')
     cell = relationship('Cell', back_populates='hosts')
+    project = relationship('Project', back_populates='hosts')
 
     # optional many-to-one relationship to a host-specific secret;
     access_secret = relationship('AccessSecret', back_populates='hosts')
