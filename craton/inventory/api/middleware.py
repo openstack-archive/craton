@@ -20,13 +20,8 @@ class ContextMiddleware(base.Middleware):
 
 class NoAuthContextMiddleware(ContextMiddleware):
 
-    def __init__(self, app):
-        self._app = app
-
-    def __call__(self, environ, start_response):
-        with self._app.request_context(environ):
-            self.process_request(request)
-        return self._app(environ, start_response)
+    def __init__(self, application):
+        self.application = application
 
     def process_request(self, request):
         # Simply insert some dummy context info
@@ -39,21 +34,16 @@ class NoAuthContextMiddleware(ContextMiddleware):
 
     @classmethod
     def factory(cls, global_config, **local_config):
-        def _factory(app):
-            return cls(app)
+        def _factory(application):
+            return cls(application)
 
         return _factory
 
 
 class LocalAuthContextMiddleware(ContextMiddleware):
 
-    def __init__(self, app):
-        self._app = app
-
-    def __call__(self, environ, start_response):
-        with self._app.request_context(environ):
-            self.process_request(request)
-        return self._app(environ, start_response)
+    def __init__(self, application):
+        self.applicatin = application
 
     def process_request(self, request):
         # TODO(sulo): for local auth we simply check pre-defined APIkey

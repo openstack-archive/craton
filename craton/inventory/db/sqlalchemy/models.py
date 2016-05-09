@@ -78,7 +78,7 @@ class VariableMixin(object):
         return relationship(
             Variable,
             collection_class=attribute_mapped_collection('key'),
-            cascade='all, delete-orphan')
+            cascade='all, delete-orphan', lazy="joined")
 
     @declared_attr
     def variables(cls):
@@ -114,6 +114,8 @@ class Region(Base, VariableMixin):
     project_id = Column(
         UUIDType, ForeignKey('projects.id'), index=True, nullable=False)
     name = Column(String(255))
+    status = Column(String(20))
+    status_reason = Column(Text)
     _repr_columns=[id, name]
 
     UniqueConstraint(project_id, name)
@@ -132,6 +134,8 @@ class Cell(Base, VariableMixin):
     project_id = Column(
         UUIDType, ForeignKey('projects.id'), index=True, nullable=False)
     name = Column(String(255))
+    status = Column(String(20))
+    status_reason = Column(Text)
     _repr_columns=[id, name]
 
     UniqueConstraint(region_id, name)
@@ -166,6 +170,8 @@ class Host(Base, VariableMixin):
     # this means the host is "active" for administration; it is explictly not state:
     # the host may or may not be reachable by Ansible/other tooling
     active = Column(Boolean, default=True)
+    status = Column(String(20))
+    status_reason = Column(Text)
     _repr_columns=[id, hostname]
 
     UniqueConstraint(region_id, hostname)

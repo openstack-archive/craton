@@ -1,17 +1,57 @@
+import json
 import mock
 
+from craton.inventory import api
+from craton.inventory.db.sqlalchemy import api as dbapi
+from craton.inventory.api import middleware
 from craton.inventory.tests import TestCase
+from craton.inventory.tests.unit import fake_resources
 
 
-class APIV1CellsTest(TestCase):
-    def test_get_cells(self):
-        pass
+class APIV1Test(TestCase):
+    def setUp(self):
+        super(APIV1Test, self).setUp()
 
-    def test_get_cells_with_name(self):
-        pass
+        # Create the app first
+        self.app = api.setup_app()
+        # Put the context middleware
+        self.app.wsgi_app = middleware.NoAuthContextMiddleware(self.app.wsgi_app)
+        # Create client
+        self.client = self.app.test_client()
 
-    def test_get_cell_no_exist_by_name_fails(self):
-        pass
+    def get(self, path, **kw):
+        resp = self.client.get(path=path)
+        try:
+            resp.json = json.loads(resp.data)
+        except ValueError:
+            resp.json = None
+
+        return resp
+
+
+class APIV1CellsTest(APIV1Test):
+    @mock.patch.object(dbapi, 'cells_get_all')
+    def test_get_cells(self, mock_cells):
+        mock_cells.return_value = fake_resources.CELL_LIST
+        resp = self.get('v1/cells')
+        self.assertEqual(len(resp.json), len(fake_resources.CELL_LIST))
+
+    @mock.patch.object(dbapi, 'cells_get_by_name')
+    def test_get_cells_with_name(self, mock_cells):
+        mock_cells.return_value = fake_resources.CELL1
+        resp = self.get('v1/cells?region=1&name=1')
+        self.assertEqual(len(resp.json), 1)
+        # Ensure we got the right cell
+        self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
+
+    @mock.patch.object(dbapi, 'cells_get_by_name')
+    def test_get_cell_no_exist_by_name_fails(self, mock_cell):
+        mock_cell.return_value = None
+        resp = self.get('v1/cells?region=1&name=dontexist')
+        # Ensure none response
+        self.assertEqual(resp.json, None)
+        # Ensure corrent status_code
+        self.assertEqual(404, resp.status_code)
 
     def test_get_cell_by_user_data(self):
         pass

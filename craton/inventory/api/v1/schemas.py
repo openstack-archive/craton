@@ -14,23 +14,24 @@ DefinitionsHost = {'discriminator': 'name',
                        'id': {'type': 'integer'},
                        'cell': {'type': 'string'},
                        'hw_manufacturer': {'type': 'string'},
-                       'data': {'type': 'object',
+                       'data': {'type': 'allOf',
                                 'description': 'User defined information'},
                        'host_uuid': {'type': 'string'}}}
 
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
                                 'status',
-                                'region_id'
+                                'region_id',
+                                'project_id'
                                 ],
                    'type': 'object',
                    'properties': {
                        'status': {'type': 'string'},
-                       'cell_uuid': {'type': 'string',
-                                     'description': 'UUID of the cell.'},
+                       'project_id': {'type': 'string',
+                                     'description': 'ID of the project'},
                        'name': {'type': 'string'},
-                       'region': {'type': 'string'},
-                       'data': {'type': 'object',
+                       'region_id': {'type': 'integer'},
+                       'data': {'type': 'allOf',
                                 'description': 'User defined information'},
                        'id': {'type': 'integer',
                               'description': 'Unique ID of the cell'}}}
@@ -64,7 +65,7 @@ DefinitionsRegion = {'discriminator': 'name',
                              'type': 'array',
                              'description': 'List of cells in this region'},
                          'data': {
-                             'type': 'object',
+                             'type': 'allOf',
                              'description': 'User defined information'},
                          'id': {
                              'type': 'integer',

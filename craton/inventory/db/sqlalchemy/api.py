@@ -8,6 +8,8 @@ from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
 
+import sqlalchemy
+
 from craton.inventory.db.sqlalchemy import models
 
 
@@ -67,7 +69,8 @@ def model_query(context, model, *args, **kwargs):
     kwargs = dict()
 
     if project_only and not context.is_admin:
-        kwargs['project_id'] = context.project_id
+        #kwargs['project_id'] = context.project_id
+        kwargs['project_id'] = "3e8994fd-15d9-11e6-bc8f-10ddb1c7add1"
 
     return db_utils.model_query(
         model=model, session=session, args=args, **kwargs)
@@ -76,18 +79,50 @@ def model_query(context, model, *args, **kwargs):
 ###################
 # TODO(sulo): add filter on project_id and deleted fields
 
-def cells_get_all(context):
+def cells_get_all(context, region):
     """Get all cells."""
-    result = model_query(context, models.Cell).\
-             all()
-    return result
+    query = model_query(context, models.Cell, project_only=True)
+    if region is not None:
+        query = query.filter_by(region=region)
 
-
-def cells_get_by_filters(context, filters):
-    """Get all cells that match the given filters."""
-    query = model_query(context, models.Cell)
-    for k,v in filters.iteritems():
-        query = query.filter_by(k=v)
-    
     result = query.all()
     return result
+
+
+def cells_get_by_name(context, region, cell):
+    """Get cell details given for a given cell in a region."""
+    try:
+        query = model_query(context, models.Cell).\
+            filter_by(region_id=region).\
+            filter_by(id=cell)
+        return query.one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        return None
+
+
+def cells_create(context, values):
+    """Create a new cell."""
+    session = get_session()
+    cell = models.Cell()
+    with session.begin():
+        cell.update(values)
+        cell.save(session)
+    return cell
+
+def cells_update(context, cell_id, values):
+    """Update an existing cell."""
+    pass
+
+def cells_delete(context, cell_id):
+    """Delete an existing cell."""
+    pass
+
+def cells_data_update(context, cell_id, data):
+    """Update existing cells variables or create when
+    its not present.
+    """
+    pass
+
+def cells_data_delete(context, cell_id, data_key):
+    """Delete the existing key (variable) from cells data."""
+    pass
