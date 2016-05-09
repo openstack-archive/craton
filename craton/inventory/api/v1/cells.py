@@ -1,14 +1,31 @@
 from flask import request, g
-from craton.inventory.api.v1 import base
+from oslo_serialization import jsonutils
 
+from craton.inventory.api.v1 import base
+from craton.inventory import db as dbapi
 
 class Cells(base.Resource):
 
     def get(self):
-        print "cells get"
-        print g.args
+        region =  g.args["region"]
+        cell = g.args["name"]
+        context = request.environ.get('context')
 
-        return [], 200, None
+        if region == 'None' and cell == 'None':
+            cells = dbapi.cells_get_all(context)
+            response = jsonutils.to_primitive(cells)
+            return response, 200, None
+        else:
+            filters = {}
+            if region != 'None':
+                filters['region'] =  region
+            if cell != 'None':
+                filters['name'] = cell
+
+            cells = dbapi.cells_get_by_filters(context, filters)
+            response = jsonutils.to_primitive(cells)
+            return response, 200, None
+
 
     def post(self):
         print "cells post"

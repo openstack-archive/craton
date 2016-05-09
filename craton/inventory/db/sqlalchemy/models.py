@@ -1,16 +1,11 @@
 """Models inventory, as defined using SQLAlchemy ORM
-
 There are three independent parts to a specific workflow execution:
-
 * configuration, as managed by a GitHub-like versioned set of config
   files (as used by Ansible and similar systems)
-
 * specific workflow, which is written in Python (eg with TaskFlow)
-
 * inventory of hosts for a given project, as organized by region, cell,
   and group, with overrides on variables; this module models that for
   SQLAlchemy
-
 In particular, this means that the configuration is used to interpret
 any inventory data.
 """
@@ -196,13 +191,10 @@ host_labels = Table(
 
 class Label(Base, VariableMixin):
     """Models a label on hosts, with a many-to-many relationship.
-
     Such labels include groupings like Ansible groups; as well as
     arbitrary other labels.
-
     Rather than subclassing labels, we can use prefixes such as
     "group-".
-
     It is assumed that hierarchies for groups, if any, is represented
     in an external format, such as a group-of-group inventory in
     Ansible.
@@ -225,13 +217,11 @@ class Label(Base, VariableMixin):
 
 class AccessSecret(Base):
     """Represents a secret for accessing a host. It may be shared.
-
     For now we assume a PEM-encoded certificate that wraps the private
     key. Such certs may or may not be encrypted; if encrypted, the
     configuration specifies how to interact with other systems, such
     as Barbican or Hashicorp Vault, to retrieve secret data to unlock
     this cert.
-
     Note that this does not include secrets such as Ansible vault
     files; those are stored outside the inventory database as part of
     the configuration.

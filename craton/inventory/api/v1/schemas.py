@@ -21,7 +21,8 @@ DefinitionsHost = {'discriminator': 'name',
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
                                 'status',
-                                'region'],
+                                'region_id'
+                                ],
                    'type': 'object',
                    'properties': {
                        'status': {'type': 'string'},
