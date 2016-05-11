@@ -1,4 +1,5 @@
 """SQLAlchemy backend implementation."""
+
 import sys
 
 from oslo_config import cfg
@@ -7,8 +8,11 @@ from oslo_db import options as db_options
 from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
+from oslo_utils import timeutils
 
 import sqlalchemy
+from sqlalchemy.orm.exc import MultipleResultsFound
+from sqlalchemy.orm.exc import NoResultFound
 
 from craton.inventory.db.sqlalchemy import models
 
@@ -109,20 +113,165 @@ def cells_create(context, values):
         cell.save(session)
     return cell
 
+
 def cells_update(context, cell_id, values):
     """Update an existing cell."""
-    pass
+    session = get_session()
+    cell = models.Cell()
+    with session.begin():
+        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = query.filter_by(id=cell_id)
+        try:
+            cell_ref = query.with_lockmode('update').one()
+        except Exception as err:
+            raise
+
+        cell_ref.update(values)
+        cell_ref.save(session)
+    return cell_ref
+
 
 def cells_delete(context, cell_id):
     """Delete an existing cell."""
-    pass
+    session = get_session()
+    cell = models.Cell()
+    with session.begin():
+        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = query.filter_by(id=cell_id)
+        query.delete()
+
 
 def cells_data_update(context, cell_id, data):
     """Update existing cells variables or create when
     its not present.
     """
+    session = get_session()
+    cell = models.Cell()
+    with session.begin():
+        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = query.filter_by(id=cell_id)
+
+        try:
+            cell_ref = query.with_lockmode('update').one()
+        except NoResultFound:
+            # cell does not exist so cant do this
+            raise
+
+        for key in data:
+            cell_ref.variables[key] = data[key]
+
+    return cell_ref
+
+
+def cells_data_delete(context, cell_id, data):
+    """Delete the existing key (variable) from cells data."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = query.filter_by(id=cell_id)
+
+        try:
+            cell_ref = query.with_lockmode('update').one()
+        except NoResultFound as err:
+            # cell does not exist so cant do this
+            raise
+
+        for key in data:
+            try:
+                del cell_ref.variables[data[key]]
+            except KeyError:
+                # This key does not exist so just ignore
+                pass
+
+    return cell_ref
+
+
+def regions_get_all(context):
+    """Get all available regions."""
+    query = model_query(context, models.Region, project_only=True)
+    result = query.all()
+    return result
+
+
+def regions_get_by_name(context, name):
+    """Get cell detail for the region with given name."""
+    query = model_query(context, models.Region, project_only=True)
+    query = query.filter_by(name=name)
+    return query.one()
+
+
+def regions_get_by_id(context, region_id):
+    """Get cell detail for the region with given id."""
+    query = model_query(context, models.Region, project_only=True)
+    query = query.filter_by(id=region_id)
+    return query.one()
+
+
+def regions_create(context, values):
+    """Create a new region."""
+    session = get_session()
+    region = models.Region()
+    with session.begin():
+        region.update(values)
+        region.save(session)
+    return region
+
+
+def regions_update(context, region_id, values):
+    """Update an existing region."""
+    # We dont have anything to update right now
     pass
 
-def cells_data_delete(context, cell_id, data_key):
-    """Delete the existing key (variable) from cells data."""
-    pass
+
+def regions_delete(context, region_id):
+    """Delete an existing region."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Region, session=session, project_only=True)
+        query = query.filter_by(id=region_id)
+        query.delete()
+    return
+
+
+def regions_data_update(context, region_id, data):
+    """
+    Update existing region variables or create when its not present.
+    """
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Region, session=session, project_only=True)
+        query = query.filter_by(id=region_id)
+
+        try:
+            region_ref = query.with_lockmode('update').one()
+        except NoResultFound:
+            # region does not exist so cant do this
+            raise
+
+        for key in data:
+            region_ref.variables[key] = data[key]
+
+    return region_ref
+
+
+def regions_data_delete(context, region_id, data_key):
+    """Delete the existing key (variable) from region data."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Region, session=session, project_only=True)
+        query = query.filter_by(id=region_id)
+
+        try:
+            region_ref = query.with_lockmode('update').one()
+        except NoResultFound as err:
+            # region does not exist so cant do this
+            raise
+
+        for key in data:
+            try:
+                del region_ref.variables[data[key]]
+            except KeyError:
+                # This key does not exist so just ignore
+                pass
+
+    return region_ref

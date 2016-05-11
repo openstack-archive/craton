@@ -43,21 +43,16 @@ class Cells(base.Resource):
 
     def put(self, id):
         """Update existing cell."""
-        context = request.environ.get('context')
-        try:
-            dbapi.cells_update(context, cell_id, g.json)
-        except Exception as err:
-            LOG.error("Error during cell update: %s" % err)
-            return None, 500, None
+        return None, 401, None
 
-        return None, 200, None
 
     def delete(self, id):
         """Delete existing cell."""
         context = request.environ.get('context')
         try:
-            dbapi.cells_delete(context, cell_id)
+            dbapi.cells_delete(context, id)
         except Exception as err:
+            print err
             LOG.error("Error during cell delete: %s" % err)
             return None, 500, None
 
@@ -71,10 +66,12 @@ class CellsData(base.Resource):
         Update existing cell data, or create if it does
         not exist.
         """
+        data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
         context = request.environ.get('context')
         try:
-            dbapi.cells_data_update(context, cell_id, g.json)
+            dbapi.cells_data_update(context, id, data)
         except Exception as err:
+            print err
             LOG.error("Error during cell data update: %s" % err)
             return None, 500, None
 
@@ -82,9 +79,13 @@ class CellsData(base.Resource):
 
     def delete(self, id):
         """Delete cell data."""
+        # NOTE(sulo): this is not that great. Find a better way to do this.
+        # We can pass multiple keys suchs as key1=one key2=two etc. but not
+        # the best way to do this.
+        data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
         context = request.environ.get('context')
         try:
-            dbapi.cells_data_delete(context, cell_id, g.json)
+            dbapi.cells_data_delete(context, id, data)
         except Exception as err:
             LOG.error("Error during cell delete: %s" % err)
             return None, 500, None

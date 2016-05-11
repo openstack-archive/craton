@@ -27,8 +27,7 @@ from sqlalchemy_utils.types.uuid import UUIDType
 # See https://github.com/rackerlabs/craton/issues/19
 
 
-class CratonBase(models.ModelBase, models.TimestampMixin,
-                 models.SoftDeleteMixin):
+class CratonBase(models.ModelBase, models.TimestampMixin):
     def __repr__(self):
         mapper = object_mapper(self)
         cols = getattr(self, '_repr_columns',  mapper.primary_key)
@@ -114,8 +113,7 @@ class Region(Base, VariableMixin):
     project_id = Column(
         UUIDType, ForeignKey('projects.id'), index=True, nullable=False)
     name = Column(String(255))
-    status = Column(String(20))
-    status_reason = Column(Text)
+    note = Column(Text)
     _repr_columns=[id, name]
 
     UniqueConstraint(project_id, name)
@@ -134,8 +132,7 @@ class Cell(Base, VariableMixin):
     project_id = Column(
         UUIDType, ForeignKey('projects.id'), index=True, nullable=False)
     name = Column(String(255))
-    status = Column(String(20))
-    status_reason = Column(Text)
+    note = Column(Text)
     _repr_columns=[id, name]
 
     UniqueConstraint(region_id, name)
@@ -170,8 +167,7 @@ class Host(Base, VariableMixin):
     # this means the host is "active" for administration; it is explictly not state:
     # the host may or may not be reachable by Ansible/other tooling
     active = Column(Boolean, default=True)
-    status = Column(String(20))
-    status_reason = Column(Text)
+    note = Column(Text)
     _repr_columns=[id, hostname]
 
     UniqueConstraint(region_id, hostname)

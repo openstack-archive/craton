@@ -42,12 +42,57 @@ def cells_delete(context, cell_id):
     """Delete an existing cell."""
     return IMPL.cells_delete(context, cell_id)
 
+
 def cells_data_update(context, cell_id, data):
     """Update existing cells variables or create when
     its not present.
     """
     return IMPL.cells_data_update(context, cell_id, data)
 
+
 def cells_data_delete(context, cell_id, data_key):
     """Delete the existing key (variable) from cells data."""
     return IMPL.cells_data_delete(context, cell_id, data_key)
+
+# Regions
+
+def regions_get_all(context):
+    """Get all available regions."""
+    return IMPL.regions_get_all(context)
+
+
+def regions_get_by_name(context, name):
+    """Get cell detail for the region with given name."""
+    return IMPL.regions_get_by_name(context, name)
+
+
+def regions_get_by_id(context, region_id):
+    """Get cell detail for the region with given id."""
+    return IMPL.regions_get_by_id(context, region_id)
+
+
+def regions_create(context, values):
+    """Create a new region."""
+    return IMPL.regions_create(context, values)
+
+
+def regions_update(context, region_id, values):
+    """Update an existing region."""
+    return IMPL.regions_update(context, regions_id, values)
+
+
+def regions_delete(context, region_id):
+    """Delete an existing region."""
+    return IMPL.regions_delete(context, region_id)
+
+
+def regions_data_update(context, region_id, data):
+    """
+    Update existing region variables or create when its not present.
+    """
+    return IMPL.regions_data_update(context, regions_id, data)
+
+
+def regions_data_delete(context, region_id, data_key):
+    """Delete the existing key (variable) from region data."""
+    return IMPL.regions_data_delete(context, region_id, data_key)

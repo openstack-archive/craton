@@ -1,12 +1,11 @@
 DefinitionsHost = {'discriminator': 'name',
                    'required': ['hostname',
                                 'ip_address',
-                                'status',
                                 'cell',
                                 'service'],
                    'type': 'object',
                    'properties': {
-                       'status': {'type': 'string'},
+                       'note': {'type': 'string'},
                        'service': {'items': {'type': 'string'},
                                    'type': 'array'},
                        'ip_address': {'type': 'string'},
@@ -20,13 +19,12 @@ DefinitionsHost = {'discriminator': 'name',
 
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
-                                'status',
                                 'region_id',
                                 'project_id'
                                 ],
                    'type': 'object',
                    'properties': {
-                       'status': {'type': 'string'},
+                       'note': {'type': 'string'},
                        'project_id': {'type': 'string',
                                      'description': 'ID of the project'},
                        'name': {'type': 'string'},
@@ -48,12 +46,12 @@ DefinitionsError = {'type': 'object',
                                    }}
 
 DefinitionsRegion = {'discriminator': 'name',
-                     'required': ['name', 'status'],
+                     'required': ['name'],
                      'type': 'object',
                      'properties': {
-                         'status': {
+                         'note': {
                              'type': 'string',
-                             'description': 'Region Status.'},
+                             'description': 'Region Note'},
                          'name': {
                              'type': 'string',
                              'description': 'Region Name.'},
