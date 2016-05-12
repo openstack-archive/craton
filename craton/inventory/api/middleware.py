@@ -2,6 +2,7 @@ from oslo_middleware import base
 from oslo_middleware import request_id
 from oslo_context import context
 
+import flask
 from flask import request
 
 
@@ -29,7 +30,7 @@ class NoAuthContextMiddleware(ContextMiddleware):
             request,
             auth_token='noauth-token',
             user='noauth-user',
-            tenant='noauth-tenant',
+            tenant=1,
         )
 
     @classmethod
@@ -62,6 +63,7 @@ class LocalAuthContextMiddleware(ContextMiddleware):
             return cls(app)
         return _factory
 
+
 class KeystoneAuthContextMiddleware(ContextMiddleware):
 
     def __init__(self, app):
@@ -82,11 +84,15 @@ class KeystoneAuthContextMiddleware(ContextMiddleware):
             # See: keystone middleware #exchanging-user-information
             pass
 
+        project_id = headers.get('X-Project-ID')
+        if project_id is None:
+            return flask.Response(status=401)
+
         self.make_context(
             request,
             auth_token=headers.get('X-Auth-Token'),
             user=headers.get('X-User-ID'),
-            tenant=tenant_id,
+            tenant=project_id,
         )
 
     @classmethod

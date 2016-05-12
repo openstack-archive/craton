@@ -36,6 +36,9 @@ def create_app(global_config, **local_config):
 
 def setup_app(config=None):
     app = Flask(__name__)
+    app.config.update(
+        PROPAGATE_EXCEPTIONS=True
+    )
     app.register_blueprint(v1.bp, url_prefix='/v1')
     return app
 

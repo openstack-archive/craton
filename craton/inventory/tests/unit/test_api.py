@@ -15,7 +15,8 @@ class APIV1Test(TestCase):
         # Create the app first
         self.app = api.setup_app()
         # Put the context middleware
-        self.app.wsgi_app = middleware.NoAuthContextMiddleware(self.app.wsgi_app)
+        self.app.wsgi_app = middleware.NoAuthContextMiddleware(
+            self.app.wsgi_app)
         # Create client
         self.client = self.app.test_client()
 
@@ -25,7 +26,6 @@ class APIV1Test(TestCase):
             resp.json = json.loads(resp.data)
         except ValueError:
             resp.json = None
-
         return resp
 
     def post(self, path, data, **kw):
@@ -37,13 +37,11 @@ class APIV1Test(TestCase):
             resp.json = json.loads(resp.data)
         except ValueError:
             resp.json = None
-
         return resp
-
 
     def delete(self, path):
         resp = self.client.delete(path=path)
-        return resp 
+        return resp
 
 
 class APIV1CellsTest(APIV1Test):
@@ -73,7 +71,7 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_with_valid_data(self, mock_cell):
         mock_cell.return_value = None
-        data = {'name':'cell1', 'region_id':1, 'project_id':"1"}
+        data = {'name': 'cell1', 'region_id': 1, 'project_id': "1"}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(200, resp.status_code)
 
@@ -81,7 +79,7 @@ class APIV1CellsTest(APIV1Test):
     def test_create_cell_fails_with_invalid_data(self, mock_cell):
         mock_cell.return_value = None
         # data is missing required cell name
-        data = {'region_id':1, 'project_id':"1"}
+        data = {'region_id': 1, 'project_id': "1"}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(422, resp.status_code)
 

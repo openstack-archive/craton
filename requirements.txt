@@ -4,9 +4,8 @@
 
 Flask
 flask_restful
-jsonschema
-ipaddr
-ipaddress
+ipaddress>=1.0.7;python_version<'3.3'  # PSF
+jsonschema>=2.0.0,<3.0.0,!=2.5.0  # MIT
 oslo.db>=4.1.0 
 oslo.middleware>=3.0.0 # Apache-2.0
 oslo.context>=2.2.0 # Apache-2.0

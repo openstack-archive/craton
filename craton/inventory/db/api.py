@@ -18,6 +18,7 @@ IMPL = db_api.DBAPI.from_config(cfg.CONF, backend_mapping=BACKEND_MAPPING,
 
 # Cells
 
+
 def cells_get_all(context, region):
     """Get all available cells."""
     return IMPL.cells_get_all(context, region)
@@ -56,6 +57,7 @@ def cells_data_delete(context, cell_id, data_key):
 
 # Regions
 
+
 def regions_get_all(context):
     """Get all available regions."""
     return IMPL.regions_get_all(context)
@@ -78,7 +80,7 @@ def regions_create(context, values):
 
 def regions_update(context, region_id, values):
     """Update an existing region."""
-    return IMPL.regions_update(context, regions_id, values)
+    return IMPL.regions_update(context, region_id, values)
 
 
 def regions_delete(context, region_id):
@@ -90,7 +92,7 @@ def regions_data_update(context, region_id, data):
     """
     Update existing region variables or create when its not present.
     """
-    return IMPL.regions_data_update(context, regions_id, data)
+    return IMPL.regions_data_update(context, region_id, data)
 
 
 def regions_data_delete(context, region_id, data_key):

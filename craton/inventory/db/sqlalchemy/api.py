@@ -3,17 +3,15 @@
 import sys
 
 from oslo_config import cfg
-from oslo_db import exception as db_exception
 from oslo_db import options as db_options
 from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
-from oslo_utils import timeutils
 
 import sqlalchemy
-from sqlalchemy.orm.exc import MultipleResultsFound
 from sqlalchemy.orm.exc import NoResultFound
 
+from craton.inventory import exceptions
 from craton.inventory.db.sqlalchemy import models
 
 
@@ -24,9 +22,10 @@ LOG = log.getLogger(__name__)
 
 _FACADE = None
 
-_DEFAULT_SQL_CONNECTION = 'sqlite:////Users/sulochan.acharya/test_craton/craton/test.db'
+_DEFAULT_SQL_CONNECTION = 'sqlite://'
 db_options.set_defaults(cfg.CONF,
                         connection=_DEFAULT_SQL_CONNECTION)
+
 
 def _create_facade_lazily():
     global _FACADE
@@ -50,12 +49,18 @@ def get_backend():
     return sys.modules[__name__]
 
 
+def is_admin_context(context):
+    """Check if this request had admin context."""
+    # FIXME(sulo): fix after we have Users table
+    return True
+
+
 def require_admin_context(f):
     """Decorator that ensures admin request context."""
 
     def wrapper(*args, **kwargs):
         if not is_admin_context(args[0]):
-            raise exception.AdminRequired()
+            raise exceptions.AdminRequired()
         return f(*args, **kwargs)
     return wrapper
 
@@ -73,8 +78,7 @@ def model_query(context, model, *args, **kwargs):
     kwargs = dict()
 
     if project_only and not context.is_admin:
-        #kwargs['project_id'] = context.project_id
-        kwargs['project_id'] = "3e8994fd-15d9-11e6-bc8f-10ddb1c7add1"
+        kwargs['project_id'] = context.tenant
 
     return db_utils.model_query(
         model=model, session=session, args=args, **kwargs)
@@ -89,8 +93,13 @@ def cells_get_all(context, region):
     if region is not None:
         query = query.filter_by(region=region)
 
-    result = query.all()
-    return result
+    try:
+        result = query.all()
+        return result
+    except sqlalchemy.orm.exc.NoResultFound:
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
 
 
 def cells_get_by_name(context, region, cell):
@@ -101,7 +110,7 @@ def cells_get_by_name(context, region, cell):
             filter_by(id=cell)
         return query.one()
     except sqlalchemy.orm.exc.NoResultFound:
-        return None
+        raise exceptions.NotFound()
 
 
 def cells_create(context, values):
@@ -117,13 +126,13 @@ def cells_create(context, values):
 def cells_update(context, cell_id, values):
     """Update an existing cell."""
     session = get_session()
-    cell = models.Cell()
     with session.begin():
-        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = model_query(context, models.Cell, session=session,
+                            project_only=True)
         query = query.filter_by(id=cell_id)
         try:
             cell_ref = query.with_lockmode('update').one()
-        except Exception as err:
+        except Exception:
             raise
 
         cell_ref.update(values)
@@ -134,9 +143,9 @@ def cells_update(context, cell_id, values):
 def cells_delete(context, cell_id):
     """Delete an existing cell."""
     session = get_session()
-    cell = models.Cell()
     with session.begin():
-        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = model_query(context, models.Cell, session=session,
+                            project_only=True)
         query = query.filter_by(id=cell_id)
         query.delete()
 
@@ -146,9 +155,9 @@ def cells_data_update(context, cell_id, data):
     its not present.
     """
     session = get_session()
-    cell = models.Cell()
     with session.begin():
-        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = model_query(context, models.Cell, session=session,
+                            project_only=True)
         query = query.filter_by(id=cell_id)
 
         try:
@@ -167,12 +176,13 @@ def cells_data_delete(context, cell_id, data):
     """Delete the existing key (variable) from cells data."""
     session = get_session()
     with session.begin():
-        query = model_query(context, models.Cell, session=session, project_only=True)
+        query = model_query(context, models.Cell, session=session,
+                            project_only=True)
         query = query.filter_by(id=cell_id)
 
         try:
             cell_ref = query.with_lockmode('update').one()
-        except NoResultFound as err:
+        except NoResultFound:
             # cell does not exist so cant do this
             raise
 
@@ -227,7 +237,8 @@ def regions_delete(context, region_id):
     """Delete an existing region."""
     session = get_session()
     with session.begin():
-        query = model_query(context, models.Region, session=session, project_only=True)
+        query = model_query(context, models.Region, session=session,
+                            project_only=True)
         query = query.filter_by(id=region_id)
         query.delete()
     return
@@ -239,7 +250,8 @@ def regions_data_update(context, region_id, data):
     """
     session = get_session()
     with session.begin():
-        query = model_query(context, models.Region, session=session, project_only=True)
+        query = model_query(context, models.Region, session=session,
+                            project_only=True)
         query = query.filter_by(id=region_id)
 
         try:
@@ -254,16 +266,17 @@ def regions_data_update(context, region_id, data):
     return region_ref
 
 
-def regions_data_delete(context, region_id, data_key):
+def regions_data_delete(context, region_id, data):
     """Delete the existing key (variable) from region data."""
     session = get_session()
     with session.begin():
-        query = model_query(context, models.Region, session=session, project_only=True)
+        query = model_query(context, models.Region, session=session,
+                            project_only=True)
         query = query.filter_by(id=region_id)
 
         try:
             region_ref = query.with_lockmode('update').one()
-        except NoResultFound as err:
+        except NoResultFound:
             # region does not exist so cant do this
             raise
 

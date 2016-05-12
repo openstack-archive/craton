@@ -1,9 +1,13 @@
 from flask import request, g
 from oslo_serialization import jsonutils
+from oslo_log import log
 
 from craton.inventory.api.v1 import base
-from craton.inventory.api.v1 import schemas
 from craton.inventory import db as dbapi
+
+
+LOG = log.getLogger(__name__)
+
 
 class Regions(base.Resource):
 
@@ -11,8 +15,8 @@ class Regions(base.Resource):
         """Get region(s) for the project. Get region details if
         for a particular region.
         """
-        #region_id =  g.args["id"]
-        #region_name = g.args["name"]
+        # region_id =  g.args["id"]
+        # region_name = g.args["name"]
         region_id = id or 'None'
         region_name = 'None'
         context = request.environ.get('context')
@@ -43,7 +47,7 @@ class Regions(base.Resource):
                 return result, 200, None
             else:
                 return None, 404, None
-            
+
     def post(self):
         """Create a new region."""
         context = request.environ.get('context')
@@ -79,12 +83,12 @@ class RegionsData(base.Resource):
         Update existing region data, or create if it does
         not exist.
         """
-        data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
+        data_keys = request.form.keys()
+        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
         try:
             dbapi.regions_data_update(context, id, data)
         except Exception as err:
-            print err
             LOG.error("Error during region data update: %s" % err)
             return None, 500, None
 
@@ -95,7 +99,8 @@ class RegionsData(base.Resource):
         # NOTE(sulo): this is not that great. Find a better way to do this.
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
-        data = dict((key, request.form.getlist(key)[0]) for key in request.form.keys())
+        data_keys = request.form.keys()
+        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
         try:
             dbapi.regions_data_delete(context, id, data)

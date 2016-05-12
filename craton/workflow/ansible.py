@@ -2,6 +2,3 @@
 
 Takes in account failure.
 """
-
-import ansible
-
