@@ -1,11 +1,5 @@
-# -*- coding: utf-8 -*-
-
-###
-### DO NOT CHANGE THIS FILE
-### 
-### The code is auto generated, your change will be overwritten by 
-### code generating.
-###
+# The code is auto generated, your change will be overwritten by
+# code generating.
 
 from datetime import date
 from functools import wraps
@@ -44,7 +38,8 @@ class FlaskValidatorAdaptor(object):
 
         convert_funs = {
             'integer': lambda v: int(v[0]),
-            'boolean': lambda v: v[0].lower() not in ['n', 'no', 'false', '', '0'],
+            'boolean': lambda v: v[0].lower() not in ['n', 'no',
+                                                      'false', '', '0'],
             'null': lambda v: None,
             'number': lambda v: float(v[0]),
             'string': lambda v: v[0]
@@ -78,7 +73,8 @@ def request_validate(view):
         endpoint = request.endpoint.partition('.')[-1]
         # scope
         if (endpoint, request.method) in scopes and not set(
-                scopes[(endpoint, request.method)]).issubset(set(security.scopes)):
+                scopes[(endpoint,
+                        request.method)]).issubset(set(security.scopes)):
             abort(403)
         # data
         method = request.method

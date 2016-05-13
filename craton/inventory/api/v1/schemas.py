@@ -1,12 +1,11 @@
 DefinitionsHost = {'discriminator': 'name',
                    'required': ['hostname',
                                 'ip_address',
-                                'status',
                                 'cell',
                                 'service'],
                    'type': 'object',
                    'properties': {
-                       'status': {'type': 'string'},
+                       'note': {'type': 'string'},
                        'service': {'items': {'type': 'string'},
                                    'type': 'array'},
                        'ip_address': {'type': 'string'},
@@ -14,23 +13,23 @@ DefinitionsHost = {'discriminator': 'name',
                        'id': {'type': 'integer'},
                        'cell': {'type': 'string'},
                        'hw_manufacturer': {'type': 'string'},
-                       'data': {'type': 'object',
+                       'data': {'type': 'allOf',
                                 'description': 'User defined information'},
                        'host_uuid': {'type': 'string'}}}
 
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
-                                'status',
-                                'region_id'
+                                'region_id',
+                                'project_id'
                                 ],
                    'type': 'object',
                    'properties': {
-                       'status': {'type': 'string'},
-                       'cell_uuid': {'type': 'string',
-                                     'description': 'UUID of the cell.'},
+                       'note': {'type': 'string'},
+                       'project_id': {'type': 'string',
+                                      'description': 'ID of the project'},
                        'name': {'type': 'string'},
-                       'region': {'type': 'string'},
-                       'data': {'type': 'object',
+                       'region_id': {'type': 'integer'},
+                       'data': {'type': 'allOf',
                                 'description': 'User defined information'},
                        'id': {'type': 'integer',
                               'description': 'Unique ID of the cell'}}}
@@ -47,12 +46,12 @@ DefinitionsError = {'type': 'object',
                                    }}
 
 DefinitionsRegion = {'discriminator': 'name',
-                     'required': ['name', 'status'],
+                     'required': ['name'],
                      'type': 'object',
                      'properties': {
-                         'status': {
+                         'note': {
                              'type': 'string',
-                             'description': 'Region Status.'},
+                             'description': 'Region Note'},
                          'name': {
                              'type': 'string',
                              'description': 'Region Name.'},
@@ -64,7 +63,7 @@ DefinitionsRegion = {'discriminator': 'name',
                              'type': 'array',
                              'description': 'List of cells in this region'},
                          'data': {
-                             'type': 'object',
+                             'type': 'allOf',
                              'description': 'User defined information'},
                          'id': {
                              'type': 'integer',
@@ -310,9 +309,9 @@ def normalize(schema, data, required_defaults=None):
         for key, _schema in schema.get('properties', {}).iteritems():
             # set default
             type_ = _schema.get('type', 'object')
-            if ('default' not in _schema
-                    and key in schema.get('required', [])
-                    and type_ in required_defaults):
+            if ('default' not in _schema and
+                key in schema.get('required', []) and
+                    type_ in required_defaults):
                 _schema['default'] = required_defaults[type_]
 
             # get value
@@ -329,11 +328,13 @@ def normalize(schema, data, required_defaults=None):
             rs_component.update(result)
             result = rs_component
 
-        additional_properties_schema = schema.get('additionalProperties', False)
+        additional_properties_schema = schema.get('additionalProperties',
+                                                  False)
         if additional_properties_schema:
             aproperties_set = set(data.keys()) - set(result.keys())
             for pro in aproperties_set:
-                result[pro] = _normalize(additional_properties_schema, data.get(pro))
+                result[pro] = _normalize(additional_properties_schema,
+                                         data.get(pro))
 
         return result
 
@@ -361,7 +362,7 @@ def normalize(schema, data, required_defaults=None):
             'default': _normalize_default,
         }
         type_ = schema.get('type', 'object')
-        if not type_ in funcs:
+        if type_ not in funcs:
             type_ = 'default'
 
         return funcs[type_](schema, data)

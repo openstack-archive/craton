@@ -2,6 +2,7 @@ from oslo_middleware import base
 from oslo_middleware import request_id
 from oslo_context import context
 
+import flask
 from flask import request
 
 
@@ -20,13 +21,8 @@ class ContextMiddleware(base.Middleware):
 
 class NoAuthContextMiddleware(ContextMiddleware):
 
-    def __init__(self, app):
-        self._app = app
-
-    def __call__(self, environ, start_response):
-        with self._app.request_context(environ):
-            self.process_request(request)
-        return self._app(environ, start_response)
+    def __init__(self, application):
+        self.application = application
 
     def process_request(self, request):
         # Simply insert some dummy context info
@@ -34,26 +30,21 @@ class NoAuthContextMiddleware(ContextMiddleware):
             request,
             auth_token='noauth-token',
             user='noauth-user',
-            tenant='noauth-tenant',
+            tenant=1,
         )
 
     @classmethod
     def factory(cls, global_config, **local_config):
-        def _factory(app):
-            return cls(app)
+        def _factory(application):
+            return cls(application)
 
         return _factory
 
 
 class LocalAuthContextMiddleware(ContextMiddleware):
 
-    def __init__(self, app):
-        self._app = app
-
-    def __call__(self, environ, start_response):
-        with self._app.request_context(environ):
-            self.process_request(request)
-        return self._app(environ, start_response)
+    def __init__(self, application):
+        self.applicatin = application
 
     def process_request(self, request):
         # TODO(sulo): for local auth we simply check pre-defined APIkey
@@ -71,6 +62,7 @@ class LocalAuthContextMiddleware(ContextMiddleware):
         def _factory(app):
             return cls(app)
         return _factory
+
 
 class KeystoneAuthContextMiddleware(ContextMiddleware):
 
@@ -92,11 +84,15 @@ class KeystoneAuthContextMiddleware(ContextMiddleware):
             # See: keystone middleware #exchanging-user-information
             pass
 
+        project_id = headers.get('X-Project-ID')
+        if project_id is None:
+            return flask.Response(status=401)
+
         self.make_context(
             request,
             auth_token=headers.get('X-Auth-Token'),
             user=headers.get('X-User-ID'),
-            tenant=tenant_id,
+            tenant=project_id,
         )
 
     @classmethod
