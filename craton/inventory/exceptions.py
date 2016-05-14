@@ -17,7 +17,7 @@ class Base(Exception):
             self.message = message
 
         super(Base, self).__init__(
-                '%s: %s' % (self.code, self.message))
+            '%s: %s' % (self.code, self.message))
 
 
 class AdminRequired(Base):

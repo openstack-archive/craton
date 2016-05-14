@@ -1,5 +1,4 @@
 from flask import request, g
-from flask import abort
 from oslo_serialization import jsonutils
 from oslo_log import log
 
@@ -26,7 +25,10 @@ class Cells(base.Resource):
             try:
                 cell_obj = dbapi.cells_get_by_name(context, region, cell)
             except exceptions.NotFound:
-                abort(404, 'Not Found')
+                return self.error_response(404, 'Not Found')
+            except Exception as err:
+                LOG.error("Error during cells get: %s" % err)
+                return self.error_response(500, 'Unknown Error')
 
             cell_obj.data = cell_obj.variables
             cell = jsonutils.to_primitive(cell_obj)
@@ -39,7 +41,7 @@ class Cells(base.Resource):
                 cell = jsonutils.to_primitive(cell_obj)
                 return cell, 200, None
             except exceptions.NotFound:
-                abort(404, 'Not Found')
+                return self.error_response(404, 'Not Found')
 
         if region != 'None' and cell == 'None':
             # Get all cells for this region only
@@ -48,7 +50,7 @@ class Cells(base.Resource):
                 cells = jsonutils.to_primitive(cells_obj)
                 return cells
             except exceptions.NotFound:
-                abort(404, 'Not Found')
+                return self.error_response(404, 'Not Found')
 
     def post(self):
         """Create a new cell."""
@@ -57,7 +59,7 @@ class Cells(base.Resource):
             dbapi.cells_create(context, g.json)
         except Exception as err:
             LOG.error("Error during cell create: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
 
@@ -70,9 +72,11 @@ class Cells(base.Resource):
         context = request.environ.get('context')
         try:
             dbapi.cells_delete(context, id)
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
         except Exception as err:
             LOG.error("Error during cell delete: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
 
@@ -89,9 +93,11 @@ class CellsData(base.Resource):
         context = request.environ.get('context')
         try:
             dbapi.cells_data_update(context, id, data)
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
         except Exception as err:
             LOG.error("Error during cell data update: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
 
@@ -105,8 +111,10 @@ class CellsData(base.Resource):
         context = request.environ.get('context')
         try:
             dbapi.cells_data_delete(context, id, data)
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
         except Exception as err:
             LOG.error("Error during cell delete: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
