@@ -4,6 +4,7 @@ from oslo_log import log
 
 from craton.inventory.api.v1 import base
 from craton.inventory import db as dbapi
+from craton.inventory import exceptions
 
 
 LOG = log.getLogger(__name__)
@@ -23,7 +24,11 @@ class Regions(base.Resource):
 
         if region_id == 'None' and region_name == 'None':
             # Get all regions for this tenant
-            regions_obj = dbapi.regions_get_all(context)
+            try:
+                regions_obj = dbapi.regions_get_all(context)
+            except exceptions.NotFound:
+                return self.error_response(404, 'Not Found')
+
             if regions_obj:
                 result = jsonutils.to_primitive(regions_obj)
                 return result, 200, None
@@ -31,7 +36,11 @@ class Regions(base.Resource):
                 return None, 404, None
 
         if region_name != 'None':
-            region_obj = dbapi.regions_get_by_name(context, region_name)
+            try:
+                region_obj = dbapi.regions_get_by_name(context, region_name)
+            except exceptions.NotFound:
+                return self.error_response(404, 'Not Found')
+
             if region_obj:
                 region_obj.data = region_obj.variables
                 result = jsonutils.to_primitive(region_obj)
@@ -40,7 +49,11 @@ class Regions(base.Resource):
                 return None, 404, None
 
         if region_id != 'None':
-            region_obj = dbapi.regions_get_by_id(context, region_id)
+            try:
+                region_obj = dbapi.regions_get_by_id(context, region_id)
+            except exceptions.NotFound:
+                return self.error_response(404, 'Not Found')
+
             if region_obj:
                 region_obj.data = region_obj.variables
                 result = jsonutils.to_primitive(region_obj)
@@ -55,7 +68,7 @@ class Regions(base.Resource):
             dbapi.regions_create(context, g.json)
         except Exception as err:
             LOG.error("Error during region create: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
 
@@ -71,7 +84,7 @@ class Regions(base.Resource):
             dbapi.regions_delete(context, id)
         except Exception as err:
             LOG.error("Error during region delete: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
 
@@ -90,7 +103,7 @@ class RegionsData(base.Resource):
             dbapi.regions_data_update(context, id, data)
         except Exception as err:
             LOG.error("Error during region data update: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
 
@@ -106,6 +119,6 @@ class RegionsData(base.Resource):
             dbapi.regions_data_delete(context, id, data)
         except Exception as err:
             LOG.error("Error during region delete: %s" % err)
-            return None, 500, None
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
