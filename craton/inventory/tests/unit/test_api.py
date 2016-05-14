@@ -1,10 +1,10 @@
-import json
 import mock
 
-from craton.inventory import api
-from craton.inventory import exceptions
-from craton.inventory.db.sqlalchemy import api as dbapi
+from oslo_serialization import jsonutils
+
+from craton.inventory import api, exceptions
 from craton.inventory.api import middleware
+from craton.inventory.db.sqlalchemy import api as dbapi
 from craton.inventory.tests import TestCase
 from craton.inventory.tests.unit import fake_resources
 
@@ -23,21 +23,15 @@ class APIV1Test(TestCase):
 
     def get(self, path, **kw):
         resp = self.client.get(path=path)
-        try:
-            resp.json = json.loads(resp.data)
-        except ValueError:
-            resp.json = None
+        resp.json = jsonutils.loads(resp.data.decode('utf-8'))
         return resp
 
     def post(self, path, data, **kw):
-        content = json.dumps(data)
+        content = jsonutils.dumps(data)
         content_type = 'application/json'
         resp = self.client.post(path=path, content_type=content_type,
                                 data=content)
-        try:
-            resp.json = json.loads(resp.data)
-        except ValueError:
-            resp.json = None
+        resp.json = jsonutils.loads(resp.data.decode('utf-8'))
         return resp
 
     def delete(self, path):
