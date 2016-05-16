@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
-from flask import request, g
+from __future__ import print_function
+
+from flask import g
 
 from craton.inventory.api.v1 import base
-from craton.inventory.api.v1 import schemas
 
 
 class Hosts(base.Resource):
 
     def get(self):
-        print g.args
+        print(g.args)
 
         return [], 200, None
 
     def post(self):
-        print g.json
+        print(g.json)
 
         return None, 200, None
 
@@ -21,7 +22,7 @@ class Hosts(base.Resource):
 class HostsId(base.Resource):
 
     def put(self, id):
-        print g.json
+        print(g.json)
 
         return None, 400, None
 
@@ -33,7 +34,7 @@ class HostsId(base.Resource):
 class HostsData(base.Resource):
 
     def put(self, id):
-        print g.json
+        print(g.json)
 
         return None, 400, None
 

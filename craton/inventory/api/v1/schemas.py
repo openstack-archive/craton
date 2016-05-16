@@ -1,3 +1,6 @@
+import six
+
+
 DefinitionsHost = {'discriminator': 'name',
                    'required': ['hostname',
                                 'ip_address',
@@ -306,7 +309,7 @@ def normalize(schema, data, required_defaults=None):
         if not isinstance(data, DataWrapper):
             data = DataWrapper(data)
 
-        for key, _schema in schema.get('properties', {}).iteritems():
+        for key, _schema in six.iteritems(schema.get('properties', {})):
             # set default
             type_ = _schema.get('type', 'object')
             if ('default' not in _schema and

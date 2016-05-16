@@ -9,6 +9,7 @@ from flask import request, g, current_app, json
 from flask_restful import abort
 from flask_restful.utils import unpack
 from jsonschema import Draft4Validator
+import six
 
 from craton.inventory.api.v1.schemas import (
     validators, filters, scopes, security, merge_default, normalize)
@@ -33,7 +34,7 @@ class FlaskValidatorAdaptor(object):
         if isinstance(obj, (dict, list)) and not isinstance(obj, MultiDict):
             return obj
         if isinstance(obj, Headers):
-            obj = MultiDict(obj.iteritems())
+            obj = MultiDict(six.iteritems(obj))
         result = dict()
 
         convert_funs = {
@@ -49,7 +50,7 @@ class FlaskValidatorAdaptor(object):
             func = convert_funs.get(type_, lambda v: v[0])
             return [func([i]) for i in v]
 
-        for k, values in obj.iterlists():
+        for k, values in six.iterlists(obj):
             prop = self.validator.schema['properties'].get(k, {})
             type_ = prop.get('type')
             fun = convert_funs.get(type_, lambda v: v[0])
@@ -81,7 +82,7 @@ def request_validate(view):
         if method == 'HEAD':
             method = 'GET'
         locations = validators.get((endpoint, method), {})
-        for location, schema in locations.iteritems():
+        for location, schema in six.iteritems(locations):
             value = getattr(request, location, MultiDict())
             validator = FlaskValidatorAdaptor(schema)
             result, errors = validator.validate(value)
