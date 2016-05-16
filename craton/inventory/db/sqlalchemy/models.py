@@ -104,6 +104,24 @@ class Project(Base):
     regions = relationship('Region', back_populates='project')
     cells = relationship('Cell', back_populates='project')
     hosts = relationship('Host', back_populates='project')
+    users = relationship('User', back_populates='project')
+
+
+class User(Base):
+    __tablename__ = 'users'
+    __table_args__ = (
+        UniqueConstraint("username", "project_id",
+                         name="uq_user0username0project"),
+    )
+    id = Column(Integer, primary_key=True)
+    project_id = Column(
+        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+    username = Column(String(255))
+    api_key = Column(String(36))
+    is_admin = Column(Boolean, default=False)
+    roles = Column(JSONType)
+
+    project = relationship('Project', back_populates='users')
 
 
 class Region(Base, VariableMixin):
