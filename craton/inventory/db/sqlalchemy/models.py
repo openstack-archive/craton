@@ -22,8 +22,9 @@ from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
 
 
-# FIXME set up table args for a given database/storage engine, as configured.
-# See https://github.com/rackerlabs/craton/issues/19
+# TODO(jimbaker) set up table args for a given database/storage
+# engine, as configured.  See
+# https://github.com/rackerlabs/craton/issues/19
 
 
 class CratonBase(models.ModelBase, models.TimestampMixin):
@@ -97,13 +98,13 @@ class Project(Base):
     name = Column(String(255))
     _repr_columns = [id, name]
 
-    # TODO we will surely need to define more columns, but this
-    # suffices to define multitenancy for MVP
+    # TODO(jimbaker) we will surely need to define more columns, but
+    # this suffices to define multitenancy for MVP
 
     # one-to-many relationship with the following objects
     regions = relationship('Region', back_populates='project')
     cells = relationship('Cell', back_populates='project')
-    hosts = relationship('Host', back_populates='project')
+    devices = relationship('Device', back_populates='project')
     users = relationship('User', back_populates='project')
 
 
@@ -138,7 +139,7 @@ class Region(Base, VariableMixin):
 
     project = relationship('Project', back_populates='regions')
     cells = relationship('Cell', back_populates='region')
-    hosts = relationship('Host', back_populates='region')
+    devices = relationship('Device', back_populates='region')
 
 
 class Cell(Base, VariableMixin):
@@ -156,50 +157,72 @@ class Cell(Base, VariableMixin):
     UniqueConstraint(region_id, name)
 
     region = relationship('Region', back_populates='cells')
-    hosts = relationship('Host', back_populates='cell')
+    devices = relationship('Device', back_populates='cell')
     project = relationship('Project', back_populates='cells')
 
 
-class Host(Base, VariableMixin):
+class Device(Base, VariableMixin):
     """Models descriptive data about a host"""
-    __tablename__ = 'hosts'
-    vars_tablename = 'host_variables'
+    __tablename__ = 'devices'
+    vars_tablename = 'device_variables'
     id = Column(Integer, primary_key=True)
-    hostname = Column(String(255), nullable=False)
-    ip_address = Column(IPAddressType, nullable=False)
-    region_id = Column(Integer,
-                       ForeignKey('regions.id'), index=True, nullable=False)
-    cell_id = Column(Integer,
-                     ForeignKey('cells.id'), index=True, nullable=True)
-    project_id = Column(Integer,
-                        ForeignKey('projects.id'), index=True, nullable=False)
-    access_secret_id = Column(Integer,
-                              ForeignKey('access_secrets.id'))
+    type = Column(String(50))  # discriminant for joined table inheritance
+    name = Column(String(255), nullable=False)
+    region_id = Column(
+        Integer, ForeignKey('regions.id'), index=True, nullable=False)
+    cell_id = Column(
+        Integer, ForeignKey('cells.id'), index=True, nullable=True)
+    project_id = Column(
+        Integer, ForeignKey('projects.id'), index=True, nullable=False)
     # this means the host is "active" for administration
-    # the host may or may not be reachable by Ansible/other tooling
+    # the device may or may not be reachable by Ansible/other tooling
+    #
+    # TODO(jimbaker) perhaps we should further generalize `note` for
+    # supporting governance
     active = Column(Boolean, default=True)
     note = Column(Text)
-    _repr_columns = [id, hostname]
+    _repr_columns = [id, name]
 
-    UniqueConstraint(region_id, hostname)
-    UniqueConstraint(region_id, ip_address)
+    UniqueConstraint(region_id, name)
 
-    _labels = relationship('Label',
-                           secondary=lambda: host_labels, collection_class=set)
+    _labels = relationship(
+        'Label', secondary=lambda: device_labels, collection_class=set)
     labels = association_proxy('_labels', 'label')
 
     # many-to-one relationship to regions and cells
-    region = relationship('Region', back_populates='hosts')
-    cell = relationship('Cell', back_populates='hosts')
-    project = relationship('Project', back_populates='hosts')
+    region = relationship('Region', back_populates='devices')
+    cell = relationship('Cell', back_populates='devices')
+    project = relationship('Project', back_populates='devices')
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'devices',
+        'with_polymorphic': '*'
+    }
+
+
+class Host(Device):
+    __tablename__ = 'hosts'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    ip_address = Column(IPAddressType, nullable=False)
+
+    # NOTE it is not possible to express table constraints such as
+    # `UniqueConstraint(Device.region_id, ip_address)`
+    # when they reference joined columns
 
     # optional many-to-one relationship to a host-specific secret;
     access_secret = relationship('AccessSecret', back_populates='hosts')
 
+    __mapper_args__ = {
+        'polymorphic_identity': 'hosts',
+    }
 
-host_labels = Table(
-    'host_labels', Base.metadata,
-    Column('host_id', ForeignKey('hosts.id'), primary_key=True),
+
+device_labels = Table(
+    'device_labels', Base.metadata,
+    Column('device_id', ForeignKey('devices.id'), primary_key=True),
     Column('label_id', ForeignKey('labels.id'), primary_key=True))
 
 
@@ -223,9 +246,9 @@ class Label(Base, VariableMixin):
     def __init__(self, label):
         self.label = label
 
-    hosts = relationship(
-        "Host",
-        secondary=host_labels,
+    devices = relationship(
+        "Device",
+        secondary=device_labels,
         back_populates="_labels")
 
 
