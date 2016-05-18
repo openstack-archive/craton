@@ -78,7 +78,7 @@ class KeystoneAuthContextMiddleware(ContextMiddleware):
         headers = request.headers
 
         try:
-            if headers["X-Identity-Status"] is "Invalid":
+            if headers["X-Identity-Status"] == "Invalid":
                 return flask.Response(status=401)
         except KeyError:
             # See: keystone middleware #exchanging-user-information
