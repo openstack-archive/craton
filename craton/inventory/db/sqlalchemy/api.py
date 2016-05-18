@@ -1,6 +1,7 @@
 """SQLAlchemy backend implementation."""
 
 import sys
+from collections import namedtuple
 
 from oslo_config import cfg
 from oslo_db import options as db_options
@@ -82,6 +83,36 @@ def model_query(context, model, *args, **kwargs):
 
     return db_utils.model_query(
         model=model, session=session, args=args, **kwargs)
+
+
+Blame = namedtuple('Blame', ['source', 'variable'])
+
+def host_blame_variables(host, keys=None):
+    """Determines the sources of how variables have been set for a host.
+    :param host: host to get blame information
+    :param keys: keys to check sourcing, or all keys if None
+
+    Returns the (source, variable) in a named tuple; note that
+    variable contains certain audit/governance information
+    (created_at, modified_at).
+
+    TODO(jimbaker) further extend schema on mixed-in variable tables
+    to capture additional governance, such as user who set the key
+    (depends on https://github.com/rackerlabs/craton/issues/46); this
+    will then transparently become available in the blame.
+    """
+    if keys is None:
+        keys = host.resolved.keys()
+    sources = [host] + list(host._labels) + [host.region, host.cell]
+    blamed = {}
+    for key in keys:
+        for source in sources:
+            try:
+                blamed[key] = Blame(source, source._variables[key])
+                break
+            except KeyError:
+                pass
+    return blamed
 
 
 ###################
@@ -183,7 +214,7 @@ def cells_data_delete(context, cell_id, data):
         try:
             cell_ref = query.with_lockmode('update').one()
         except NoResultFound:
-            # cell does not exist so cant do this
+            # cell does not exist so can't do this
             raise
 
         for key in data:

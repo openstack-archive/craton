@@ -4,13 +4,21 @@ There are three independent parts to a specific workflow execution:
   files (as used by Ansible and similar systems)
 * specific workflow, which is written in Python (eg with TaskFlow)
 * inventory of hosts for a given project, as organized by region, cell,
-  and group, with overrides on variables; this module models that for
+  and labels, with overrides on variables; this module models that for
   SQLAlchemy
 In particular, this means that the configuration is used to interpret
 any inventory data.
 """
 
+try:
+    from collections import ChainMap
+except ImportError:
+    # else get the backport of this Python 3 functionality
+    from chainmap import ChainMap
+from operator import attrgetter
+
 from oslo_db.sqlalchemy import models
+from sortedcontainers import SortedSet
 from sqlalchemy import (
     Boolean, Column, ForeignKey, Integer, String, Table, Text,
     UniqueConstraint)
@@ -76,7 +84,7 @@ class VariableMixin(object):
         return relationship(
             Variable,
             collection_class=attribute_mapped_collection('key'),
-            cascade='all, delete-orphan', lazy="joined")
+            cascade='all, delete-orphan', lazy='joined')
 
     @declared_attr
     def variables(cls):
@@ -149,14 +157,14 @@ class Host(Base, VariableMixin):
     id = Column(Integer, primary_key=True)
     hostname = Column(String(255), nullable=False)
     ip_address = Column(IPAddressType, nullable=False)
-    region_id = Column(Integer,
-                       ForeignKey('regions.id'), index=True, nullable=False)
-    cell_id = Column(Integer,
-                     ForeignKey('cells.id'), index=True, nullable=True)
-    project_id = Column(Integer,
-                        ForeignKey('projects.id'), index=True, nullable=False)
-    access_secret_id = Column(Integer,
-                              ForeignKey('access_secrets.id'))
+    region_id = Column(
+        Integer, ForeignKey('regions.id'), index=True, nullable=False)
+    cell_id = Column(
+        Integer, ForeignKey('cells.id'), index=True, nullable=True)
+    project_id = Column(
+        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+    access_secret_id = Column(
+        Integer, ForeignKey('access_secrets.id'))
     # this means the host is "active" for administration
     # the host may or may not be reachable by Ansible/other tooling
     active = Column(Boolean, default=True)
@@ -166,19 +174,34 @@ class Host(Base, VariableMixin):
     UniqueConstraint(region_id, hostname)
     UniqueConstraint(region_id, ip_address)
 
-    _labels = relationship('Label',
-                           secondary=lambda: host_labels, collection_class=set)
+    # many-to-many relationship with labels; labels are sorted to
+    # ensure that variable resolution is stable if labels have
+    # conflicting settings for a given key
+    _labels = relationship(
+        'Label',
+        secondary=lambda: host_labels,
+        collection_class=lambda: SortedSet(key=attrgetter('label')))
     labels = association_proxy('_labels', 'label')
 
-    # many-to-one relationship to regions and cells
+    # many-to-one relationship to regions, cells, and projects
     region = relationship('Region', back_populates='hosts')
     cell = relationship('Cell', back_populates='hosts')
     project = relationship('Project', back_populates='hosts')
 
-    # optional many-to-one relationship to a host-specific secret;
+    # optional many-to-one relationship to a host-specific secret
     access_secret = relationship('AccessSecret', back_populates='hosts')
 
+    @property
+    def resolved(self):
+        """Provides a mapping that uses scope resolution for variables"""
+        return ChainMap(
+            self.variables,
+            ChainMap(*[label.variables for label in self._labels]),
+            self.cell.variables,
+            self.region.variables)
 
+
+# association table for many-to-many relationship between hosts, labels
 host_labels = Table(
     'host_labels', Base.metadata,
     Column('host_id', ForeignKey('hosts.id'), primary_key=True),

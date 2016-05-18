@@ -16,8 +16,15 @@ BACKEND_MAPPING = {'sqlalchemy': 'craton.inventory.db.sqlalchemy.api'}
 IMPL = db_api.DBAPI.from_config(cfg.CONF, backend_mapping=BACKEND_MAPPING,
                                 lazy=True)
 
-# Cells
 
+# Hosts
+
+def host_blame_variables(host, keys=None):
+    """Gets sources on how variables are set for a given host"""
+    return IMPL.host_blame_variables(host, keys)
+
+
+# Cells
 
 def cells_get_all(context, region):
     """Get all available cells."""
