@@ -1,43 +1,154 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-
 from flask import g
+from flask import request
+from oslo_serialization import jsonutils
+from oslo_log import log
 
+from craton.inventory import exceptions
 from craton.inventory.api.v1 import base
+from craton.inventory import db as dbapi
+
+
+LOG = log.getLogger(__name__)
 
 
 class Hosts(base.Resource):
 
     def get(self):
-        print(g.args)
+        """
+        Get all hosts for region/cell. You can get hosts for
+        a particulr region or for a region/cell combination.
 
-        return [], 200, None
+        :param region: Region this host belongs to (required)
+        :param cell: Cell this host belongs to
+        :param name: Name of the host to get
+        :param id: ID of the host to get
+        :param ip_address: IP address of the host to get
+        """
+        region = g.args["region"]
+        cell = g.args["cell"]
+        hostname = g.args["name"]
+        host_id = g.args["id"]
+        ip_address = g.args["ip"]
+        context = request.environ.get("context")
+
+        filters = {}
+        if host_id != 'None':
+            filters["host_id"] = host_id
+        if hostname != 'None':
+            filters["hostname"] = hostname
+        if ip_address != 'None':
+            filters["ip"] = ip_address
+
+        # This is a query constraint, you cant fetch all hosts
+        # for all regions, you have to query hosts by region.
+        if region == 'None':
+            return self.error_response(400, "Missing `region` in query")
+
+        if region != 'None' and cell != 'None':
+            try:
+                hosts_obj = dbapi.hosts_get_by_region_cell(context,
+                                                           region,
+                                                           cell,
+                                                           filters)
+            except exceptions.NotFound:
+                return self.error_response(404, 'Not Found')
+            except Exception as err:
+                LOG.error("Error during host get: %s" % err)
+                return self.error_response(500, 'Unknown Error')
+
+            # return all hosts
+            hosts = jsonutils.to_primitive(hosts_obj)
+            return hosts, 200, None
+
+        # Get all hosts for this region
+        if cell == 'None':
+            try:
+                hosts_obj = dbapi.hosts_get_by_region(context, region, filters)
+            except exceptions.NotFound:
+                return self.error_response(404, 'Not Found')
+            except Exception as err:
+                LOG.error("Error during host get: %s" % err)
+                return self.error_response(500, 'Unknown Error')
+
+            # return all hosts
+            hosts = jsonutils.to_primitive(hosts_obj)
+            return hosts, 200, None
 
     def post(self):
-        print(g.json)
+        """Create a new host."""
+        context = request.environ.get('context')
+        try:
+            dbapi.hosts_create(context, g.json)
+        except Exception as err:
+            LOG.error("Error during host create: %s" % err)
+            return self.error_response(500, 'Unknown Error')
 
         return None, 200, None
 
 
-class HostsId(base.Resource):
+class HostById(base.Resource):
+
+    def get(self, id):
+        """Get host by given id"""
+        context = request.environ.get('context')
+        try:
+            host_obj = dbapi.hosts_get_by_id(context, id)
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
+        except Exception as err:
+            LOG.error("Error during host get: %s" % err)
+            return self.error_response(500, 'Unknown Error')
+
+        host_obj.data = host_obj.variables
+        host_obj.labels = host_obj.labels
+        host = jsonutils.to_primitive(host_obj)
+        return host
 
     def put(self, id):
-        print(g.json)
-
         return None, 400, None
 
     def delete(self, id):
+        """Delete existing host."""
+        context = request.environ.get('context')
+        try:
+            dbapi.hosts_delete(context, id)
+        except Exception as err:
+            LOG.error("Error during host delete: %s" % err)
+            return self.error_response(500, 'Unknown Error')
 
-        return None, 400, None
+        return None, 200, None
 
 
 class HostsData(base.Resource):
 
     def put(self, id):
-        print(g.json)
+        """
+        Update existing host data, or create if it does
+        not exist.
+        """
+        data_keys = request.form.keys()
+        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
+        context = request.environ.get('context')
+        try:
+            dbapi.hosts_data_update(context, id, data)
+        except Exception as err:
+            LOG.error("Error during host data update: %s" % err)
+            return self.error_response(500, 'Unknown Error')
 
-        return None, 400, None
+        return None, 200, None
 
     def delete(self, id):
+        """Delete host  data."""
+        # NOTE(sulo): this is not that great. Find a better way to do this.
+        # We can pass multiple keys suchs as key1=one key2=two etc. but not
+        # the best way to do this.
+        data_keys = request.form.keys()
+        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
+        context = request.environ.get('context')
+        try:
+            dbapi.hosts_data_delete(context, id, data)
+        except Exception as err:
+            LOG.error("Error during host delete: %s" % err)
+            return self.error_response(500, 'Unknown Error')
 
-        return None, 400, None
+        return None, 200, None

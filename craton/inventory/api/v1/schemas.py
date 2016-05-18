@@ -2,23 +2,23 @@ import six
 
 
 DefinitionsHost = {'discriminator': 'name',
-                   'required': ['hostname',
-                                'ip_address',
-                                'cell',
-                                'service'],
+                   'required': ['name',
+                                'region_id',
+                                'cell_id',
+                                'project_id'],
                    'type': 'object',
                    'properties': {
                        'note': {'type': 'string'},
-                       'service': {'items': {'type': 'string'},
-                                   'type': 'array'},
-                       'ip_address': {'type': 'string'},
-                       'hostname': {'type': 'string'},
+                       'ip': {'type': 'string'},
+                       'name': {'type': 'string'},
                        'id': {'type': 'integer'},
-                       'cell': {'type': 'string'},
-                       'hw_manufacturer': {'type': 'string'},
+                       'cell_id': {'type': 'string'},
+                       'project_id': {'type': 'string'},
+                       'lables': {'type': 'allOf',
+                                  'description': 'User defined lables'},
                        'data': {'type': 'allOf',
                                 'description': 'User defined information'},
-                       'host_uuid': {'type': 'string'}}}
+                       'region_id': {'type': 'string'}}}
 
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
@@ -79,39 +79,34 @@ validators = {
     ('regions_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts', 'POST'): {'json': DefinitionsHost},
     ('hosts', 'GET'): {
-        'args': {'required': [],
+        'args': {'required': ['region'],
                  'properties': {
                      'name': {
                          'default': 'None',
                          'type': 'string',
                          'description': 'name of the hosts to get'},
-                     'service': {
-                         'description': 'Openstack service to query host by',
-                         'default': [],
-                         'items': {'type': 'string'},
-                         'type': 'array'},
                      'region': {
                          'default': 'None',
                          'type': 'string',
-                         'description': 'name of the region to get hosts for'},
+                         'description': 'ID region to get hosts for'},
                      'cell': {
                          'default': 'None',
                          'type': 'string',
-                         'description': 'name of the cell to get hosts for'},
+                         'description': 'ID the cell to get hosts for'},
                      'limit': {
                          'minimum': 1,
                          'description': 'number of hosts to return',
                          'default': 1000,
                          'type': 'integer',
                          'maximum': 10000},
-                     'ip_address': {
+                     'ip': {
                          'default': 'None',
                          'type': 'string',
                          'description': 'ip_address of the hosts to get'},
-                     'uuid': {
+                     'id': {
                          'default': 'None',
                          'type': 'string',
-                         'description': 'UUID of host to get'}}
+                         'description': 'ID of host to get'}}
                  }},
     ('cells_id', 'PUT'): {'json': DefinitionsCell},
     ('cells', 'POST'): {'json': DefinitionsCell},
