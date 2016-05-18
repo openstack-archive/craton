@@ -196,11 +196,11 @@ class Device(Base, VariableMixin):
     # many-to-many relationship with labels; labels are sorted to
     # ensure that variable resolution is stable if labels have
     # conflicting settings for a given key
-    _labels = relationship(
+    labels = relationship(
         'Label',
         secondary=lambda: device_labels,
         collection_class=lambda: SortedSet(key=attrgetter('label')))
-    labels = association_proxy('_labels', 'label')
+    associated_labels = association_proxy('labels', 'label')
 
     # many-to-one relationship to regions and cells
     region = relationship('Region', back_populates='devices')
@@ -233,7 +233,7 @@ class Host(Device):
         """Provides a mapping that uses scope resolution for variables"""
         return ChainMap(
             self.variables,
-            ChainMap(*[label.variables for label in self._labels]),
+            ChainMap(*[label.variables for label in self.labels]),
             self.cell.variables,
             self.region.variables)
 
@@ -271,7 +271,7 @@ class Label(Base, VariableMixin):
     devices = relationship(
         "Device",
         secondary=device_labels,
-        back_populates="_labels")
+        back_populates="labels")
 
 
 class AccessSecret(Base):
