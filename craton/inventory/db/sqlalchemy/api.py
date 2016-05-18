@@ -87,6 +87,7 @@ def model_query(context, model, *args, **kwargs):
 
 Blame = namedtuple('Blame', ['source', 'variable'])
 
+
 def host_blame_variables(host, keys=None):
     """Determines the sources of how variables have been set for a host.
     :param host: host to get blame information
@@ -97,9 +98,8 @@ def host_blame_variables(host, keys=None):
     (created_at, modified_at).
 
     TODO(jimbaker) further extend schema on mixed-in variable tables
-    to capture additional governance, such as user who set the key
-    (depends on https://github.com/rackerlabs/craton/issues/46); this
-    will then transparently become available in the blame.
+    to capture additional governance, such as user who set the key;
+    this will then transparently become available in the blame.
     """
     if keys is None:
         keys = host.resolved.keys()
