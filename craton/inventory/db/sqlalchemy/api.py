@@ -350,12 +350,12 @@ def hosts_create(context, values):
     with session.begin():
         host.update(values)
         host.save(session)
-    return host 
+    return host
 
 
 def hosts_update(context, host_id, values):
     """Update an existing host."""
-    return None 
+    return None
 
 
 def hosts_delete(context, host_id):
@@ -365,7 +365,7 @@ def hosts_delete(context, host_id):
         host_devices = with_polymorphic(models.Device, '*')
         query = model_query(context, host_devices, session=session,
                             project_only=True)
-        query = query.filter_by(id=region_id)
+        query = query.filter_by(id=host_id)
         query.delete()
     return
 
@@ -399,7 +399,7 @@ def hosts_data_delete(context, host_id, data):
         host_devices = with_polymorphic(models.Device, '*')
         query = model_query(context, host_devices, session=session,
                             project_only=True)
-        query = query.filter_by(id=host)
+        query = query.filter_by(id=host_id)
 
         try:
             host_ref = query.with_lockmode('update').one()
