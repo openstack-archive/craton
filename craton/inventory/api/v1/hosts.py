@@ -16,7 +16,7 @@ class Hosts(base.Resource):
     def get(self):
         """
         Get all hosts for region/cell. You can get hosts for
-        a particulr region or for a region/cell combination.
+        a particular region or for a region/cell combination.
 
         :param region: Region this host belongs to (required)
         :param cell: Cell this host belongs to
@@ -29,6 +29,7 @@ class Hosts(base.Resource):
         hostname = g.args["name"]
         host_id = g.args["id"]
         ip_address = g.args["ip"]
+
         context = request.environ.get("context")
 
         filters = {}
@@ -37,42 +38,26 @@ class Hosts(base.Resource):
         if hostname != 'None':
             filters["hostname"] = hostname
         if ip_address != 'None':
-            filters["ip"] = ip_address
+            filters["ip_address"] = ip_address
+        if cell != 'None':
+            filters["cell"] = cell
 
         # This is a query constraint, you cant fetch all hosts
         # for all regions, you have to query hosts by region.
         if region == 'None':
             return self.error_response(400, "Missing `region` in query")
 
-        if region != 'None' and cell != 'None':
-            try:
-                hosts_obj = dbapi.hosts_get_by_region_cell(context,
-                                                           region,
-                                                           cell,
-                                                           filters)
-            except exceptions.NotFound:
-                return self.error_response(404, 'Not Found')
-            except Exception as err:
-                LOG.error("Error during host get: %s" % err)
-                return self.error_response(500, 'Unknown Error')
+        try:
+            LOG.info("Getting hosts that match filters %s" % filters)
+            hosts_obj = dbapi.hosts_get_by_region(context, region, filters)
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
+        except Exception as err:
+            LOG.error("Error during host get: %s" % err)
+            return self.error_response(500, 'Unknown Error')
 
-            # return all hosts
-            hosts = jsonutils.to_primitive(hosts_obj)
-            return hosts, 200, None
-
-        # Get all hosts for this region
-        if cell == 'None':
-            try:
-                hosts_obj = dbapi.hosts_get_by_region(context, region, filters)
-            except exceptions.NotFound:
-                return self.error_response(404, 'Not Found')
-            except Exception as err:
-                LOG.error("Error during host get: %s" % err)
-                return self.error_response(500, 'Unknown Error')
-
-            # return all hosts
-            hosts = jsonutils.to_primitive(hosts_obj)
-            return hosts, 200, None
+        hosts = jsonutils.to_primitive(hosts_obj)
+        return hosts, 200, None
 
     def post(self):
         """Create a new host."""

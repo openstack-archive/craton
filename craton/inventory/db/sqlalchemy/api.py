@@ -290,33 +290,25 @@ def regions_data_delete(context, region_id, data):
     return region_ref
 
 
-def hosts_get_by_region_cell(context, region_id, cell_id, filters):
-    """Get all hosts for this region cell combination with
-    given filters."""
-    host_devices = with_polymorphic(models.Device, '*')
-    query = model_query(context, host_devices, project_only=True)
-    for key, value in filters.iteritems():
-        if key == "hostname":
-            query = query.filter_by(hostname=value)
-        if key == "ip":
-            query = query.filter_by(ip=value)
-        if key == "id":
-            query = query.filter_by(id=value)
-
-    try:
-        result = query.all()
-        return result
-    except sa_exc.NoResultFound:
-        raise exceptions.NotFound()
-    except Exception as err:
-        raise exceptions.UnknownException(message=err)
-
-
 def hosts_get_by_region(context, region_id, filters):
-    """Get all hosts for this region."""
-    host_devices = with_polymorphic(models.Device, '*')
+    """Get all hosts for this region.
+
+    :param region_id: ID for the region
+    :param filters: filters wich contails differnt keys/values to match.
+    Supported filters are by name, ip_address, id and cell_id.
+    """
+    host_devices = with_polymorphic(models.Device, [models.Host])
     query = model_query(context, host_devices, project_only=True)
     query = query.filter_by(region_id=region_id)
+
+    if "name" in filters:
+        query = query.filter_by(name=filters["name"])
+    if "ip_address" in filters:
+        query = query.filter_by(ip_address=filters["ip_address"])
+    if "id" in filters:
+        query = query.filter_by(id=filters["id"])
+    if "cell" in filters:
+        query = query.filter_by(cell_id=filters["cell"])
 
     try:
         result = query.all()
