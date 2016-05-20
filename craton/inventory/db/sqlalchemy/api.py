@@ -91,7 +91,7 @@ def cells_get_all(context, region):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
     if region is not None:
-        query = query.filter_by(region=region)
+        query = query.filter_by(region_id=region)
 
     try:
         result = query.all()
@@ -102,12 +102,23 @@ def cells_get_all(context, region):
         raise exceptions.UnknownException(message=err)
 
 
-def cells_get_by_name(context, region, cell):
+def cells_get_by_name(context, region_id, cell_id):
     """Get cell details given for a given cell in a region."""
     try:
         query = model_query(context, models.Cell).\
-            filter_by(region_id=region).\
-            filter_by(id=cell)
+            filter_by(region_id=region_id).\
+            filter_by(name=cell_id)
+        return query.one()
+    except sqlalchemy.orm.exc.NoResultFound:
+        raise exceptions.NotFound()
+
+
+def cells_get_by_id(context, region_id, cell_id):
+    """Get cell details given for a given cell in a region."""
+    try:
+        query = model_query(context, models.Cell).\
+            filter_by(region_id=region_id).\
+            filter_by(id=cell_id)
         return query.one()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
