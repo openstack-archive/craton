@@ -9,7 +9,10 @@ cell1 = {'region_id': 1, 'project_id': 1, 'name': 'cell1'}
 class CellsDBTestCase(base.DBTestCase):
 
     def test_cells_create(self):
-        dbapi.cells_create(self.context, cell1)
+        try:
+            dbapi.cells_create(self.context, cell1)
+        except Exception:
+            self.fail("Cell create raised unexpected exception")
 
     def test_cells_get_all(self):
         dbapi.cells_create(self.context, cell1)

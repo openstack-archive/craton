@@ -109,7 +109,7 @@ def cells_get_by_name(context, region_id, cell_id):
             filter_by(region_id=region_id).\
             filter_by(name=cell_id)
         return query.one()
-    except sqlalchemy.orm.exc.NoResultFound:
+    except sa_exc.NoResultFound:
         raise exceptions.NotFound()
 
 
