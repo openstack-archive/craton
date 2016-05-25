@@ -1,7 +1,7 @@
 from craton.inventory.api.v1.cells import Cells
 from craton.inventory.api.v1.cells import CellsData
 from craton.inventory.api.v1.hosts import Hosts
-from craton.inventory.api.v1.hosts import HostsId
+from craton.inventory.api.v1.hosts import HostById
 from craton.inventory.api.v1.hosts import HostsData
 from craton.inventory.api.v1.regions import Regions
 from craton.inventory.api.v1.regions import RegionsData
@@ -11,7 +11,7 @@ routes = [
     dict(resource=HostsData,
          urls=['/hosts/<id>/data'],
          endpoint='hosts_data'),
-    dict(resource=HostsId,
+    dict(resource=HostById,
          urls=['/hosts/<id>'],
          endpoint='hosts_id'),
     dict(resource=Hosts,

@@ -18,8 +18,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import object_mapper, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
+
+from craton.inventory.db.sqlalchemy import types
 
 
 # TODO(jimbaker) set up table args for a given database/storage
@@ -174,6 +175,7 @@ class Device(Base, VariableMixin):
         Integer, ForeignKey('cells.id'), index=True, nullable=True)
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
+    ip_address = Column(types.IPAddressType, nullable=False)
     # this means the host is "active" for administration
     # the device may or may not be reachable by Ansible/other tooling
     #
@@ -206,7 +208,6 @@ class Host(Device):
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
-    ip_address = Column(IPAddressType, nullable=False)
 
     # NOTE it is not possible to express table constraints such as
     # `UniqueConstraint(Device.region_id, ip_address)`
