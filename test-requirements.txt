@@ -2,11 +2,17 @@
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
 
+# Needed for testing
 flake8
 flask
 flask-restful
 jsonschema
 nose
 mock
+sphinx!=1.2.0,!=1.3b1,<1.3,>=1.1.2 # BSD
 oslotest>=1.10.0 #Apache-2.0
 testtools>=1.4.0
+
+# Documentation
+oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
+
