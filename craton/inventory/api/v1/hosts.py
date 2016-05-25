@@ -33,18 +33,18 @@ class Hosts(base.Resource):
         context = request.environ.get("context")
 
         filters = {}
-        if host_id != 'None':
+        if host_id:
             filters["host_id"] = host_id
-        if hostname != 'None':
+        if hostname:
             filters["hostname"] = hostname
-        if ip_address != 'None':
+        if ip_address:
             filters["ip_address"] = ip_address
-        if cell != 'None':
+        if cell:
             filters["cell"] = cell
 
         # This is a query constraint, you cant fetch all hosts
         # for all regions, you have to query hosts by region.
-        if region == 'None':
+        if not region:
             return self.error_response(400, "Missing `region` in query")
 
         try:

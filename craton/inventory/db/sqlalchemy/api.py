@@ -294,7 +294,7 @@ def hosts_get_by_region(context, region_id, filters):
     """Get all hosts for this region.
 
     :param region_id: ID for the region
-    :param filters: filters wich contails differnt keys/values to match.
+    :param filters: filters wich contains differnt keys/values to match.
     Supported filters are by name, ip_address, id and cell_id.
     """
     host_devices = with_polymorphic(models.Device, [models.Host])

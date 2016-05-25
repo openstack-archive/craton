@@ -82,17 +82,17 @@ validators = {
         'args': {'required': ['region'],
                  'properties': {
                      'name': {
-                         'default': 'None',
+                         'default': None,
                          'type': 'string',
                          'description': 'name of the hosts to get'},
                      'region': {
-                         'default': 'None',
+                         'default': None,
                          'type': 'string',
-                         'description': 'ID region to get hosts for'},
+                         'description': 'ID of the region to get hosts'},
                      'cell': {
-                         'default': 'None',
+                         'default': None,
                          'type': 'string',
-                         'description': 'ID the cell to get hosts for'},
+                         'description': 'ID of the cell to get hosts'},
                      'limit': {
                          'minimum': 1,
                          'description': 'number of hosts to return',
@@ -100,11 +100,11 @@ validators = {
                          'type': 'integer',
                          'maximum': 10000},
                      'ip': {
-                         'default': 'None',
+                         'default': None,
                          'type': 'string',
                          'description': 'ip_address of the hosts to get'},
                      'id': {
-                         'default': 'None',
+                         'default': None,
                          'type': 'string',
                          'description': 'ID of host to get'}}
                  }},

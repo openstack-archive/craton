@@ -5,6 +5,10 @@ import six
 from sqlalchemy import types
 
 
+# TODO(sulo): get rid of this once we have
+# ipaddress supported by oslo.serialization.
+
+
 class IPAddressType(types.TypeDecorator):
 
     impl = types.String(64)

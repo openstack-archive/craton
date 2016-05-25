@@ -108,7 +108,7 @@ def hosts_get_by_region_cell(context, region_id, cell_id, filters):
 
 
 def hosts_get_by_region(context, region_id, filters):
-    """Geta all hosts for this region."""
+    """Get all hosts for this region."""
     return IMPL.hosts_get_by_region(context, region_id, filters)
 
 
@@ -134,7 +134,7 @@ def hosts_delete(context, host_id):
 
 def hosts_data_update(context, host_id, data):
     """
-    Update existing host variables or create when its not present.
+    Update existing host variables or create them when not present.
     """
     return IMPL.hosts_data_update(context, host_id, data)
 
