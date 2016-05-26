@@ -75,6 +75,18 @@ DefinitionsRegion = {'discriminator': 'name',
 validators = {
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts_id', 'PUT'): {'json': DefinitionsHost},
+    ('regions', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'name': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'name of the region to get'},
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'ID of the region to get'}}}
+        },
     ('regions', 'POST'): {'json': DefinitionsRegion},
     ('regions_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts', 'POST'): {'json': DefinitionsHost},
@@ -114,11 +126,16 @@ validators = {
         'args': {'required': [],
                  'properties': {
                      'region': {
-                         'default': 'None',
+                         'default': None,
                          'type': 'string',
                          'description': 'name of the region to get cells for'},
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the cell to get'
+                         },
                      'name': {
-                         'default': 'None',
+                         'default': None,
                          'type': 'string',
                          'description': 'name of the cell to get'}}
                  }},

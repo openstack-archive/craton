@@ -17,13 +17,18 @@ class Cells(base.Resource):
         for a particular region.
         """
         region = g.args["region"]
-        cell = g.args["name"]
+        cell_name = g.args["name"]
+        cell_id = g.args["id"]
         context = request.environ.get('context')
 
-        if region != 'None' and cell != 'None':
+        if not region:
+            msg = "`region` is required to get cells"
+            return self.error_response(400, msg)
+
+        if region and cell_name:
             # Get this particular cell along with its data
             try:
-                cell_obj = dbapi.cells_get_by_name(context, region, cell)
+                cell_obj = dbapi.cells_get_by_name(context, region, cell_name)
             except exceptions.NotFound:
                 return self.error_response(404, 'Not Found')
             except Exception as err:
@@ -34,21 +39,26 @@ class Cells(base.Resource):
             cell = jsonutils.to_primitive(cell_obj)
             return [cell], 200, None
 
-        if region == 'None':
-            # Get all cells for all regions
+        if region and cell_id:
+            # Get this particular cell along with its data
             try:
-                cell_obj = dbapi.cells_get_all(context, None)
-                cell = jsonutils.to_primitive(cell_obj)
-                return cell, 200, None
+                cell_obj = dbapi.cells_get_by_id(context, region, cell_id)
             except exceptions.NotFound:
                 return self.error_response(404, 'Not Found')
+            except Exception as err:
+                LOG.error("Error during cells get: %s" % err)
+                return self.error_response(500, 'Unknown Error')
 
-        if region != 'None' and cell == 'None':
+            cell_obj.data = cell_obj.variables
+            cell = jsonutils.to_primitive(cell_obj)
+            return [cell], 200, None
+
+        if region and not (cell_name or cell_id):
             # Get all cells for this region only
             try:
                 cells_obj = dbapi.cells_get_all(context, region)
                 cells = jsonutils.to_primitive(cells_obj)
-                return cells
+                return cells, 200, None
             except exceptions.NotFound:
                 return self.error_response(404, 'Not Found')
 

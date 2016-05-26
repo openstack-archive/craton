@@ -1,7 +1,6 @@
-import sqlalchemy.orm.exc
-
 from craton.inventory.db import api as dbapi
 from craton.inventory.tests.unit.db import base
+from craton.inventory import exceptions
 
 
 region1 = {'project_id': 1, 'name': 'region1'}
@@ -46,7 +45,7 @@ class RegionsDBTestCase(base.DBTestCase):
         self.assertEqual(res.name, 'region1')
 
         dbapi.regions_delete(self.context, res.id)
-        self.assertRaises(sqlalchemy.orm.exc.NoResultFound,
+        self.assertRaises(exceptions.NotFound,
                           dbapi.regions_get_by_name,
                           self.context, 'fake-region')
 
