@@ -16,13 +16,13 @@ class Regions(base.Resource):
         """Get region(s) for the project. Get region details if
         for a particular region.
         """
-        # region_id =  g.args["id"]
-        # region_name = g.args["name"]
-        region_id = id or 'None'
-        region_name = 'None'
+        _id = g.args["id"]
+        _name = g.args["name"]
+        region_id = id or _id
+        region_name = _name
         context = request.environ.get('context')
 
-        if region_id == 'None' and region_name == 'None':
+        if not region_id and not region_name:
             # Get all regions for this tenant
             try:
                 regions_obj = dbapi.regions_get_all(context)
@@ -35,7 +35,7 @@ class Regions(base.Resource):
             else:
                 return None, 404, None
 
-        if region_name != 'None':
+        if region_name:
             try:
                 region_obj = dbapi.regions_get_by_name(context, region_name)
             except exceptions.NotFound:
@@ -44,11 +44,11 @@ class Regions(base.Resource):
             if region_obj:
                 region_obj.data = region_obj.variables
                 result = jsonutils.to_primitive(region_obj)
-                return result, 200, None
+                return [result], 200, None
             else:
                 return None, 404, None
 
-        if region_id != 'None':
+        if region_id:
             try:
                 region_obj = dbapi.regions_get_by_id(context, region_id)
             except exceptions.NotFound:
@@ -57,7 +57,7 @@ class Regions(base.Resource):
             if region_obj:
                 region_obj.data = region_obj.variables
                 result = jsonutils.to_primitive(region_obj)
-                return result, 200, None
+                return [result], 200, None
             else:
                 return None, 404, None
 

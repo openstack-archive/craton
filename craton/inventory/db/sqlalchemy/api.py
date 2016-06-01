@@ -94,8 +94,7 @@ def cells_get_all(context, region):
         query = query.filter_by(region_id=region)
 
     try:
-        result = query.all()
-        return result
+        return query.all()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
     except Exception as err:
@@ -210,22 +209,30 @@ def cells_data_delete(context, cell_id, data):
 def regions_get_all(context):
     """Get all available regions."""
     query = model_query(context, models.Region, project_only=True)
-    result = query.all()
-    return result
+    try:
+        return query.all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
 
 
 def regions_get_by_name(context, name):
     """Get cell detail for the region with given name."""
     query = model_query(context, models.Region, project_only=True)
     query = query.filter_by(name=name)
-    return query.one()
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
 
 
 def regions_get_by_id(context, region_id):
     """Get cell detail for the region with given id."""
     query = model_query(context, models.Region, project_only=True)
     query = query.filter_by(id=region_id)
-    return query.one()
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
 
 
 def regions_create(context, values):
