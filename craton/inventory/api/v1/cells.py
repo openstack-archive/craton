@@ -53,14 +53,13 @@ class Cells(base.Resource):
             cell = jsonutils.to_primitive(cell_obj)
             return [cell], 200, None
 
-        if region and not (cell_name or cell_id):
-            # Get all cells for this region only
-            try:
-                cells_obj = dbapi.cells_get_all(context, region)
-                cells = jsonutils.to_primitive(cells_obj)
-                return cells, 200, None
-            except exceptions.NotFound:
-                return self.error_response(404, 'Not Found')
+        # No cell id or name so get all cells for this region only
+        try:
+            cells_obj = dbapi.cells_get_all(context, region)
+            cells = jsonutils.to_primitive(cells_obj)
+            return cells, 200, None
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
 
     def post(self):
         """Create a new cell."""

@@ -94,8 +94,7 @@ def cells_get_all(context, region):
         query = query.filter_by(region_id=region)
 
     try:
-        result = query.all()
-        return result
+        return query.all()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
     except Exception as err:
@@ -211,11 +210,9 @@ def regions_get_all(context):
     """Get all available regions."""
     query = model_query(context, models.Region, project_only=True)
     try:
-        result = query.all()
+        return query.all()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
-
-    return result
 
 
 def regions_get_by_name(context, name):
@@ -223,11 +220,9 @@ def regions_get_by_name(context, name):
     query = model_query(context, models.Region, project_only=True)
     query = query.filter_by(name=name)
     try:
-        result = query.one()
+        return query.one()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
-
-    return result
 
 
 def regions_get_by_id(context, region_id):
@@ -235,11 +230,9 @@ def regions_get_by_id(context, region_id):
     query = model_query(context, models.Region, project_only=True)
     query = query.filter_by(id=region_id)
     try:
-        result = query.one()
+        return query.one()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
-
-    return result
 
 
 def regions_create(context, values):
