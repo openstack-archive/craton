@@ -21,16 +21,6 @@ Contents
 
 `craton project-update`_
 
-`craton project-region-list`_
-
-`craton project-cell-list`_
-
-`craton project-device-list`_
-
-`craton project-host-list`_
-
-`craton project-user-list`_
-
 `craton region-create`_
 
 `craton region-delete`_
@@ -41,12 +31,6 @@ Contents
 
 `craton region-update`_
 
-`craton region-cell-list`_
-
-`craton region-device-list`_
-
-`craton region-host-list`_
-
 `craton cell-create`_
 
 `craton cell-delete`_
@@ -56,10 +40,6 @@ Contents
 `craton cell-show`_
 
 `craton cell-update`_
-
-`craton cell-device-list`_
-
-`craton cell-host-list`_
 
 `craton device-create`_
 
@@ -81,83 +61,67 @@ Contents
 
 `craton host-update`_
 
+`craton user-list`_
+
 craton usage
 ------------
 
 **Subcommands:**
 
 **craton usage**
-    Shows usages of craton client.
+    Show usages of craton client.
 **craton project-create**
-    Creates a new project.
+    Create a new project.
 **craton project-delete**
-    Deletes a project.
+    Delete a project.
 **craton project-list**
-    Lists all projects.
+    List all projects.
 **craton project-show**
     Show detailed information about a project.
 **craton project-update**
     Update information about a project.
-**craton project-region-list**
-    Lists the regions in a project.
-**craton project-cell-list**
-    Lists the cells in a project.
-**craton project-device-list**
-    Lists the devices in a project.
-**craton project-host-list**
-    Lists the hosts in a project.
-**craton project-user-list**
-    Lists the users of a project.
 **craton region-create**
-    Creates a new region.
+    Create a new region.
 **craton region-delete**
-    Deletes a region.
+    Delete a region.
 **craton region-list**
-    Lists all regions.
+    List all regions.
 **craton region-show**
     Show detailed information about a region.
 **craton region-update**
     Update information about a region.
-**craton region-cell-list**
-    Lists the cells in a region.
-**craton region-device-list**
-    Lists the devices in a region.
-**craton region-host-list**
-    Lists the hosts in a region.
 **craton cell-create**
-    Creates a new cell.
+    Create a new cell.
 **craton cell-delete**
-    Deletes a cell.
+    Delete a cell.
 **craton cell-list**
-    Lists all cells.
+    List all cells.
 **craton cell-show**
-    Shows detailed information about a cell.
+    Show detailed information about a cell.
 **craton cell-update**
     Update information about a cell.
-**craton cell-device-list**
-    Lists the devices in a cell.
-**craton cell-host-list**
-    Lists the hosts in a cell.
 **craton device-create**
-    Creates a new device.
+    Create a new device.
 **craton device-delete**
-    Deletes a device.
+    Delete a device.
 **craton device-list**
-    Lists all devices.
+    List all devices.
 **craton device-show**
     Show detailed information about a device.
 **craton device-update**
     Update information about a device.
 **craton host-create**
-    Creates a new host.
+    Create a new host.
 **craton host-delete**
-    Deletes a host.
+    Delete a host.
 **craton host-list**
-    Lists all hosts.
+    List all hosts.
 **craton host-show**
     Show detailed information about a host.
 **craton host-update**
     Update information about a host.
+**craton user-list**
+    List the users of a project.
 **craton help**
     Display help about this program or one of its subcommands.
 
@@ -165,13 +129,14 @@ craton optional arguments
 -------------------------
 
 ``--version``
- Show program's version number and exit
+ Show program's version number and exits.
 ``-v, --verbose``
- Print more verbose output
+ Print more verbose output.
 
 craton project-create
 ---------------------
-Create a new project::
+Create a new project.
+::
 
  usage: craton project-create [-n <name>] [-u <uuid>]
 
@@ -186,18 +151,20 @@ Create a new project::
 
 craton project-delete
 ---------------------
-Deletes a project::
+Delete a project.
+::
 
  usage: craton project-delete <project>
 
 **Positional arguments:**
 
 ``<project>``
- uuid of the project.
+ UUID of the project.
 
 craton project-list
 -------------------
-List the projects::
+List the projects.
+::
 
  usage: craton project-list [--detail] [--limit <limit>]
 
@@ -206,13 +173,12 @@ List the projects::
 ``--detail``
  Show detailed information about the projects.
 ``--limit <limit>``
- Maximum number of projects to return per request, 0 for no limit.
- 
- Default is the maximum number used by the Craton API Service.
+ Maximum number of projects to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
 
 craton project-show
 -------------------
-Shows detailed information about a project::
+Show detailed information about a project.
+::
 
  usage: craton project-show <project>
 
@@ -224,7 +190,8 @@ Shows detailed information about a project::
 
 craton project-update
 ---------------------
-Update information about a project::
+Update information about a project.
+::
 
  usage: craton project-update <project> [-n <name>]
 
@@ -238,168 +205,10 @@ Update information about a project::
 ``-n <name>, --name <name>``
  New name for the project.
 
-craton project-region-list
---------------------------
-Lists the regions in a project::
-
- usage: craton project-region-list [--detail] [--limit <limit>]
-                                   [--sort-key <field>] [--sort-dir <direction>]
-                                   [--fields <field> [<field> ...]]
-                                   <project>
-
-**Positional arguments:**
-
-``<project>``
- UUID of the project.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the regions.
-
-``--limit <limit>``
- Maximum number of regions to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Region field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more region fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
-
-craton project-cell-list
-------------------------
-Lists the cells in a project::
-
- usage: craton project-cell-list [--detail] [--limit <limit>]
-                                 [--sort-key <field>] [--sort-dir <direction>]
-                                 [--fields <field> [<field> ...]]
-                                 <project>
-
-**Positional arguments:**
-
-``<project>``
- UUID of the project.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the cells.
-
-``--limit <limit>``
- Maximum number of cells to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Cell field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more cell fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
-craton project-device-list
---------------------------
-Lists the devices in a project::
-
- usage: craton project-device-list [--detail] [--limit <limit>]
-                                   [--sort-key <field>] [--sort-dir <direction>]
-                                   [--fields <field> [<field> ...]]
-                                   <project>
-
-**Positional arguments:**
-
-``<project>``
- UUID of the project.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the devices.
-
-``--limit <limit>``
- Maximum number of devices to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Device field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more device fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
-
-craton project-host-list
-------------------------
-Lists the hosts in a project::
-
- usage: craton project-host-list [--detail] [--limit <limit>]
-                                 [--sort-key <field>] [--sort-dir <direction>]
-                                 [--fields <field> [<field> ...]]
-                                 <project>
-
-**Positional arguments:**
-
-``<project>``
- UUID of the project.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the hosts.
-
-``--limit <limit>``
- Maximum number of hosts to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Host field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more host fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
-
-
-craton project-user-list
-------------------------
-Lists the users in a project::
-
- usage: craton project-user-list [--detail] [--limit <limit>]
-                                 [--sort-key <field>] [--sort-dir <direction>]
-                                 [--fields <field> [<field> ...]]
-                                 <project>
-
-**Positional arguments:**
-
-``<project>``
- UUID of the project.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the users.
-
-``--limit <limit>``
- Maximum number of users to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- User field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more user fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
 craton region-create
 --------------------
-Create a new region::
+Create a new region.
+::
 
  usage: craton region-create [-n <name>] [-u <uuid>] [-p <project>] [--note <note>]
 
@@ -419,33 +228,46 @@ Create a new region::
 
 craton region-delete
 --------------------
-Deletes a region::
+Delete a region.
+::
 
  usage: craton region-delete <region>
 
 **Positional arguments:**
 
 ``<region>``
- uuid of the region.
+ UUID of the region.
 
 craton region-list
 ------------------
-List the regions::
+List the regions.
+::
 
  usage: craton region-list [--detail] [--limit <limit>]
+                           [--sort-key <field>] [--sort-dir <direction>]
+                           [--fields <field> [<field> ...]]
 
 **Optional arguments:**
 
 ``--detail``
  Show detailed information about the regions.
+
 ``--limit <limit>``
- Maximum number of regions to return per request, 0 for no limit.
- 
- Default is the maximum number used by the Craton API Service.
+ Maximum number of regions to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
+
+``--sort-key <field>``
+ Region field that will be used for sorting.
+
+``--sort-dir <direction>``
+ Sort direction: “asc” (the default) or “desc”.
+
+``--fields <field> [<field> ...]``
+ One or more region fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
 
 craton region-show
 ------------------
-Shows detailed information about a region::
+Show detailed information about a region.
+::
 
  usage: craton region-show <region>
 
@@ -456,7 +278,8 @@ Shows detailed information about a region::
 
 craton region-update
 --------------------
-Update information about a region::
+Update information about a region.
+::
 
  usage: craton region-update <region> [-n <name>]
 
@@ -470,102 +293,10 @@ Update information about a region::
 ``-n <name>, --name <name>``
  New name for the region.
 
-craton region-cell-list
------------------------
-Lists the cells in a region::
-
- usage: craton region-cell-list [--detail] [--limit <limit>]
-                                [--sort-key <field>] [--sort-dir <direction>]
-                                [--fields <field> [<field> ...]]
-                                <region>
-
-**Positional arguments:**
-
-``<region>``
- UUID of the region.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the cells.
-
-``--limit <limit>``
- Maximum number of cells to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Cell field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more cell fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
-craton region-device-list
--------------------------
-Lists the devices in a region::
-
- usage: craton region-device-list [--detail] [--limit <limit>]
-                                  [--sort-key <field>] [--sort-dir <direction>]
-                                  [--fields <field> [<field> ...]]
-                                  <region>
-
-**Positional arguments:**
-
-``<region>``
- UUID of the region.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the devices.
-
-``--limit <limit>``
- Maximum number of devices to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Device field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more device fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
-craton region-host-list
------------------------
-Lists the hosts in a region::
-
- usage: craton region-host-list [--detail] [--limit <limit>]
-                                [--sort-key <field>] [--sort-dir <direction>]
-                                [--fields <field> [<field> ...]]
-                                <region>
-
-**Positional arguments:**
-
-``<region>``
- UUID of the region.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the hosts.
-
-``--limit <limit>``
- Maximum number of hosts to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Host field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more host fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
 craton cell-create
 ------------------
-Create a new cell::
+Create a new cell.
+::
 
  usage: craton cell-create [-n <name>] [-u <uuid>] [-p <project>] [-r <region>] [--note <note>]
 
@@ -588,33 +319,50 @@ Create a new cell::
 
 craton cell-delete
 ------------------
-Deletes a cell::
+Delete a cell.
+::
 
  usage: craton cell-delete <cell>
 
 **Positional arguments:**
 
 ``<cell>``
- uuid of the cell.
+ UUID of the cell.
 
 craton cell-list
 ----------------
-List the cells::
+List the cells.
+::
 
  usage: craton cell-list [--detail] [--limit <limit>]
+                         [--sort-key <field>] [--sort-dir <direction>]
+                         [--fields <field> [<field> ...]]
+                         [--region <region>]
 
 **Optional arguments:**
 
 ``--detail``
  Show detailed information about the cells.
+
+``-r <region>, --region <region>``
+ UUID of the region that contains the desired list of cells.
+
 ``--limit <limit>``
- Maximum number of cells to return per request, 0 for no limit.
- 
- Default is the maximum number used by the Craton API Service.
+ Maximum number of cells to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
+
+``--sort-key <field>``
+ Cell field that will be used for sorting.
+
+``--sort-dir <direction>``
+ Sort direction: “asc” (the default) or “desc”.
+
+``--fields <field> [<field> ...]``
+ One or more cell fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
 
 craton cell-show
 ----------------
-Shows detailed information about a cell::
+Show detailed information about a cell.
+::
 
  usage: craton cell-show <cell>
 
@@ -625,7 +373,8 @@ Shows detailed information about a cell::
 
 craton cell-update
 ------------------
-Update information about a cell::
+Update information about a cell.
+::
 
  usage: craton cell-update <cell> [-n <name>]
 
@@ -639,71 +388,10 @@ Update information about a cell::
 ``-n <name>, --name <name>``
  New name for the cell.
 
-craton cell-device-list
------------------------
-Lists the devices in a cell::
-
- usage: craton cell-device-list [--detail] [--limit <limit>]
-                                [--sort-key <field>] [--sort-dir <direction>]
-                                [--fields <field> [<field> ...]]
-                                <cell>
-
-**Positional arguments:**
-
-``<cell>``
- UUID of the cell.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the devices.
-
-``--limit <limit>``
- Maximum number of devices to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Device field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more device fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
-craton cell-host-list
----------------------
-Lists the hosts in a cell::
-
- usage: craton cell-host-list [--detail] [--limit <limit>]
-                              [--sort-key <field>] [--sort-dir <direction>]
-                              [--fields <field> [<field> ...]]
-                              <cell>
-
-**Positional arguments:**
-
-``<cell>``
- UUID of the cell.
-
-**Optional arguments:**
-
-``--detail``
- Show detailed information about the hosts.
-
-``--limit <limit>``
- Maximum number of hosts to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
-
-``--sort-key <field>``
- Host field that will be used for sorting.
-
-``--sort-dir <direction>``
- Sort direction: “asc” (the default) or “desc”.
-
-``--fields <field> [<field> ...]``
- One or more host fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
-
 craton device-create
 --------------------
-Create a new device::
+Create a new device.
+::
 
  usage: craton device-create [-n <name>] [-t <type>] [-a <active>] [-u <uuid>] [-p <project>] [-r <region>] [-c <cell>] [--note <note>]
 
@@ -735,33 +423,50 @@ Create a new device::
 
 craton device-delete
 --------------------
-Deletes a device::
+Delete a device.
+::
 
  usage: craton device-delete <device>
 
 **Positional arguments:**
 
 ``<device>``
- uuid of the device.
+ UUID of the device.
 
 craton device-list
 ------------------
-List the devices::
+List the devices.
+::
 
  usage: craton device-list [--detail] [--limit <limit>]
+                           [--sort-key <field>] [--sort-dir <direction>]
+                           [--fields <field> [<field> ...]]
+                           [--cell <cell>]
 
 **Optional arguments:**
 
+``-c <cell>, --cell <cell>``
+ UUID of the cell that contains the desired list of devices.
+
 ``--detail``
- Show detailed information about the devices.
+ Show detailed information about the device.
+
 ``--limit <limit>``
- Maximum number of devices to return per request, 0 for no limit.
- 
- Default is the maximum number used by the Craton API Service.
+ Maximum number of devices to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
+
+``--sort-key <field>``
+ Device field that will be used for sorting.
+
+``--sort-dir <direction>``
+ Sort direction: “asc” (the default) or “desc”.
+
+``--fields <field> [<field> ...]``
+ One or more device fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
 
 craton device-show
 ------------------
-Shows detailed information about a device::
+Show detailed information about a device.
+::
 
  usage: craton device-show <device>
 
@@ -772,7 +477,8 @@ Shows detailed information about a device::
 
 craton device-update
 --------------------
-Update information about a device::
+Update information about a device.
+::
 
  usage: craton device-update <device> [-n <name>]
 
@@ -788,7 +494,8 @@ Update information about a device::
 
 craton host-create
 ------------------
-Create a new host::
+Create a new host.
+::
 
  usage: craton host-create [-n <name>] [-t <type>] [-a <active>] [-u <uuid>] [-p <project>] [-r <region>] [-c <cell>] [--note <note>] [--access_secret <access_secret>] [-i <ip_address>]
 
@@ -826,33 +533,50 @@ Create a new host::
 
 craton host-delete
 ------------------
-Deletes a host::
+Delete a host.
+::
 
  usage: craton host-delete <host>
 
 **Positional arguments:**
 
 ``<host>``
- uuid of the host.
+ UUID of the host.
 
 craton host-list
 ----------------
-List the hosts::
+List the hosts.
+::
 
  usage: craton host-list [--detail] [--limit <limit>]
+                         [--sort-key <field>] [--sort-dir <direction>]
+                         [--fields <field> [<field> ...]]
+                         [--cell <cell>]
 
 **Optional arguments:**
 
+``-c <cell>, --cell <cell>``
+ UUID of the cell that contains the desired list of hosts.
+
 ``--detail``
- Show detailed information about the hosts.
+ Show detailed information about the host.
+
 ``--limit <limit>``
- Maximum number of hosts to return per request, 0 for no limit.
- 
- Default is the maximum number used by the Craton API Service.
+ Maximum number of hosts to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
+
+``--sort-key <field>``
+ Host field that will be used for sorting.
+
+``--sort-dir <direction>``
+ Sort direction: “asc” (the default) or “desc”.
+
+``--fields <field> [<field> ...]``
+ One or more host fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
 
 craton host-show
 ----------------
-Shows detailed information about a host::
+Show detailed information about a host.
+::
 
  usage: craton host-show <host>
 
@@ -863,7 +587,8 @@ Shows detailed information about a host::
 
 craton host-update
 ------------------
-Update information about a host::
+Update information about a host.
+::
 
  usage: craton host-update <host> [-n <name>]
 
@@ -876,3 +601,30 @@ Update information about a host::
 
 ``-n <name>, --name <name>``
  New name for the host.
+
+
+craton user-list
+------------------------
+List the users in a project.
+::
+
+ usage: craton user-list [--detail] [--limit <limit>]
+                         [--sort-key <field>] [--sort-dir <direction>]
+                         [--fields <field> [<field> ...]]
+
+**Optional arguments:**
+
+``--detail``
+ Show detailed information about the users.
+
+``--limit <limit>``
+ Maximum number of users to return per request, 0 for no limit. Default is the maximum number used by the Craton API Service.
+
+``--sort-key <field>``
+ User field that will be used for sorting.
+
+``--sort-dir <direction>``
+ Sort direction: “asc” (the default) or “desc”.
+
+``--fields <field> [<field> ...]``
+ One or more user fields. Only these fields will be fetched from the server. Can not be used when ‘-- detail’ is specified.
