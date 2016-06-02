@@ -129,7 +129,7 @@ craton optional arguments
 -------------------------
 
 ``--version``
- Show program's version number and exits.
+ Show program's version number and exit.
 ``-v, --verbose``
  Print more verbose output.
 
