@@ -2,7 +2,8 @@ import mock
 
 from oslo_serialization import jsonutils
 
-from craton.inventory import api, exceptions
+from craton.inventory import api
+from craton.inventory import exceptions
 from craton.inventory.api import middleware
 from craton.inventory.db.sqlalchemy import api as dbapi
 from craton.inventory.tests import TestCase
@@ -49,7 +50,7 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_get_by_name')
     def test_get_cells_with_name(self, mock_cells):
         mock_cells.return_value = fake_resources.CELL1
-        resp = self.get('v1/cells?region=1&name=1')
+        resp = self.get('v1/cells?region=1&name=cell1')
         self.assertEqual(len(resp.json), 1)
         # Ensure we got the right cell
         self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
@@ -90,37 +91,57 @@ class APIV1RegionsTest(APIV1Test):
         resp = self.get('v1/regions')
         self.assertEqual(len(resp.json), len(fake_resources.REGIONS_LIST))
 
-    def test_regions_get_by_id(self):
-        pass
+    @mock.patch.object(dbapi, 'regions_get_by_name')
+    def test_regions_get_by_name(self, mock_regions):
+        mock_regions.return_value = fake_resources.REGION1
+        resp = self.get('v1/regions?name=region1')
+        self.assertEqual(resp.json[0]["name"], fake_resources.REGION1.name)
 
-    def test_get_region_by_name(self):
-        pass
+    @mock.patch.object(dbapi, 'regions_get_by_name')
+    def test_get_region_no_exist_by_name_fails(self, mock_regions):
+        mock_regions.side_effect = exceptions.NotFound()
+        resp = self.get('v1/regions?name=bla')
+        self.assertEqual(404, resp.status_code)
 
-    def test_get_region_no_exist_by_name_fails(self):
-        pass
+    @mock.patch.object(dbapi, 'regions_create')
+    def test_post_region_with_valid_data(self, mock_region):
+        mock_region.return_value = None
+        data = {'name': 'region1', 'project_id': '1'}
+        resp = self.post('v1/regions', data=data)
+        self.assertEqual(200, resp.status_code)
 
-    def test_post_region_with_valid_data(self):
-        pass
+    @mock.patch.object(dbapi, 'regions_create')
+    def test_post_region_with_invalid_data_fails(self, mock_region):
+        mock_region.return_value = None
+        data = {'project_id': '1'}
+        resp = self.post('v1/regions', data=data)
+        self.assertEqual(422, resp.status_code)
 
-    def test_post_region_with_invalid_data_fails(self):
-        pass
+    @mock.patch.object(dbapi, 'regions_delete')
+    def test_delete_region_no_exist_fails(self, mock_region):
+        mock_region.return_value = None
+        mock_region.side_effect = exceptions.NotFound()
+        resp = self.delete('v1/regionss/100')
+        self.assertEqual(404, resp.status_code)
 
-    def test_delete_region_no_exist_fails(self):
-        pass
 
+class APIV1HostsTest(APIV1Test):
+    @mock.patch.object(dbapi, 'hosts_get_by_region')
+    def test_get_hosts_by_region_gets_all_hosts(self, fake_hosts):
+        fake_hosts.return_value = fake_resources.HOSTS_LIST_R1
+        resp = self.get('/v1/hosts?region=1')
+        self.assertEqual(len(resp.json), 2)
 
-class APIV1HostsTest(TestCase):
-    def test_get_hosts(self):
-        pass
+    @mock.patch.object(dbapi, 'hosts_get_by_region')
+    def test_get_host_by_non_existing_region_raises404(self, fake_hosts):
+        fake_hosts.side_effect = exceptions.NotFound()
+        resp = self.get('/v1/host?region=5')
+        self.assertEqual(404, resp.status_code)
 
-    def test_get_host_by_name(self):
-        pass
-
-    def test_get_host_by_ip_address(self):
-        pass
-
-    def test_get_host_by_filter_query(self):
-        pass
-
-    def test_get_host_no_exist_fails(self):
-        pass
+    @mock.patch.object(dbapi, 'hosts_create')
+    def test_create_cell_with_valid_data(self, mock_host):
+        mock_host.return_value = None
+        data = {'name': 'www.host1.com', 'region_id': '1', 'project_id': '1',
+                'ip_address': '10.0.0.1'}
+        resp = self.post('/v1/hosts', data=data)
+        self.assertEqual(200, resp.status_code)

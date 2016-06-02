@@ -8,8 +8,8 @@ from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
 
-import sqlalchemy
-from sqlalchemy.orm.exc import NoResultFound
+import sqlalchemy.orm.exc as sa_exc
+from sqlalchemy.orm import with_polymorphic
 
 from craton.inventory import exceptions
 from craton.inventory.db.sqlalchemy import models
@@ -91,25 +91,35 @@ def cells_get_all(context, region):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
     if region is not None:
-        query = query.filter_by(region=region)
+        query = query.filter_by(region_id=region)
 
     try:
-        result = query.all()
-        return result
-    except sqlalchemy.orm.exc.NoResultFound:
+        return query.all()
+    except sa_exc.NoResultFound:
         raise exceptions.NotFound()
     except Exception as err:
         raise exceptions.UnknownException(message=err)
 
 
-def cells_get_by_name(context, region, cell):
+def cells_get_by_name(context, region_id, cell_id):
     """Get cell details given for a given cell in a region."""
     try:
         query = model_query(context, models.Cell).\
-            filter_by(region_id=region).\
-            filter_by(id=cell)
+            filter_by(region_id=region_id).\
+            filter_by(name=cell_id)
         return query.one()
-    except sqlalchemy.orm.exc.NoResultFound:
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+
+def cells_get_by_id(context, region_id, cell_id):
+    """Get cell details given for a given cell in a region."""
+    try:
+        query = model_query(context, models.Cell).\
+            filter_by(region_id=region_id).\
+            filter_by(id=cell_id)
+        return query.one()
+    except sa_exc.NoResultFound:
         raise exceptions.NotFound()
 
 
@@ -162,7 +172,7 @@ def cells_data_update(context, cell_id, data):
 
         try:
             cell_ref = query.with_lockmode('update').one()
-        except NoResultFound:
+        except sa_exc.NoResultFound:
             # cell does not exist so cant do this
             raise
 
@@ -182,8 +192,8 @@ def cells_data_delete(context, cell_id, data):
 
         try:
             cell_ref = query.with_lockmode('update').one()
-        except NoResultFound:
-            # cell does not exist so can't do this
+        except sa_exc.NoResultFound:
+            # cell does not exist so cant do this
             raise
 
         for key in data:
@@ -199,22 +209,30 @@ def cells_data_delete(context, cell_id, data):
 def regions_get_all(context):
     """Get all available regions."""
     query = model_query(context, models.Region, project_only=True)
-    result = query.all()
-    return result
+    try:
+        return query.all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
 
 
 def regions_get_by_name(context, name):
     """Get cell detail for the region with given name."""
     query = model_query(context, models.Region, project_only=True)
     query = query.filter_by(name=name)
-    return query.one()
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
 
 
 def regions_get_by_id(context, region_id):
     """Get cell detail for the region with given id."""
     query = model_query(context, models.Region, project_only=True)
     query = query.filter_by(id=region_id)
-    return query.one()
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
 
 
 def regions_create(context, values):
@@ -256,7 +274,7 @@ def regions_data_update(context, region_id, data):
 
         try:
             region_ref = query.with_lockmode('update').one()
-        except NoResultFound:
+        except sa_exc.NoResultFound:
             # region does not exist so cant do this
             raise
 
@@ -276,7 +294,7 @@ def regions_data_delete(context, region_id, data):
 
         try:
             region_ref = query.with_lockmode('update').one()
-        except NoResultFound:
+        except sa_exc.NoResultFound:
             # region does not exist so cant do this
             raise
 
@@ -288,3 +306,120 @@ def regions_data_delete(context, region_id, data):
                 pass
 
     return region_ref
+
+
+def hosts_get_by_region(context, region_id, filters):
+    """Get all hosts for this region.
+
+    :param region_id: ID for the region
+    :param filters: filters wich contains differnt keys/values to match.
+    Supported filters are by name, ip_address, id and cell_id.
+    """
+    host_devices = with_polymorphic(models.Device, [models.Host])
+    query = model_query(context, host_devices, project_only=True)
+    query = query.filter_by(region_id=region_id)
+
+    if "name" in filters:
+        query = query.filter_by(name=filters["name"])
+    if "ip_address" in filters:
+        query = query.filter_by(ip_address=filters["ip_address"])
+    if "id" in filters:
+        query = query.filter_by(id=filters["id"])
+    if "cell" in filters:
+        query = query.filter_by(cell_id=filters["cell"])
+
+    try:
+        result = query.all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+    return result
+
+
+def hosts_get_by_id(context, host_id):
+    """Get details for the host with given id."""
+    host_devices = with_polymorphic(models.Device, '*')
+    query = model_query(context, host_devices, project_only=True).\
+        filter_by(id=host_id)
+    try:
+        result = query.one()
+        LOG.info("Result by host id %s" % result)
+    except sa_exc.NoResultFound:
+        LOG.error("No result found for host with id %s" % host_id)
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+    return result
+
+
+def hosts_create(context, values):
+    """Create a new host."""
+    session = get_session()
+    host = models.Host()
+    with session.begin():
+        host.update(values)
+        host.save(session)
+    return host
+
+
+def hosts_update(context, host_id, values):
+    """Update an existing host."""
+    return None
+
+
+def hosts_delete(context, host_id):
+    """Delete an existing host."""
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(id=host_id)
+        query.delete()
+    return
+
+
+def hosts_data_update(context, host_id, data):
+    """
+    Update existing host variables or create when its not present.
+    """
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(id=host_id)
+
+        try:
+            host_ref = query.with_lockmode('update').one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        for key in data:
+            host_ref.variables[key] = data[key]
+
+    return host_ref
+
+
+def hosts_data_delete(context, host_id, data):
+    """Delete the existing key (variable) from region data."""
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(id=host_id)
+
+        try:
+            host_ref = query.with_lockmode('update').one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        for key in data:
+            try:
+                del host_ref.variables[data[key]]
+            except KeyError:
+                pass
+
+    return host_ref

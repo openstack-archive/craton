@@ -26,8 +26,9 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import object_mapper, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
+
+from craton.inventory.db.sqlalchemy import types
 
 
 # TODO(jimbaker) set up table args for a given database/storage
@@ -135,6 +136,10 @@ class User(Base):
 
 class Region(Base, VariableMixin):
     __tablename__ = 'regions'
+    __table_args__ = (
+        UniqueConstraint("project_id", "name",
+                         name="uq_region0projectid0name"),
+    )
     vars_tablename = 'region_variables'
     id = Column(Integer, primary_key=True)
     project_id = Column(
@@ -143,8 +148,6 @@ class Region(Base, VariableMixin):
     note = Column(Text)
     _repr_columns = [id, name]
 
-    UniqueConstraint(project_id, name)
-
     project = relationship('Project', back_populates='regions')
     cells = relationship('Cell', back_populates='region')
     devices = relationship('Device', back_populates='region')
@@ -152,6 +155,10 @@ class Region(Base, VariableMixin):
 
 class Cell(Base, VariableMixin):
     __tablename__ = 'cells'
+    __table_args__ = (
+        UniqueConstraint("region_id", "name",
+                         name="uq_cell0regionid0name"),
+    )
     vars_tablename = 'cell_variables'
     id = Column(Integer, primary_key=True)
     region_id = Column(
@@ -162,8 +169,6 @@ class Cell(Base, VariableMixin):
     note = Column(Text)
     _repr_columns = [id, name]
 
-    UniqueConstraint(region_id, name)
-
     region = relationship('Region', back_populates='cells')
     devices = relationship('Device', back_populates='cell')
     project = relationship('Project', back_populates='cells')
@@ -172,6 +177,10 @@ class Cell(Base, VariableMixin):
 class Device(Base, VariableMixin):
     """Models descriptive data about a host"""
     __tablename__ = 'devices'
+    __table_args__ = (
+        UniqueConstraint("region_id", "name",
+                         name="uq_device0regionid0name"),
+    )
     vars_tablename = 'device_variables'
     id = Column(Integer, primary_key=True)
     type = Column(String(50))  # discriminant for joined table inheritance
@@ -182,6 +191,7 @@ class Device(Base, VariableMixin):
         Integer, ForeignKey('cells.id'), index=True, nullable=True)
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
+    ip_address = Column(types.IPAddressType, nullable=False)
     # this means the host is "active" for administration
     # the device may or may not be reachable by Ansible/other tooling
     #
@@ -190,8 +200,6 @@ class Device(Base, VariableMixin):
     active = Column(Boolean, default=True)
     note = Column(Text)
     _repr_columns = [id, name]
-
-    UniqueConstraint(region_id, name)
 
     # many-to-many relationship with labels; labels are sorted to
     # ensure that variable resolution is stable if labels have
@@ -219,7 +227,6 @@ class Host(Device):
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
-    ip_address = Column(IPAddressType, nullable=False)
 
     # NOTE it is not possible to express table constraints such as
     # `UniqueConstraint(Device.region_id, ip_address)`

@@ -63,6 +63,11 @@ def cells_get_by_name(context, region, cell):
     return IMPL.cells_get_by_name(context, region, cell)
 
 
+def cells_get_by_id(context, region_id, cell_id):
+    """Get cell detail for the cell id in given region."""
+    return IMPL.cells_get_by_id(context, region_id, cell_id)
+
+
 def cells_create(context, values):
     """Create a new cell."""
     return IMPL.cells_create(context, values)
@@ -132,3 +137,47 @@ def regions_data_update(context, region_id, data):
 def regions_data_delete(context, region_id, data_key):
     """Delete the existing key (variable) from region data."""
     return IMPL.regions_data_delete(context, region_id, data_key)
+
+# Hosts
+
+
+def hosts_get_by_region_cell(context, region_id, cell_id, filters):
+    """Get all hosts for region/cell."""
+    return IMPL.hosts_get_by_region_cell(context, region_id, cell_id, filters)
+
+
+def hosts_get_by_region(context, region_id, filters):
+    """Get all hosts for this region."""
+    return IMPL.hosts_get_by_region(context, region_id, filters)
+
+
+def hosts_get_by_id(context, host_id):
+    """Get details for the host with given id."""
+    return IMPL.hosts_get_by_id(context, host_id)
+
+
+def hosts_create(context, values):
+    """Create a new host."""
+    return IMPL.hosts_create(context, values)
+
+
+def hosts_update(context, host_id, values):
+    """Update an existing host."""
+    return IMPL.hosts_update(context, host_id, values)
+
+
+def hosts_delete(context, host_id):
+    """Delete an existing host."""
+    return IMPL.hosts_delete(context, host_id)
+
+
+def hosts_data_update(context, host_id, data):
+    """
+    Update existing host variables or create them when not present.
+    """
+    return IMPL.hosts_data_update(context, host_id, data)
+
+
+def hosts_data_delete(context, host_id, data_key):
+    """Delete the existing key (variable) from region data."""
+    return IMPL.hosts_data_delete(context, host_id, data_key)
