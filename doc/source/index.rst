@@ -15,6 +15,7 @@ Contents:
    installation
    usage
    contributing
+   high-level-design
 
 Indices and tables
 ==================
