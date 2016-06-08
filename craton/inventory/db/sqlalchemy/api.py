@@ -84,8 +84,17 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
-###################
-# TODO(sulo): add filter on project_id and deleted fields
+def get_user_info(context, username):
+    """Get user info."""
+    query = model_query(context, models.User, project_only=True)
+    query = query.filter_by(username=username)
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+
 
 def cells_get_all(context, region):
     """Get all cells."""
