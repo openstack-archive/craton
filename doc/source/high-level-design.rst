@@ -79,8 +79,6 @@ Users
     workflows can be linked to roles; and that permissions include
     being the ability to run workflows.
 
-Principals 
-
 Inventory interactions can be optionally logged. For example, if
 inventory is configured to use MySQL with InnoDB as its backing store,
 then all changes can be captured in the write-ahead log and reliably
