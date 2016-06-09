@@ -1,9 +1,16 @@
 from oslo_middleware import base
 from oslo_middleware import request_id
 from oslo_context import context
+from oslo_log import log
 
 import flask
 from flask import request
+
+from craton.inventory.db import api as dbapi
+from craton.inventory import exceptions
+
+
+LOG = log.getLogger(__name__)
 
 
 class ContextMiddleware(base.Middleware):
@@ -44,35 +51,46 @@ class NoAuthContextMiddleware(ContextMiddleware):
 class LocalAuthContextMiddleware(ContextMiddleware):
 
     def __init__(self, application):
-        self.applicatin = application
+        self.application = application
 
     def process_request(self, request):
-        # TODO(sulo): for local auth we simply check pre-defined APIkey
-        # ProjectID and UserID against the db here and proceed accordingly.
         headers = request.headers
-        self.make_context(
+        ctx = self.make_context(
             request,
             auth_token=headers.get('X-Auth-Token', None),
             user=headers.get('X-Auth-User', None),
             tenant=headers.get('X-Auth-Project', None)
-        )
+            )
+
+        # NOTE(sulo): this means every api call hits the db
+        # at least once for auth. Better way to handle this?
+        try:
+            user_info = dbapi.get_user_info(ctx,
+                                            headers.get('X-Auth-User', None))
+            if user_info.api_key != headers.get('X-Auth-Token', None):
+                return flask.Response(status=401)
+        except exceptions.NotFound:
+            return flask.Response(status=401)
+        except Exception as err:
+            LOG.error(err)
+            return flask.Response(status=500)
 
     @classmethod
     def factory(cls, global_config, **local_config):
-        def _factory(app):
-            return cls(app)
+        def _factory(application):
+            return cls(application)
         return _factory
 
 
 class KeystoneAuthContextMiddleware(ContextMiddleware):
 
-    def __init__(self, app):
-        self._app = app
+    def __init__(self, application):
+        self.application = application
 
     def __call__(self, environ, start_response):
-        with self._app.request_context(environ):
+        with self.application.request_context(environ):
             self.process_request(request)
-        return self._app(environ, start_response)
+        return self.application(environ, start_response)
 
     def process_request(self, request):
         headers = request.headers
@@ -97,6 +115,6 @@ class KeystoneAuthContextMiddleware(ContextMiddleware):
 
     @classmethod
     def factory(cls, global_config, **local_config):
-        def _factory(app):
-            return cls(app)
+        def _factory(application):
+            return cls(application)
         return _factory
