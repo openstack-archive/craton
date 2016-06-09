@@ -39,7 +39,11 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'craton'
+project = u'Craton'
+
+# All contributors should update with their employers (if applicable);
+# for individuals working on Craton, we can add Craton Developers when
+# that becomes relevant.
 copyright = u'2016, Rackspace, Intel'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
