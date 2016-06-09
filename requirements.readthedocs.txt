@@ -1,2 +1,0 @@
-# Support being built on readthedocs.org
-oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
