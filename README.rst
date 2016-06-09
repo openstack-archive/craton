@@ -19,8 +19,8 @@ For more information, please refer to the following project resources:
 * **Blueprints:** https://blueprints.launchpad.net/craton
 * **Bugs:** https://waffle.io/rackerlabs/craton
 
-We plan to move these links to OpenStack infrastructure once Craton
-becomes an OpenStack project.
+TODO(all) We plan to move these links to OpenStack infrastructure once
+Craton becomes an OpenStack project.
 
 For information on how to contribute to Craton, please see the
 contents of the `CONTRIBUTING.rst file <CONTRIBUTING.rst>`_.
