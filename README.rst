@@ -1,36 +1,29 @@
-===================================
-Craton (OpenStack Fleet Management)
-===================================
+Craton
+======
 
-Craton is a fleet management tool set that helps operators manage
-their OpenStack cloud environments.  Craton provides operators with
-auditing to provide reports and alerts on resource status to help
-maintain cloud health. The inventory database is completely encapsulated
-by a CLI, REST, and python API.
+Craton is a new project we plan to propose for OpenStack inclusion.
+Craton supports deploying and operating OpenStack clouds by providing
+scalable fleet management:
 
+* Inventory of configurable physical devices/hosts (the fleet)
+* Audit and remediation workflows against this inventory
+* REST APIs, CLI, and Python client to manage
 
------------------
-Project Resources
------------------
+Support for workflows, CLI, and the Python client is in progress.
 
-* Free software: Apache license, Version 2.0
+For more information, please refer to the following project resources:
 
-..
+* **Free software:** under the `Apache license <http://www.apache.org/licenses/LICENSE-2.0>`_
+* **Documentation:** http://craton.readthedocs.org
+* **Source:** https://github.com/rackerlabs/craton
+* **Blueprints:** https://blueprints.launchpad.net/craton
+* **Bugs:** https://waffle.io/rackerlabs/craton
 
-* Documentation: http://docs.openstack.org/cli-reference/craton.html
-                 http://docs.openstack.org/developer/craton
-
-* Source: https://git.openstack.org/cgit/openstack/craton
-
-* Bugs: http://bugs.launchpad.net/craton
-
-* Wiki: https://wiki.openstack.org/wiki/Craton
-
-Project status, bugs, and features are tracked on Launchpad:
- http://launchpad.net/craton
+TODO(all) We plan to move these links to OpenStack infrastructure once
+Craton becomes an OpenStack project.
 
 For information on how to contribute to Craton, please see the
-contents of the CONTRIBUTING.rst file.
+contents of the `CONTRIBUTING.rst file <CONTRIBUTING.rst>`_.
 
 For more information on Craton distribution license, please see
-the contents of the LICENSE file.
+the contents of the `LICENSE file <LICENSE>`_.
