@@ -195,8 +195,7 @@ class Device(Base, VariableMixin):
     # this means the host is "active" for administration
     # the device may or may not be reachable by Ansible/other tooling
     #
-    # TODO(jimbaker) perhaps we should further generalize `note` for
-    # supporting governance
+    # TODO(jimbaker) generalize `note` for supporting governance
     active = Column(Boolean, default=True)
     note = Column(Text)
     _repr_columns = [id, name]
@@ -227,10 +226,6 @@ class Host(Device):
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
-
-    # NOTE it is not possible to express table constraints such as
-    # `UniqueConstraint(Device.region_id, ip_address)`
-    # when they reference joined columns
 
     # optional many-to-one relationship to a host-specific secret
     access_secret = relationship('AccessSecret', back_populates='hosts')
