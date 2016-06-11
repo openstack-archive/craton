@@ -1,0 +1,11 @@
+Please see https://alembic.readthedocs.org/en/latest/index.html for general documentation
+
+To create alembic migrations use:
+$ craton-inventory-dbsync --config-file=craton.conf revision --message "revision description" --autogenerate
+
+Stamp db with most recent migration version, without actually running migrations
+$ craton-inventory-dbsync --config-file=crton.conf stamp head
+
+Upgrade can be performed by:
+$ craton-inventory-dbsync --config-file=craton.conf upgrade
+$ craton-inventory-dbsync --config-file=craton.conf upgrade head

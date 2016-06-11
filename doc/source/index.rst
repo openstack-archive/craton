@@ -13,8 +13,10 @@ Contents:
 
    readme
    installation
+   cratoncli
    usage
    contributing
+   high-level-design
 
 Indices and tables
 ==================
