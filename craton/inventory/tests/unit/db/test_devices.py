@@ -54,15 +54,21 @@ class HostsDBTestCase(base.DBTestCase):
 
         # Need to do this query despite creation above because other
         # elements (cell, region) were in separate committed sessions
-        # when the host was created. Verify these linked elements are loaded:
-
+        # when the host was created. Verify these linked elements load
+        # correctly:
         host = dbapi.hosts_get_by_id(self.context, 7)
         self.assertEqual(host.region.id, 3)
         self.assertEqual(host.region.name, 'region3')
         self.assertEqual(host.cell.id, 5)
         self.assertEqual(host.cell.name, 'cell5')
 
-        # As well as resolved variables
+        # Verify resolved variables/blames override properly
         self.assertEqual(
             host.resolved,
             {'foo': 'H1', 'bar': 'C2', 'baz': 'H3', 'bax': 'R3'})
+
+        blame = dbapi.device_blame_variables(host, ['foo', 'bar'])
+        self.assertEqual(blame['foo'].source.name, 'www1.example.com')
+        self.assertEqual(blame['foo'].variable.value, 'H1')
+        self.assertEqual(blame['bar'].source.name, 'cell5')
+        self.assertEqual(blame['bar'].variable.value, 'C2')

@@ -18,8 +18,10 @@ BACKEND_MAPPING = {'sqlalchemy': 'craton.inventory.db.sqlalchemy.api'}
 IMPL = db_api.DBAPI.from_config(cfg.CONF, backend_mapping=BACKEND_MAPPING,
                                 lazy=True)
 
+
 def get_user_info(context, user):
     return IMPL.get_user_info(context, user)
+
 
 # Cells
 
@@ -43,7 +45,7 @@ def device_blame_variables(device, keys=None):
     """
     if keys is None:
         keys = device.resolved.keys()
-    sources = [device] + list(device.labels) + [device.region, device.cell]
+    sources = [device] + list(device.labels) + [device.cell, device.region]
     blamed = {}
     for key in keys:
         for source in sources:
