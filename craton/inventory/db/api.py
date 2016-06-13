@@ -23,8 +23,6 @@ def get_user_info(context, user):
     return IMPL.get_user_info(context, user)
 
 
-# Cells
-
 # Devices
 
 Blame = namedtuple('Blame', ['source', 'variable'])

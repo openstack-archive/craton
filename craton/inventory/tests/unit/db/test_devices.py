@@ -4,63 +4,60 @@ from craton.inventory.db import api as dbapi
 from craton.inventory.tests.unit.db import base
 
 
-def make_region(context, name, project_id, variables):
-    region = dbapi.regions_create(
-        context,
-        {'name': name,
-         'project_id': project_id})
-    dbapi.regions_data_update(context, region.id, variables)
-    return region.id
-
-
-def make_cell(context, name, project_id, region_id, variables):
-    cell = dbapi.cells_create(
-        context,
-        {'name': name,
-         'project_id': project_id,
-         'region_id': region_id})
-    dbapi.cells_data_update(context, cell.id, variables)
-    return cell.id
-
-
-def make_host(context, name, region_id, variables):
-    host = dbapi.hosts_create(
-        context, {'name': name, 'region_id': region_id})
-    dbapi.cells_data_update(context, host.id, variables)
-    return host.id
-
-
 class HostsDBTestCase(base.DBTestCase):
 
+    project_id = 42
+
+    def make_region(self, name, **variables):
+        region = dbapi.regions_create(
+            self.context,
+            {'name': name,
+             'project_id': self.project_id,
+             'variables': variables})
+        return region.id
+
+    def make_cell(self, region_id, name, **variables):
+        cell = dbapi.cells_create(
+            self.context,
+            {'name': name,
+             'project_id': self.project_id,
+             'region_id': region_id,
+             'variables': variables})
+        return cell.id
+
+    def make_host(self, region_id, cell_id, name, ip_address,
+                  labels=None, **variables):
+        host = dbapi.hosts_create(
+            self.context,
+            {'name': name,
+             'project_id': self.project_id,
+             'region_id': region_id,
+             'cell_id': cell_id,
+             'ip_address': ip_address,
+             'active': True,
+             'labels': set() if labels is None else labels,
+             'variables': variables})
+        return host.id
+
     def test_hosts_create(self):
-        region3 = {'id': 3, 'project_id': 2,
-                   'name': 'region3',
-                   'variables': {'foo': 'R1',
-                                 'bar': 'R2',
-                                 'bax': 'R3'}}
-        dbapi.regions_create(self.context, region3)
-        cell5 = {'id': 5, 'project_id': 2, 'region_id': 3,
-                 'name': 'cell5',
-                 'variables': {'bar': 'C2'}}
-        dbapi.cells_create(self.context, cell5)
-        host7 = {
-            'id': 7, 'project_id': 2, 'region_id': 3, 'cell_id': 5,
-            'name': 'www1.example.com',
-            'ip_address': IPAddress(u'10.1.2.101'),
-            'active': True,
-            'labels': set(),  # TODO(jimbaker) add actual labels
-            'variables': {'foo': 'H1', 'baz': 'H3'}}
-        dbapi.hosts_create(self.context, host7)
+        region_id = self.make_region(
+            'region_1',
+            foo='R1', bar='R2', bax='R3')
+        cell_id = self.make_cell(region_id, 'cell_1', bar='C2')
+        host_id = self.make_host(
+            region_id, cell_id, 'www1.example.com',
+            IPAddress(u'10.1.2.101'),
+            foo='H1', baz='H3')
 
         # Need to do this query despite creation above because other
         # elements (cell, region) were in separate committed sessions
         # when the host was created. Verify these linked elements load
-        # correctly:
-        host = dbapi.hosts_get_by_id(self.context, 7)
-        self.assertEqual(host.region.id, 3)
-        self.assertEqual(host.region.name, 'region3')
-        self.assertEqual(host.cell.id, 5)
-        self.assertEqual(host.cell.name, 'cell5')
+        # correctly
+        host = dbapi.hosts_get_by_id(self.context, host_id)
+        self.assertEqual(host.region.id, region_id)
+        self.assertEqual(host.region.name, 'region_1')
+        self.assertEqual(host.cell.id, cell_id)
+        self.assertEqual(host.cell.name, 'cell_1')
 
         # Verify resolved variables/blames override properly
         self.assertEqual(
@@ -70,5 +67,5 @@ class HostsDBTestCase(base.DBTestCase):
         blame = dbapi.device_blame_variables(host, ['foo', 'bar'])
         self.assertEqual(blame['foo'].source.name, 'www1.example.com')
         self.assertEqual(blame['foo'].variable.value, 'H1')
-        self.assertEqual(blame['bar'].source.name, 'cell5')
+        self.assertEqual(blame['bar'].source.name, 'cell_1')
         self.assertEqual(blame['bar'].variable.value, 'C2')
