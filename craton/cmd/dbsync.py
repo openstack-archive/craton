@@ -1,4 +1,3 @@
-import sys
 from oslo_config import cfg
 
 from craton.inventory.db.sqlalchemy import migration
@@ -59,22 +58,12 @@ def add_command_parsers(subparsers):
     parser.set_defaults(func=command_object.create_schema)
 
 
-command_opt = cfg.SubCommandOpt('command',
-                                title='Command',
-                                help=('Available commands'),
-                                handler=add_command_parsers)
-
-CONF.register_cli_opt(command_opt)
-
-
 def main():
-    # this is hack to work with previous usage of ironic-dbsync
-    # pls change it to ironic-dbsync upgrade
-    valid_commands = set([
-        'upgrade', 'revision',
-        'version', 'stamp', 'create_schema',
-    ])
-    if not set(sys.argv) & valid_commands:
-        sys.argv.append('upgrade')
+    command_opt = cfg.SubCommandOpt('command',
+                                    title='Command',
+                                    help=('Available commands'),
+                                    handler=add_command_parsers)
 
+    CONF.register_cli_opt(command_opt)
+    CONF(project='craton-inventory')
     CONF.command.func()
