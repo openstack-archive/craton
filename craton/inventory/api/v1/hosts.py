@@ -63,12 +63,13 @@ class Hosts(base.Resource):
         """Create a new host."""
         context = request.environ.get('context')
         try:
-            dbapi.hosts_create(context, g.json)
+            host_obj = dbapi.hosts_create(context, g.json)
         except Exception as err:
             LOG.error("Error during host create: %s" % err)
             return self.error_response(500, 'Unknown Error')
 
-        return None, 200, None
+        host = jsonutils.to_primitive(host_obj)
+        return host, 200, None
 
 
 class HostById(base.Resource):
@@ -111,11 +112,9 @@ class HostsData(base.Resource):
         Update existing host data, or create if it does
         not exist.
         """
-        data_keys = request.form.keys()
-        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
         try:
-            dbapi.hosts_data_update(context, id, data)
+            dbapi.hosts_data_update(context, id, request.json)
         except Exception as err:
             LOG.error("Error during host data update: %s" % err)
             return self.error_response(500, 'Unknown Error')
@@ -127,11 +126,9 @@ class HostsData(base.Resource):
         # NOTE(sulo): this is not that great. Find a better way to do this.
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
-        data_keys = request.form.keys()
-        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
         try:
-            dbapi.hosts_data_delete(context, id, data)
+            dbapi.hosts_data_delete(context, id, request.json)
         except Exception as err:
             LOG.error("Error during host delete: %s" % err)
             return self.error_response(500, 'Unknown Error')

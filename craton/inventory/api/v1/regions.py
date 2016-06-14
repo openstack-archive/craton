@@ -65,12 +65,13 @@ class Regions(base.Resource):
         """Create a new region."""
         context = request.environ.get('context')
         try:
-            dbapi.regions_create(context, g.json)
+            region_obj = dbapi.regions_create(context, g.json)
         except Exception as err:
             LOG.error("Error during region create: %s" % err)
             return self.error_response(500, 'Unknown Error')
 
-        return None, 200, None
+        region = jsonutils.to_primitive(region_obj)
+        return region, 200, None
 
     def put(self, id):
         """Update existing region."""
