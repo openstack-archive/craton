@@ -4,13 +4,21 @@ There are three independent parts to a specific workflow execution:
   files (as used by Ansible and similar systems)
 * specific workflow, which is written in Python (eg with TaskFlow)
 * inventory of hosts for a given project, as organized by region, cell,
-  and group, with overrides on variables; this module models that for
+  and labels, with overrides on variables; this module models that for
   SQLAlchemy
 In particular, this means that the configuration is used to interpret
 any inventory data.
 """
 
+try:
+    from collections import ChainMap
+except ImportError:
+    # else get the backport of this Python 3 functionality
+    from chainmap import ChainMap
+from operator import attrgetter
+
 from oslo_db.sqlalchemy import models
+from sortedcontainers import SortedSet
 from sqlalchemy import (
     Boolean, Column, ForeignKey, Integer, String, Table, Text,
     UniqueConstraint)
@@ -77,7 +85,7 @@ class VariableMixin(object):
         return relationship(
             Variable,
             collection_class=attribute_mapped_collection('key'),
-            cascade='all, delete-orphan', lazy="joined")
+            cascade='all, delete-orphan', lazy='joined')
 
     @declared_attr
     def variables(cls):
@@ -186,15 +194,19 @@ class Device(Base, VariableMixin):
     # this means the host is "active" for administration
     # the device may or may not be reachable by Ansible/other tooling
     #
-    # TODO(jimbaker) perhaps we should further generalize `note` for
-    # supporting governance
+    # TODO(jimbaker) generalize `note` for supporting governance
     active = Column(Boolean, default=True)
     note = Column(Text)
     _repr_columns = [id, name]
 
-    _labels = relationship(
-        'Label', secondary=lambda: device_labels, collection_class=set)
-    labels = association_proxy('_labels', 'label')
+    # many-to-many relationship with labels; labels are sorted to
+    # ensure that variable resolution is stable if labels have
+    # conflicting settings for a given key
+    labels = relationship(
+        'Label',
+        secondary=lambda: device_labels,
+        collection_class=lambda: SortedSet(key=attrgetter('label')))
+    associated_labels = association_proxy('labels', 'label')
 
     # many-to-one relationship to regions and cells
     region = relationship('Region', back_populates='devices')
@@ -214,12 +226,17 @@ class Host(Device):
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
 
-    # NOTE it is not possible to express table constraints such as
-    # `UniqueConstraint(Device.region_id, ip_address)`
-    # when they reference joined columns
-
-    # optional many-to-one relationship to a host-specific secret;
+    # optional many-to-one relationship to a host-specific secret
     access_secret = relationship('AccessSecret', back_populates='hosts')
+
+    @property
+    def resolved(self):
+        """Provides a mapping that uses scope resolution for variables"""
+        return ChainMap(
+            self.variables,
+            ChainMap(*[label.variables for label in self.labels]),
+            self.cell.variables,
+            self.region.variables)
 
     __mapper_args__ = {
         'polymorphic_identity': 'hosts',
@@ -255,7 +272,7 @@ class Label(Base, VariableMixin):
     devices = relationship(
         "Device",
         secondary=device_labels,
-        back_populates="_labels")
+        back_populates="labels")
 
 
 class AccessSecret(Base):
