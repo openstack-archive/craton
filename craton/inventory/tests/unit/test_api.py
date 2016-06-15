@@ -70,6 +70,16 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'cells_create')
+    def test_create_cell_returns_cell_obj(self, mock_cell):
+        return_value = {'name': 'cell1', 'region_id': 1,
+                        'project_id': 1, 'id': 1}
+        mock_cell.return_value = return_value
+        data = {'name': 'cell1', 'region_id': 1, 'project_id': "1"}
+        resp = self.post('v1/cells', data=data)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(return_value, resp.json)
+
+    @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_fails_with_invalid_data(self, mock_cell):
         mock_cell.return_value = None
         # data is missing required cell name
@@ -111,6 +121,15 @@ class APIV1RegionsTest(APIV1Test):
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'regions_create')
+    def test_create_region_returns_region_obj(self, mock_region):
+        return_value = {'name': 'region1', 'project_id': '1', 'id': 1}
+        mock_region.return_value = return_value
+        data = {'name': 'region1', 'project_id': '1'}
+        resp = self.post('v1/regions', data=data)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(return_value, resp.json)
+
+    @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_invalid_data_fails(self, mock_region):
         mock_region.return_value = None
         data = {'project_id': '1'}
@@ -145,3 +164,14 @@ class APIV1HostsTest(APIV1Test):
                 'ip_address': '10.0.0.1'}
         resp = self.post('/v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
+
+    @mock.patch.object(dbapi, 'hosts_create')
+    def test_create_host_returns_host_obj(self, mock_host):
+        return_value = {'name': 'www.host1.com', 'region_id': '1',
+                        'project_id': '1', 'ip_address': '10.0.0.1', 'id': 1}
+        mock_host.return_value = return_value
+        data = {'name': 'www.host1.com', 'region_id': '1', 'project_id': '1',
+                'ip_address': '10.0.0.1'}
+        resp = self.post('v1/hosts', data=data)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(return_value, resp.json)
