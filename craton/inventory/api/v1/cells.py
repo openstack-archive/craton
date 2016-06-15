@@ -65,12 +65,13 @@ class Cells(base.Resource):
         """Create a new cell."""
         context = request.environ.get('context')
         try:
-            dbapi.cells_create(context, g.json)
+            cell_obj = dbapi.cells_create(context, g.json)
         except Exception as err:
             LOG.error("Error during cell create: %s" % err)
             return self.error_response(500, 'Unknown Error')
 
-        return None, 200, None
+        cell = jsonutils.to_primitive(cell_obj)
+        return cell, 200, None
 
     def put(self, id):
         """Update existing cell."""

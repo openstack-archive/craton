@@ -58,9 +58,9 @@ DefinitionsRegion = {'discriminator': 'name',
                          'name': {
                              'type': 'string',
                              'description': 'Region Name.'},
-                         'region_uuid': {
+                         'project_id': {
                              'type': 'string',
-                             'description': 'UUID of the region.'},
+                             'description': 'ID of the project'},
                          'cells': {
                              'items': DefinitionsCell,
                              'type': 'array',
@@ -165,7 +165,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions', 'POST'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsRegion},
          400: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions', 'GET'):
@@ -184,7 +184,7 @@ filters = {
             404: {'headers': None, 'schema': None},
             405: {'headers': None, 'schema': None}},
     ('hosts', 'POST'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsHost},
          400: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('hosts', 'GET'):
@@ -204,7 +204,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('cells', 'POST'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsCell},
          400: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('cells', 'GET'):
