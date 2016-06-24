@@ -8,7 +8,7 @@ log_file=craton-inventory.log
 
 [api]
 # Host IP to use for API service
-host=127.0.0.1
+host=0.0.0.0
 # Port to use for API service
 port=8080
 # Paste Config file to use
@@ -22,18 +22,18 @@ api_paste_config=etc/inventory-api-paste.ini
 ##auth_version = 3
 ##auth_protocol = http
 ##project_name = service
-##username = designate
-##password = designate
+##username = craton
+##password = craton
 ##project_domain_id = default
 ##user_domain_id = default
 ##memcached_servers = localhost:11211
 ##auth_type = password
 
 [database]
-sqlite_db = oslo.sqlite
 backend = sqlalchemy
+connection = mysql://craton:craton@localhost/craton
 use_db_reconnect = false
 db_retry_interval = 1
 db_inc_retry_interval = true
-db_max_retry_interval = 10
-db_max_retries = 20
+db_max_retry_interval = 5
+db_max_retries = 5
