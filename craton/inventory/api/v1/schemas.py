@@ -172,6 +172,7 @@ filters = {
         {200: {'headers': None,
                'schema': {'items': DefinitionsRegion, 'type': 'array'}},
          400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions_id_data', 'PUT'):
         {200: {'headers': None, 'schema': None},

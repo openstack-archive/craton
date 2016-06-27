@@ -73,6 +73,23 @@ class Regions(base.Resource):
         region = jsonutils.to_primitive(region_obj)
         return region, 200, None
 
+
+class RegionsById(base.Resource):
+
+    def get(self, id):
+        context = request.environ.get('context')
+        try:
+            region_obj = dbapi.regions_get_by_id(context, id)
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
+        except Exception as err:
+            LOG.error("Error during Region get by id: %s" % err)
+            return self.error_response(500, 'Unknown Error')
+
+        region_obj.data = region_obj.variables
+        region = jsonutils.to_primitive(region_obj)
+        return region
+
     def put(self, id):
         """Update existing region."""
         # NOTE(sulo): we can only update `note` on region
@@ -97,11 +114,9 @@ class RegionsData(base.Resource):
         Update existing region data, or create if it does
         not exist.
         """
-        data_keys = request.form.keys()
-        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
         try:
-            dbapi.regions_data_update(context, id, data)
+            dbapi.regions_data_update(context, id, request.json)
         except Exception as err:
             LOG.error("Error during region data update: %s" % err)
             return self.error_response(500, 'Unknown Error')
@@ -110,14 +125,9 @@ class RegionsData(base.Resource):
 
     def delete(self, id):
         """Delete region data."""
-        # NOTE(sulo): this is not that great. Find a better way to do this.
-        # We can pass multiple keys suchs as key1=one key2=two etc. but not
-        # the best way to do this.
-        data_keys = request.form.keys()
-        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
         try:
-            dbapi.regions_data_delete(context, id, data)
+            dbapi.regions_data_delete(context, id, request.json)
         except Exception as err:
             LOG.error("Error during region delete: %s" % err)
             return self.error_response(500, 'Unknown Error')

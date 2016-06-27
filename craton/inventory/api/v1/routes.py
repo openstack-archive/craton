@@ -4,6 +4,7 @@ from craton.inventory.api.v1.hosts import Hosts
 from craton.inventory.api.v1.hosts import HostById
 from craton.inventory.api.v1.hosts import HostsData
 from craton.inventory.api.v1.regions import Regions
+from craton.inventory.api.v1.regions import RegionsById
 from craton.inventory.api.v1.regions import RegionsData
 
 
@@ -20,7 +21,7 @@ routes = [
     dict(resource=Regions,
          urls=['/regions'],
          endpoint='regions'),
-    dict(resource=Regions,
+    dict(resource=RegionsById,
          urls=['/regions/<id>'],
          endpoint='regions_id'),
     dict(resource=RegionsData,
