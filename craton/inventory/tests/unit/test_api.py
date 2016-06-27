@@ -154,8 +154,16 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_get_by_region')
     def test_get_host_by_non_existing_region_raises404(self, fake_hosts):
         fake_hosts.side_effect = exceptions.NotFound()
-        resp = self.get('/v1/host?region=5')
+        resp = self.get('/v1/hosts?region=5')
         self.assertEqual(404, resp.status_code)
+
+    @mock.patch.object(dbapi, 'hosts_get_by_region')
+    def test_get_host_by_name_filters(self, fake_hosts):
+        fake_hosts.return_value = fake_resources.HOSTS_LIST_R2
+        resp = self.get('/v1/hosts?region=1&name=www.example.net')
+        host_resp = fake_resources.HOSTS_LIST_R2
+        self.assertEqual(len(resp.json), len(host_resp))
+        self.assertEqual(resp.json[0]["name"], host_resp[0].name)
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_cell_with_valid_data(self, mock_host):
