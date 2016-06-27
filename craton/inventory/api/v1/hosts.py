@@ -26,7 +26,7 @@ class Hosts(base.Resource):
         """
         region = g.args["region"]
         cell = g.args["cell"]
-        hostname = g.args["name"]
+        name = g.args["name"]
         host_id = g.args["id"]
         ip_address = g.args["ip"]
 
@@ -34,9 +34,9 @@ class Hosts(base.Resource):
 
         filters = {}
         if host_id:
-            filters["host_id"] = host_id
-        if hostname:
-            filters["hostname"] = hostname
+            filters["id"] = host_id
+        if name:
+            filters["name"] = name
         if ip_address:
             filters["ip_address"] = ip_address
         if cell:
