@@ -42,7 +42,7 @@ class Cells(base.Resource):
         if region and cell_id:
             # Get this particular cell along with its data
             try:
-                cell_obj = dbapi.cells_get_by_id(context, region, cell_id)
+                cell_obj = dbapi.cells_get_by_id(context, cell_id)
             except exceptions.NotFound:
                 return self.error_response(404, 'Not Found')
             except Exception as err:
@@ -70,6 +70,23 @@ class Cells(base.Resource):
             LOG.error("Error during cell create: %s" % err)
             return self.error_response(500, 'Unknown Error')
 
+        cell = jsonutils.to_primitive(cell_obj)
+        return cell, 200, None
+
+
+class CellById(base.Resource):
+
+    def get(self, id):
+        context = request.environ.get('context')
+        try:
+            cell_obj = dbapi.cells_get_by_id(context, id)
+        except exceptions.NotFound:
+            return self.error_response(404, 'Not Found')
+        except Exception as err:
+            LOG.error("Error during Cell get by id: %s" % err)
+            return self.error_response(500, 'Unknown Error')
+
+        cell_obj.data = cell_obj.variables
         cell = jsonutils.to_primitive(cell_obj)
         return cell, 200, None
 

@@ -121,11 +121,10 @@ def cells_get_by_name(context, region_id, cell_id):
         raise exceptions.NotFound()
 
 
-def cells_get_by_id(context, region_id, cell_id):
-    """Get cell details given for a given cell in a region."""
+def cells_get_by_id(context, cell_id):
+    """Get cell details given for a given cell id."""
     try:
         query = model_query(context, models.Cell).\
-            filter_by(region_id=region_id).\
             filter_by(id=cell_id)
         return query.one()
     except sa_exc.NoResultFound:

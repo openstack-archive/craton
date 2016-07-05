@@ -40,6 +40,25 @@ class APIV1Test(TestCase):
         return resp
 
 
+class APIV1CellsIDTest(APIV1Test):
+    @mock.patch.object(dbapi, 'cells_get_by_id')
+    def test_get_cells_by_id(self, mock_cells):
+        mock_cells.return_value = fake_resources.CELL1
+        resp = self.get('v1/cells/1')
+        self.assertEqual(resp.json["name"], fake_resources.CELL1.name)
+
+    @mock.patch.object(dbapi, 'cells_get_by_id')
+    def test_get_cells_by_bad_id_is_404(self, mock_cells):
+        mock_cells.side_effect = exceptions.NotFound()
+        resp = self.get('v1/cells/3')
+        self.assertEqual(404, resp.status_code)
+
+    @mock.patch.object(dbapi, 'cells_delete')
+    def test_cells_delete(self, mock_cell):
+        resp = self.delete('v1/cells/1')
+        self.assertEqual(200, resp.status_code)
+
+
 class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_get_all')
     def test_get_cells(self, mock_cells):
@@ -51,6 +70,14 @@ class APIV1CellsTest(APIV1Test):
     def test_get_cells_with_name(self, mock_cells):
         mock_cells.return_value = fake_resources.CELL1
         resp = self.get('v1/cells?region=1&name=cell1')
+        self.assertEqual(len(resp.json), 1)
+        # Ensure we got the right cell
+        self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
+
+    @mock.patch.object(dbapi, 'cells_get_by_id')
+    def test_get_cells_with_id(self, mock_cells):
+        mock_cells.return_value = fake_resources.CELL1
+        resp = self.get('v1/cells?region=1&id=1')
         self.assertEqual(len(resp.json), 1)
         # Ensure we got the right cell
         self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
@@ -86,11 +113,6 @@ class APIV1CellsTest(APIV1Test):
         data = {'region_id': 1, 'project_id': "1"}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(422, resp.status_code)
-
-    @mock.patch.object(dbapi, 'cells_delete')
-    def test_cells_delete(self, mock_cell):
-        resp = self.delete('v1/cells/1')
-        self.assertEqual(200, resp.status_code)
 
 
 class APIV1RegionsTest(APIV1Test):
