@@ -37,6 +37,19 @@ DefinitionsCell = {'discriminator': 'name',
                        'id': {'type': 'integer',
                               'description': 'Unique ID of the cell'}}}
 
+DefinitionsCellId = {'discriminator': 'name',
+                     'type': 'object',
+                     'properties': {
+                         'note': {'type': 'string'},
+                         'project_id': {'type': 'string',
+                                        'description': 'ID of the project'},
+                         'name': {'type': 'string'},
+                         'region_id': {'type': 'integer'},
+                         'data': {'type': 'allOf',
+                                  'description': 'User defined information'},
+                         'id': {'type': 'integer',
+                                'description': 'Unique ID of the cell'}}}
+
 DefinitionsData = {'type': 'object',
                    'properties': {'key': {'type': 'string'},
                                   'value': {'type': 'object'}}}
@@ -191,6 +204,11 @@ filters = {
     ('hosts', 'GET'):
         {200: {'headers': None,
                'schema': {'items': DefinitionsHost, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionsCellId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},

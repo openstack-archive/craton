@@ -67,9 +67,9 @@ def cells_get_by_name(context, region, cell):
     return IMPL.cells_get_by_name(context, region, cell)
 
 
-def cells_get_by_id(context, region_id, cell_id):
-    """Get cell detail for the cell id in given region."""
-    return IMPL.cells_get_by_id(context, region_id, cell_id)
+def cells_get_by_id(context, cell_id):
+    """Get cell detail for the unique cell id."""
+    return IMPL.cells_get_by_id(context, cell_id)
 
 
 def cells_create(context, values):
