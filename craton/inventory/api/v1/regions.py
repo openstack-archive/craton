@@ -88,7 +88,7 @@ class RegionsById(base.Resource):
 
         region_obj.data = region_obj.variables
         region = jsonutils.to_primitive(region_obj)
-        return region
+        return region, 200, None
 
     def put(self, id):
         """Update existing region."""

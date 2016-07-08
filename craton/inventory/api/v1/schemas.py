@@ -20,6 +20,21 @@ DefinitionsHost = {'discriminator': 'name',
                                 'description': 'User defined information'},
                        'region_id': {'type': 'string'}}}
 
+DefinitionsHostId = {'discriminator': 'name',
+                     'type': 'object',
+                     'properties': {
+                         'note': {'type': 'string'},
+                         'ip_address': {'type': 'string'},
+                         'name': {'type': 'string'},
+                         'id': {'type': 'integer'},
+                         'cell_id': {'type': 'string'},
+                         'project_id': {'type': 'string'},
+                         'labels': {'type': 'allOf',
+                                    'description': 'User defined labels'},
+                         'data': {'type': 'allOf',
+                                  'description': 'User defined information'},
+                         'region_id': {'type': 'string'}}}
+
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
                                 'region_id',
@@ -84,6 +99,29 @@ DefinitionsRegion = {'discriminator': 'name',
                          'id': {
                              'type': 'integer',
                              'description': 'Unique ID for the region.'}}}
+
+DefinitionsRegionId = {'discriminator': 'name',
+                       'type': 'object',
+                       'properties': {
+                           'note': {
+                               'type': 'string',
+                               'description': 'Region Note'},
+                           'name': {
+                               'type': 'string',
+                               'description': 'Region Name.'},
+                           'project_id': {
+                               'type': 'string',
+                               'description': 'ID of the project'},
+                           'cells': {
+                               'items': DefinitionsCell,
+                               'type': 'array',
+                               'description': 'List of cells in this region'},
+                           'data': {
+                               'type': 'allOf',
+                               'description': 'User defined information'},
+                           'id': {
+                               'type': 'integer',
+                               'description': 'Unique ID for the region.'}}}
 
 validators = {
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
@@ -167,6 +205,11 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('hosts_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionsHostId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
     ('hosts_id', 'PUT'):
         {200: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
@@ -177,26 +220,6 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
-    ('regions', 'POST'):
-        {200: {'headers': None, 'schema': DefinitionsRegion},
-         400: {'headers': None, 'schema': None},
-         405: {'headers': None, 'schema': None}},
-    ('regions', 'GET'):
-        {200: {'headers': None,
-               'schema': {'items': DefinitionsRegion, 'type': 'array'}},
-         400: {'headers': None, 'schema': None},
-         404: {'headers': None, 'schema': None},
-         405: {'headers': None, 'schema': None}},
-    ('regions_id_data', 'PUT'):
-        {200: {'headers': None, 'schema': None},
-         400: {'headers': None, 'schema': None},
-         404: {'headers': None, 'schema': None},
-         405: {'headers': None, 'schema': None}},
-    ('regions_id_data', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
-            400: {'headers': None, 'schema': None},
-            404: {'headers': None, 'schema': None},
-            405: {'headers': None, 'schema': None}},
     ('hosts', 'POST'):
         {200: {'headers': None, 'schema': DefinitionsHost},
          400: {'headers': None, 'schema': None},
@@ -222,6 +245,16 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('cells_id_data', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('cells_id_data', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
     ('cells', 'POST'):
         {200: {'headers': None, 'schema': DefinitionsCell},
          400: {'headers': None, 'schema': None},
@@ -232,22 +265,37 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('regions', 'POST'):
+        {200: {'headers': None, 'schema': DefinitionsRegion},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionsRegion, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions_id_data', 'PUT'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions_id_data', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('regions_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionsRegionId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
     ('regions_id', 'PUT'):
         {200: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions_id', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
-         400: {'headers': None, 'schema': None},
-         404: {'headers': None, 'schema': None},
-         405: {'headers': None, 'schema': None}},
-    ('cells_id_data', 'PUT'):
-        {200: {'headers': None, 'schema': None},
-         400: {'headers': None, 'schema': None},
-         404: {'headers': None, 'schema': None},
-         405: {'headers': None, 'schema': None}},
-    ('cells_id_data', 'DELETE'):
         {200: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},

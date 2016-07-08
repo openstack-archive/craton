@@ -88,7 +88,7 @@ class HostById(base.Resource):
         host_obj.data = host_obj.variables
         host_obj.labels = host_obj.labels
         host = jsonutils.to_primitive(host_obj)
-        return host
+        return host, 200, None
 
     def put(self, id):
         return None, 400, None
