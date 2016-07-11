@@ -67,7 +67,7 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(len(resp.json), len(fake_resources.CELL_LIST))
 
     @mock.patch.object(dbapi, 'cells_get_by_name')
-    def test_get_cells_with_name(self, mock_cells):
+    def test_get_cells_with_name_filters(self, mock_cells):
         mock_cells.return_value = fake_resources.CELL1
         resp = self.get('v1/cells?region=1&name=cell1')
         self.assertEqual(len(resp.json), 1)
@@ -75,7 +75,7 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
 
     @mock.patch.object(dbapi, 'cells_get_by_id')
-    def test_get_cells_with_id(self, mock_cells):
+    def test_get_cells_with_id_filters(self, mock_cells):
         mock_cells.return_value = fake_resources.CELL1
         resp = self.get('v1/cells?region=1&id=1')
         self.assertEqual(len(resp.json), 1)
@@ -115,8 +115,26 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(422, resp.status_code)
 
 
-class APIV1RegionsTest(APIV1Test):
+class APIV1RegionsIDTest(APIV1Test):
+    @mock.patch.object(dbapi, 'regions_get_by_id')
+    def test_regions_get_by_id(self, mock_regions):
+        mock_regions.return_value = fake_resources.REGION1
+        resp = self.get('v1/regions/1')
+        self.assertEqual(resp.json["name"], fake_resources.REGION1.name)
 
+    @mock.patch.object(dbapi, 'regions_get_by_id')
+    def test_regions_get_by_bad_id_is_404(self, mock_regions):
+        mock_regions.side_effect = exceptions.NotFound()
+        resp = self.get('v1/regions/1')
+        self.assertEqual(404, resp.status_code)
+
+    @mock.patch.object(dbapi, 'regions_delete')
+    def test_delete_region(self, mock_region):
+        resp = self.delete('v1/regions/1')
+        self.assertEqual(200, resp.status_code)
+
+
+class APIV1RegionsTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_get_all')
     def test_regions_get_all(self, mock_regions):
         mock_regions.return_value = fake_resources.REGIONS_LIST
@@ -124,9 +142,15 @@ class APIV1RegionsTest(APIV1Test):
         self.assertEqual(len(resp.json), len(fake_resources.REGIONS_LIST))
 
     @mock.patch.object(dbapi, 'regions_get_by_name')
-    def test_regions_get_by_name(self, mock_regions):
+    def test_regions_get_by_name_filters(self, mock_regions):
         mock_regions.return_value = fake_resources.REGION1
         resp = self.get('v1/regions?name=region1')
+        self.assertEqual(resp.json[0]["name"], fake_resources.REGION1.name)
+
+    @mock.patch.object(dbapi, 'regions_get_by_id')
+    def test_regions_get_by_id_filters(self, mock_regions):
+        mock_regions.return_value = fake_resources.REGION1
+        resp = self.get('v1/regions?id=1')
         self.assertEqual(resp.json[0]["name"], fake_resources.REGION1.name)
 
     @mock.patch.object(dbapi, 'regions_get_by_name')
@@ -158,11 +182,18 @@ class APIV1RegionsTest(APIV1Test):
         resp = self.post('v1/regions', data=data)
         self.assertEqual(422, resp.status_code)
 
-    @mock.patch.object(dbapi, 'regions_delete')
-    def test_delete_region_no_exist_fails(self, mock_region):
-        mock_region.return_value = None
-        mock_region.side_effect = exceptions.NotFound()
-        resp = self.delete('v1/regionss/100')
+
+class APIV1HostsIDTest(APIV1Test):
+    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    def test_get_hosts_by_id(self, mock_hosts):
+        mock_hosts.return_value = fake_resources.HOST1
+        resp = self.get('v1/hosts/1')
+        self.assertEqual(resp.json["name"], fake_resources.HOST1.name)
+
+    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    def test_get_hosts_by_bad_id_is_404(self, mock_hosts):
+        mock_hosts.side_effect = exceptions.NotFound()
+        resp = self.get('v1/hosts/1')
         self.assertEqual(404, resp.status_code)
 
 
