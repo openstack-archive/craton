@@ -335,6 +335,8 @@ def hosts_get_by_region(context, region_id, filters):
         query = query.filter_by(id=filters["id"])
     if "cell" in filters:
         query = query.filter_by(cell_id=filters["cell"])
+    if "device_type" in filters:
+        query = query.filter_by(device_type=filters["device_type"])
 
     try:
         result = query.all()

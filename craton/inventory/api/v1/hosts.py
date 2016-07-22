@@ -28,6 +28,7 @@ class Hosts(base.Resource):
         cell = g.args["cell"]
         name = g.args["name"]
         host_id = g.args["id"]
+        device_type = g.args["device_type"]
         ip_address = g.args["ip"]
 
         context = request.environ.get("context")
@@ -41,6 +42,8 @@ class Hosts(base.Resource):
             filters["ip_address"] = ip_address
         if cell:
             filters["cell"] = cell
+        if device_type:
+            filters["device_type"] = device_type
 
         # This is a query constraint, you cant fetch all hosts
         # for all regions, you have to query hosts by region.
