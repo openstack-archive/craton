@@ -134,6 +134,7 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('type', sa.String(length=50), nullable=True),
+        sa.Column('device_type', sa.String(length=255), nullable=False),
         sa.Column('name', sa.String(length=255), nullable=False),
         sa.Column('region_id', sa.Integer(), nullable=False),
         sa.Column('cell_id', sa.Integer(), nullable=True),
@@ -179,8 +180,10 @@ def upgrade():
         'hosts',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('access_secret_id', sa.Integer(), nullable=True),
+        sa.Column('parent_id', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['access_secret_id'], ['access_secrets.id'], ),
         sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
+        sa.ForeignKeyConstraint(['parent_id'], ['hosts.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
     # end Alembic commands

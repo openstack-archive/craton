@@ -26,12 +26,14 @@ class HostsDBTestCase(base.DBTestCase):
         return cell.id
 
     def make_host(self, region_id, cell_id, name, ip_address,
-                  labels=None, **variables):
+                  host_type, parent_id=None, labels=None, **variables):
         host = dbapi.hosts_create(
             self.context,
             {'name': name,
              'project_id': self.project_id,
              'region_id': region_id,
+             'parent_id': parent_id,
+             'device_type': host_type,
              'cell_id': cell_id,
              'ip_address': ip_address,
              'active': True,
@@ -47,6 +49,7 @@ class HostsDBTestCase(base.DBTestCase):
         host_id = self.make_host(
             region_id, cell_id, 'www1.example.com',
             IPAddress(u'10.1.2.101'),
+            'server',
             foo='H1', baz='H3')
 
         # Need to do this query despite creation above because other
