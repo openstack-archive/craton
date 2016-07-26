@@ -25,18 +25,27 @@ class HostsDBTestCase(base.DBTestCase):
              'variables': variables})
         return cell.id
 
-    def make_host(self, region_id, cell_id, name, ip_address,
+    def make_host(self, region_id, name, ip_address, cell_id=None,
                   labels=None, **variables):
-        host = dbapi.hosts_create(
-            self.context,
-            {'name': name,
-             'project_id': self.project_id,
-             'region_id': region_id,
-             'cell_id': cell_id,
-             'ip_address': ip_address,
-             'active': True,
-             'labels': set() if labels is None else labels,
-             'variables': variables})
+        if cell_id:
+            host = {'name': name,
+                    'project_id': self.project_id,
+                    'region_id': region_id,
+                    'cell_id': cell_id,
+                    'ip_address': ip_address,
+                    'active': True,
+                    'labels': set() if labels is None else labels,
+                    'variables': variables}
+        else:
+            host = {'name': name,
+                    'project_id': self.project_id,
+                    'region_id': region_id,
+                    'ip_address': ip_address,
+                    'active': True,
+                    'labels': set() if labels is None else labels,
+                    'variables': variables}
+
+        host = dbapi.hosts_create(self.context, host)
         return host.id
 
     def test_hosts_create(self):
@@ -44,10 +53,9 @@ class HostsDBTestCase(base.DBTestCase):
             'region_1',
             foo='R1', bar='R2', bax='R3')
         cell_id = self.make_cell(region_id, 'cell_1', bar='C2')
-        host_id = self.make_host(
-            region_id, cell_id, 'www1.example.com',
-            IPAddress(u'10.1.2.101'),
-            foo='H1', baz='H3')
+        host_id = self.make_host(region_id, 'www1.example.com',
+                                 IPAddress(u'10.1.2.101'),
+                                 cell_id=cell_id, foo='H1', baz='H3')
 
         # Need to do this query despite creation above because other
         # elements (cell, region) were in separate committed sessions
@@ -69,3 +77,11 @@ class HostsDBTestCase(base.DBTestCase):
         self.assertEqual(blame['foo'].variable.value, 'H1')
         self.assertEqual(blame['bar'].source.name, 'cell_1')
         self.assertEqual(blame['bar'].variable.value, 'C2')
+
+    def test_hosts_resolved_vars_no_cells(self):
+        region_id = self.make_region('region_1', foo='R1')
+        host_id = self.make_host(region_id, 'www.example.xyz',
+                                 IPAddress(u'10.1.2.101'), bar='bar2')
+        host = dbapi.hosts_get_by_id(self.context, host_id)
+        self.assertEqual(host.name, 'www.example.xyz')
+        self.assertEqual(host.resolved, {'bar': 'bar2', 'foo': 'R1'})
