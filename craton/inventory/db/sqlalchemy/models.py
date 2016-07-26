@@ -233,11 +233,17 @@ class Host(Device):
     @property
     def resolved(self):
         """Provides a mapping that uses scope resolution for variables"""
-        return ChainMap(
-            self.variables,
-            ChainMap(*[label.variables for label in self.labels]),
-            self.cell.variables,
-            self.region.variables)
+        if self.cell:
+            return ChainMap(
+                self.variables,
+                ChainMap(*[label.variables for label in self.labels]),
+                self.cell.variables,
+                self.region.variables)
+        else:
+            return ChainMap(
+                self.variables,
+                ChainMap(*[label.variables for label in self.labels]),
+                self.region.variables)
 
     __mapper_args__ = {
         'polymorphic_identity': 'hosts',
