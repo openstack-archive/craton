@@ -15,12 +15,9 @@ For more information, please refer to the following project resources:
 
 * **Free software:** under the `Apache license <http://www.apache.org/licenses/LICENSE-2.0>`_
 * **Documentation:** http://craton.readthedocs.org
-* **Source:** https://github.com/rackerlabs/craton
+* **Source:** https://github.com/openstack/craton
 * **Blueprints:** https://blueprints.launchpad.net/craton
-* **Bugs:** https://waffle.io/rackerlabs/craton
-
-TODO(all) We plan to move these links to OpenStack infrastructure once
-Craton becomes an OpenStack project.
+* **Bugs:** https://bugs.launchpad.net/craton
 
 For information on how to contribute to Craton, please see the
 contents of the `CONTRIBUTING.rst file <CONTRIBUTING.rst>`_.
