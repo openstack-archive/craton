@@ -70,3 +70,6 @@ RUN bin/pip install -r /craton/requirements.txt
 RUN bin/pip install .
 
 CMD ["tools/docker_run.sh"]
+
+#Assign Permissions
+RUN chmod u+x tools/docker_run.sh
