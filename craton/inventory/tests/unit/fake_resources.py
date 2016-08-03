@@ -35,20 +35,21 @@ REGIONS_LIST = [REGION1, REGION2]
 
 
 class Host(object):
-    def __init__(self, name, project_id, region_id, ip_address, variables,
-                 labels=None):
+    def __init__(self, name, project_id, region_id, ip_address,
+                 device_type, variables, labels=None):
         self.name = name
         self.project_id = project_id
         self.region_id = region_id
         self.ip_address = ip_address
         self.variables = variables
+        self.device_type = device_type
         self.labels = labels
 
-HOST1 = Host("www.craton.com", "1", "1", "192.168.1.1",
+HOST1 = Host("www.craton.com", "1", "1", "192.168.1.1", "server",
              {"key1": "value1", "key2": "value2"})
-HOST2 = Host("www.example.com", "1", "1", "192.168.1.2",
+HOST2 = Host("www.example.com", "1", "1", "192.168.1.2", "server",
              {"key1": "value1", "key2": "value2"})
-HOST3 = Host("www.example.net", "1", "2", "10.10.0.1",
+HOST3 = Host("www.example.net", "1", "2", "10.10.0.1", "server",
              {"key1": "value1", "key2": "value2"})
 HOSTS_LIST_R1 = [HOST1, HOST2]
 HOSTS_LIST_R2 = [HOST3]

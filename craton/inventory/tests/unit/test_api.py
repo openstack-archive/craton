@@ -219,20 +219,21 @@ class APIV1HostsTest(APIV1Test):
         self.assertEqual(resp.json[0]["name"], host_resp[0].name)
 
     @mock.patch.object(dbapi, 'hosts_create')
-    def test_create_cell_with_valid_data(self, mock_host):
+    def test_create_host_with_valid_data(self, mock_host):
         mock_host.return_value = None
         data = {'name': 'www.host1.com', 'region_id': '1', 'project_id': '1',
-                'ip_address': '10.0.0.1'}
+                'ip_address': '10.0.0.1', 'device_type': 'server'}
         resp = self.post('/v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_returns_host_obj(self, mock_host):
         return_value = {'name': 'www.host1.com', 'region_id': '1',
-                        'project_id': '1', 'ip_address': '10.0.0.1', 'id': 1}
+                        'project_id': '1', 'ip_address': '10.0.0.1', 'id': 1,
+                        'device_type': 'server'}
         mock_host.return_value = return_value
         data = {'name': 'www.host1.com', 'region_id': '1', 'project_id': '1',
-                'ip_address': '10.0.0.1'}
+                'ip_address': '10.0.0.1', 'device_type': 'server'}
         resp = self.post('v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)

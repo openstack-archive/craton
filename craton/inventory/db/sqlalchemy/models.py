@@ -191,6 +191,7 @@ class Device(Base, VariableMixin):
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
     ip_address = Column(IPAddressType, nullable=False)
+    device_type = Column(String(255), nullable=False)
     # this means the host is "active" for administration
     # the device may or may not be reachable by Ansible/other tooling
     #
@@ -225,7 +226,7 @@ class Host(Device):
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
-
+    parent_id = Column(Integer, ForeignKey('hosts.id'))
     # optional many-to-one relationship to a host-specific secret
     access_secret = relationship('AccessSecret', back_populates='hosts')
 
