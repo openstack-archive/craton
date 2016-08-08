@@ -1,0 +1,9 @@
+Code-Review+1: Chris Spencer <christopher.m.spencer@intel.com>
+Code-Review+2: sulochan-acharya <sulochan@gmail.com>
+Workflow+1: sulochan-acharya <sulochan@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 08 Aug 2016 14:50:00 +0000
+Reviewed-on: https://review.openstack.org/347547
+Project: openstack/craton
+Branch: refs/heads/master
