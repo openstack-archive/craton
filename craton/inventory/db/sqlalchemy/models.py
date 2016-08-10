@@ -115,12 +115,15 @@ class Project(Base):
     devices = relationship('Device', back_populates='project')
     users = relationship('User', back_populates='project')
 
+#Create Global Variable for charset of db
+mysql_table_args = {'mysql_charset': 'utf8mb4', 'mysql_engine': 'InnoDB'}
 
 class User(Base):
     __tablename__ = 'users'
     __table_args__ = (
         UniqueConstraint("username", "project_id",
                          name="uq_user0username0project"),
+                         mysql_table_args
     )
     id = Column(Integer, primary_key=True)
     project_id = Column(
@@ -138,6 +141,7 @@ class Region(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("project_id", "name",
                          name="uq_region0projectid0name"),
+                         mysql_table_args
     )
     vars_tablename = 'region_variables'
     id = Column(Integer, primary_key=True)
@@ -157,6 +161,7 @@ class Cell(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("region_id", "name",
                          name="uq_cell0regionid0name"),
+                         mysql_table_args
     )
     vars_tablename = 'cell_variables'
     id = Column(Integer, primary_key=True)
@@ -179,6 +184,7 @@ class Device(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("region_id", "name",
                          name="uq_device0regionid0name"),
+                         mysql_table_args
     )
     vars_tablename = 'device_variables'
     id = Column(Integer, primary_key=True)
@@ -223,6 +229,7 @@ class Device(Base, VariableMixin):
 
 class Host(Device):
     __tablename__ = 'hosts'
+    __table_args__ = mysql_table_args
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
@@ -267,6 +274,7 @@ class Label(Base, VariableMixin):
     Ansible.
     """
     __tablename__ = 'labels'
+    __table_args__ = mysql_table_args
     vars_tablename = 'label_variables'
     id = Column(Integer, primary_key=True)
     label = Column(String(255), unique=True)
@@ -294,6 +302,7 @@ class AccessSecret(Base):
     the configuration.
     """
     __tablename__ = 'access_secrets'
+    __table_args__ = mysql_table_args
     id = Column(Integer, primary_key=True)
     cert = Column(Text)
 
