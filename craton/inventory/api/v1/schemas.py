@@ -13,8 +13,8 @@ DefinitionsHost = {'discriminator': 'name',
                        'ip_address': {'type': 'string'},
                        'name': {'type': 'string'},
                        'id': {'type': 'integer'},
-                       'cell_id': {'type': 'string'},
-                       'project_id': {'type': 'string'},
+                       'cell_id': {'type': 'integer'},
+                       'project_id': {'type': 'integer'},
                        'parent_id': {'type': 'integer',
                                      'description': 'Parent Id of this host'},
                        'device_type': {'type': 'string',
@@ -23,7 +23,7 @@ DefinitionsHost = {'discriminator': 'name',
                                   'description': 'User defined labels'},
                        'data': {'type': 'allOf',
                                 'description': 'User defined information'},
-                       'region_id': {'type': 'string'}}}
+                       'region_id': {'type': 'integer'}}}
 
 DefinitionsHostId = {'discriminator': 'name',
                      'type': 'object',
@@ -32,13 +32,13 @@ DefinitionsHostId = {'discriminator': 'name',
                          'ip_address': {'type': 'string'},
                          'name': {'type': 'string'},
                          'id': {'type': 'integer'},
-                         'cell_id': {'type': 'string'},
-                         'project_id': {'type': 'string'},
+                         'cell_id': {'type': 'integer'},
+                         'project_id': {'type': 'integer'},
                          'labels': {'type': 'allOf',
                                     'description': 'User defined labels'},
                          'data': {'type': 'allOf',
                                   'description': 'User defined information'},
-                         'region_id': {'type': 'string'}}}
+                         'region_id': {'type': 'integer'}}}
 
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
@@ -48,7 +48,7 @@ DefinitionsCell = {'discriminator': 'name',
                    'type': 'object',
                    'properties': {
                        'note': {'type': 'string'},
-                       'project_id': {'type': 'string',
+                       'project_id': {'type': 'integer',
                                       'description': 'ID of the project'},
                        'name': {'type': 'string'},
                        'region_id': {'type': 'integer'},
@@ -61,7 +61,7 @@ DefinitionsCellId = {'discriminator': 'name',
                      'type': 'object',
                      'properties': {
                          'note': {'type': 'string'},
-                         'project_id': {'type': 'string',
+                         'project_id': {'type': 'integer',
                                         'description': 'ID of the project'},
                          'name': {'type': 'string'},
                          'region_id': {'type': 'integer'},
@@ -92,7 +92,7 @@ DefinitionsRegion = {'discriminator': 'name',
                              'type': 'string',
                              'description': 'Region Name.'},
                          'project_id': {
-                             'type': 'string',
+                             'type': 'integer',
                              'description': 'ID of the project'},
                          'cells': {
                              'items': DefinitionsCell,
@@ -115,7 +115,7 @@ DefinitionsRegionId = {'discriminator': 'name',
                                'type': 'string',
                                'description': 'Region Name.'},
                            'project_id': {
-                               'type': 'string',
+                               'type': 'integer',
                                'description': 'ID of the project'},
                            'cells': {
                                'items': DefinitionsCell,
@@ -155,11 +155,11 @@ validators = {
                          'description': 'name of the hosts to get'},
                      'region': {
                          'default': None,
-                         'type': 'string',
+                         'type': 'integer',
                          'description': 'ID of the region to get hosts'},
                      'cell': {
                          'default': None,
-                         'type': 'string',
+                         'type': 'integer',
                          'description': 'ID of the cell to get hosts'},
                      'device_type': {
                          'default': None,
@@ -177,7 +177,7 @@ validators = {
                          'description': 'ip_address of the hosts to get'},
                      'id': {
                          'default': None,
-                         'type': 'string',
+                         'type': 'integer',
                          'description': 'ID of host to get'}}
                  }},
     ('cells_id', 'PUT'): {'json': DefinitionsCell},
