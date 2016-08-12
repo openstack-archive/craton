@@ -14,7 +14,7 @@ CONF = cfg.CONF
 CONF.register_opts(db_opts)
 
 # entrypoint namespace for db backend
-BACKEND_MAPPING = {'sqlalchemy': 'craton.inventory.db.sqlalchemy.api'}
+BACKEND_MAPPING = {'sqlalchemy': 'craton.db.sqlalchemy.api'}
 IMPL = db_api.DBAPI.from_config(cfg.CONF, backend_mapping=BACKEND_MAPPING,
                                 lazy=True)
 

@@ -6,8 +6,8 @@ from oslo_log import log
 import flask
 from flask import request
 
-from craton.inventory.db import api as dbapi
-from craton.inventory import exceptions
+from craton.db import api as dbapi
+from craton import exceptions
 
 
 LOG = log.getLogger(__name__)

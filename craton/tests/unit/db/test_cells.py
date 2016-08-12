@@ -1,6 +1,6 @@
-from craton.inventory import exceptions
-from craton.inventory.db import api as dbapi
-from craton.inventory.tests.unit.db import base
+from craton import exceptions
+from craton.db import api as dbapi
+from craton.tests.unit.db import base
 
 
 cell1 = {'region_id': 1, 'project_id': 1, 'name': 'cell1'}
