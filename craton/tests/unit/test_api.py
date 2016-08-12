@@ -2,12 +2,12 @@ import mock
 
 from oslo_serialization import jsonutils
 
-from craton.inventory import api
-from craton.inventory import exceptions
-from craton.inventory.api import middleware
-from craton.inventory.db.sqlalchemy import api as dbapi
-from craton.inventory.tests import TestCase
-from craton.inventory.tests.unit import fake_resources
+from craton import api
+from craton import exceptions
+from craton.api import middleware
+from craton.db.sqlalchemy import api as dbapi
+from craton.tests import TestCase
+from craton.tests.unit import fake_resources
 
 
 class APIV1Test(TestCase):

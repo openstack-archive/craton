@@ -1,8 +1,8 @@
 import fixtures
 
-from craton.inventory.db.sqlalchemy import api as sa_api
-from craton.inventory.db.sqlalchemy import models
-from craton.inventory.tests import TestCase
+from craton.db.sqlalchemy import api as sa_api
+from craton.db.sqlalchemy import models
+from craton.tests import TestCase
 
 
 _DB_SCHEMA = None

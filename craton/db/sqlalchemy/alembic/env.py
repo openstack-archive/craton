@@ -2,8 +2,8 @@ from __future__ import with_statement
 from alembic import context
 from logging.config import fileConfig
 
-from craton.inventory.db.sqlalchemy import api as sa_api
-from craton.inventory.db.sqlalchemy import models as db_models
+from craton.db.sqlalchemy import api as sa_api
+from craton.db.sqlalchemy import models as db_models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
