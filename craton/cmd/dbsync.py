@@ -1,6 +1,6 @@
 from oslo_config import cfg
 
-from craton.inventory.db.sqlalchemy import migration
+from craton.db.sqlalchemy import migration
 
 
 CONF = cfg.CONF

@@ -1,8 +1,8 @@
 from flask import Blueprint
 import flask_restful as restful
 
-from craton.inventory.api.v1.routes import routes
-from craton.inventory.api.v1.validators import security
+from craton.api.v1.routes import routes
+from craton.api.v1.validators import security
 
 
 @security.scopes_loader

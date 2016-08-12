@@ -11,7 +11,7 @@ from flask_restful.utils import unpack
 from jsonschema import Draft4Validator
 import six
 
-from craton.inventory.api.v1.schemas import (
+from craton.api.v1.schemas import (
     validators, filters, scopes, security, merge_default, normalize)
 
 

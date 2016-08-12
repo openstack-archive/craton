@@ -1,12 +1,12 @@
-from craton.inventory.api.v1.cells import Cells
-from craton.inventory.api.v1.cells import CellById
-from craton.inventory.api.v1.cells import CellsData
-from craton.inventory.api.v1.hosts import Hosts
-from craton.inventory.api.v1.hosts import HostById
-from craton.inventory.api.v1.hosts import HostsData
-from craton.inventory.api.v1.regions import Regions
-from craton.inventory.api.v1.regions import RegionsById
-from craton.inventory.api.v1.regions import RegionsData
+from craton.api.v1.inventory.cells import Cells
+from craton.api.v1.inventory.cells import CellById
+from craton.api.v1.inventory.cells import CellsData
+from craton.api.v1.inventory.hosts import Hosts
+from craton.api.v1.inventory.hosts import HostById
+from craton.api.v1.inventory.hosts import HostsData
+from craton.api.v1.inventory.regions import Regions
+from craton.api.v1.inventory.regions import RegionsById
+from craton.api.v1.inventory.regions import RegionsData
 
 
 routes = [

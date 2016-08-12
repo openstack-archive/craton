@@ -3,9 +3,9 @@ from flask import request
 from oslo_serialization import jsonutils
 from oslo_log import log
 
-from craton.inventory import exceptions
-from craton.inventory.api.v1 import base
-from craton.inventory import db as dbapi
+from craton.api.v1 import base
+from craton import db as dbapi
+from craton import exceptions
 
 
 LOG = log.getLogger(__name__)

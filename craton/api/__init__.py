@@ -6,7 +6,7 @@ from flask import Flask
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from craton.inventory.api import v1
+from craton.api import v1
 
 
 LOG = logging.getLogger(__name__)

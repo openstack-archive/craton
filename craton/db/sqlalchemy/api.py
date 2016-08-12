@@ -11,8 +11,8 @@ from oslo_log import log
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
 
-from craton.inventory import exceptions
-from craton.inventory.db.sqlalchemy import models
+from craton import exceptions
+from craton.db.sqlalchemy import models
 
 
 CONF = cfg.CONF
