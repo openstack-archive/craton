@@ -28,7 +28,8 @@ from sqlalchemy.orm import object_mapper, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
-
+import six.moves.urllib.parse as urlparse
+from oslo_config import cfg
 
 # TODO(jimbaker) set up table args for a given database/storage
 # engine, as configured.  See
@@ -99,9 +100,17 @@ class VariableMixin(object):
         return self._variables.any(key=key, value=value)
 
 
+def table_args():
+    engine_name = urlparse.urlparse(cfg.CONF.database.connection).scheme
+    if engine_name == 'mysql':
+        return {'mysql_engine': 'InnoDB',
+                'mysql_charset': 'utf8mb4'}
+
+
 class Project(Base):
     """Supports multitenancy for all other schema elements."""
     __tablename__ = 'projects'
+    __table_args__ = table_args()
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     _repr_columns = [id, name]
@@ -121,6 +130,7 @@ class User(Base):
     __table_args__ = (
         UniqueConstraint("username", "project_id",
                          name="uq_user0username0project"),
+        table_args()
     )
     id = Column(Integer, primary_key=True)
     project_id = Column(
@@ -138,6 +148,7 @@ class Region(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("project_id", "name",
                          name="uq_region0projectid0name"),
+        table_args()
     )
     vars_tablename = 'region_variables'
     id = Column(Integer, primary_key=True)
@@ -157,6 +168,7 @@ class Cell(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("region_id", "name",
                          name="uq_cell0regionid0name"),
+        table_args()
     )
     vars_tablename = 'cell_variables'
     id = Column(Integer, primary_key=True)
@@ -179,6 +191,7 @@ class Device(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("region_id", "name",
                          name="uq_device0regionid0name"),
+        table_args()
     )
     vars_tablename = 'device_variables'
     id = Column(Integer, primary_key=True)
@@ -223,6 +236,7 @@ class Device(Base, VariableMixin):
 
 class Host(Device):
     __tablename__ = 'hosts'
+    __table_args__ = table_args()
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
@@ -267,6 +281,7 @@ class Label(Base, VariableMixin):
     Ansible.
     """
     __tablename__ = 'labels'
+    __table_args__ = table_args()
     vars_tablename = 'label_variables'
     id = Column(Integer, primary_key=True)
     label = Column(String(255), unique=True)
@@ -294,6 +309,7 @@ class AccessSecret(Base):
     the configuration.
     """
     __tablename__ = 'access_secrets'
+    __table_args__ = table_args()
     id = Column(Integer, primary_key=True)
     cert = Column(Text)
 
