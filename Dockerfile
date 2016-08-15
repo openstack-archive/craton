@@ -14,6 +14,7 @@
 # Usage:
 # docker build -t craton-inventory:latest .
 # docker run --name craton-inventory -p 127.0.0.1:8080:8080 -d craton-inventory:latest
+# python tools/generate_fake_data.py --url http://127.0.0.1:8080/v1 --user demo --project 1 --key demo
 # curl http://127.0.0.1:8080/v1/regions -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: 1"
 #############################################################################
 
