@@ -128,6 +128,131 @@ DefinitionsRegionId = {'discriminator': 'name',
                                'type': 'integer',
                                'description': 'Unique ID for the region.'}}}
 
+DefinitionTask = {'discriminator': 'name',
+                       'type': 'object',
+                       'required': ['name', 'description'],
+                       'properties': {
+                           'name': {
+                               'type': 'string',
+                               'description': 'Region Name.'},
+                           'description': {
+                               'type': 'string',
+                               'description': 'Description of what the task does'},
+                           'meta': {
+                               'type': 'allOf',
+                               'description': 'User defined information'},
+                           'restricted_to': {
+                               'type': 'allOf',
+                               'description': 'User defined information'},
+                           'uuid':{
+                               'type': 'string',
+                               'description': 'UUID for the task'},
+                           'id': {
+                               'type': 'integer',
+                               'description': 'Unique ID for the region.'}}}
+
+DefinitionTaskId = {'discriminator': 'name',
+                         'type': 'object',
+                         'properties': {
+                             'name': {
+                                 'type': 'string',
+                                 'description': 'Region Name.'},
+                             'description': {
+                                 'type': 'string',
+                                 'description': 'Description of what the task does'},
+                             'meta': {
+                                 'type': 'allOf',
+                                 'description': 'User defined information'},
+                             'restricted_to': {
+                                 'type': 'allOf',
+                                 'description': 'User defined information'},
+                             'uuid':{
+                                 'type': 'string',
+                                 'description': 'UUID for the task'},
+                             'id': {
+                                 'type': 'integer',
+                                 'description': 'Unique ID for the region.'}}}
+
+DefinitionWorkflow = {'discriminator': 'name',
+                         'type': 'object',
+                         'required': ['name'],
+                         'properties': {
+                             'name': {
+                                 'type': 'string',
+                                 'description': 'Region Name.'},
+                             'description': {
+                                 'type': 'string',
+                                 'description': 'Description of what the task does'},
+                             'tasks': {
+                                 'type': 'object',
+                                 'additionalProperties': {
+                                      'type': 'string'},
+                                 'description': 'User defined information'},
+                             'meta': {
+                                 'type': 'allOf',
+                                 'description': 'Tasks in this workflow'},
+                             'restricted_to': {
+                                 'type': 'allOf',
+                                 'description': 'User defined information'},
+                             'type': {
+                                 'type': 'string',
+                                 'description': 'Type of workflow'},
+                             'uuid': {
+                                 'type': 'string',
+                                 'description': 'UUID for the task'},
+                             'id': {
+                                 'type': 'integer',
+                                 'description': 'Unique ID for the region.'}}}
+
+DefinitionWorkflowId = {'discriminator': 'name',
+                          'type': 'object',
+                          'properties': {
+                              'name': {
+                                  'type': 'string',
+                                  'description': 'Region Name.'},
+                              'description': {
+                                  'type': 'string',
+                                  'description': 'Description of what the task does'},
+                              'meta': {
+                                  'type': 'allOf',
+                                  'description': 'User defined information'},
+                              'tasks': {
+                                  'type': 'allOf',
+                                  'description': 'Tasks in this workflow'},
+                              'restricted_to': {
+                                  'type': 'allOf',
+                                  'description': 'User defined information'},
+                              'type':{
+                                  'type': 'string',
+                                  'description': 'Type of workflow'},
+                              'uuid':{
+                                  'type': 'string',
+                                  'description': 'UUID for the task'},
+                              'id': {
+                                  'type': 'integer',
+                                  'description': 'Unique ID for the region.'}}}
+
+DefinitionJob = {'discriminator': 'name',
+                    'type': 'object',
+                    'properties': {
+                        'workflow_uuid': {
+                            'type': 'string',
+                            'description': 'Workflow uuid'},
+                        'workflow_name': {
+                            'type': 'string',
+                            'description': 'Name of workflow'},
+                        'vars': {
+                            'type': 'object',
+                            'additionalProperties': {
+                                'type': 'string'},
+                         },
+                        'uuid': {
+                            'type': 'string',
+                            'description': 'UUID for the task'},
+                        'id': {
+                            'type': 'integer',
+                            'description': 'Unique ID for the region.'}}}
+
 validators = {
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts_id', 'PUT'): {'json': DefinitionsHost},
@@ -201,6 +326,39 @@ validators = {
                  }},
     ('regions_id', 'PUT'): {'json': DefinitionsRegion},
     ('cells_id_data', 'PUT'): {'json': DefinitionsData},
+    ('tasks', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'name': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'name of the task to get'},
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the cell to get'
+                         },
+                     'uuid': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'UUID of the task to get'}}
+                 }},
+    ('tasks', 'POST'): {'json': DefinitionTask},
+    ('workflows', 'GET'):{
+        'args': {'required': [],
+                 'properties': {
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the workflow to get'
+                         },
+                     'uuid': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'UUID of the workflow to get'}}
+                 }},
+    ('workflows', 'POST'): {'json': DefinitionWorkflow},
+    ('jobs', 'POST'): {'json': DefinitionJob},
 }
 
 filters = {
@@ -309,6 +467,32 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('tasks', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionTaskId, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('tasks', 'POST'):
+        {200: {'headers': None, 'schema': DefinitionTask},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('workflows', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionWorkflowId, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('workflows', 'POST'):
+        {200: {'headers': None, 'schema': DefinitionWorkflow},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('jobs', 'GET'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('jobs', 'POST'):
+        {200: {'headers': None, 'schema': DefinitionJob},
+         400: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
 }
 
 
@@ -329,6 +513,12 @@ scopes = {
     ('regions_id', 'PUT'): [],
     ('cells_id_data', 'PUT'): [],
     ('cells_id_data', 'DELETE'): [],
+    ('tasks', 'GET'): [],
+    ('tasks', 'POST'): [],
+    ('workflows', 'GET'): [],
+    ('workflows', 'POST'): [],
+    ('jobs', 'GET'): [],
+    ('jobs', 'POST'): [],
 }
 
 

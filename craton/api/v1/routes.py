@@ -9,6 +9,11 @@ from craton.api.v1.inventory.regions import RegionsById
 from craton.api.v1.inventory.regions import RegionsData
 
 
+from craton.api.v1.workflow import tasks
+from craton.api.v1.workflow import workflows
+from craton.api.v1.workflow import jobs
+
+
 routes = [
     dict(resource=HostsData,
          urls=['/hosts/<id>/data'],
@@ -37,4 +42,19 @@ routes = [
     dict(resource=CellsData,
          urls=['/cells/<id>/data'],
          endpoint='cells_data'),
+    dict(resource=tasks.Tasks,
+         urls=['/tasks'],
+         endpoint='tasks'),
+    dict(resource=tasks.TaskById,
+         urls=['/tasks/<id>'],
+         endpoint='task_id'),
+    dict(resource=tasks.Workflows,
+         urls=['/workflows'],
+         endpoint='workflows'),
+    dict(resource=tasks.WorkflowById,
+         urls=['/workflow/<id>'],
+         endpoint='workflow_id'),
+    dict(resource=tasks.Jobs,
+         urls=['/jobs'],
+         endpoint='jobs'),
 ]

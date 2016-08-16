@@ -298,3 +298,61 @@ class AccessSecret(Base):
     cert = Column(Text)
 
     hosts = relationship('Host', back_populates='access_secret')
+
+
+class Task(Base):
+    """Task represents a unit of work for Craton workflow engine.
+
+    It is a python plugin that can be executed in a standalone manner
+    if needed. Tasks can be grouped together into an ordered or
+    unordered workflow, or can form a workflow of single task.
+    Task names are unique, each task has its corresponding plugin/entrypoint.
+    If a task is `restricted_to` a role(s), it will only appear for users
+    who belong that that role.
+    """
+    __tablename__ = 'tasks'
+    id = Column(Integer, primary_key=True)
+    uuid = Column(String(36), nullable=False)
+    name = Column(String(36), nullable=False, unique=True)
+    meta = Column(JSONType)
+    description = Column(Text)
+    restricted_to = Column(JSONType)
+
+
+class Workflow(Base):
+    """Workflow is a group of task that is used by Craton for executing
+    certain work. Workflow can represent a single task or multiple tasks.
+    It can be ordered, where tasks are executed sequentially or unordered
+    where tasks have no sequence of execution.
+
+    Users can create workflows from available tasks, which tasks are available
+    to a user is controlled through Role Based Access Control. User with
+    admin context can make general purpose workflows for certain roles that
+    are available to all users specified by the role. If a workflow is
+    `restricted_to` a role(s), it will appear by default on the list of
+    workflows available to the users belonging to that role.
+    """
+    __tablename__ = 'workflows'
+    id = Column(Integer, primary_key=True)
+    uuid = Column(String(36), nullable=False)
+    name = Column(String(36), nullable=False)
+    meta = Column(JSONType)
+    type = Column(String(36), nullable=False) # ordered or unordered
+    tasks = Column(JSONType) # example {1: "task1", 2: "task2", 3: "task3"}
+    restricted_to = Column(JSONType)
+    description = Column(Text)
+
+
+class Jobs(Base):
+    """Jobs represent user submitted jobs. It is simply workflows submitted
+    by users againt a host, a cab, cell, region etc, with user defined vars
+    along with vars from Craton inventory.
+    """
+    __tablename__ = 'jobs'
+    id = Column(Integer, primary_key=True)
+    uuid = Column(String(36), nullable=False)
+    # use defined variables passed during job creation
+    user_vars = Column(JSONType)
+    workflow_uuid = Column(String(36), nullable=False)
+    # list of hosts against which this workflow is going to execute
+    workflow_hosts = Column(JSONType)
