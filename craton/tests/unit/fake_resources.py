@@ -42,6 +42,7 @@ class Host(object):
         self.region_id = region_id
         self.ip_address = ip_address
         self.variables = variables
+        self.resolved = variables
         self.device_type = device_type
         self.labels = labels
 
