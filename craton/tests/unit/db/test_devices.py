@@ -81,6 +81,15 @@ class HostsDBTestCase(base.DBTestCase):
         self.assertEqual(blame['bar'].source.name, 'cell_1')
         self.assertEqual(blame['bar'].variable.value, 'C2')
 
+    def test_hosts_variables_no_resolved(self):
+        region_id = self.make_region('region_1', foo='R1')
+        host_id = self.make_host(region_id, 'www.example.xyz',
+                                 IPAddress(u'10.1.2.101'),
+                                 'server', bar='bar2')
+        host = dbapi.hosts_get_by_id(self.context, host_id)
+        self.assertEqual(host.name, 'www.example.xyz')
+        self.assertEqual(host.variables, {'bar': 'bar2'})
+
     def test_hosts_resolved_vars_no_cells(self):
         region_id = self.make_region('region_1', foo='R1')
         host_id = self.make_host(region_id, 'www.example.xyz',
