@@ -1,3 +1,6 @@
+import copy
+
+
 """
 Provides some fake resources - region, cell, host and other related
 objects for test.
@@ -64,6 +67,7 @@ class Host(object):
         self.region_id = region_id
         self.ip_address = ip_address
         self.variables = variables
+        self.resolved = copy.copy(variables)
         self.device_type = device_type
         self.labels = labels
 

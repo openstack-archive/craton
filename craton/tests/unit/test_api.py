@@ -196,6 +196,26 @@ class APIV1HostsIDTest(APIV1Test):
         resp = self.get('v1/hosts/1')
         self.assertEqual(404, resp.status_code)
 
+    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    def test_get_hosts_resolved_vars(self, mock_host):
+        region_vars = {"r_var": "one"}
+        host = fake_resources.HOST1
+        host.resolved.update(region_vars)
+        expected = {"r_var": "one", "key1": "value1", "key2": "value2"}
+        mock_host.return_value = host
+        resp = self.get('v1/hosts/1')
+        self.assertEqual(resp.json["data"], expected)
+
+    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    def test_get_hosts_no_resolved_vars(self, mock_host):
+        region_vars = {"r_var": "one"}
+        host = fake_resources.HOST1
+        host.resolved.update(region_vars)
+        expected = {"key1": "value1", "key2": "value2"}
+        mock_host.return_value = host
+        resp = self.get('v1/hosts/1?resolved-values=false')
+        self.assertEqual(resp.json["data"], expected)
+
 
 class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_get_by_region')
