@@ -130,6 +130,15 @@ DefinitionsRegionId = {'discriminator': 'name',
 
 validators = {
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
+    ('hosts_id', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'resolved-values': {
+                         'default': True,
+                         'type': 'boolean'
+                     }
+                 }}
+    },
     ('hosts_id', 'PUT'): {'json': DefinitionsHost},
     ('regions', 'GET'): {
         'args': {'required': [],

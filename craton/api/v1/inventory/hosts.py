@@ -80,6 +80,8 @@ class HostById(base.Resource):
     def get(self, id):
         """Get host by given id"""
         context = request.environ.get('context')
+        resolved_values = g.args["resolved-values"]
+
         try:
             host_obj = dbapi.hosts_get_by_id(context, id)
         except exceptions.NotFound:
@@ -88,7 +90,11 @@ class HostById(base.Resource):
             LOG.error("Error during host get: %s" % err)
             return self.error_response(500, 'Unknown Error')
 
-        host_obj.data = host_obj.variables
+        if resolved_values:
+            host_obj.data = host_obj.resolved
+        else:
+            host_obj.data = host_obj.variables
+
         host_obj.labels = host_obj.labels
         host = jsonutils.to_primitive(host_obj)
         return host, 200, None
