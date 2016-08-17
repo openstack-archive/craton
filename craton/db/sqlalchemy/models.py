@@ -127,6 +127,9 @@ class User(Base):
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
     username = Column(String(255))
     api_key = Column(String(36))
+    # root = craton admin that can create other pojects/usrs
+    is_root = Column(Boolean, default=False)
+    # admin = project context admin
     is_admin = Column(Boolean, default=False)
     roles = Column(JSONType)
 
