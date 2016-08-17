@@ -50,18 +50,37 @@ def get_backend():
 
 
 def is_admin_context(context):
-    """Check if this request had admin context."""
-    # FIXME(sulo): fix after we have Users table
-    return True
+    """Check if this request had admin project context."""
+    if (context.is_admin and context.is_admin_project):
+        return True
+    return False
+
+
+def is_project_admin_context(context):
+    """Check if this request has admin context with in the project."""
+    if context.is_admin:
+        return True
+    return False
 
 
 def require_admin_context(f):
     """Decorator that ensures admin request context."""
-
     def wrapper(*args, **kwargs):
         if not is_admin_context(args[0]):
             raise exceptions.AdminRequired()
         return f(*args, **kwargs)
+    return wrapper
+
+
+def require_project_admin_context(f):
+    """Decorator that ensures admin or project_admin request context."""
+    def wrapper(*args, **kwargs):
+        if is_admin_context(args[0]):
+            return f(*args, **kwargs)
+        elif is_project_admin_context(args[0]):
+            return f(*args, **kwargs)
+        else:
+            raise exceptions.AdminRequired()
     return wrapper
 
 
@@ -433,3 +452,126 @@ def hosts_data_delete(context, host_id, data):
                 pass
 
     return host_ref
+
+
+@require_admin_context
+def projects_get_all(context):
+    """Get all the projects."""
+    query = model_query(context, models.Project)
+    try:
+        return query.all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+
+
+@require_admin_context
+def projects_get_by_name(context, project_name):
+    """Get all projects that match the given name."""
+    query = model_query(context, models.Project)
+    query = query.filter(models.Project.name.like(project_name))
+    try:
+        return query.all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+
+
+@require_admin_context
+def projects_get_by_id(context, project_id):
+    """Get project by its id."""
+    query = model_query(context, models.Project)
+    query = query.filter_by(id=project_id)
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+
+
+@require_admin_context
+def projects_create(context, values):
+    """Create a new project with given values."""
+    session = get_session()
+    project = models.Project()
+    with session.begin():
+        project.update(values)
+        project.save(session)
+    return project
+
+
+@require_admin_context
+def projects_delete(context, project_id):
+    """Delete an existing project given by its id."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Project, session=session)
+        query = query.filter_by(id=project_id)
+        query.delete()
+
+
+@require_project_admin_context
+def users_get_all(context):
+    """Get all the users."""
+    if is_admin_context(context):
+        LOG.info("Getting all users as root user")
+        query = model_query(context, models.User)
+    else:
+        LOG.info("Getting all users as project admin user")
+        query = model_query(context, models.User, project_only=True)
+        query = query.filter_by(project_id=context.tenant)
+
+    return query.all()
+
+
+@require_project_admin_context
+def users_get_by_name(context, user_name):
+    """Get all users that match the given username."""
+    if is_admin_context(context):
+        query = model_query(context, models.User)
+    else:
+        query = model_query(context, models.User, project_only=True)
+
+    query = query.filter_by(username=user_name)
+    return query.all()
+
+
+@require_project_admin_context
+def users_get_by_id(context, user_id):
+    """Get user by its id."""
+    if is_admin_context(context):
+        query = model_query(context, models.User)
+    else:
+        query = model_query(context, models.User, project_only=True)
+
+    query = query.filter_by(id=user_id)
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+
+@require_project_admin_context
+def users_create(context, values):
+    """Create a new user with given values."""
+    session = get_session()
+    user = models.User()
+    with session.begin():
+        user.update(values)
+        user.save(session)
+    return user
+
+
+@require_project_admin_context
+def users_delete(context, user_id):
+    """Delete an existing user given by its id."""
+    LOG.info("Deleting user with id %s" % user_id)
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.User, session=session)
+        query = query.filter_by(id=user_id)
+        query.delete()
+    return

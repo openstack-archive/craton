@@ -38,6 +38,8 @@ class NoAuthContextMiddleware(ContextMiddleware):
             auth_token='noauth-token',
             user='noauth-user',
             tenant=1,
+            is_admin=True,
+            is_admin_project=True,
         )
 
     @classmethod
@@ -69,6 +71,15 @@ class LocalAuthContextMiddleware(ContextMiddleware):
                                             headers.get('X-Auth-User', None))
             if user_info.api_key != headers.get('X-Auth-Token', None):
                 return flask.Response(status=401)
+            if user_info["is_root"]:
+                ctx.is_admin = True
+                ctx.is_admin_project = True
+            elif user_info["is_admin"]:
+                ctx.is_admin = True
+                ctx.is_admin_project = False
+            else:
+                ctx.is_admin = False
+                ctx.is_admin_project = False
         except exceptions.NotFound:
             return flask.Response(status=401)
         except Exception as err:
