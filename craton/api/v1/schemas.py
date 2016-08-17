@@ -128,6 +128,22 @@ DefinitionsRegionId = {'discriminator': 'name',
                                'type': 'integer',
                                'description': 'Unique ID for the region.'}}}
 
+DefinitionUser = {'discriminator': 'name',
+                  'type': 'object',
+                  'properties': {
+                      'id': {'type': 'integer'},
+                      'api_key': {'type': 'string'},
+                      'username': {'type': 'string'},
+                      'is_admin': {'type': 'boolean'},
+                      'project_id': {'type': 'integer'},
+                      'roles': {'type': 'allOf'}}}
+
+DefinitionProject = {'discriminator': 'name',
+                     'type': 'object',
+                     'properties': {
+                         'id': {'type': 'integer'},
+                         'name': {'type': 'string'}}}
+
 validators = {
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts_id', 'PUT'): {'json': DefinitionsHost},
@@ -201,6 +217,34 @@ validators = {
                  }},
     ('regions_id', 'PUT'): {'json': DefinitionsRegion},
     ('cells_id_data', 'PUT'): {'json': DefinitionsData},
+    ('projects', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the project to get'
+                         },
+                     'name': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'name of the project to get'}}
+                 }},
+    ('projects', 'POST'): {'json': DefinitionProject},
+    ('users', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the user to get'
+                         },
+                     'name': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'name of the user to get'}}
+                 }},
+    ('users', 'POST'): {'json': DefinitionUser},
 }
 
 filters = {
@@ -309,6 +353,38 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('projects', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionProject, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('projects', 'POST'):
+        {200: {'headers': None, 'schema': DefinitionProject},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('users', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionUser, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('users', 'POST'):
+        {200: {'headers': None, 'schema': DefinitionUser},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('users_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionUser},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('users_id', 'DELETE'):
+        {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
 }
 
 
@@ -329,6 +405,14 @@ scopes = {
     ('regions_id', 'PUT'): [],
     ('cells_id_data', 'PUT'): [],
     ('cells_id_data', 'DELETE'): [],
+    ('projects', 'GET'): [],
+    ('projects_id', 'GET'): [],
+    ('projects_id', 'DELETE'): [],
+    ('projects', 'POST'): [],
+    ('users', 'GET'): [],
+    ('users', 'POST'): [],
+    ('users_id', 'GET'): [],
+
 }
 
 

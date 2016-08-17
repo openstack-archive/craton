@@ -185,3 +185,57 @@ def hosts_data_update(context, host_id, data):
 def hosts_data_delete(context, host_id, data_key):
     """Delete the existing key (variable) from region data."""
     return IMPL.hosts_data_delete(context, host_id, data_key)
+
+
+# Projects
+
+def projects_get_all(context):
+    """Get all the projects."""
+    return IMPL.projects_get_all(context)
+
+
+def projects_get_by_name(context, project_name):
+    """Get all projects that match the given name."""
+    return IMPL.projects_get_by_name(context, project_name)
+
+
+def projects_get_by_id(context, project_id):
+    """Get project by its id."""
+    return IMPL.projects_get_by_id(context, project_id)
+
+
+def projects_create(context, values):
+    """Create a new project with given values."""
+    return IMPL.projects_create(context, values)
+
+
+def projects_delete(context, project_id):
+    """Delete an existing project given by its id."""
+    return IMPL.projects_delete(context, project_id)
+
+
+# Users
+
+def users_get_all(context):
+    """Get all the users."""
+    return IMPL.users_get_all(context)
+
+
+def users_get_by_name(context, user_name):
+    """Get all users that match the given username."""
+    return IMPL.users_get_by_name(context, user_name)
+
+
+def users_get_by_id(context, user_id):
+    """Get user by its id."""
+    return IMPL.users_get_by_id(context, user_id)
+
+
+def users_create(context, values):
+    """Create a new user with given values."""
+    return IMPL.users_create(context, values)
+
+
+def users_delete(context, user_id):
+    """Delete an existing user given by its id."""
+    return IMPL.users_delete(context, user_id)
