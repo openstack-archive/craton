@@ -1,13 +1,17 @@
 """Models inventory, as defined using SQLAlchemy ORM
-There are three independent parts to a specific workflow execution:
-* configuration, as managed by a GitHub-like versioned set of config
-  files (as used by Ansible and similar systems)
-* specific workflow, which is written in Python (eg with TaskFlow)
-* inventory of hosts for a given project, as organized by region, cell,
-  and labels, with overrides on variables; this module models that for
-  SQLAlchemy
-In particular, this means that the configuration is used to interpret
-any inventory data.
+
+Craton uses the following related aspects of inventory:
+
+* Device inventory, with devices are further organized by region,
+  cell, and labels. Variables are associated with all of these
+  entities, with the ability to override via resolution and to track
+  with blaming. This in terms forms the foundation of an *inventory
+  fabric*, which is implemented above this level.
+
+* Workflows are run against this inventory, taking in account the
+  variable configuration; as well as any specifics baked into the
+  workflow itself.
+
 """
 
 try:
@@ -24,7 +28,8 @@ from sqlalchemy import (
     UniqueConstraint)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import object_mapper, relationship
+from sqlalchemy.ext.declarative.api import _declarative_constructor
+from sqlalchemy.orm import backref, object_mapper, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
@@ -47,56 +52,140 @@ class CratonBase(models.ModelBase, models.TimestampMixin):
             ', '.join(['{0}={1!r}'.format(*item) for item in items]))
 
 
-Base = declarative_base(cls=CratonBase)
+def _variable_mixin_aware_constructor(self, **kwargs):
+    # The standard default for the underlying relationship for
+    # variables sets it to None, which means it cannot directly be
+    # used as a mappable collection. Cure the problem accordingly with
+    # a different default.
+    if isinstance(self, VariableMixin):
+        kwargs.setdefault('variables', {})
+    return _declarative_constructor(self, **kwargs)
 
+
+Base = declarative_base(
+    cls=CratonBase, constructor=_variable_mixin_aware_constructor)
+
+
+class VariableAssociation(Base):
+    """Associates a collection of Variable key-value objects
+    with a particular parent.
+
+    """
+    __tablename__ = "variable_association"
+
+    id = Column(Integer, primary_key=True)
+    discriminator = Column(String(50), nullable=False)
+    """Refers to the type of parent, such as 'cell' or 'device'"""
+
+    variables = relationship(
+        'Variable',
+        collection_class=attribute_mapped_collection('key'),
+        back_populates='association',
+        cascade='all, delete-orphan', lazy='joined',
+    )
+
+    def _variable_creator(key, value):
+        # Necessary to create a single key/value setting, even once
+        # the corresponding variable association has been setup
+        return Variable(key=key, value=value)
+
+    values = association_proxy(
+        'variables', 'value', creator=_variable_creator)
+
+    __mapper_args__ = {
+        'polymorphic_on': discriminator,
+    }
+
+
+class Variable(Base):
+    """The Variable class.
+
+    This represents all variable records in a single table.
+    """
+    __tablename__ = 'variables'
+    association_id = Column(
+        Integer,
+        ForeignKey(VariableAssociation.id,
+                   name='fk_variables_variable_association'),
+        primary_key=True)
+    # Use "key_", "value_" to avoid the use of reserved keywords in
+    # MySQL.  This difference in naming is only visible in the use of
+    # raw SQL.
+    key = Column('key_', String(255), primary_key=True)
+    value = Column('value_', JSONType)
+    association = relationship(
+        VariableAssociation, back_populates='variables',
+    )
+    parent = association_proxy('association', 'parent')
+
+    def __repr__(self):
+        return '%s(key=%r, value=%r)' % \
+            (self.__class__.__name__, self.key, self.value)
+
+
+# The VariableMixin mixin is adapted from this example code:
+# http://docs.sqlalchemy.org/en/latest/_modules/examples/generic_associations/discriminator_on_association.html
+# This blog post goes into more details about the underlying modeling:
+# http://techspot.zzzeek.org/2007/05/29/polymorphic-associations-with-sqlalchemy/
 
 class VariableMixin(object):
-    """Some metaprogramming so we can avoid repeating this construction"""
+    """VariableMixin mixin, creates a relationship to
+    the variable_association table for each parent.
+
+    """
+    @declared_attr
+    def variable_association_id(cls):
+        return Column(
+            Integer,
+            ForeignKey(VariableAssociation.id,
+                       name='fk_%ss_variable_association' %
+                       cls.__name__.lower()))
 
     @declared_attr
-    def _variables(cls):
-        # Camelcase the tablename to give the Variable inner class
-        # here a specific class name; necessary for reporting on
-        # classes
-        class_name = \
-            "".join(x.title() for x in cls.vars_tablename[:-1].split('_'))
+    def variable_association(cls):
+        name = cls.__name__
+        discriminator = name.lower()
 
-        # Because we are constructing Variable inner class with the
-        # 3-arg `type` function, we need to pull out all SA columns
-        # given that initialization order matters for SA!
-        #
-        # * Defines the primary key with correct ordering
-        # * Captures references, as seen in _repr_columns
-        parent_id = Column(ForeignKey(
-            '%s.id' % cls.__tablename__), primary_key=True)
-        key = Column(String(255), primary_key=True)
-        value = Column(JSONType)
-        Variable = type(class_name, (Base,), {
-            '__tablename__': cls.vars_tablename,
-            'parent_id': parent_id,
-            'key': key,
-            'value': value,
-            '_repr_columns': [key, value]})
+        # Defines a polymorphic class to distinguish variables stored
+        # for regions, cells, etc.
+        cls.variable_assoc_cls = assoc_cls = type(
+            "%sVariableAssociation" % name,
+            (VariableAssociation,),
+            {
+                '__tablename__': None,  # because mapping into a shared table
+                '__mapper_args__': {
+                    'polymorphic_identity': discriminator
+                }
+            })
 
-        # Need a reference for the association proxy to lookup the
-        # Variable class so it can reference
-        cls.variable_class = Variable
+        def _assoc_creator(kv):
+            assoc = assoc_cls()
+            for key, value in kv.items():
+                assoc.variables[key] = Variable(key=key, value=value)
+            return assoc
 
-        return relationship(
-            Variable,
+        cls._variables = association_proxy(
+            'variable_association', 'variables', creator=_assoc_creator)
+
+        # Using a composite associative proxy here enables returning the
+        # underlying values for a given key, as opposed to the
+        # Variable object; we need both.
+        cls.variables = association_proxy(
+            'variable_association', 'values', creator=_assoc_creator)
+
+        def with_characteristic(self, key, value):
+            return self._variables.any(key=key, value=value)
+
+        cls.with_characteristic = classmethod(with_characteristic)
+
+        rel = relationship(
+            assoc_cls,
             collection_class=attribute_mapped_collection('key'),
-            cascade='all, delete-orphan', lazy='joined')
+            cascade='all, delete-orphan', lazy='joined',
+            single_parent=True,
+            backref=backref('parent', uselist=False))
 
-    @declared_attr
-    def variables(cls):
-        return association_proxy(
-            '_variables', 'value',
-            creator=lambda key, value: cls.variable_class(key=key,
-                                                          value=value))
-
-    @classmethod
-    def with_characteristic(self, key, value):
-        return self._variables.any(key=key, value=value)
+        return rel
 
 
 class Project(Base):
@@ -116,7 +205,7 @@ class Project(Base):
     users = relationship('User', back_populates='project')
 
 
-class User(Base):
+class User(Base, VariableMixin):
     __tablename__ = 'users'
     __table_args__ = (
         UniqueConstraint("username", "project_id",
@@ -139,7 +228,6 @@ class Region(Base, VariableMixin):
         UniqueConstraint("project_id", "name",
                          name="uq_region0projectid0name"),
     )
-    vars_tablename = 'region_variables'
     id = Column(Integer, primary_key=True)
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
@@ -158,7 +246,6 @@ class Cell(Base, VariableMixin):
         UniqueConstraint("region_id", "name",
                          name="uq_cell0regionid0name"),
     )
-    vars_tablename = 'cell_variables'
     id = Column(Integer, primary_key=True)
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
@@ -180,7 +267,6 @@ class Device(Base, VariableMixin):
         UniqueConstraint("region_id", "name",
                          name="uq_device0regionid0name"),
     )
-    vars_tablename = 'device_variables'
     id = Column(Integer, primary_key=True)
     type = Column(String(50))  # discriminant for joined table inheritance
     name = Column(String(255), nullable=False)
@@ -267,7 +353,6 @@ class Label(Base, VariableMixin):
     Ansible.
     """
     __tablename__ = 'labels'
-    vars_tablename = 'label_variables'
     id = Column(Integer, primary_key=True)
     label = Column(String(255), unique=True)
 
