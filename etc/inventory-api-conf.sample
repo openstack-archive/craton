@@ -1,6 +1,4 @@
 [DEFAULT]
-# Show more verbose log output
-verbose=True
 # Set Debug level
 debug=True
 # Log file for craton inventory
