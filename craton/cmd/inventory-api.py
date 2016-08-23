@@ -5,7 +5,7 @@ from wsgiref import simple_server
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from craton.inventory import api
+from craton import api
 
 LOG = logging.getLogger(__name__)
 
