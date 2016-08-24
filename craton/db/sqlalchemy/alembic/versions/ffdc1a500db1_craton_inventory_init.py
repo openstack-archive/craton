@@ -78,6 +78,7 @@ def upgrade():
         sa.Column('project_id', sa.Integer(), nullable=False),
         sa.Column('username', sa.String(length=255), nullable=True),
         sa.Column('api_key', sa.String(length=36), nullable=True),
+        sa.Column('is_root', sa.Boolean(), nullable=True),
         sa.Column('is_admin', sa.Boolean(), nullable=True),
         sa.Column('roles', sqlalchemy_utils.types.json.JSONType(),
                   nullable=True),

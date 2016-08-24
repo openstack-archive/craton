@@ -4,6 +4,28 @@ objects for test.
 """
 
 
+class Project(object):
+    def __init__(self, name):
+        self.name = name
+
+PROJECT1 = Project("project1")
+PROJECT2 = Project("project2")
+
+
+class User(object):
+    def __init__(self, username, project_id, is_admin, is_root,
+                 api_key, roles=None):
+        self.username = username
+        self.project_id = project_id
+        self.is_admin = is_admin
+        self.is_root = is_root
+        self.api_key = api_key
+        self.roles = roles
+
+USER1 = User('user1', 1, True, False, 'xx-yy-zz')
+USER2 = User('user2', 1, False, False, 'aa-bb-cc')
+
+
 class Cell(object):
     def __init__(self, name, status, region_id, project_id, variables,
                  labels=None):

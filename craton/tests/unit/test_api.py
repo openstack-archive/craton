@@ -237,3 +237,59 @@ class APIV1HostsTest(APIV1Test):
         resp = self.post('v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
+
+
+class APIV1ProjectsTest(APIV1Test):
+    @mock.patch.object(dbapi, 'projects_create')
+    def test_create_project(self, mock_project):
+        return_value = {'name': 'project1', 'id': 1}
+        mock_project.return_value = return_value
+        data = {'name': 'project1'}
+        resp = self.post('v1/projects', data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json['id'], 1)
+
+    @mock.patch.object(dbapi, 'projects_get_all')
+    def test_project_get_all(self, mock_projects):
+        proj1 = fake_resources.PROJECT1
+        proj2 = fake_resources.PROJECT2
+        return_value = [proj1, proj2]
+        mock_projects.return_value = return_value
+
+        resp = self.get('v1/projects')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.json), 2)
+
+    @mock.patch.object(dbapi, 'projects_get_all')
+    def test_projects_get_no_admin_fails(self, mock_project):
+        mock_project.side_effect = exceptions.AdminRequired()
+        resp = self.get('v1/projects')
+        self.assertEqual(resp.status_code, 401)
+
+
+class APIV1UsersTest(APIV1Test):
+    @mock.patch.object(dbapi, 'projects_get_by_id')
+    @mock.patch.object(dbapi, 'users_create')
+    def test_create_users(self, mock_project, mock_user):
+        mock_project.return_value = {'id': 1, 'name': 'project1'}
+        return_value = {'name': 'user1', 'project_id': 1,
+                        'is_admin': False, 'id': 1, 'api_key': 'xxxx'}
+        mock_user.return_value = return_value
+        data = {'name': 'user1', 'project_id': 1, 'is_admin': False}
+        resp = self.post('v1/users', data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json['id'], 1)
+
+    @mock.patch.object(dbapi, 'users_get_all')
+    def test_users_get_all(self, mock_user):
+        return_values = [fake_resources.USER1, fake_resources.USER2]
+        mock_user.return_value = return_values
+        resp = self.get('v1/users')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.json), 2)
+
+    @mock.patch.object(dbapi, 'users_get_all')
+    def test_users_get_no_admin_fails(self, mock_user):
+        mock_user.side_effect = exceptions.AdminRequired()
+        resp = self.get('v1/users')
+        self.assertEqual(resp.status_code, 401)
