@@ -98,3 +98,28 @@ class HostsDBTestCase(base.DBTestCase):
         host = dbapi.hosts_get_by_id(self.context, host_id)
         self.assertEqual(host.name, 'www.example.xyz')
         self.assertEqual(host.resolved, {'bar': 'bar2', 'foo': 'R1'})
+
+    def test_hosts_get_all_with_filters(self):
+        region_id = self.make_region('region_1', foo='R1')
+        host_id = self.make_host(region_id, 'www.example.xyz',
+                                 IPAddress(u'10.1.2.101'),
+                                 'server')
+        variables = {"key1": "value1", "key2": "value2"}
+        dbapi.hosts_data_update(self.context, host_id, variables)
+        filters = {}
+        filters["var_filters"] = {"key2": "value2"}
+        res = dbapi.hosts_get_by_region(self.context, region_id, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].name, 'www.example.xyz')
+
+    def test_hosts_get_all_with_filters_noexist(self):
+        region_id = self.make_region('region_1', foo='R1')
+        host_id = self.make_host(region_id, 'www.example.xyz',
+                                 IPAddress(u'10.1.2.101'),
+                                 'server')
+        variables = {"key1": "value1", "key2": "value2"}
+        dbapi.hosts_data_update(self.context, host_id, variables)
+        filters = {}
+        filters["var_filters"] = {"key1": "value5"}
+        res = dbapi.hosts_get_by_region(self.context, region_id, filters)
+        self.assertEqual(len(res), 0)

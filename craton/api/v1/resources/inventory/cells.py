@@ -1,6 +1,7 @@
 from flask import request, g
 from oslo_serialization import jsonutils
 from oslo_log import log
+import six
 
 from craton.api.v1 import base
 from craton import db as dbapi
@@ -19,6 +20,17 @@ class Cells(base.Resource):
         region = g.args["region"]
         cell_name = g.args["name"]
         cell_id = g.args["id"]
+        filters = {}
+        var_filters = {}
+
+        # Get any undefined args as variables filter
+        for key, value in six.iteritems(g.args):
+            if key not in ["id", "name", "region"]:
+                var_filters[key] = g.args[key]
+
+        if var_filters:
+            filters["var_filters"] = var_filters
+
         context = request.environ.get('context')
 
         if not region:
@@ -55,7 +67,7 @@ class Cells(base.Resource):
 
         # No cell id or name so get all cells for this region only
         try:
-            cells_obj = dbapi.cells_get_all(context, region)
+            cells_obj = dbapi.cells_get_all(context, region, filters)
             cells = jsonutils.to_primitive(cells_obj)
             return cells, 200, None
         except exceptions.NotFound:

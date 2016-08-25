@@ -2,6 +2,7 @@ from flask import g
 from flask import request
 from oslo_serialization import jsonutils
 from oslo_log import log
+import six
 
 from craton.api.v1 import base
 from craton import db as dbapi
@@ -30,10 +31,20 @@ class Hosts(base.Resource):
         host_id = g.args["id"]
         device_type = g.args["device_type"]
         ip_address = g.args["ip"]
+        filters = {}
+        var_filters = {}
+
+        # Treat any undefined filter as variables filter
+        for key, value in six.iteritems(g.args):
+            if key not in ["name", "limit", "region", "cell", "id",
+                           "device_type", "ip"]:
+                var_filters[key] = value
+
+        if var_filters:
+            filters['var_filters'] = var_filters
 
         context = request.environ.get("context")
 
-        filters = {}
         if host_id:
             filters["id"] = host_id
         if name:

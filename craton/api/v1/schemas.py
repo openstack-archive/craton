@@ -164,7 +164,8 @@ validators = {
                      'id': {
                          'default': None,
                          'type': 'integer',
-                         'description': 'ID of the region to get'}}}
+                         'description': 'ID of the region to get'}},
+                 'additionalProperties': {'type': 'string'}}
         },
     ('regions', 'POST'): {'json': DefinitionsRegion},
     ('regions_id_data', 'PUT'): {'json': DefinitionsData},
@@ -201,8 +202,8 @@ validators = {
                      'id': {
                          'default': None,
                          'type': 'integer',
-                         'description': 'ID of host to get'}}
-                 }},
+                         'description': 'ID of host to get'}},
+                 'additionalProperties': {'type': 'string'}}},
     ('cells_id', 'PUT'): {'json': DefinitionsCell},
     ('cells', 'POST'): {'json': DefinitionsCell},
     ('cells', 'GET'): {
@@ -220,8 +221,8 @@ validators = {
                      'name': {
                          'default': None,
                          'type': 'string',
-                         'description': 'name of the cell to get'}}
-                 }},
+                         'description': 'name of the cell to get'}},
+                 'additionalProperties': {'type': 'string'}}},
     ('regions_id', 'PUT'): {'json': DefinitionsRegion},
     ('cells_id_data', 'PUT'): {'json': DefinitionsData},
     ('projects', 'GET'): {

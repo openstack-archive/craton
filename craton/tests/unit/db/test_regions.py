@@ -16,9 +16,29 @@ class RegionsDBTestCase(base.DBTestCase):
 
     def test_reions_get_all(self):
         dbapi.regions_create(self.context, region1)
-        res = dbapi.regions_get_all(self.context)
+        filters = {}
+        res = dbapi.regions_get_all(self.context, filters)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'region1')
+
+    def test_regions_get_all_with_var_filters(self):
+        res = dbapi.regions_create(self.context, region1)
+        variables = {"key1": "value1", "key2": "value2"}
+        dbapi.regions_data_update(self.context, res.id, variables)
+        filters = {}
+        filters["var_filters"] = {"key1": "value1"}
+        regions = dbapi.regions_get_all(self.context, filters)
+        self.assertEqual(len(regions), 1)
+        self.assertEqual(regions[0].name, region1['name'])
+
+    def test_regions_get_all_with_var_filters_noexist(self):
+        res = dbapi.regions_create(self.context, region1)
+        variables = {"key1": "value1", "key2": "value2"}
+        dbapi.regions_data_update(self.context, res.id, variables)
+        filters = {}
+        filters["var_filters"] = {"key1": "value12"}
+        regions = dbapi.regions_get_all(self.context, filters)
+        self.assertEqual(len(regions), 0)
 
     def test_region_get_by_name(self):
         dbapi.regions_create(self.context, region1)

@@ -1,6 +1,7 @@
 """SQLAlchemy backend implementation."""
 
 import sys
+import six
 
 from oslo_config import cfg
 from oslo_db import options as db_options
@@ -115,11 +116,16 @@ def get_user_info(context, username):
         raise exceptions.UnknownException(message=err)
 
 
-def cells_get_all(context, region):
+def cells_get_all(context, region, filters):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
     if region is not None:
         query = query.filter_by(region_id=region)
+
+    if "var_filters" in filters:
+        query = query.join('variable_association', 'variables')
+        for k, v in six.iteritems(filters["var_filters"]):
+            query = query.filter_by(key=k).filter_by(value=v)
 
     try:
         return query.all()
@@ -233,9 +239,15 @@ def cells_data_delete(context, cell_id, data):
     return cell_ref
 
 
-def regions_get_all(context):
+def regions_get_all(context, filters):
     """Get all available regions."""
     query = model_query(context, models.Region, project_only=True)
+
+    if "var_filters" in filters:
+        query = query.join('variable_association', 'variables')
+        for k, v in six.iteritems(filters["var_filters"]):
+            query = query.filter_by(key=k).filter_by(value=v)
+
     try:
         return query.all()
     except sa_exc.NoResultFound:
@@ -356,6 +368,11 @@ def hosts_get_by_region(context, region_id, filters):
         query = query.filter_by(cell_id=filters["cell"])
     if "device_type" in filters:
         query = query.filter_by(device_type=filters["device_type"])
+
+    if "var_filters" in filters:
+        query = query.join('variable_association', 'variables')
+        for k, v in six.iteritems(filters["var_filters"]):
+            query = query.filter_by(key=k).filter_by(value=v)
 
     try:
         result = query.all()
