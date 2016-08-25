@@ -522,9 +522,9 @@ definitions:
       id:
         type: integer
         description: Unique ID for the region.
-      region_uuid:
+      project_id:
         type: string
-        description: UUID of the region.
+        description: ID of the project
       name:
         type: string
         description: Region Name.
