@@ -3,6 +3,7 @@ from oslo_serialization import jsonutils
 from oslo_log import log
 
 from craton.api.v1 import base
+from craton.api.v1 import utils
 from craton import db as dbapi
 from craton import exceptions
 
@@ -20,12 +21,15 @@ class Regions(base.Resource):
         _name = g.args["name"]
         region_id = id or _id
         region_name = _name
+        filters = {}
+        filters["var_filters"] = utils.extract_variable_filters()
+
         context = request.environ.get('context')
 
         if not region_id and not region_name:
             # Get all regions for this tenant
             try:
-                regions_obj = dbapi.regions_get_all(context)
+                regions_obj = dbapi.regions_get_all(context, filters)
             except exceptions.NotFound:
                 return self.error_response(404, 'Not Found')
 

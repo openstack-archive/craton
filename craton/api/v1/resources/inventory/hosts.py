@@ -4,6 +4,7 @@ from oslo_serialization import jsonutils
 from oslo_log import log
 
 from craton.api.v1 import base
+from craton.api.v1 import utils
 from craton import db as dbapi
 from craton import exceptions
 
@@ -30,10 +31,11 @@ class Hosts(base.Resource):
         host_id = g.args["id"]
         device_type = g.args["device_type"]
         ip_address = g.args["ip"]
+        filters = {}
+        filters["var_filters"] = utils.extract_variable_filters()
 
         context = request.environ.get("context")
 
-        filters = {}
         if host_id:
             filters["id"] = host_id
         if name:

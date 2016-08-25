@@ -16,9 +16,29 @@ class CellsDBTestCase(base.DBTestCase):
 
     def test_cells_get_all(self):
         dbapi.cells_create(self.context, cell1)
-        res = dbapi.cells_get_all(self.context, cell1['region_id'])
+        filters = {}
+        res = dbapi.cells_get_all(self.context, cell1['region_id'], filters)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'cell1')
+
+    def test_cells_get_all_with_filters(self):
+        res = dbapi.cells_create(self.context, cell1)
+        variables = {"key1": "value1", "key2": "value2"}
+        dbapi.cells_data_update(self.context, res.id, variables)
+        filters = {}
+        filters["var_filters"] = {"key2": "value2"}
+        res = dbapi.cells_get_all(self.context, cell1['region_id'], filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['name'], 'cell1')
+
+    def test_cells_get_all_with_filters_noexist(self):
+        res = dbapi.cells_create(self.context, cell1)
+        variables = {"key1": "value1", "key2": "value2"}
+        dbapi.cells_data_update(self.context, res.id, variables)
+        filters = {}
+        filters["var_filters"] = {"key2": "value5"}
+        res = dbapi.cells_get_all(self.context, cell1['region_id'], filters)
+        self.assertEqual(len(res), 0)
 
     def test_cell_get_by_name(self):
         dbapi.cells_create(self.context, cell1)

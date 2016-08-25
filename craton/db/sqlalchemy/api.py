@@ -103,6 +103,14 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
+def add_var_filters_to_query(query, filters):
+    if filters.get("var_filters"):
+        query = query.join('variable_association', 'variables')
+        for k, v in filters["var_filters"].items():
+            query = query.filter_by(key=k).filter_by(value=v)
+    return query
+
+
 def get_user_info(context, username):
     """Get user info."""
     query = model_query(context, models.User, project_only=True)
@@ -115,11 +123,14 @@ def get_user_info(context, username):
         raise exceptions.UnknownException(message=err)
 
 
-def cells_get_all(context, region):
+def cells_get_all(context, region, filters):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
     if region is not None:
         query = query.filter_by(region_id=region)
+
+    # Add variables filters to query
+    query = add_var_filters_to_query(query, filters)
 
     try:
         return query.all()
@@ -233,9 +244,13 @@ def cells_data_delete(context, cell_id, data):
     return cell_ref
 
 
-def regions_get_all(context):
+def regions_get_all(context, filters):
     """Get all available regions."""
     query = model_query(context, models.Region, project_only=True)
+
+    # Add variable filters to query
+    query = add_var_filters_to_query(query, filters)
+
     try:
         return query.all()
     except sa_exc.NoResultFound:
@@ -356,6 +371,9 @@ def hosts_get_by_region(context, region_id, filters):
         query = query.filter_by(cell_id=filters["cell"])
     if "device_type" in filters:
         query = query.filter_by(device_type=filters["device_type"])
+
+    # Add variable filters to query
+    query = add_var_filters_to_query(query, filters)
 
     try:
         result = query.all()
