@@ -20,12 +20,23 @@ class Regions(base.Resource):
         _name = g.args["name"]
         region_id = id or _id
         region_name = _name
+        filters = {}
+        var_filters = {}
+
+        # Get any undefined args as variables filter
+        for key, value in g.args.items():
+            if key not in ["id", "name"]:
+                var_filters[key] = g.args[key]
+
+        if var_filters:
+            filters["var_filters"] = var_filters
+
         context = request.environ.get('context')
 
         if not region_id and not region_name:
             # Get all regions for this tenant
             try:
-                regions_obj = dbapi.regions_get_all(context)
+                regions_obj = dbapi.regions_get_all(context, filters)
             except exceptions.NotFound:
                 return self.error_response(404, 'Not Found')
 

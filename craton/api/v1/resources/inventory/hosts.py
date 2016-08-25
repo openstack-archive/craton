@@ -30,10 +30,20 @@ class Hosts(base.Resource):
         host_id = g.args["id"]
         device_type = g.args["device_type"]
         ip_address = g.args["ip"]
+        filters = {}
+        var_filters = {}
+
+        # Treat any undefined filter as variables filter
+        for key, value in g.args.items():
+            if key not in ["name", "limit", "region", "cell", "id",
+                           "device_type", "ip"]:
+                var_filters[key] = value
+
+        if var_filters:
+            filters['var_filters'] = var_filters
 
         context = request.environ.get("context")
 
-        filters = {}
         if host_id:
             filters["id"] = host_id
         if name:

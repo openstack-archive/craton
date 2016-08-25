@@ -57,9 +57,9 @@ def device_blame_variables(device, keys=None):
 
 # Cells
 
-def cells_get_all(context, region):
+def cells_get_all(context, region, filters):
     """Get all available cells."""
-    return IMPL.cells_get_all(context, region)
+    return IMPL.cells_get_all(context, region, filters)
 
 
 def cells_get_by_name(context, region, cell):
@@ -101,9 +101,9 @@ def cells_data_delete(context, cell_id, data_key):
 # Regions
 
 
-def regions_get_all(context):
+def regions_get_all(context, filters):
     """Get all available regions."""
-    return IMPL.regions_get_all(context)
+    return IMPL.regions_get_all(context, filters)
 
 
 def regions_get_by_name(context, name):
