@@ -339,6 +339,42 @@ class Host(Device):
     }
 
 
+class NetDevice(Device):
+    __tablename__ = 'net_devices'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    parent_id = Column(Integer, ForeignKey('devices.id'))
+    access_secret = relationship('AccessSecret', back_populates='hosts')
+    # network device specific properties
+    model_name = Column(String(255), nullable=True)
+    os_version = Column(String(255), nullable=True)
+    neighbours = Column(JSONType)
+    vlans = Column(JSONType)
+    vlan_interfaces = Column(JSONType)
+    interfaces = Column(JSONType)
+    networks = Column(JSONType)
+
+    @property
+    def resolved(self):
+        """Provides a mapping that uses scope resolution for variables"""
+        if self.cell:
+            return ChainMap(
+                self.variables,
+                ChainMap(*[label.variables for label in self.labels]),
+                self.cell.variables,
+                self.region.variables)
+        else:
+            return ChainMap(
+                self.variables,
+                ChainMap(*[label.variables for label in self.labels]),
+                self.region.variables)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'net_devices',
+    }
+
+
 device_labels = Table(
     'device_labels', Base.metadata,
     Column('device_id', ForeignKey('devices.id'), primary_key=True),
