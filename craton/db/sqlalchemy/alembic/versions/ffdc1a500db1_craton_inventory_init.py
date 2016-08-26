@@ -130,6 +130,47 @@ def upgrade():
         sa.PrimaryKeyConstraint('parent_id', 'key')
     )
     op.create_table(
+        'networks',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('cidr', sa.String(length=255), nullable=True),
+        sa.Column('gateway', sa.String(length=255), nullable=True),
+        sa.Column('netmask', sa.String(length=255), nullable=True),
+        sa.Column('ip_block_type', sa.String(length=255), nullable=True),
+        sa.Column('nss', sa.String(length=255), nullable=True),
+        sa.Column('region_id', sa.Integer(), nullable=False),
+        sa.Column('cell_id', sa.Integer(), nullable=True),
+        sa.Column('project_id', sa.Integer(), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        sa.ForeignKeyConstraint(['cell_id'], ['cells.id'], ),
+        sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
+        sa.ForeignKeyConstraint(['region_id'], ['regions.id'], ),
+    )
+    op.create_index(
+        op.f('ix_networks_cell_id'),
+        'networks',
+        ['cell_id'],
+        unique=False)
+    op.create_index(
+        op.f('ix_networks_project_id'),
+        'networks',
+        ['project_id'],
+        unique=False)
+    op.create_index(
+        op.f('ix_networks_region_id'),
+        'networks',
+        ['region_id'],
+        unique=False)
+    op.create_table(
+        'network_variables',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('key', sa.String(length=255), nullable=False),
+        sa.Column('value', sqlalchemy_utils.types.json.JSONType(),
+                  nullable=True))
+    op.create_table(
         'devices',
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
@@ -140,13 +181,17 @@ def upgrade():
         sa.Column('region_id', sa.Integer(), nullable=False),
         sa.Column('cell_id', sa.Integer(), nullable=True),
         sa.Column('project_id', sa.Integer(), nullable=False),
+        sa.Column('access_secret_id', sa.Integer(), nullable=True),
+        sa.Column('parent_id', sa.Integer(), nullable=True),
         sa.Column('ip_address',
                   sqlalchemy_utils.types.IPAddressType(length=64),
                   nullable=False),
         sa.Column('active', sa.Boolean(), nullable=True),
         sa.Column('note', sa.Text(), nullable=True),
+        sa.ForeignKeyConstraint(['access_secret_id'], ['access_secrets.id'], ),
         sa.ForeignKeyConstraint(['cell_id'], ['cells.id'], ),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
+        sa.ForeignKeyConstraint(['parent_id'], ['devices.id'], ),
         sa.ForeignKeyConstraint(['region_id'], ['regions.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('region_id', 'name',
@@ -180,11 +225,40 @@ def upgrade():
     op.create_table(
         'hosts',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('access_secret_id', sa.Integer(), nullable=True),
-        sa.Column('parent_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['access_secret_id'], ['access_secrets.id'], ),
         sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
-        sa.ForeignKeyConstraint(['parent_id'], ['hosts.id'], ),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table(
+        'net_devices',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('model_name', sa.String(length=255), nullable=True),
+        sa.Column('os_version', sa.String(length=255), nullable=True),
+        sa.Column('vlans', sqlalchemy_utils.types.json.JSONType(),
+                  nullable=True),
+        sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table(
+        'net_interfaces',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('interface_type', sa.String(length=255), nullable=True),
+        sa.Column('vlan_id', sa.Integer(), nullable=True),
+        sa.Column('port', sa.Integer(), nullable=True),
+        sa.Column('vlan', sa.String(length=255), nullable=True),
+        sa.Column('duplex', sa.String(length=255), nullable=True),
+        sa.Column('speed', sa.String(length=255), nullable=True),
+        sa.Column('link', sa.String(length=255), nullable=True),
+        sa.Column('cdp', sa.String(length=255), nullable=True),
+        sa.Column('security', sa.String(length=255), nullable=True),
+        sa.Column('device_id', sa.Integer(), nullable=False),
+        sa.Column('network_id', sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(['device_id'], ['net_devices.id'], ),
+        sa.ForeignKeyConstraint(['network_id'], ['networks.id'], ),
+        sa.UniqueConstraint('device_id', 'name',
+                            name='uq_netinter0deviceid0name')
         sa.PrimaryKeyConstraint('id')
     )
     # end Alembic commands
@@ -192,8 +266,16 @@ def upgrade():
 
 def downgrade():
     # commands auto generated by Alembic - please adjust!
+    op.drop_table('net_interfaces')
+    op.drop_table('net_interface_variables')
+    op.drop_table('net_devices')
     op.drop_table('hosts')
     op.drop_table('device_variables')
+    op.drop_index(op.f('ix_networks_region_id'), table_name='networks')
+    op.drop_index(op.f('ix_networks_project_id'), table_name='networks')
+    op.drop_index(op.f('ix_networks_cell_id'), table_name='networks')
+    op.drop_table('networks')
+    op.drop_table('network_variables')
     op.drop_table('device_labels')
     op.drop_index(op.f('ix_devices_region_id'), table_name='devices')
     op.drop_index(op.f('ix_devices_project_id'), table_name='devices')

@@ -52,7 +52,8 @@ def upgrade():
         sa.PrimaryKeyConstraint('association_id', 'key_')
     )
 
-    for table_name in ['users', 'regions', 'cells', 'labels', 'devices']:
+    var_tables = ['users', 'regions', 'cells', 'labels', 'devices', 'networks']
+    for table_name in var_tables:
         copy_and_move(table_name, copy_data=table_name != 'users')
 
     with op.batch_alter_table('variables') as batch_op:

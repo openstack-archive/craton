@@ -4,6 +4,7 @@ from craton.api.v1.resources import projects
 from craton.api.v1.resources.inventory import cells
 from craton.api.v1.resources.inventory import hosts
 from craton.api.v1.resources.inventory import regions
+from craton.api.v1.resources.inventory import networks
 
 
 routes = [
@@ -46,4 +47,22 @@ routes = [
     dict(resource=users.UserById,
          urls=['/users/<id>'],
          endpoint='users_id'),
+    dict(resource=networks.Networks,
+         urls=['/networks'],
+         endpoint='networks'),
+    dict(resource=networks.NetworkById,
+         urls=['/networks/<id>'],
+         endpoint='networks_id'),
+    dict(resource=networks.NetInterfaces,
+         urls=['/net_interfaces'],
+         endpoint='net_interfaces'),
+    dict(resource=networks.NetInterfaceById,
+         urls=['/net_interfaces/<id>'],
+         endpoint='net_interfaces_id'),
+    dict(resource=networks.NetDevices,
+         urls=['/netdevices'],
+         endpoint='netdevices'),
+    dict(resource=networks.NetDeviceById,
+         urls=['/netdevices/<id>'],
+         endpoint='netdevices_id'),
 ]
