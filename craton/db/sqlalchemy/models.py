@@ -303,22 +303,6 @@ class Device(Base, VariableMixin):
     cell = relationship('Cell', back_populates='devices')
     project = relationship('Project', back_populates='devices')
 
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'devices',
-        'with_polymorphic': '*'
-    }
-
-
-class Host(Device):
-    __tablename__ = 'hosts'
-    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
-    hostname = Device.name
-    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
-    parent_id = Column(Integer, ForeignKey('hosts.id'))
-    # optional many-to-one relationship to a host-specific secret
-    access_secret = relationship('AccessSecret', back_populates='hosts')
-
     @property
     def resolved(self):
         """Provides a mapping that uses scope resolution for variables"""
@@ -335,7 +319,100 @@ class Host(Device):
                 self.region.variables)
 
     __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'devices',
+        'with_polymorphic': '*'
+    }
+
+
+class Host(Device):
+    __tablename__ = 'hosts'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    parent_id = Column(Integer, ForeignKey('devices.id'))
+    # optional many-to-one relationship to a host-specific secret
+    access_secret = relationship('AccessSecret', back_populates='hosts')
+
+    __mapper_args__ = {
         'polymorphic_identity': 'hosts',
+        'inherit_condition': (id == Device.id)
+    }
+
+
+class Interface(Base):
+    __tablename__ = 'net_interfaces'
+    name = Column(String(255), nullable=True)
+    interface_type = Column(String(255), nullable=True)
+    vlan_id = Column(Integer, nullable=True)
+    port = Column(Integer, nullable=True)
+    vlan = Column(String(255), nullable=True)
+    duplex = Column(String(255), nullable=True)
+    speed = Column(String(255), nullable=True)
+    link = Column(String(255), nullable=True)
+    cdp = Column(String(255), nullable=True)
+    security = Column(String(255), nullable=True)
+    device_id = Column(Integer,
+                       ForeignKey('net_devices.id', ondelete="CASCADE"),
+                       nullable=False,
+                       primary_key=True)
+    network_id = Column(Integer,
+                        ForeignKey('networks.id'))
+    network = relationship('Network', back_populates="net_interfaces")
+
+
+# Many-to-Many relationship between devices and networks
+netdevices_networks = Table(
+    "netdevices_networks",
+    Base.metadata,
+    Column('netdevice_id', Integer, ForeignKey('net_devices.id')),
+    Column('network_id', Integer, ForeignKey('networks.id'))
+)
+
+
+class Network(Base):
+    __tablename__ = 'networks'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=True)
+    vlan = Column(String(255), nullable=True)
+    cidr = Column(String(255), nullable=True)
+    gateway = Column(String(255), nullable=True)
+    netmask = Column(String(255), nullable=True)
+    ip_block_type = Column(String(255), nullable=True)
+    nss = Column(String(255), nullable=True)
+
+    net_interfaces = relationship("Interface", back_populates="network")
+    net_devices = relationship("NetDevice",
+                               secondary=netdevices_networks,
+                               back_populates="networks")
+
+
+class NetDevice(Device):
+    __tablename__ = 'net_devices'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    parent_id = Column(Integer, ForeignKey('devices.id'))
+    access_secret = relationship('AccessSecret', back_populates='net_devices')
+    # network device specific properties
+    model_name = Column(String(255), nullable=True)
+    os_version = Column(String(255), nullable=True)
+    neighbours = Column(JSONType)
+    vlans = Column(JSONType)
+    network_id = Column(Integer, ForeignKey('networks.id'))
+
+    # one-to-many relationship between device and interface
+    net_interfaces = relationship('Interface',
+                                  backref='net_devices',
+                                  lazy='dynamic')
+    # many-to-many relationship between device and network
+    networks = relationship('Network',
+                            secondary=netdevices_networks,
+                            back_populates='net_devices')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'net_devices',
+        'inherit_condition': (id == Device.id)
     }
 
 
@@ -386,3 +463,4 @@ class AccessSecret(Base):
     cert = Column(Text)
 
     hosts = relationship('Host', back_populates='access_secret')
+    net_devices = relationship('NetDevice', back_populates='access_secret')
