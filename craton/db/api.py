@@ -239,3 +239,65 @@ def users_create(context, values):
 def users_delete(context, user_id):
     """Delete an existing user given by its id."""
     return IMPL.users_delete(context, user_id)
+
+
+# Networks
+
+def networks_get_by_region(context, region_id, filters):
+    """Get all networks for the given region."""
+    return IMPL.networks_get_by_region(context, region_id, filters)
+
+
+def networks_get_by_id(context, network_id):
+    """Get a given network by its id."""
+    return IMPL.networks_get_by_id(context, network_id)
+
+
+def networks_create(context, values):
+    """Create a new network."""
+    return IMPL.networks_create(context, values)
+
+
+def networks_delete(context, network_id):
+    """Delete existing network."""
+    return IMPL.networks_delete(context, network_id)
+
+
+def netdevices_get_by_region(context, region_id, filters):
+    """Get all network devices for the given region id."""
+    return IMPL.netdevices_get_by_region(context, region_id, filters)
+
+
+def netdevices_get_by_id(context, netdevice_id):
+    """Get a given network device by its id."""
+    return IMPL.netdevices_get_by_id(context, netdevice_id)
+
+
+def netdevices_create(context, values):
+    """Create a new network device."""
+    return IMPL.netdevices_create(context, values)
+
+
+def netdevices_delete(context, netdevice_id):
+    """Delete existing network device."""
+    return IMPL.netdevices_delete(context, netdevice_id)
+
+
+def net_interfaces_get_by_device(context, device_id, filters):
+    """Get all network interfaces for the given device."""
+    return IMPL.net_interfaces_get_by_device(context, device_id, filters)
+
+
+def net_interfaces_get_by_id(context, interface_id):
+    """Get a given network interface by its id."""
+    return IMPL.net_interfaces_get_by_id(context, interface_id)
+
+
+def net_interfaces_create(context, values):
+    """Create a new network interface."""
+    return IMPL.net_interfaces_create(context, values)
+
+
+def net_interfaces_delete(context, interface_id):
+    """Delete existing network interface."""
+    return IMPL.net_interfaces_delete(context, interface_id)

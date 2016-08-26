@@ -575,3 +575,141 @@ def users_delete(context, user_id):
         query = query.filter_by(id=user_id)
         query.delete()
     return
+
+
+def networks_get_by_region(context, region_id, filters):
+    """Get all networks for the given region."""
+    query = model_query(context, models.Network, project_only=True)
+    query = query.filter_by(region_id=region_id)
+
+    if "id" in filters:
+        query = query.filter_by(id=filters["id"])
+    if "network_type" in filters:
+        query = query.filter_by(network_type=filters["network_type"])
+    if "cell_id" in filters:
+        query = query.filter_by(cell_id=filters["cell_id"])
+    if "name" in filters:
+        query = query.filter_by(name=filters["name"])
+
+    result = query.all()
+    return result
+
+
+def networks_get_by_id(context, network_id):
+    """Get a given network by its id."""
+    query = model_query(context, models.Network, project_only=True)
+    query = query.filter_by(id=network_id)
+    try:
+        result = query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+    return result
+
+
+def networks_create(context, values):
+    """Create a new network."""
+    session = get_session()
+    network = models.Network()
+    with session.begin():
+        network.update(values)
+        network.save(session)
+    return network
+
+
+def networks_delete(context, network_id):
+    """Delete existing network."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Network, session=session,
+                            project_only=True)
+        query = query.filter_by(id=network_id)
+        query.delete()
+    return
+
+
+def netdevices_get_by_region(context, region_id, filters):
+    """Get all network devices for the given region."""
+    query = model_query(context, models.NetDevice, project_only=True)
+    query = query.filter_by(region_id=region_id)
+    result = query.all()
+    return result
+
+
+def netdevices_get_by_id(context, netdevice_id):
+    """Get a given network device by its id."""
+    query = model_query(context, models.NetDevice, project_only=True)
+    query = query.filter_by(id=netdevice_id)
+    try:
+        result = query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+    return result
+
+
+def netdevices_create(context, values):
+    """Create a new network device."""
+    session = get_session()
+    device = models.NetDevice()
+    with session.begin():
+        device.update(values)
+        device.save(session)
+    return device
+
+
+def netdevices_delete(context, netdevice_id):
+    """Delete existing network device."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.NetDevice, session=session,
+                            project_only=True)
+        query = query.filter_by(id=netdevice_id)
+        query.delete()
+
+
+def net_interfaces_get_by_device(context, device_id, filters):
+    """Get all network interfaces for the given host."""
+    query = model_query(context, models.NetInterface, project_only=True)
+    query = query.filter_by(device_id=device_id)
+
+    if "id" in filters:
+        query = query.filter_by(id=filters["id"])
+    if "ip_address" in filters:
+        query = query.filter_by(ip_address=filters["ip_address"])
+    if "interface_type" in filters:
+        query = query.filter_by(interface_type=filters["interface_type"])
+
+    return query.all()
+
+
+def net_interfaces_get_by_id(context, interface_id):
+    """Get a given network interface by its id."""
+    query = model_query(context, models.NetInterface, project_only=True)
+    query = query.filter_by(id=interface_id)
+    try:
+        result = query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+    return result
+
+
+def net_interfaces_create(context, values):
+    """Create a new network interface."""
+    session = get_session()
+    interface = models.NetInterface()
+    with session.begin():
+        interface.update(values)
+        interface.save(session)
+    return interface
+
+
+def net_interfaces_delete(context, interface_id):
+    """Delete existing network interface."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.NetInterface, session=session,
+                            project_only=True)
+        query = query.filter_by(id=interface_id)
+        query.delete()

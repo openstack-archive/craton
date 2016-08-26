@@ -144,6 +144,128 @@ DefinitionProject = {'discriminator': 'name',
                          'id': {'type': 'integer'},
                          'name': {'type': 'string'}}}
 
+DefinitionNetwork = {'discriminator': 'name',
+                     'required': ['name',
+                                  'project_id',
+                                  'cidr',
+                                  'gateway',
+                                  'netmask'],
+                     'type': 'object',
+                     'properties': {
+                         'id': {'type': 'integer'},
+                         'project_id': {'type': 'integer'},
+                         'region_id': {'type': 'integer'},
+                         'cell_id': {'type': 'integer'},
+                         'name': {'type': 'string'},
+                         'cidr': {'type': 'string'},
+                         'gateway': {'type': 'string'},
+                         'netmask': {'type': 'string'},
+                         'data': {'type': 'allOf'},
+                         "ip_block_type": {'type': 'string'},
+                         "nss": {'type': 'string'}}}
+
+DefinitionNetworkId = {'discriminator': 'name',
+                       'type': 'object',
+                       'properties': {
+                           'id': {'type': 'integer'},
+                           'project_id': {'type': 'integer'},
+                           'region_id': {'type': 'integer'},
+                           'cell_id': {'type': 'integer'},
+                           'name': {'type': 'string'},
+                           'cidr': {'type': 'string'},
+                           'gateway': {'type': 'string'},
+                           'netmask': {'type': 'string'},
+                           'data': {'type': 'allOf'},
+                           "ip_block_type": {'type': 'string'},
+                           "nss": {'type': 'string'}}}
+
+DefinitionNetInterface = {'discriminator': 'name',
+                          'required': ['name',
+                                       'device_id',
+                                       'interface_type'],
+                          'type': 'object',
+                          'properties': {
+                              'id': {'type': 'integer'},
+                              'name': {'type': 'string'},
+                              'device_id': {'type': 'integer',
+                                            'default': None},
+                              'network_id': {'type': 'integer',
+                                             'default': None},
+                              'interface_type': {'type': 'string'},
+                              'vlan_id': {'type': 'integer'},
+                              'vlan': {'type': 'string'},
+                              'port': {'type': 'string'},
+                              'duplex': {'type': 'string'},
+                              'speed': {'type': 'integer'},
+                              'link': {'type': 'string'},
+                              'cdp': {'type': 'string'},
+                              'data': {'type': 'allOf'},
+                              'security': {'type': 'string'}}}
+
+DefinitionNetInterfaceId = {'discriminator': 'name',
+                            'type': 'object',
+                            'properties': {
+                                'id': {'type': 'integer'},
+                                'name': {'type': 'string'},
+                                'device_id': {'type': 'integer'},
+                                'network_id': {'type': 'integer'},
+                                'interface_type': {'type': 'string'},
+                                'vlan_id': {'type': 'integer'},
+                                'vlan': {'type': 'string'},
+                                'port': {'type': 'string'},
+                                'duplex': {'type': 'string'},
+                                'speed': {'type': 'integer'},
+                                'link': {'type': 'string'},
+                                'cdp': {'type': 'string'},
+                                'data': {'type': 'allOf'},
+                                'security': {'type': 'string'}}}
+
+DefinitionNetDevice = {'discriminator': 'hostname',
+                       'required': ['hostname',
+                                    'region_id',
+                                    'project_id',
+                                    'device_type',
+                                    'ip_address'],
+                       'type': 'object',
+                       'properties': {
+                           'id': {'type': 'integer'},
+                           'project_id': {'type': 'integer'},
+                           'region_id': {'type': 'integer'},
+                           'cell_id': {'type': 'integer'},
+                           'parent_id': {'type': 'integer'},
+                           'ip_address': {'type': 'string'},
+                           'device_type': {'type': 'string'},
+                           'hostname': {'type': 'string'},
+                           'access_secret_id': {'type': 'integer'},
+                           'model_name': {'type': 'string'},
+                           'os_version': {'type': 'string'},
+                           'vlans': {'type': 'string'},
+                           'data': {'type': 'allOf',
+                                    'description': 'User defined variables'},
+                           'interface_id': {'type': 'integer'},
+                           'network_id': {'type': 'integer'}}}
+
+DefinitionNetDeviceId = {'discriminator': 'hostname',
+                         'type': 'object',
+                         'properties': {
+                             'id': {'type': 'integer'},
+                             'project_id': {'type': 'integer'},
+                             'region_id': {'type': 'integer'},
+                             'cell_id': {'type': 'integer'},
+                             'parent_id': {'type': 'integer'},
+                             'ip_address': {'type': 'string'},
+                             'device_type': {'type': 'string'},
+                             'hostname': {'type': 'string'},
+                             'access_secret_id': {'type': 'integer'},
+                             'model_name': {'type': 'string'},
+                             'os_version': {'type': 'string'},
+                             'vlans': {'type': 'string'},
+                             'interface_id': {'type': 'integer'},
+                             'data': {'type': 'allOf',
+                                      'description': 'User defined variables'},
+                             'network_id': {'type': 'integer'}}}
+
+
 validators = {
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts_id', 'GET'): {
@@ -252,6 +374,90 @@ validators = {
                          'description': 'name of the user to get'}}
                  }},
     ('users', 'POST'): {'json': DefinitionUser},
+    ('netdevices', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the net device to get'
+                         },
+                     'ip': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'IP of the device to get'},
+                     'region_id': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'region id of the device to get'},
+                     'name': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'name of the device to get'},
+                     'device_type': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'type of the device to get'},
+                     'cell_id': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'cell id of the device to get'}}
+                 }},
+    ('netdevices_id', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'resolved-values': {
+                         'default': True,
+                         'type': 'boolean'}}}},
+    ('netdevices', 'POST'): {'json': DefinitionNetDevice},
+    ('net_interfaces', 'GET'): {
+        'args': {'required': ['device_id'],
+                 'properties': {
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the net interface to get'
+                         },
+                     'device_id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'device id of the interface to get'},
+                     'ip': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'IP of the interface to get'},
+                     'interface_type': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'Type of the interface  to get'}}
+                 }},
+    ('net_interfaces', 'POST'): {'json': DefinitionNetInterface},
+    ('networks', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'id': {
+                         'default': None,
+                         'type': 'integer',
+                         'description': 'id of the network to get'
+                         },
+                     'network_type': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'type of the network to get'},
+                     'name': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'name of the network to get'},
+                     'region_id': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'region id of the network to get'},
+                     'cell_id': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'cell idof the network to get'}}
+                 }},
+    ('networks', 'POST'): {'json': DefinitionNetwork},
 }
 
 filters = {
@@ -389,6 +595,39 @@ filters = {
          405: {'headers': None, 'schema': None}},
     ('users_id', 'DELETE'):
         {200: {'headers': None, 'schema': None},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('netdevices', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionNetDeviceId, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('netdevices_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionNetDeviceId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('networks', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionNetwork, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('networks_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionNetworkId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('net_interfaces', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionNetInterface, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('net_interfaces_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionNetInterfaceId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},

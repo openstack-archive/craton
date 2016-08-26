@@ -79,3 +79,21 @@ HOST3 = Host("www.example.net", "1", "2", "10.10.0.1", "server",
              {"key1": "value1", "key2": "value2"})
 HOSTS_LIST_R1 = [HOST1, HOST2]
 HOSTS_LIST_R2 = [HOST3]
+
+
+class Networks(object):
+    def __init__(self, name, project_id, cidr, gateway, netmask,
+                 variables, labels=None):
+        self.name = name
+        self.project_id = project_id
+        self.cidr = cidr
+        self.gateway = gateway
+        self.netmask = netmask
+        self.variables = variables
+        self.labels = labels
+
+NETWORK1 = Networks("PrivateNetwork", 1, "192.168.1.0/24", "192.168.1.1",
+                    "255.255.255.0", {"key1": "value1"})
+NETWORK2 = Networks("PublicNetwork", 1, "10.10.1.0/24", "10.10.1.1",
+                    "255.255.255.0", {"pkey1": "pvalue1"})
+NETWORKS_LIST = [NETWORK1, NETWORK2]
