@@ -28,6 +28,37 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
     op.create_table(
+        'net_interfaces',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('interface_type', sa.String(length=255), nullable=True),
+        sa.Column('vlan_id', sa.Integer(), nullable=True),
+        sa.Column('port', sa.Integer(), nullable=True),
+        sa.Column('vlan', sa.String(length=255), nullable=True),
+        sa.Column('duplex', sa.String(length=255), nullable=True),
+        sa.Column('speed', sa.String(length=255), nullable=True),
+        sa.Column('link', sa.String(length=255), nullable=True),
+        sa.Column('cdp', sa.String(length=255), nullable=True),
+        sa.Column('security', sa.String(length=255), nullable=True),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table(
+        'networks',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('vlan', sa.String(length=255), nullable=True),
+        sa.Column('cidr', sa.String(length=255), nullable=True),
+        sa.Column('gateway', sa.String(length=255), nullable=True),
+        sa.Column('netmask', sa.String(length=255), nullable=True),
+        sa.Column('ip_block_type', sa.String(length=255), nullable=True),
+        sa.Column('nss', sa.String(length=255), nullable=True),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table(
         'labels',
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
@@ -184,7 +215,31 @@ def upgrade():
         sa.Column('parent_id', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['access_secret_id'], ['access_secrets.id'], ),
         sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
-        sa.ForeignKeyConstraint(['parent_id'], ['hosts.id'], ),
+        sa.ForeignKeyConstraint(['parent_id'], ['devices.id'], ),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table(
+        'net_devices',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('access_secret_id', sa.Integer(), nullable=True),
+        sa.Column('parent_id', sa.Integer(), nullable=True),
+        sa.Column('model_name', sa.String(length=255), nullable=True),
+        sa.Column('os_version', sa.String(length=255), nullable=True),
+        sa.Column('neighbours',
+                  sqlalchemy_utils.types.json.JSONType(),
+                  nullable=True),
+        sa.Column('vlans',
+                  sqlalchemy_utils.types.json.JSONType(),
+                  nullable=True),
+        sa.Column('interface_id', sa.Integer(), nullable=True),
+        sa.Column('network_id', sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(['access_secret_id'],
+                                ['access_secrets.id'], ),
+        sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
+        sa.ForeignKeyConstraint(['interface_id'],
+                                ['net_interfaces.id'], ),
+        sa.ForeignKeyConstraint(['network_id'], ['networks.id'], ),
+        sa.ForeignKeyConstraint(['parent_id'], ['devices.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
     # end Alembic commands
@@ -211,5 +266,7 @@ def downgrade():
     op.drop_table('label_variables')
     op.drop_table('projects')
     op.drop_table('labels')
+    op.drop_table('networks')
+    op.drop_table('net_interfaces')
     op.drop_table('access_secrets')
     # end Alembic commands

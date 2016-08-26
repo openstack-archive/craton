@@ -303,22 +303,6 @@ class Device(Base, VariableMixin):
     cell = relationship('Cell', back_populates='devices')
     project = relationship('Project', back_populates='devices')
 
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'devices',
-        'with_polymorphic': '*'
-    }
-
-
-class Host(Device):
-    __tablename__ = 'hosts'
-    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
-    hostname = Device.name
-    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
-    parent_id = Column(Integer, ForeignKey('hosts.id'))
-    # optional many-to-one relationship to a host-specific secret
-    access_secret = relationship('AccessSecret', back_populates='hosts')
-
     @property
     def resolved(self):
         """Provides a mapping that uses scope resolution for variables"""
@@ -335,7 +319,98 @@ class Host(Device):
                 self.region.variables)
 
     __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'devices',
+        'with_polymorphic': '*'
+    }
+
+
+class Host(Device):
+    """
+    Host represents a host device, both physical and virutal
+    hosts can be represented by host type. Physical hosts such as
+    servers and virutal hosts such as a virtual machine or a
+    container are a few common examples.
+    """
+
+    __tablename__ = 'hosts'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    parent_id = Column(Integer, ForeignKey('devices.id'))
+    # optional many-to-one relationship to a host-specific secret
+    access_secret = relationship('AccessSecret', back_populates='hosts')
+
+    __mapper_args__ = {
         'polymorphic_identity': 'hosts',
+        'inherit_condition': (id == Device.id)
+    }
+
+
+class NetInterface(Base):
+   """NetInterface represents a model of a network interface."""
+
+    __tablename__ = 'net_interfaces'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=True)
+    interface_type = Column(String(255), nullable=True)
+    vlan_id = Column(Integer, nullable=True)
+    port = Column(Integer, nullable=True)
+    vlan = Column(String(255), nullable=True)
+    duplex = Column(String(255), nullable=True)
+    speed = Column(String(255), nullable=True)
+    link = Column(String(255), nullable=True)
+    cdp = Column(String(255), nullable=True)
+    security = Column(String(255), nullable=True)
+
+    net_devices = relationship('NetDevice', back_populates='net_interfaces')
+
+
+class Network(Base):
+   """Network represents a view of physical as well as software defined
+   network model."""
+
+    __tablename__ = 'networks'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=True)
+    vlan = Column(String(255), nullable=True)
+    cidr = Column(String(255), nullable=True)
+    gateway = Column(String(255), nullable=True)
+    netmask = Column(String(255), nullable=True)
+    ip_block_type = Column(String(255), nullable=True)
+    nss = Column(String(255), nullable=True)
+
+    net_devices = relationship('NetDevice', back_populates='networks')
+
+
+class NetDevice(Device):
+    """
+    NetDevice represents a network device.
+
+    It can be a physical switch, a router, or a virutal switch
+    bridge and so on.
+    """
+
+    __tablename__ = 'net_devices'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    parent_id = Column(Integer, ForeignKey('devices.id'))
+    access_secret = relationship('AccessSecret', back_populates='net_devices')
+    # network device specific properties
+    model_name = Column(String(255), nullable=True)
+    os_version = Column(String(255), nullable=True)
+    neighbours = Column(JSONType)
+    vlans = Column(JSONType)
+    interface_id = Column(Integer, ForeignKey('net_interfaces.id'))
+    network_id = Column(Integer, ForeignKey('networks.id'))
+
+    net_interfaces = relationship('NetInterface', back_populates='net_devices')
+    networks = relationship('Network', back_populates='net_devices')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'net_devices',
+        'inherit_condition': (id == Device.id)
     }
 
 
@@ -386,3 +461,4 @@ class AccessSecret(Base):
     cert = Column(Text)
 
     hosts = relationship('Host', back_populates='access_secret')
+    net_devices = relationship('NetDevice', back_populates='access_secret')
