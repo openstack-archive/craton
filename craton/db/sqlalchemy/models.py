@@ -203,6 +203,7 @@ class Project(Base):
     cells = relationship('Cell', back_populates='project')
     devices = relationship('Device', back_populates='project')
     users = relationship('User', back_populates='project')
+    networks = relationship('Network', back_populates='project')
 
 
 class User(Base, VariableMixin):
@@ -241,6 +242,7 @@ class Region(Base, VariableMixin):
     project = relationship('Project', back_populates='regions')
     cells = relationship('Cell', back_populates='region')
     devices = relationship('Device', back_populates='region')
+    networks = relationship('Network', back_populates='region')
 
 
 class Cell(Base, VariableMixin):
@@ -261,10 +263,12 @@ class Cell(Base, VariableMixin):
     region = relationship('Region', back_populates='cells')
     devices = relationship('Device', back_populates='cell')
     project = relationship('Project', back_populates='cells')
+    networks = relationship('Network', back_populates='cell')
 
 
 class Device(Base, VariableMixin):
-    """Models descriptive data about a host"""
+    """Base class for all devices."""
+
     __tablename__ = 'devices'
     __table_args__ = (
         UniqueConstraint("region_id", "name",
@@ -279,14 +283,14 @@ class Device(Base, VariableMixin):
         Integer, ForeignKey('cells.id'), index=True, nullable=True)
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
+    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
+    parent_id = Column(Integer, ForeignKey('devices.id'))
     ip_address = Column(IPAddressType, nullable=False)
     device_type = Column(String(255), nullable=False)
-    # this means the host is "active" for administration
-    # the device may or may not be reachable by Ansible/other tooling
-    #
     # TODO(jimbaker) generalize `note` for supporting governance
     active = Column(Boolean, default=True)
     note = Column(Text)
+
     _repr_columns = [id, name]
 
     # many-to-many relationship with labels; labels are sorted to
@@ -298,26 +302,11 @@ class Device(Base, VariableMixin):
         collection_class=lambda: SortedSet(key=attrgetter('label')))
     associated_labels = association_proxy('labels', 'label')
 
-    # many-to-one relationship to regions and cells
+    # relationships
     region = relationship('Region', back_populates='devices')
     cell = relationship('Cell', back_populates='devices')
     project = relationship('Project', back_populates='devices')
-
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'devices',
-        'with_polymorphic': '*'
-    }
-
-
-class Host(Device):
-    __tablename__ = 'hosts'
-    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
-    hostname = Device.name
-    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
-    parent_id = Column(Integer, ForeignKey('hosts.id'))
-    # optional many-to-one relationship to a host-specific secret
-    access_secret = relationship('AccessSecret', back_populates='hosts')
+    access_secret = relationship('AccessSecret', back_populates='devices')
 
     @property
     def resolved(self):
@@ -335,7 +324,87 @@ class Host(Device):
                 self.region.variables)
 
     __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'devices',
+        'with_polymorphic': '*'
+    }
+
+
+class Host(Device):
+    __tablename__ = 'hosts'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+
+    __mapper_args__ = {
         'polymorphic_identity': 'hosts',
+        'inherit_condition': (id == Device.id)
+    }
+
+
+class NetInterface(Base):
+    __tablename__ = 'net_interfaces'
+    __table_args__ = (
+        UniqueConstraint("device_id", "name",
+                         name="uq_netinter0deviceid0name"),
+    )
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=True)
+    interface_type = Column(String(255), nullable=True)
+    vlan_id = Column(Integer, nullable=True)
+    port = Column(Integer, nullable=True)
+    vlan = Column(String(255), nullable=True)
+    duplex = Column(String(255), nullable=True)
+    speed = Column(String(255), nullable=True)
+    link = Column(String(255), nullable=True)
+    cdp = Column(String(255), nullable=True)
+    security = Column(String(255), nullable=True)
+    device_id = Column(Integer,
+                       ForeignKey('net_devices.id'))
+    network_id = Column(Integer,
+                        ForeignKey('networks.id'),
+                        nullable=True)
+    network = relationship('Network', back_populates="net_devices",
+                           cascade='all', lazy='joined')
+    net_device = relationship('NetDevice', back_populates="interfaces",
+                              cascade='all', lazy='joined')
+
+
+class Network(Base, VariableMixin):
+    __tablename__ = 'networks'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=True)
+    cidr = Column(String(255), nullable=True)
+    gateway = Column(String(255), nullable=True)
+    netmask = Column(String(255), nullable=True)
+    ip_block_type = Column(String(255), nullable=True)
+    nss = Column(String(255), nullable=True)
+    region_id = Column(
+        Integer, ForeignKey('regions.id'), index=True, nullable=False)
+    cell_id = Column(
+        Integer, ForeignKey('cells.id'), index=True, nullable=True)
+    project_id = Column(
+        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+
+    net_devices = relationship('NetInterface', back_populates='network')
+    region = relationship('Region', back_populates='networks')
+    cell = relationship('Cell', back_populates='networks')
+    project = relationship('Project', back_populates='networks')
+
+
+class NetDevice(Device):
+    __tablename__ = 'net_devices'
+    id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
+    hostname = Device.name
+    # network device specific properties
+    model_name = Column(String(255), nullable=True)
+    os_version = Column(String(255), nullable=True)
+    vlans = Column(JSONType)
+
+    interfaces = relationship('NetInterface', back_populates='net_device')
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'net_devices',
+        'inherit_condition': (id == Device.id)
     }
 
 
@@ -385,4 +454,4 @@ class AccessSecret(Base):
     id = Column(Integer, primary_key=True)
     cert = Column(Text)
 
-    hosts = relationship('Host', back_populates='access_secret')
+    devices = relationship('Device', back_populates='access_secret')
