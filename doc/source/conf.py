@@ -24,9 +24,10 @@ on_read_the_docs = os.environ.get('READTHEDOCS') == 'True'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'oslosphinx',
 ]
-if not on_read_the_docs:
-    extensions.append('oslosphinx')
+#if not on_read_the_docs:
+#    extensions.append('oslosphinx')
 
 # autodoc generation is a bit aggressive and a nuisance when doing heavy
 # text edit cycles.
