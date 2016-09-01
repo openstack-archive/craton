@@ -28,4 +28,4 @@ mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, 
 #########################
 # Start the API service #
 #########################
-/craton/bin/python3.5 /craton/craton/cmd/inventory-api.py --config-file=/craton/etc/inventory-api-conf.sample
+/craton/bin/python3.5 /craton/craton/cmd/api.py --config-file=/craton/etc/inventory-api-conf.sample
