@@ -33,7 +33,8 @@ from sqlalchemy.orm import backref, object_mapper, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
-
+import six.moves.urllib.parse as urlparse
+from oslo_config import cfg
 
 # TODO(jimbaker) set up table args for a given database/storage
 # engine, as configured.  See
@@ -66,13 +67,22 @@ Base = declarative_base(
     cls=CratonBase, constructor=_variable_mixin_aware_constructor)
 
 
+def table_args():
+    if cfg.CONF.database.connection:
+        engine_name = urlparse.urlparse(cfg.CONF.database.connection).scheme
+    engine_name = 'mysql'
+    if engine_name == 'mysql':
+        return {'mysql_engine': 'InnoDB',
+                'mysql_charset': 'utf8mb4'}
+
+
 class VariableAssociation(Base):
     """Associates a collection of Variable key-value objects
     with a particular parent.
 
     """
     __tablename__ = "variable_association"
-
+    __table_args__ = table_args()
     id = Column(Integer, primary_key=True)
     discriminator = Column(String(50), nullable=False)
     """Refers to the type of parent, such as 'cell' or 'device'"""
@@ -103,6 +113,7 @@ class Variable(Base):
     This represents all variable records in a single table.
     """
     __tablename__ = 'variables'
+    __table_args__ = table_args()
     association_id = Column(
         Integer,
         ForeignKey(VariableAssociation.id,
@@ -111,7 +122,7 @@ class Variable(Base):
     # Use "key_", "value_" to avoid the use of reserved keywords in
     # MySQL.  This difference in naming is only visible in the use of
     # raw SQL.
-    key = Column('key_', String(255), primary_key=True)
+    key = Column('key_', String(191), primary_key=True)
     value = Column('value_', JSONType)
     association = relationship(
         VariableAssociation, back_populates='variables',
@@ -191,8 +202,9 @@ class VariableMixin(object):
 class Project(Base):
     """Supports multitenancy for all other schema elements."""
     __tablename__ = 'projects'
+    __table_args__ = table_args()
     id = Column(Integer, primary_key=True)
-    name = Column(String(255))
+    name = Column(String(191))
     _repr_columns = [id, name]
 
     # TODO(jimbaker) we will surely need to define more columns, but
@@ -210,11 +222,12 @@ class User(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("username", "project_id",
                          name="uq_user0username0project"),
+        table_args()
     )
     id = Column(Integer, primary_key=True)
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
-    username = Column(String(255))
+    username = Column(String(191))
     api_key = Column(String(36))
     # root = craton admin that can create other pojects/usrs
     is_root = Column(Boolean, default=False)
@@ -230,11 +243,12 @@ class Region(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("project_id", "name",
                          name="uq_region0projectid0name"),
+        table_args()
     )
     id = Column(Integer, primary_key=True)
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
-    name = Column(String(255))
+    name = Column(String(191))
     note = Column(Text)
     _repr_columns = [id, name]
 
@@ -248,13 +262,14 @@ class Cell(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("region_id", "name",
                          name="uq_cell0regionid0name"),
+        table_args()
     )
     id = Column(Integer, primary_key=True)
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
-    name = Column(String(255))
+    name = Column(String(191))
     note = Column(Text)
     _repr_columns = [id, name]
 
@@ -269,10 +284,11 @@ class Device(Base, VariableMixin):
     __table_args__ = (
         UniqueConstraint("region_id", "name",
                          name="uq_device0regionid0name"),
+        table_args()
     )
     id = Column(Integer, primary_key=True)
     type = Column(String(50))  # discriminant for joined table inheritance
-    name = Column(String(255), nullable=False)
+    name = Column(String(191), nullable=False)
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
     cell_id = Column(
@@ -280,7 +296,7 @@ class Device(Base, VariableMixin):
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
     ip_address = Column(IPAddressType, nullable=False)
-    device_type = Column(String(255), nullable=False)
+    device_type = Column(String(191), nullable=False)
     # this means the host is "active" for administration
     # the device may or may not be reachable by Ansible/other tooling
     #
@@ -312,6 +328,7 @@ class Device(Base, VariableMixin):
 
 class Host(Device):
     __tablename__ = 'hosts'
+    __table_args__ = table_args()
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
@@ -356,8 +373,9 @@ class Label(Base, VariableMixin):
     Ansible.
     """
     __tablename__ = 'labels'
+    __table_args__ = table_args()
     id = Column(Integer, primary_key=True)
-    label = Column(String(255), unique=True)
+    label = Column(String(191), unique=True)
 
     _repr_columns = [label]
 
@@ -382,6 +400,7 @@ class AccessSecret(Base):
     the configuration.
     """
     __tablename__ = 'access_secrets'
+    __table_args__ = table_args()
     id = Column(Integer, primary_key=True)
     cert = Column(Text)
 
