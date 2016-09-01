@@ -175,7 +175,7 @@ Start the API Service
 
 * To start the API service, run the following command::
 
-    # python craton/cmd/inventory-api.py --config-file=etc/
+    # python craton/cmd/api.py --config-file=etc/
     inventory-api-conf.sample
 
 
