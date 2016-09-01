@@ -25,35 +25,43 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('cert', sa.Text(), nullable=True),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'labels',
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('label', sa.String(length=255), nullable=True),
+        sa.Column('label', sa.String(length=191), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('label')
+        sa.UniqueConstraint('label'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'projects',
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=255), nullable=True),
-        sa.PrimaryKeyConstraint('id')
+        sa.Column('name', sa.String(length=191), nullable=True),
+        sa.PrimaryKeyConstraint('id'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'label_variables',
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('parent_id', sa.Integer(), nullable=False),
-        sa.Column('key', sa.String(length=255), nullable=False),
+        sa.Column('key', sa.String(length=191), nullable=False),
         sa.Column('value', sqlalchemy_utils.types.json.JSONType(),
                   nullable=True),
         sa.ForeignKeyConstraint(['parent_id'], ['labels.id'], ),
-        sa.PrimaryKeyConstraint('parent_id', 'key')
+        sa.PrimaryKeyConstraint('parent_id', 'key'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'regions',
@@ -61,12 +69,14 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('project_id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('name', sa.String(length=191), nullable=True),
         sa.Column('note', sa.Text(), nullable=True),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('project_id', 'name',
-                            name='uq_region0projectid0name')
+                            name='uq_region0projectid0name'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_index(op.f('ix_regions_project_id'),
                     'regions', ['project_id'], unique=False)
@@ -76,7 +86,7 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('project_id', sa.Integer(), nullable=False),
-        sa.Column('username', sa.String(length=255), nullable=True),
+        sa.Column('username', sa.String(length=191), nullable=True),
         sa.Column('api_key', sa.String(length=36), nullable=True),
         sa.Column('is_root', sa.Boolean(), nullable=True),
         sa.Column('is_admin', sa.Boolean(), nullable=True),
@@ -85,7 +95,9 @@ def upgrade():
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('username', 'project_id',
-                            name='uq_user0username0project')
+                            name='uq_user0username0project'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_index(op.f('ix_users_project_id'), 'users', ['project_id'],
                     unique=False)
@@ -96,12 +108,15 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('region_id', sa.Integer(), nullable=False),
         sa.Column('project_id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('name', sa.String(length=191), nullable=True),
         sa.Column('note', sa.Text(), nullable=True),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
         sa.ForeignKeyConstraint(['region_id'], ['regions.id'], ),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('region_id', 'name', name='uq_cell0regionid0name')
+        sa.UniqueConstraint('region_id', 'name',
+                            name='uq_cell0regionid0name'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_index(op.f('ix_cells_project_id'), 'cells', ['project_id'],
                     unique=False)
@@ -112,22 +127,26 @@ def upgrade():
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('parent_id', sa.Integer(), nullable=False),
-        sa.Column('key', sa.String(length=255), nullable=False),
+        sa.Column('key', sa.String(length=191), nullable=False),
         sa.Column('value', sqlalchemy_utils.types.json.JSONType(),
                   nullable=True),
         sa.ForeignKeyConstraint(['parent_id'], ['regions.id'], ),
-        sa.PrimaryKeyConstraint('parent_id', 'key')
+        sa.PrimaryKeyConstraint('parent_id', 'key'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'cell_variables',
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('parent_id', sa.Integer(), nullable=False),
-        sa.Column('key', sa.String(length=255), nullable=False),
+        sa.Column('key', sa.String(length=191), nullable=False),
         sa.Column('value', sqlalchemy_utils.types.json.JSONType(),
                   nullable=True),
         sa.ForeignKeyConstraint(['parent_id'], ['cells.id'], ),
-        sa.PrimaryKeyConstraint('parent_id', 'key')
+        sa.PrimaryKeyConstraint('parent_id', 'key'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'devices',
@@ -135,8 +154,8 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('type', sa.String(length=50), nullable=True),
-        sa.Column('device_type', sa.String(length=255), nullable=False),
-        sa.Column('name', sa.String(length=255), nullable=False),
+        sa.Column('device_type', sa.String(length=191), nullable=False),
+        sa.Column('name', sa.String(length=191), nullable=False),
         sa.Column('region_id', sa.Integer(), nullable=False),
         sa.Column('cell_id', sa.Integer(), nullable=True),
         sa.Column('project_id', sa.Integer(), nullable=False),
@@ -150,7 +169,9 @@ def upgrade():
         sa.ForeignKeyConstraint(['region_id'], ['regions.id'], ),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('region_id', 'name',
-                            name='uq_device0regionid0name')
+                            name='uq_device0regionid0name'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_index(op.f('ix_devices_cell_id'), 'devices', ['cell_id'],
                     unique=False)
@@ -164,18 +185,22 @@ def upgrade():
         sa.Column('label_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['device_id'], ['devices.id'], ),
         sa.ForeignKeyConstraint(['label_id'], ['labels.id'], ),
-        sa.PrimaryKeyConstraint('device_id', 'label_id')
+        sa.PrimaryKeyConstraint('device_id', 'label_id'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'device_variables',
         sa.Column('created_at', sa.DateTime(), nullable=True),
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('parent_id', sa.Integer(), nullable=False),
-        sa.Column('key', sa.String(length=255), nullable=False),
+        sa.Column('key', sa.String(length=191), nullable=False),
         sa.Column('value', sqlalchemy_utils.types.json.JSONType(),
                   nullable=True),
         sa.ForeignKeyConstraint(['parent_id'], ['devices.id'], ),
-        sa.PrimaryKeyConstraint('parent_id', 'key')
+        sa.PrimaryKeyConstraint('parent_id', 'key'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     op.create_table(
         'hosts',
@@ -185,7 +210,9 @@ def upgrade():
         sa.ForeignKeyConstraint(['access_secret_id'], ['access_secrets.id'], ),
         sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
         sa.ForeignKeyConstraint(['parent_id'], ['hosts.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.PrimaryKeyConstraint('id'),
+        mysql_engine='InnoDB',
+        mysql_charset='utf8mb4'
     )
     # end Alembic commands
 
