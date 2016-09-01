@@ -17,7 +17,7 @@ mysqladmin flush-privileges
 ###############
 # Run db-sync #
 ##############
-/craton/bin/craton-inventory-dbsync --config-file=etc/inventory-api-conf.sample upgrade
+/craton/bin/craton-inventory-dbsync --config-file=/craton/etc/inventory-api-conf.sample upgrade
 
 ###################################
 # Create initial project and user #

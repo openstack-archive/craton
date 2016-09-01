@@ -10,7 +10,7 @@ host=0.0.0.0
 # Port to use for API service
 port=8080
 # Paste Config file to use
-api_paste_config=etc/inventory-api-paste.ini
+api_paste_config=/craton/etc/inventory-api-paste.ini
 
 
 # Keystone Middlewre settings
