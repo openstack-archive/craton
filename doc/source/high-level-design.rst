@@ -148,6 +148,8 @@ Implementation
 Craton's inventory is modeled using Python objects, which in turn has 
 a concrete reference implementation using SQLAlchemy:
 
+.. graphviz:: database.dot
+
 .. image:: img/schema.svg
    :width: 660px
    :align: center
