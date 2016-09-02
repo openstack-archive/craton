@@ -1,0 +1,139 @@
+digraph G
+{
+    size = "8,11";
+    node [shape=plaintext]
+
+    Project [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Project</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+name : String</font></TD></TR>
+</TABLE>>];
+
+    Region [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Region</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+project_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+name : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+note : String</font></TD></TR>
+</TABLE>>];
+
+    User [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">User</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+project_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+username : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+is_admin : Boolean</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+roles : JSONType</font></TD></TR>
+</TABLE>>];
+
+    Cell [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Cell</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+region_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+project_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+name : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+note : String</font></TD></TR>
+</TABLE>>];
+
+    Device [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Device</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+type : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+name : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+region_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+project_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+ip_address : IPAddressType</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+active : Boolean</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+note : String</font></TD></TR>
+</TABLE>>];
+
+    Label [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Label</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+label : String</font></TD></TR>
+</TABLE>>];
+
+    Host [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Host</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+type : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+name : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+region_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+cell_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+project_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+ip_address : IPAddressType</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+active : Boolean</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+note : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+access_secret_id : Integer</font></TD></TR>
+</TABLE>>];
+
+    AccessSecret [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">AccessSecret</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+cert : Text</font></TD></TR>
+</TABLE>>];
+
+    VariableCorrelation [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">VariableCorrelation</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+object_id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+object_type : String</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+variable_id : Integer</font></TD></TR>
+</TABLE>>];
+
+    Variable [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Variable</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+created_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+updated_at : DateTime</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+id : Integer</font></TD></TR>
+  <TR><TD ALIGN="LEFT"><font face="Helvetica" point-size="10">+variable : String</font></TD></TR>
+</TABLE>>];
+
+    Project -> Region [dir=both headlabel="    *" fontsize="8" taillabel="1    "];
+    Project -> User [dir=both  headlabel="*     " fontsize="8"  taillabel="1   "];
+    Project -> Cell [dir=both  headlabel="    *" fontsize="8"  taillabel="&nbsp; 1"];
+    Region -> Cell [dir=both  headlabel="*  " fontsize="8"  taillabel="1    "];
+    Project -> Device [dir=both  headlabel="*      " fontsize="8"  taillabel="1    "];
+    Region -> Device [dir=both  headlabel="*      " fontsize="8"  taillabel="1     "];
+    Cell -> Device [dir=both  headlabel="*     " fontsize="8"  taillabel="1  "];
+    Label -> Device [dir=both  headlabel="*   " fontsize="8"  taillabel="1   "];
+    Device -> Host [dir=none];
+    Host -> AccessSecret [dir=both headlabel="0..1    " fontsize="8" taillabel="1    "];    
+    VariableCorrelation -> Variable [dir=both headlabel="1    " fontsize="8" taillabel="1   "];
+    VariableCorrelation -> Region [dir=both headlabel="        0..1" fontsize="8" taillabel="*   "];
+    VariableCorrelation -> Cell [dir=both headlabel="        0..1" fontsize="8" taillabel="*   "];
+    VariableCorrelation -> Device [dir=both headlabel="        0..1" fontsize="8" taillabel="*   "];
+    VariableCorrelation -> Label [dir=both headlabel="        0..1" fontsize="8" taillabel="*   "];
+    VariableCorrelation -> User [dir=both headlabel="&nbsp;\n0..1" fontsize="8" taillabel="*"];
+    VariableCorrelation -> Host [dir=both headlabel="        0..1" fontsize="8" taillabel= "*       "];
+
+    
+}
