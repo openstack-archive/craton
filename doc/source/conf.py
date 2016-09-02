@@ -24,6 +24,7 @@ on_read_the_docs = os.environ.get('READTHEDOCS') == 'True'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.graphviz',
 ]
 if not on_read_the_docs:
     extensions.append('oslosphinx')
@@ -63,6 +64,8 @@ pygments_style = 'sphinx'
 # html_theme_path = ["."]
 # html_theme = '_theme'
 # html_static_path = ['static']
+
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'], }
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = '%sdoc' % project
