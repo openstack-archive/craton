@@ -1,0 +1,201 @@
+# variables in header
+Content-Type:
+  description: |
+    Type of content sent using cURL
+  in: header
+  required: true
+  type: string
+X-Auth-Project:
+  description: |
+    ID of the project this user is assigned to.
+  in: header
+  required: true
+  type: integer
+X-Auth-Token:
+  description: |
+    User authentication token for the current session
+  in: header
+  required: true
+  type: string
+X-Auth-User
+  description: |
+    User of the current session
+  in: header
+  required: true
+  type: string
+# variables in path
+cell_id:
+  description: |
+    The unique ID of the cell
+  in: path
+  required: true
+  type: integer
+host_id:
+  description: |
+    The unique ID of the host
+region_id:
+  description: |
+    The unique ID of the region
+  in: path
+  required: true
+  type: integer
+# variables in body
+cell:
+  description: |
+    A cell object
+  in: body
+  required: false
+  type: object
+cell_id_body:
+  description: |
+    Unique ID of the cell
+  in: body
+  required: false
+  type: integer
+cell_name:
+  description: |
+    Unique name of the cell
+  in: body
+  required: true
+  type: string
+cells:
+  description: |
+    An array of cell objects
+  in: body
+  required: false
+  type: array
+data:
+  description: |
+    User defined information
+  in: body
+  required: false
+  type: object
+device_type:
+  description: |
+    Type of host
+  in: body
+  required: false
+  type: string
+host:
+  description: |
+    A host object
+  in: body
+  required: false
+  type: object
+host_id_body:
+  description: |
+    Unique ID of the host
+  in: body
+  required: false
+  type: integer
+host_name:
+  description: |
+    Unique name of the host
+hosts:
+  description: |
+    An array of host objects
+  in: body
+  required: false
+  type: array
+ip_address:
+  description: |
+    IP adress
+  in: body
+  type: string
+labels:
+  description: |
+    User defined labels
+  in: body
+  required: false
+  type: string
+parent_id:
+  description: |
+    Parent ID of this host
+  in: body
+  required: false
+  type: integer
+project_id:
+  description: |
+   ID of the project
+  in: body
+  required: true
+  type: integer
+note:
+  description: |
+    Note used for governance
+  in: body
+  required: false
+  type: string
+region:
+  description: |
+    A region object
+  in: body
+  required: false
+  type: object
+region_id_body:
+  description: |
+    The unique ID of the region
+  in: body
+  required: false
+  type: integer
+region_name:
+  description: |
+     Unique name of the region
+  in: body
+  required: true
+  type: string
+regions:
+  description: |
+    An array of region objects
+  in: body
+  required: true
+  type: array
+# variables in query
+cell_name_query:
+  description: |
+    Name of the cell to get
+  in: query
+  required: false
+  type: string
+ip_address_query:
+  description: |
+    IP address to get
+  in: query
+  required: false
+  type: string
+host_id_query:
+  description: |
+    ID of the host to get
+  in: query
+  required: false
+  type: integer
+host_name_query:
+  description: |
+    Name of host to get
+  in: query
+  required: false
+  type: string
+limit:
+  description: |
+    Number of host to return ranging from 1 - 10000. Default = 1000
+  in: query
+  required: false
+  type: integer
+region_id_query:
+  description: |
+    ID of the region to get
+  in: query
+  required: false
+  type: string
+region_name_query:
+  description: |
+    Name of the the region to get
+  in: query
+  required: false
+  type: string
+service:
+  description: |
+    Openstack service to query host by
+  in: query
+  required: false
+  type: array
