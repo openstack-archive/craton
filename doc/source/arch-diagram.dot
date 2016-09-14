@@ -1,0 +1,167 @@
+digraph structs {
+    node [shape=plaintext]
+    
+#    overlap=false;
+#    splines=true;
+#    layout="neato";
+ 
+    Cli [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD PORT="Cli"><font face="Helvetica" point-size="12">CLI<br/></font>
+  </TD></TR>
+</TABLE>>];
+
+    PythonApi [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD PORT="PythonApi"><font face="Helvetica" point-size="12">Python API<br/></font>
+  </TD></TR>
+</TABLE>>];
+
+
+    CratonCore [label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="4">
+<TR>
+<TD>
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="8">
+
+  <TR>
+    <TD PORT="Horizon"><font face="Helvetica" point-size="12">
+    <font face="Helvetica" point-size="12">Horizon UI<br/><font point-size="8">
+    Inventory,<br/>Workflow Panels</font></font>
+    </font></TD>
+  </TR>
+  <TR><TD PORT="Keystone"><font face="Helvetica" point-size="12">Keystone<br/><font point-size="8">
+    Principals, roles,<br/>privileges,<br/>catalog endpoints</font></font>
+  </TD></TR>
+  <TR><TD PORT="Barbican"><font face="Helvetica" point-size="12">Barbican<br/><font point-size="8">
+    Key Storage for<br/>TaskFlow Workers</font></font>
+  </TD></TR>
+</TABLE>
+</TD>
+<TD>
+<TABLE BORDER="1" CELLBORDER="1" CELLSPACING="4">
+<!--font face="Helvetica"-->
+  <TR>
+    <TD rowspan="5" PORT="Rbac"><font face="Helvetica" point-size="12">RBAC</font></TD>
+    <TD colspan="4" PORT="RestApi"><font face="Helvetica" point-size="12">REST API Service (Flask)</font></TD>
+  </TR>
+  <TR>
+    <TD colspan="3" PORT="PythonObjectModel"><font face="Helvetica" point-size="12">Python Object Model</font></TD>
+    <TD colspan="1" PORT="OsloCache"><font face="Helvetica" point-size="12">oslo.cache</font></TD>
+  </TR>
+  <TR>
+    <TD colspan="2" PORT="InventoryFabric"><font face="Helvetica" point-size="12">Inventory Fabric</font></TD>
+    <TD colspan="2" PORT="Workflows"><font face="Helvetica" point-size="12">Workflows</font></TD>
+  </TR>
+  <TR>
+    <TD colspan="1" PORT="VirtualizedVariables"><font face="Helvetica" point-size="12">Virtualized <br/>Variables</font></TD>
+    <TD colspan="2" PORT="DefaultInventoryModel"><font face="Helvetica" point-size="12">Default<br/>Inventory<br/>Model</font></TD>
+    <TD colspan="1" PORT="TaskFlowController"><font face="Helvetica" point-size="12">TaskFlow<br/>Controller</font></TD>
+  </TR>
+  <TR>
+    <TD colspan="1" PORT="VariablePlugin"><font face="Helvetica" point-size="12">Variable<br/>Plugin<br/>(Stevedore)</font></TD>
+    <TD colspan="2" PORT="SqlAlchemy"><font face="Helvetica" point-size="12">SQL<br/>Alchemy</font></TD>
+    <TD colspan="1" PORT="WorkflowPlugin"><font face="Helvetica" point-size="12">Workflow<br/>Plugin<br/>(Stevedore)</font></TD>
+  </TR>
+  <!--/font-->
+</TABLE>
+</TD>
+<TD>
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="8">
+
+  <TR><TD COLSPAN="2" PORT="Redis"><font face="Helvetica" point-size="12">REDIS<br/></font>
+  </TD></TR>
+
+  <TR><TD  COLSPAN="2" PORT="MySqlGalera"><font face="Helvetica" point-size="12">MySQL/Galera<br/></font>
+  </TD></TR>
+  <TR>
+  <TD PORT="TfJobBoard"><font face="Helvetica" point-size="12">TF<br/>JobBoard<br/></font>
+  </TD>
+  <TD PORT="WaLogCapture" bgcolor="#D6DBDF"><font face="Helvetica" point-size="12">WA Log<br/>Capture<br/></font>
+  </TD>
+  </TR>
+  <TR>
+  <TD ><font face="Helvetica" point-size="12">TF<br/>Worker<br/>Pool<br/></font>
+  </TD>
+  <TD bgcolor="#D7BDE2"><font face="Helvetica" point-size="12" >ZooKeeper<br/></font>
+  </TD>
+  </TR>
+
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+
+>];
+
+
+    NovaPlugin [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD PORT="NovaPlugin"><font face="Helvetica" point-size="12">Nova Plugin<br/><font point-size="8">
+    (Inventory)</font></font>
+  </TD></TR>
+</TABLE>>];
+
+    HistoryPlugin [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD PORT="HistoryPlugin" bgcolor="#D6DBDF"><font face="Helvetica" point-size="12">History Plugin<br/><font point-size="8">
+    (Inventory)</font></font>
+  </TD></TR>
+</TABLE>>];
+
+    AnsiblePlugin [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD PORT="AnsiblePlugin"><font face="Helvetica" point-size="12">Ansible Plugin<br/><font point-size="8">
+    (Workflow)</font></font>
+  </TD></TR>
+</TABLE>>];
+
+    HistoricalData [label=<
+<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+  <TR><TD PORT="HistoricalData" bgcolor="#D6DBDF"><font face="Helvetica" point-size="12">Historica lData</font>
+  </TD></TR>
+</TABLE>>];
+
+
+    Legend [label=<
+<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0">
+  <TR><TD><font face="Helvetica" point-size="12">Legend</font>
+  </TD></TR>
+  <TR><TD border="1" bgcolor="#D7BDE2"><font face="Helvetica" point-size="10">Used For Scaling</font>
+  </TD></TR>
+  <TR><TD border="1" bgcolor="#D6DBDF"><font face="Helvetica" point-size="10">Future Work</font>
+  </TD></TR>
+</TABLE>>];
+
+
+
+//UndercloudIntegrations [pos="1,1"];
+#subgraph cluster1 {
+#        style=invis;
+#        Barbican;
+#        Horizon;
+#        Keystone;
+#    }    
+
+ranksep=.25; 
+#size = "8,8";
+#{ rank = same; Horizon; CratonCore:PythonObjectModel; }
+
+#{ rank = same; UndercloudIntegrations; CratonCore; }
+#Horizon -> Keystone [style=invis]
+NovaPlugin -> Legend [style=invis];
+CratonCore:Barbican -> Legend [style=invis];
+
+    CratonCore:WaLogCapture -> HistoricalData:HistoricalData;
+    HistoryPlugin:HistoryPlugin -> HistoricalData:HistoricalData;
+    CratonCore:Horizon -> PythonApi:PythonApi [constraint=false]; 
+    CratonCore:RBAC -> CratonCore:Keystone;
+    PythonApi:PythonApi -> CratonCore:RestApi;
+    Cli:Cli -> PythonApi:PythonApi;
+    CratonCore:VariablePlugin -> NovaPlugin:NovaPlugin;
+    CratonCore:VariablePlugin -> HistoryPlugin:HistoryPlugin;
+    CratonCore:WorkflowPlugin -> AnsiblePlugin:AnsiblePlugin;
+    CratonCore:OsloCache -> CratonCore:Redis [constraint=false];
+    CratonCore:SqlAlchemy -> CratonCore:MySqlGalera;
+
+}

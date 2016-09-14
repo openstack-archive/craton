@@ -1,7 +1,6 @@
-.. _install:
 
 =====================================================
-Developer Guide: Setting up a Development Environment
+Installing and Setting up a Development Environment
 =====================================================
 
 Installation
