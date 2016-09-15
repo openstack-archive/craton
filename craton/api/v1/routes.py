@@ -1,6 +1,7 @@
 from craton.api.v1.resources import users
 from craton.api.v1.resources import projects
 
+from craton.api.v1.resources.inventory import ansible_inventory
 from craton.api.v1.resources.inventory import cells
 from craton.api.v1.resources.inventory import hosts
 from craton.api.v1.resources.inventory import regions
@@ -8,6 +9,9 @@ from craton.api.v1.resources.inventory import networks
 
 
 routes = [
+    dict(resource=ansible_inventory.AnsibleInventory,
+         urls=['/ansible_inventory'],
+         endpoint='ansible_inventory'),
     dict(resource=hosts.HostsData,
          urls=['/hosts/<id>/data'],
          endpoint='hosts_data'),
