@@ -61,7 +61,7 @@ class Inventory(object):
 
     def create_region(self, region, data=None):
         region_url = self.url + "/regions"
-        payload = {"name": region, "project_id": self.project_id}
+        payload = {"name": region, "project": self.project_id}
 
         print("Creating region entry for %s with data %s" % (payload, data))
         resp = requests.post(region_url, headers=self.headers,
@@ -79,8 +79,8 @@ class Inventory(object):
 
     def create_cell(self, cell, data=None):
         region_url = self.url + "/cells"
-        payload = {"region_id": self.region.get("id"), "name": cell,
-                   "project_id": self.project_id}
+        payload = {"region": self.region.get("id"), "name": cell,
+                   "project": self.project_id}
 
         print("Creating cell entry %s with data %s" % (payload, data))
         resp = requests.post(region_url, headers=self.headers,
@@ -98,9 +98,9 @@ class Inventory(object):
 
     def create_device(self, host, device_type, data=None):
         region_url = self.url + "/hosts"
-        payload = {"region_id": self.region.get("id"),
-                   "cell_id": self.cell.get("id"),
-                   "project_id": self.project_id,
+        payload = {"region": self.region.get("id"),
+                   "cell": self.cell.get("id"),
+                   "project": self.project_id,
                    "name": host,
                    "ip_address": self.ip_addresses.pop(0),
                    "device_type": device_type}

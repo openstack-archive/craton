@@ -64,7 +64,7 @@ class Users(base.Resource):
         context = request.environ.get('context')
 
         try:
-            project_id = g.json["project_id"]
+            project_id = g.json["project"]
             dbapi.projects_get_by_id(context, project_id)
         except exceptions.NotFound:
             return self.error_response(404, 'Project with given id not found')
