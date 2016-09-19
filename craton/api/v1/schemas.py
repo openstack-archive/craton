@@ -3,8 +3,8 @@ import six
 
 DefinitionsHost = {'discriminator': 'name',
                    'required': ['name',
-                                'region_id',
-                                'project_id',
+                                'region',
+                                'project',
                                 'ip_address',
                                 'device_type'],
                    'type': 'object',
@@ -13,9 +13,9 @@ DefinitionsHost = {'discriminator': 'name',
                        'ip_address': {'type': 'string'},
                        'name': {'type': 'string'},
                        'id': {'type': 'integer'},
-                       'cell_id': {'type': 'integer'},
-                       'project_id': {'type': 'integer'},
-                       'parent_id': {'type': 'integer',
+                       'cell': {'type': 'integer'},
+                       'project': {'type': 'integer'},
+                       'parent': {'type': 'integer',
                                      'description': 'Parent Id of this host'},
                        'device_type': {'type': 'string',
                                        'description': 'Type of host'},
@@ -23,7 +23,7 @@ DefinitionsHost = {'discriminator': 'name',
                                   'description': 'User defined labels'},
                        'data': {'type': 'allOf',
                                 'description': 'User defined information'},
-                       'region_id': {'type': 'integer'}}}
+                       'region': {'type': 'integer'}}}
 
 DefinitionsHostId = {'discriminator': 'name',
                      'type': 'object',
@@ -32,26 +32,26 @@ DefinitionsHostId = {'discriminator': 'name',
                          'ip_address': {'type': 'string'},
                          'name': {'type': 'string'},
                          'id': {'type': 'integer'},
-                         'cell_id': {'type': 'integer'},
-                         'project_id': {'type': 'integer'},
+                         'cell': {'type': 'integer'},
+                         'project': {'type': 'integer'},
                          'labels': {'type': 'allOf',
                                     'description': 'User defined labels'},
                          'data': {'type': 'allOf',
                                   'description': 'User defined information'},
-                         'region_id': {'type': 'integer'}}}
+                         'region': {'type': 'integer'}}}
 
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
-                                'region_id',
-                                'project_id'
+                                'region',
+                                'project'
                                 ],
                    'type': 'object',
                    'properties': {
                        'note': {'type': 'string'},
-                       'project_id': {'type': 'integer',
-                                      'description': 'ID of the project'},
+                       'project': {'type': 'integer',
+                                   'description': 'ID of the project'},
                        'name': {'type': 'string'},
-                       'region_id': {'type': 'integer'},
+                       'region': {'type': 'integer'},
                        'data': {'type': 'allOf',
                                 'description': 'User defined information'},
                        'id': {'type': 'integer',
@@ -61,10 +61,10 @@ DefinitionsCellId = {'discriminator': 'name',
                      'type': 'object',
                      'properties': {
                          'note': {'type': 'string'},
-                         'project_id': {'type': 'integer',
-                                        'description': 'ID of the project'},
+                         'project': {'type': 'integer',
+                                     'description': 'ID of the project'},
                          'name': {'type': 'string'},
-                         'region_id': {'type': 'integer'},
+                         'region': {'type': 'integer'},
                          'data': {'type': 'allOf',
                                   'description': 'User defined information'},
                          'id': {'type': 'integer',
@@ -91,7 +91,7 @@ DefinitionsRegion = {'discriminator': 'name',
                          'name': {
                              'type': 'string',
                              'description': 'Region Name.'},
-                         'project_id': {
+                         'project': {
                              'type': 'integer',
                              'description': 'ID of the project'},
                          'cells': {
@@ -114,7 +114,7 @@ DefinitionsRegionId = {'discriminator': 'name',
                            'name': {
                                'type': 'string',
                                'description': 'Region Name.'},
-                           'project_id': {
+                           'project': {
                                'type': 'integer',
                                'description': 'ID of the project'},
                            'cells': {
@@ -135,7 +135,7 @@ DefinitionUser = {'discriminator': 'name',
                       'api_key': {'type': 'string'},
                       'username': {'type': 'string'},
                       'is_admin': {'type': 'boolean'},
-                      'project_id': {'type': 'integer'},
+                      'project': {'type': 'integer'},
                       'roles': {'type': 'allOf'}}}
 
 DefinitionProject = {'discriminator': 'name',
@@ -146,16 +146,16 @@ DefinitionProject = {'discriminator': 'name',
 
 DefinitionNetwork = {'discriminator': 'name',
                      'required': ['name',
-                                  'project_id',
+                                  'project',
                                   'cidr',
                                   'gateway',
                                   'netmask'],
                      'type': 'object',
                      'properties': {
                          'id': {'type': 'integer'},
-                         'project_id': {'type': 'integer'},
-                         'region_id': {'type': 'integer'},
-                         'cell_id': {'type': 'integer'},
+                         'project': {'type': 'integer'},
+                         'region': {'type': 'integer'},
+                         'cell': {'type': 'integer'},
                          'name': {'type': 'string'},
                          'cidr': {'type': 'string'},
                          'gateway': {'type': 'string'},
@@ -168,9 +168,9 @@ DefinitionNetworkId = {'discriminator': 'name',
                        'type': 'object',
                        'properties': {
                            'id': {'type': 'integer'},
-                           'project_id': {'type': 'integer'},
-                           'region_id': {'type': 'integer'},
-                           'cell_id': {'type': 'integer'},
+                           'project': {'type': 'integer'},
+                           'region': {'type': 'integer'},
+                           'cell': {'type': 'integer'},
                            'name': {'type': 'string'},
                            'cidr': {'type': 'string'},
                            'gateway': {'type': 'string'},
@@ -181,16 +181,16 @@ DefinitionNetworkId = {'discriminator': 'name',
 
 DefinitionNetInterface = {'discriminator': 'name',
                           'required': ['name',
-                                       'device_id',
+                                       'device',
                                        'interface_type'],
                           'type': 'object',
                           'properties': {
                               'id': {'type': 'integer'},
                               'name': {'type': 'string'},
-                              'device_id': {'type': 'integer',
-                                            'default': None},
-                              'network_id': {'type': 'integer',
-                                             'default': None},
+                              'device': {'type': 'integer',
+                                         'default': None},
+                              'network': {'type': 'integer',
+                                          'default': None},
                               'interface_type': {'type': 'string'},
                               'vlan_id': {'type': 'integer'},
                               'vlan': {'type': 'string'},
@@ -207,8 +207,8 @@ DefinitionNetInterfaceId = {'discriminator': 'name',
                             'properties': {
                                 'id': {'type': 'integer'},
                                 'name': {'type': 'string'},
-                                'device_id': {'type': 'integer'},
-                                'network_id': {'type': 'integer'},
+                                'device': {'type': 'integer'},
+                                'network': {'type': 'integer'},
                                 'interface_type': {'type': 'string'},
                                 'vlan_id': {'type': 'integer'},
                                 'vlan': {'type': 'string'},
@@ -222,17 +222,17 @@ DefinitionNetInterfaceId = {'discriminator': 'name',
 
 DefinitionNetDevice = {'discriminator': 'hostname',
                        'required': ['hostname',
-                                    'region_id',
-                                    'project_id',
+                                    'region',
+                                    'project',
                                     'device_type',
                                     'ip_address'],
                        'type': 'object',
                        'properties': {
                            'id': {'type': 'integer'},
-                           'project_id': {'type': 'integer'},
-                           'region_id': {'type': 'integer'},
-                           'cell_id': {'type': 'integer'},
-                           'parent_id': {'type': 'integer'},
+                           'project': {'type': 'integer'},
+                           'region': {'type': 'integer'},
+                           'cell': {'type': 'integer'},
+                           'parent': {'type': 'integer'},
                            'ip_address': {'type': 'string'},
                            'device_type': {'type': 'string'},
                            'hostname': {'type': 'string'},
@@ -242,17 +242,17 @@ DefinitionNetDevice = {'discriminator': 'hostname',
                            'vlans': {'type': 'string'},
                            'data': {'type': 'allOf',
                                     'description': 'User defined variables'},
-                           'interface_id': {'type': 'integer'},
-                           'network_id': {'type': 'integer'}}}
+                           'interface': {'type': 'integer'},
+                           'network': {'type': 'integer'}}}
 
 DefinitionNetDeviceId = {'discriminator': 'hostname',
                          'type': 'object',
                          'properties': {
                              'id': {'type': 'integer'},
-                             'project_id': {'type': 'integer'},
-                             'region_id': {'type': 'integer'},
-                             'cell_id': {'type': 'integer'},
-                             'parent_id': {'type': 'integer'},
+                             'project': {'type': 'integer'},
+                             'region': {'type': 'integer'},
+                             'cell': {'type': 'integer'},
+                             'parent': {'type': 'integer'},
                              'ip_address': {'type': 'string'},
                              'device_type': {'type': 'string'},
                              'hostname': {'type': 'string'},
@@ -260,10 +260,10 @@ DefinitionNetDeviceId = {'discriminator': 'hostname',
                              'model_name': {'type': 'string'},
                              'os_version': {'type': 'string'},
                              'vlans': {'type': 'string'},
-                             'interface_id': {'type': 'integer'},
+                             'interface': {'type': 'integer'},
                              'data': {'type': 'allOf',
                                       'description': 'User defined variables'},
-                             'network_id': {'type': 'integer'}}}
+                             'network': {'type': 'integer'}}}
 
 
 validators = {
@@ -386,7 +386,7 @@ validators = {
                          'default': None,
                          'type': 'string',
                          'description': 'IP of the device to get'},
-                     'region_id': {
+                     'region': {
                          'default': None,
                          'type': 'string',
                          'description': 'region id of the device to get'},
@@ -398,7 +398,7 @@ validators = {
                          'default': None,
                          'type': 'string',
                          'description': 'type of the device to get'},
-                     'cell_id': {
+                     'cell': {
                          'default': None,
                          'type': 'string',
                          'description': 'cell id of the device to get'}}
@@ -411,14 +411,14 @@ validators = {
                          'type': 'boolean'}}}},
     ('netdevices', 'POST'): {'json': DefinitionNetDevice},
     ('net_interfaces', 'GET'): {
-        'args': {'required': ['device_id'],
+        'args': {'required': ['device'],
                  'properties': {
                      'id': {
                          'default': None,
                          'type': 'integer',
                          'description': 'id of the net interface to get'
                          },
-                     'device_id': {
+                     'device': {
                          'default': None,
                          'type': 'integer',
                          'description': 'device id of the interface to get'},
@@ -448,11 +448,11 @@ validators = {
                          'default': None,
                          'type': 'string',
                          'description': 'name of the network to get'},
-                     'region_id': {
+                     'region': {
                          'default': None,
                          'type': 'string',
                          'description': 'region id of the network to get'},
-                     'cell_id': {
+                     'cell': {
                          'default': None,
                          'type': 'string',
                          'description': 'cell idof the network to get'}}
