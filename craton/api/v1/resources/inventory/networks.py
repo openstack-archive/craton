@@ -17,8 +17,8 @@ class Networks(base.Resource):
     def get(self):
         """Get all networks for this cell/region."""
         id = g.args["id"]
-        region_id = g.args["region_id"]
-        cell_id = g.args["cell_id"]
+        region_id = g.args["region"]
+        cell_id = g.args["cell"]
         name = g.args["name"]
         network_type = g.args["network_type"]
         context = request.environ.get("context")
@@ -100,8 +100,8 @@ class NetDevices(base.Resource):
 
     def get(self):
         """Get all network devices for this cell/region."""
-        region_id = g.args["region_id"]
-        cell_id = g.args["cell_id"]
+        region_id = g.args["region"]
+        cell_id = g.args["cell"]
         name = g.args["name"]
         id = g.args["id"]
         ip_address = g.args["ip"]
@@ -195,7 +195,7 @@ class NetInterfaces(base.Resource):
 
     def get(self):
         """Get all network interfaces for a given network device."""
-        device_id = g.args["device_id"]
+        device_id = g.args["device"]
         id = g.args["id"]
         ip_address = g.args["ip"]
         interface_type = g.args["interface_type"]
