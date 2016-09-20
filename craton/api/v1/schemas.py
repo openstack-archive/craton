@@ -267,6 +267,18 @@ DefinitionNetDeviceId = {'discriminator': 'hostname',
 
 
 validators = {
+    ('ansible_inventory', 'GET'): {
+        'args': {'required': ['region'],
+                 'properties': {
+                     'region': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'Region to generate inventory for'},
+                     'cell': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'Cell to generate inventory for'}}}
+    },
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts_id', 'GET'): {
         'args': {'required': [],
