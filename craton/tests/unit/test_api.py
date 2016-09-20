@@ -242,7 +242,8 @@ class APIV1HostsTest(APIV1Test):
     def test_create_host_with_valid_data(self, mock_host):
         mock_host.return_value = None
         data = {'name': 'www.host1.com', 'region_id': 1, 'project_id': 1,
-                'ip_address': '10.0.0.1', 'device_type': 'server'}
+                'ip_address': '10.0.0.1', 'device_type': 'server',
+                'active': True}
         resp = self.post('/v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
 
@@ -250,7 +251,7 @@ class APIV1HostsTest(APIV1Test):
     def test_create_host_returns_host_obj(self, mock_host):
         return_value = {'name': 'www.host1.com', 'region_id': 1,
                         'project_id': 1, 'ip_address': '10.0.0.1', 'id': 1,
-                        'device_type': 'server'}
+                        'device_type': 'server', 'active': True}
         mock_host.return_value = return_value
         data = {'name': 'www.host1.com', 'region_id': 1, 'project_id': 1,
                 'ip_address': '10.0.0.1', 'device_type': 'server'}
