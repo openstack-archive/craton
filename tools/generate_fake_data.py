@@ -50,7 +50,7 @@ class Inventory(object):
         self.ip_addresses = self.generate_ip_addresses(16)
 
         self.headers = {"Content-Type": "application/json",
-                        "X-Auth-Project": self.project_id,
+                        "X-Auth-Project": str(self.project_id),
                         "X-Auth-User": self.auth_user,
                         "X-Auth-Token": self.auth_key}
 
