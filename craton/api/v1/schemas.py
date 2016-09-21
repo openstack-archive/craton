@@ -270,9 +270,9 @@ DefinitionNetDeviceId = {'discriminator': 'hostname',
 
 validators = {
     ('ansible_inventory', 'GET'): {
-        'args': {'required': ['region'],
+        'args': {'required': ['region_id'],
                  'properties': {
-                     'region': {
+                     'region_id': {
                          'default': None,
                          'type': 'string',
                          'description': 'Region to generate inventory for'},
@@ -306,17 +306,17 @@ validators = {
     ('regions_id_data', 'PUT'): {'json': DefinitionsData},
     ('hosts', 'POST'): {'json': DefinitionsHost},
     ('hosts', 'GET'): {
-        'args': {'required': ['region'],
+        'args': {'required': ['region_id'],
                  'properties': {
                      'name': {
                          'default': None,
                          'type': 'string',
                          'description': 'name of the hosts to get'},
-                     'region': {
+                     'region_id': {
                          'default': None,
                          'type': 'integer',
                          'description': 'ID of the region to get hosts'},
-                     'cell': {
+                     'cell_id': {
                          'default': None,
                          'type': 'integer',
                          'description': 'ID of the cell to get hosts'},
@@ -342,9 +342,9 @@ validators = {
     ('cells_id', 'PUT'): {'json': DefinitionsCell},
     ('cells', 'POST'): {'json': DefinitionsCell},
     ('cells', 'GET'): {
-        'args': {'required': [],
+        'args': {'required': ['region_id'],
                  'properties': {
-                     'region': {
+                     'region_id': {
                          'default': None,
                          'type': 'string',
                          'description': 'name of the region to get cells for'},
