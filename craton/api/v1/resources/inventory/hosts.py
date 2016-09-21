@@ -24,8 +24,8 @@ class Hosts(base.Resource):
         :param id: ID of the host to get
         :param ip_address: IP address of the host to get
         """
-        region = g.args["region"]
-        cell = g.args["cell"]
+        region_id = g.args["region_id"]
+        cell_id = g.args["cell_id"]
         name = g.args["name"]
         host_id = g.args["id"]
         device_type = g.args["device_type"]
@@ -40,19 +40,19 @@ class Hosts(base.Resource):
             filters["name"] = name
         if ip_address:
             filters["ip_address"] = ip_address
-        if cell:
-            filters["cell"] = cell
+        if cell_id:
+            filters["cell_id"] = cell_id
         if device_type:
             filters["device_type"] = device_type
 
         # This is a query constraint, you cant fetch all hosts
         # for all regions, you have to query hosts by region.
-        if not region:
-            return self.error_response(400, "Missing `region` in query")
+        if not region_id:
+            return self.error_response(400, "Missing `region_id` in query")
 
         try:
             LOG.info("Getting hosts that match filters %s" % filters)
-            hosts_obj = dbapi.hosts_get_by_region(context, region, filters)
+            hosts_obj = dbapi.hosts_get_by_region(context, region_id, filters)
         except exceptions.NotFound:
             return self.error_response(404, 'Not Found')
         except Exception as err:

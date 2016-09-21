@@ -211,7 +211,7 @@ Get all hosts for Region 1
 
 * To get all hosts for region 1, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/hosts?region=1"
+    # curl -i "http://${MY_IP}:8080/v1/hosts?region_id=1"
     -H "Content-Type: application/json" -H "X-Auth-Token: demo"
     -H "X-Auth-User: demo" -H "X-Auth-Project: 1"
 
