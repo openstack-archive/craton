@@ -200,7 +200,7 @@ def cells_data_update(context, cell_id, data):
         try:
             cell_ref = query.with_lockmode('update').one()
         except sa_exc.NoResultFound:
-            # cell does not exist so cant do this
+            # cell does not exist so can't do this
             raise
 
         for key in data:
@@ -220,7 +220,7 @@ def cells_data_delete(context, cell_id, data):
         try:
             cell_ref = query.with_lockmode('update').one()
         except sa_exc.NoResultFound:
-            # cell does not exist so cant do this
+            # cell does not exist so can't do this
             raise
 
         for key in data:
@@ -302,7 +302,7 @@ def regions_data_update(context, region_id, data):
         try:
             region_ref = query.with_lockmode('update').one()
         except sa_exc.NoResultFound:
-            # region does not exist so cant do this
+            # region does not exist so can't do this
             raise
 
         for key in data:
@@ -322,7 +322,7 @@ def regions_data_delete(context, region_id, data):
         try:
             region_ref = query.with_lockmode('update').one()
         except sa_exc.NoResultFound:
-            # region does not exist so cant do this
+            # region does not exist so can't do this
             raise
 
         for key in data:
