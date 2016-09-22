@@ -16,19 +16,21 @@ class Cells(base.Resource):
         """Get cell(s) for the project. Get cell details if
         for a particular region.
         """
-        region = g.args["region"]
+        region_id = g.args["region_id"]
         cell_name = g.args["name"]
         cell_id = g.args["id"]
         context = request.environ.get('context')
 
-        if not region:
-            msg = "`region` is required to get cells"
+        if not region_id:
+            msg = "`region_id` is required to get cells"
             return self.error_response(400, msg)
 
-        if region and cell_name:
+        if region_id and cell_name:
             # Get this particular cell along with its data
             try:
-                cell_obj = dbapi.cells_get_by_name(context, region, cell_name)
+                cell_obj = dbapi.cells_get_by_name(context,
+                                                   region_id,
+                                                   cell_name)
             except exceptions.NotFound:
                 return self.error_response(404, 'Not Found')
             except Exception as err:
@@ -39,7 +41,7 @@ class Cells(base.Resource):
             cell = jsonutils.to_primitive(cell_obj)
             return [cell], 200, None
 
-        if region and cell_id:
+        if region_id and cell_id:
             # Get this particular cell along with its data
             try:
                 cell_obj = dbapi.cells_get_by_id(context, cell_id)
@@ -55,7 +57,7 @@ class Cells(base.Resource):
 
         # No cell id or name so get all cells for this region only
         try:
-            cells_obj = dbapi.cells_get_all(context, region)
+            cells_obj = dbapi.cells_get_all(context, region_id)
             cells = jsonutils.to_primitive(cells_obj)
             return cells, 200, None
         except exceptions.NotFound:
