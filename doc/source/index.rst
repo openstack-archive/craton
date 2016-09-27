@@ -37,6 +37,7 @@ Developer Guide
    contributing
    architecture
    high-level-design
+   api-reference
 
 
 Indices and Tables
