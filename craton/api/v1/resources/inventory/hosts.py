@@ -45,7 +45,7 @@ class Hosts(base.Resource):
         if device_type:
             filters["device_type"] = device_type
 
-        # This is a query constraint, you cant fetch all hosts
+        # This is a query constraint, you can't fetch all hosts
         # for all regions, you have to query hosts by region.
         if not region_id:
             return self.error_response(400, "Missing `region_id` in query")
