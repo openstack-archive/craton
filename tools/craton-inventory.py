@@ -45,7 +45,7 @@ def main(args):
 
     try:
         env_name = os.environ['REGION']
-    except KeyError, e:
+    except KeyError as e:
         sys.stderr.write('Unable to load %s\n' % e.message)
         sys.exit(1)
 
@@ -60,10 +60,10 @@ def main(args):
         url = CRATON_INVENTORY_URL % env_name
         resp = requests.get(url, headers=headers, verify=False)
         if resp.status_code != 200:
-            print ("Got non 200 response from Craton Inventory API")
+            print("Got non 200 response from Craton Inventory API")
             sys.exit(1)
     except Exception:
-        print ("Error generating inventory from Craton Inventory API")
+        print("Error generating inventory from Craton Inventory API")
         sys.exit(1)
 
     return resp.json()

@@ -3,6 +3,7 @@
 # process, which may cause wedges in the gate later.
 
 chainmap # PSF; backport would be an addition to global-requirements.txt
+decorator # BSD
 Flask
 flask_restful
 ipaddress>=1.0.7;python_version<'3.3'  # PSF
