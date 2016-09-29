@@ -26,8 +26,8 @@ Installing Environment from packages: Ubuntu
 
     # sudo apt-get install python-dev
     # sudo apt-get install python-pip
+    # sudo apt-get install python-setuptools
     # sudo pip install --upgrade pip
-    # sudo pip install setuptools
     # sudo pip install --upgrade setuptools
 
 * Goto craton directory and install the following::
@@ -64,9 +64,9 @@ Installing Environment from packages: Fedora/CentOS etc.
 
     # sudo yum install python-devel
     # sudo yum install python-pip
-    # sudo yum install --upgrade pip
-    # sudo yum install setuptools
-    # sudo yum install --upgrade setuptools
+    # sudo yum install python-setuptools
+    # sudo pip install --upgrade pip
+    # sudo pip install --upgrade setuptools
 
 * Goto craton directory and install the following::
 
