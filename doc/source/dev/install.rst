@@ -64,9 +64,9 @@ Installing Environment from packages: Fedora/CentOS etc.
 
     # sudo yum install python-devel
     # sudo yum install python-pip
-    # sudo yum install --upgrade pip
-    # sudo yum install setuptools
-    # sudo yum install --upgrade setuptools
+    # sudo pip install --upgrade pip
+    # sudo pip install setuptools
+    # sudo pip install --upgrade setuptools
 
 * Goto craton directory and install the following::
 
