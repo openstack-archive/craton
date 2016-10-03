@@ -22,7 +22,7 @@ class Base(Exception):
 
 class AdminRequired(Base):
     code = 401
-    message = "This action requires 'admin' role"
+    message = "This action requires the 'admin' role"
 
 
 class BadRequest(Base):

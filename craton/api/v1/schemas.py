@@ -481,7 +481,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('hosts_id_data', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
+        {204: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -496,7 +496,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('hosts_id', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
+        {204: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -521,7 +521,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('cells_id', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
+        {204: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -531,7 +531,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('cells_id_data', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
+        {204: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -561,7 +561,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions_id_data', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
+        {204: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -576,7 +576,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions_id', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
+        {204: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -608,7 +608,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('users_id', 'DELETE'):
-        {200: {'headers': None, 'schema': None},
+        {204: {'headers': None, 'schema': None},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
