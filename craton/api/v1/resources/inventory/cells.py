@@ -4,7 +4,6 @@ from oslo_log import log
 
 from craton.api.v1 import base
 from craton import db as dbapi
-from craton import exceptions
 
 
 LOG = log.getLogger(__name__)
@@ -12,82 +11,39 @@ LOG = log.getLogger(__name__)
 
 class Cells(base.Resource):
 
-    def get(self):
-        """Get cell(s) for the project. Get cell details if
-        for a particular region.
-        """
-        region_id = g.args["region_id"]
-        cell_name = g.args["name"]
-        cell_id = g.args["id"]
-        context = request.environ.get('context')
-
-        if not region_id:
-            msg = "`region_id` is required to get cells"
-            return self.error_response(400, msg)
-
-        if region_id and cell_name:
-            # Get this particular cell along with its data
-            try:
-                cell_obj = dbapi.cells_get_by_name(context,
-                                                   region_id,
-                                                   cell_name)
-            except exceptions.NotFound:
-                return self.error_response(404, 'Not Found')
-            except Exception as err:
-                LOG.error("Error during cells get: %s" % err)
-                return self.error_response(500, 'Unknown Error')
-
+    @base.http_codes
+    @base.filtered_context(
+        required='region_id',
+        filters=['id', 'name'])
+    def get(self, context, region_id, filters):
+        """Get cells for the region, with optional filtering."""
+        if 'name' in filters or 'id' in filters:
+            if 'name' in filters:
+                cell_obj = dbapi.cells_get_by_name(
+                    context, region_id, filters['name'])
+            else:
+                cell_obj = dbapi.cells_get_by_id(
+                    context, filters['id'])
             cell_obj.data = cell_obj.variables
-            cell = jsonutils.to_primitive(cell_obj)
-            return [cell], 200, None
-
-        if region_id and cell_id:
-            # Get this particular cell along with its data
-            try:
-                cell_obj = dbapi.cells_get_by_id(context, cell_id)
-            except exceptions.NotFound:
-                return self.error_response(404, 'Not Found')
-            except Exception as err:
-                LOG.error("Error during cells get: %s" % err)
-                return self.error_response(500, 'Unknown Error')
-
-            cell_obj.data = cell_obj.variables
-            cell = jsonutils.to_primitive(cell_obj)
-            return [cell], 200, None
-
-        # No cell id or name so get all cells for this region only
-        try:
+            cells_obj = [cell_obj]
+        else:
             cells_obj = dbapi.cells_get_all(context, region_id)
-            cells = jsonutils.to_primitive(cells_obj)
-            return cells, 200, None
-        except exceptions.NotFound:
-            return self.error_response(404, 'Not Found')
+        return jsonutils.to_primitive(cells_obj), 200, None
 
+    @base.http_codes
     def post(self):
         """Create a new cell."""
         context = request.environ.get('context')
-        try:
-            cell_obj = dbapi.cells_create(context, g.json)
-        except Exception as err:
-            LOG.error("Error during cell create: %s" % err)
-            return self.error_response(500, 'Unknown Error')
-
-        cell = jsonutils.to_primitive(cell_obj)
-        return cell, 200, None
+        cell_obj = dbapi.cells_create(context, g.json)
+        return jsonutils.to_primitive(cell_obj), 200, None
 
 
 class CellById(base.Resource):
 
+    @base.http_codes
     def get(self, id):
         context = request.environ.get('context')
-        try:
-            cell_obj = dbapi.cells_get_by_id(context, id)
-        except exceptions.NotFound:
-            return self.error_response(404, 'Not Found')
-        except Exception as err:
-            LOG.error("Error during Cell get by id: %s" % err)
-            return self.error_response(500, 'Unknown Error')
-
+        cell_obj = dbapi.cells_get_by_id(context, id)
         cell_obj.data = cell_obj.variables
         cell = jsonutils.to_primitive(cell_obj)
         return cell, 200, None
@@ -96,54 +52,32 @@ class CellById(base.Resource):
         """Update existing cell."""
         return None, 401, None
 
+    @base.http_codes
     def delete(self, id):
         """Delete existing cell."""
         context = request.environ.get('context')
-        try:
-            dbapi.cells_delete(context, id)
-        except exceptions.NotFound:
-            return self.error_response(404, 'Not Found')
-        except Exception as err:
-            LOG.error("Error during cell delete: %s" % err)
-            return self.error_response(500, 'Unknown Error')
-
-        return None, 200, None
+        dbapi.cells_delete(context, id)
+        return None, 204, None
 
 
 class CellsData(base.Resource):
 
+    @base.http_codes
     def put(self, id):
         """
         Update existing cell data, or create if it does
         not exist.
         """
-        data_keys = request.form.keys()
-        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
-        try:
-            dbapi.cells_data_update(context, id, data)
-        except exceptions.NotFound:
-            return self.error_response(404, 'Not Found')
-        except Exception as err:
-            LOG.error("Error during cell data update: %s" % err)
-            return self.error_response(500, 'Unknown Error')
-
+        dbapi.cells_data_update(context, id, request.json)
         return None, 200, None
 
+    @base.http_codes
     def delete(self, id):
         """Delete cell data."""
         # NOTE(sulo): this is not that great. Find a better way to do this.
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
-        data_keys = request.form.keys()
-        data = dict((key, request.form.getlist(key)[0]) for key in data_keys)
         context = request.environ.get('context')
-        try:
-            dbapi.cells_data_delete(context, id, data)
-        except exceptions.NotFound:
-            return self.error_response(404, 'Not Found')
-        except Exception as err:
-            LOG.error("Error during cell delete: %s" % err)
-            return self.error_response(500, 'Unknown Error')
-
-        return None, 200, None
+        dbapi.cells_data_delete(context, id, request.json)
+        return None, 204, None
