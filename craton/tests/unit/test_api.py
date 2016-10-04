@@ -56,7 +56,7 @@ class APIV1CellsIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_delete')
     def test_cells_delete(self, mock_cell):
         resp = self.delete('v1/cells/1')
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(204, resp.status_code)
 
 
 class APIV1CellsTest(APIV1Test):
@@ -131,7 +131,7 @@ class APIV1RegionsIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_delete')
     def test_delete_region(self, mock_region):
         resp = self.delete('v1/regions/1')
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(204, resp.status_code)
 
 
 class APIV1RegionsTest(APIV1Test):
