@@ -307,6 +307,7 @@ class Device(Base, VariableMixin):
     cell = relationship('Cell', back_populates='devices')
     project = relationship('Project', back_populates='devices')
     access_secret = relationship('AccessSecret', back_populates='devices')
+    interfaces = relationship('NetInterface', back_populates='device')
 
     @property
     def resolved(self):
@@ -358,15 +359,15 @@ class NetInterface(Base):
     link = Column(String(255), nullable=True)
     cdp = Column(String(255), nullable=True)
     security = Column(String(255), nullable=True)
-    device_id = Column(Integer,
-                       ForeignKey('net_devices.id'))
-    network_id = Column(Integer,
-                        ForeignKey('networks.id'),
-                        nullable=True)
-    network = relationship('Network', back_populates="net_devices",
+    project_id = Column(Integer, ForeignKey('projects.id'),
+                        index=True, nullable=False)
+    device_id = Column(Integer, ForeignKey('devices.id'))
+    network_id = Column(Integer, ForeignKey('networks.id'), nullable=True)
+
+    network = relationship('Network', back_populates="devices",
                            cascade='all', lazy='joined')
-    net_device = relationship('NetDevice', back_populates="interfaces",
-                              cascade='all', lazy='joined')
+    device = relationship('Device', back_populates="interfaces",
+                          cascade='all', lazy='joined')
 
 
 class Network(Base, VariableMixin):
@@ -385,7 +386,7 @@ class Network(Base, VariableMixin):
     project_id = Column(
         Integer, ForeignKey('projects.id'), index=True, nullable=False)
 
-    net_devices = relationship('NetInterface', back_populates='network')
+    devices = relationship('NetInterface', back_populates='network')
     region = relationship('Region', back_populates='networks')
     cell = relationship('Cell', back_populates='networks')
     project = relationship('Project', back_populates='networks')
@@ -399,8 +400,6 @@ class NetDevice(Device):
     model_name = Column(String(255), nullable=True)
     os_version = Column(String(255), nullable=True)
     vlans = Column(JSONType)
-
-    interfaces = relationship('NetInterface', back_populates='net_device')
 
     __mapper_args__ = {
         'polymorphic_identity': 'net_devices',
