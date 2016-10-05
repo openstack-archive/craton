@@ -15,9 +15,9 @@ CONF = cfg.CONF
 def main():
     logging.register_options(CONF)
     CONF(sys.argv[1:],
-         project='craton-inventory',
+         project='craton-api',
          default_config_files=[])
-    logging.setup(CONF, 'craton-inventory')
+    logging.setup(CONF, 'craton-api')
 
     app = api.load_app()
     host, port = cfg.CONF.api.host, cfg.CONF.api.port

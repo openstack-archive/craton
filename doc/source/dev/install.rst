@@ -137,9 +137,9 @@ Run dbsync
 
 * Make sure to run dbsync to get the db tables created::
 
-    # craton-inventory-dbsync --config-file=etc/inventory
+    # craton-dbsync --config-file=etc/inventory
     -api-conf.sample version
-    # craton-inventory-dbsync --config-file=etc/inventory
+    # craton-dbsync --config-file=etc/inventory
     -api-conf.sample upgrade
 
 -----------------------

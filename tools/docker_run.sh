@@ -17,7 +17,7 @@ mysqladmin flush-privileges
 ###############
 # Run db-sync #
 ##############
-/craton/bin/craton-inventory-dbsync --config-file=/craton/etc/inventory-api-conf.sample upgrade
+/craton/bin/craton-dbsync --config-file=/craton/etc/craton-api-conf.sample upgrade
 
 ###################################
 # Create initial project and user #
@@ -28,4 +28,4 @@ mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, 
 #########################
 # Start the API service #
 #########################
-/craton/bin/python3.5 /craton/craton/cmd/inventory-api.py --config-file=/craton/etc/inventory-api-conf.sample
+/craton/bin/python3.5 /craton/craton/cmd/craton-api.py --config-file=/craton/etc/craton-api-conf.sample

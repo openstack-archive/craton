@@ -2,7 +2,7 @@
 # Set Debug level
 debug=True
 # Log file for craton inventory
-log_file=craton-inventory.log
+log_file=craton-api.log
 
 [api]
 # Host IP to use for API service
@@ -10,7 +10,7 @@ host=0.0.0.0
 # Port to use for API service
 port=8080
 # Paste Config file to use
-api_paste_config=/craton/etc/inventory-api-paste.ini
+api_paste_config=/craton/etc/craton-api-paste.ini
 
 
 # Keystone Middlewre settings

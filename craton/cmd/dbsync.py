@@ -65,5 +65,5 @@ def main():
                                     handler=add_command_parsers)
 
     CONF.register_cli_opt(command_opt)
-    CONF(project='craton-inventory')
+    CONF(project='craton-api')
     CONF.command.func()
