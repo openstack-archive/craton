@@ -4,7 +4,7 @@ import json
 import requests
 import sys
 
-REGIONS = [{'ORD': {
+REGIONS = [{'ORD135': {
             "glance_default_store": "swift",
             "neutron_l2_population": True,
             "tempest_public_subnet_cidr": "192.168.1.0/22",
@@ -106,18 +106,82 @@ class Inventory(object):
                    "device_type": device_type}
 
         print("Creating host entry %s with data %s" % (payload, data))
-        resp = requests.post(region_url, headers=self.headers,
-                             data=json.dumps(payload), verify=False)
+        device_obj = requests.post(region_url, headers=self.headers,
+                                   data=json.dumps(payload), verify=False)
 
-        if resp.status_code != 200:
+        if device_obj.status_code != 200:
             raise Exception(resp.text)
 
         if data:
-            region_data_url = self.url + "/hosts/%s/data" % resp.json()["id"]
+            region_data_url = self.url + "/hosts/%s/data" % device_obj.json()["id"]
             resp = requests.put(region_data_url, headers=self.headers,
                                 data=json.dumps(data), verify=False)
             if resp.status_code != 200:
                 print(resp.text)
+
+        return device_obj.json()
+
+    def create_network(self, name, cidr, gateway, netmask, block_type):
+        networks_url = self.url + "/networks"
+        payload = {"name": name,
+                   "cidr": cidr,
+                   "gateway": gateway,
+                   "netmask": netmask,
+                   "ip_block_type": block_type,
+                   "region_id": self.region.get("id"),
+                   "cell_id": self.cell.get("id"),
+                   "project_id": self.project_id}
+
+        print("Creating new network: %s" % payload)
+        resp = requests.post(networks_url, headers=self.headers,
+                             data=json.dumps(payload), verify=False)
+        if resp.status_code != 200:
+            raise Exception(resp.text)
+
+        return resp.json()
+
+    def create_netdevice(self, name, device_type):
+        netdevices_url = self.url + "/netdevices"
+        payload = {"hostname": name,
+                   "model_name": "model-x",
+                   "os_version": "version-1",
+                   "device_type": device_type,
+                   "ip_address": "10.10.1.1",
+                   "active": True,
+                   "region_id": self.region.get("id"),
+                   "cell_id": self.cell.get("id"),
+                   "project_id": self.project_id}
+
+        resp = requests.post(netdevices_url, headers=self.headers,
+                             data=json.dumps(payload), verify=False)
+        if resp.status_code != 200:
+            raise Exception(resp.text)
+
+        return resp.json()
+
+    def create_net_interface(self, device, int_num, network=None):
+        netinterfaces_url = self.url + "/net_interfaces"
+        name = "eth%s" % int_num
+        payload = {"name": name,
+                   "interface_type": "ethernet",
+                   "vlan_id": 1,
+                   "port": int_num,
+                   "duplex": "full",
+                   "speed": "1000",
+                   "link": "up",
+                   "project_id": self.project_id,
+                   "device_id": device.get("id")}
+        if network:
+            payload["network_id"] = network.get("id")
+
+        print("Creating network interface %s on device %s for network %s"
+              % (name, device.get("id"), network.get("id")))
+        resp = requests.post(netinterfaces_url, headers=self.headers,
+                             data=json.dumps(payload), verify=False)
+        if resp.status_code != 200:
+            raise Exception(resp.text)
+
+        return resp.json()
 
 
 if __name__ == "__main__":
@@ -145,13 +209,33 @@ if __name__ == "__main__":
 
     for region in REGIONS:
         # Frist create region
-        region_name = region.keys()[0]
+        region_name = list(region.keys())[0]
         Inv.create_region(region_name, data=region[region_name])
 
         for cell in CELLS:
-            cell_name = cell.keys()[0]
+            cell_name = list(cell.keys())[0]
             Inv.create_cell(cell_name, data=cell[cell_name])
+            # Create a example private network for the cell
+            network = Inv.create_network("private_net",
+                                         "192.168.1.0",
+                                         "192.168.1.1",
+                                         "255.255.255.0",
+                                         "private")
+            # Create a ToR switch for this cell
+            switch_name = "switch1.%s.%s.example.com" % (cell_name, region_name)
+            switch = Inv.create_netdevice(switch_name, "switch")
+            # NOTE(sulo): Create 6 switch ports on the switch with the
+            # above network, the same switch can have other networks
+            # as well.
+            for int_num in range(5):
+                Inv.create_net_interface(switch, int_num, network=network)
             # Get host in the cell
             hosts = make_hosts(region_name, cell_name)
             for host in hosts:
-                Inv.create_device(host, 'server')
+                host_obj = Inv.create_device(host, 'server')
+                # Create network interface on the host to connect to the
+                # private network, the interfaces allows us to conncet this
+                # host to the switch or other devices, such that we can form
+                # logical or physical groupings such as a cab.
+                # TODO(sulo): uncomment this after fixing: lp1630511
+                # Inv.create_net_interface(host_obj, 0, network=network)
