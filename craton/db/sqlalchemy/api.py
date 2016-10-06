@@ -115,6 +115,47 @@ def get_user_info(context, username):
         raise exceptions.UnknownException(message=err)
 
 
+def _device_labels_update(context, device_type, device_id, labels):
+    """Update labels for the given device. Add the label if it is not present
+    in host labels list, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type=device_type)
+        query = query.filter_by(id=device_id)
+        try:
+            device = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        device.labels.update(labels["labels"])
+        device.save(session)
+        return device
+
+
+def _device_labels_delete(context, device_type, device_id, labels):
+    """Delete labels from the device labels list if it matches
+    the given label in the query, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type=device_type)
+        query = query.filter_by(id=device_id)
+        try:
+            device = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        for label in labels["labels"]:
+            device.labels.discard(label)
+        device.save(session)
+        return device
+
+
 def cells_get_all(context, region):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
@@ -454,6 +495,18 @@ def hosts_data_delete(context, host_id, data):
     return host_ref
 
 
+def hosts_labels_update(context, host_id, labels):
+    """Update labels for host. Add the label if it is not present
+    in host labels list, otherwise do nothing."""
+    return _device_labels_update(context, 'hosts', host_id, labels)
+
+
+def hosts_labels_delete(context, host_id, labels):
+    """Delete labels from the host labels list if it matches
+    the given label in the query, otherwise do nothing."""
+    return _device_labels_delete(context, 'hosts', host_id, labels)
+
+
 @require_admin_context
 def projects_get_all(context):
     """Get all the projects."""
@@ -672,6 +725,18 @@ def netdevices_delete(context, netdevice_id):
         query = query.filter_by(type='net_devices')
         query = query.filter_by(id=netdevice_id)
         query.delete()
+
+
+def netdevices_labels_update(context, device_id, labels):
+    """Update labels for a network device. Add the label if it is not present
+    in host labels list, otherwise do nothing."""
+    return _device_labels_update(context, 'net_devices', device_id, labels)
+
+
+def netdevices_labels_delete(context, device_id, labels):
+    """Delete labels from the network device labels list if it matches
+    the given label in the query, otherwise do nothing."""
+    return _device_labels_delete(context, 'net_devices', device_id, labels)
 
 
 def net_interfaces_get_by_device(context, device_id, filters):

@@ -187,6 +187,16 @@ def hosts_data_delete(context, host_id, data_key):
     return IMPL.hosts_data_delete(context, host_id, data_key)
 
 
+def hosts_labels_delete(context, host_id, labels):
+    """Delete existing device label(s)."""
+    return IMPL.hosts_labels_delete(context, host_id, labels)
+
+
+def hosts_labels_update(context, host_id, labels):
+    """Update existing device label entirely."""
+    return IMPL.hosts_labels_update(context, host_id, labels)
+
+
 # Projects
 
 def projects_get_all(context):
@@ -281,6 +291,16 @@ def netdevices_create(context, values):
 def netdevices_delete(context, netdevice_id):
     """Delete existing network device."""
     return IMPL.netdevices_delete(context, netdevice_id)
+
+
+def netdevices_labels_delete(context, netdevice_id, labels):
+    """Delete network device labels."""
+    return IMPL.netdevices_labels_delete(context, netdevice_id, labels)
+
+
+def netdevices_labels_update(context, netdevice_id, labels):
+    """Update network device labels."""
+    return IMPL.netdevices_labels_update(context, netdevice_id, labels)
 
 
 def net_interfaces_get_by_device(context, device_id, filters):
