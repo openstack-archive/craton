@@ -6,6 +6,14 @@ Provides some fake resources - region, cell, host and other related
 objects for test.
 """
 
+class Label(object):
+    def __init__(self, label):
+        self.label = label
+
+LABEL1 = Label("a")
+LABEL2 = Label("b")
+LABEL3 = Label("c")
+
 
 class Project(object):
     def __init__(self, name):
@@ -77,6 +85,8 @@ HOST2 = Host("www.example.com", "1", "1", "192.168.1.2", "server",
              {"key1": "value1", "key2": "value2"})
 HOST3 = Host("www.example.net", "1", "2", "10.10.0.1", "server",
              {"key1": "value1", "key2": "value2"})
+HOST4 = Host("www.example.net", "1", "2", "10.10.0.1", "server",
+             {"key1": "value1", "key2": "value2"}, labels=[LABEL1, LABEL2])
 HOSTS_LIST_R1 = [HOST1, HOST2]
 HOSTS_LIST_R2 = [HOST3]
 

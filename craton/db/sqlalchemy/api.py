@@ -8,6 +8,7 @@ from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
 
+from sortedcontainers import SortedSet
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
 
@@ -454,6 +455,49 @@ def hosts_data_delete(context, host_id, data):
     return host_ref
 
 
+def hosts_labels_update(context, host_id, labels):
+    """Update labels for host. Add the label if it is not present
+    in host labels list, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type='hosts')
+        query = query.filter_by(id=host_id)
+        try:
+            host = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        present_labels = [l.label for l in host.labels]
+        to_update = [i for i in labels["labels"] if i not in present_labels]
+        _labels = [models.Label(i) for i in to_update]
+        host.labels.update(_labels)
+        host.save(session)
+
+
+def hosts_labels_delete(context, host_id, labels):
+    """Delete labels from the host labels list if it matches
+    the given label in the query, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type='hosts')
+        query = query.filter_by(id=host_id)
+        try:
+            host = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        to_remove = [i for i in host.labels if i.label in labels["labels"]]
+        for i in to_remove:
+            host.labels.remove(i)
+        host.save(session)
+
+
 @require_admin_context
 def projects_get_all(context):
     """Get all the projects."""
@@ -672,6 +716,45 @@ def netdevices_delete(context, netdevice_id):
         query = query.filter_by(type='net_devices')
         query = query.filter_by(id=netdevice_id)
         query.delete()
+
+
+def netdevices_labels_update(context, device_id, labels):
+    """Update labels for a network device. Add the label if it is not present
+    in host labels list, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        net_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, net_devices, session=session,
+                            project_only=True).filter_by(id=device_id)
+        try:
+            netdevice = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        present_labels = [l.label for l in netdevice.labels]
+        to_update = [i for i in labels["labels"] if i not in present_labels]
+        _labels = [models.Label(i) for i in to_update]
+        netdevice.labels.update(_labels)
+        netdevice.save(session)
+
+
+def netdevices_labels_delete(context, device_id, labels):
+    """Delete labels from the network device labels list if it matches
+    the given label in the query, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        net_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, net_devices, session=session,
+                            project_only=True).filter_by(id=device_id)
+        try:
+            netdevice = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        to_remove = [i for i in netdevice.labels if i.label in labels["labels"]]
+        for i in to_remove:
+            netdevice.labels.remove(i)
+        netdevice.save(session)
 
 
 def net_interfaces_get_by_device(context, device_id, filters):
