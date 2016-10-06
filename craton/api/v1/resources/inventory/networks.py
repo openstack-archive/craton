@@ -105,6 +105,33 @@ class NetDeviceById(base.Resource):
         return None, 204, None
 
 
+class NetDeviceLabels(base.Resource):
+    """Controller for Netowrk Device Labels."""
+
+    @base.http_codes
+    def get(self, id):
+        """Get labels for given network device."""
+        context = request.environ.get('context')
+        obj = dbapi.netdevices_get_by_id(context, id)
+        response = {"labels": list(obj.labels)}
+        return response, 200, None
+
+    @base.http_codes
+    def put(self, id):
+        """Update existing device label. Adds if it does not exist."""
+        context = request.environ.get('context')
+        resp = dbapi.netdevices_labels_update(context, id, request.json)
+        response = {"labels": list(resp)}
+        return response, 200, None
+
+    @base.http_codes
+    def delete(self, id):
+        """Delete device label(s)."""
+        context = request.environ.get('context')
+        dbapi.netdevices_labels_delete(context, id)
+        return None, 204, None
+
+
 class NetInterfaces(base.Resource):
     """Controller for Netowrk Interfaces."""
 

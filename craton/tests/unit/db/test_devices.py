@@ -115,3 +115,25 @@ class HostsDBTestCase(base.DBTestCase):
         host = dbapi.hosts_get_by_id(self.context, host_id)
         self.assertEqual(host.name, 'www.example.xyz')
         self.assertEqual(host.resolved, {'bar': 'bar2', 'foo': 'R1'})
+
+    def test_host_labels_create(self):
+        region_id = self.make_region('region_1', foo='R1')
+        host_id = self.make_host(region_id, 'www.example.xyz',
+                                 IPAddress(u'10.1.2.101'),
+                                 'server', bar='bar2')
+        labels = {"labels": ["tom", "jerry"]}
+        dbapi.hosts_labels_update(self.context, host_id, labels)
+
+    def test_host_labels_delete(self):
+        region_id = self.make_region('region_1', foo='R1')
+        host_id = self.make_host(region_id, 'www.example.xyz',
+                                 IPAddress(u'10.1.2.101'),
+                                 'server', bar='bar2')
+        _labels = {"labels": ["tom", "jerry", "jones"]}
+        dbapi.hosts_labels_update(self.context, host_id, _labels)
+        host = dbapi.hosts_get_by_id(self.context, host_id)
+        self.assertEqual(sorted(host.labels), sorted(_labels["labels"]))
+        _dlabels = {"labels": ["tom"]}
+        dbapi.hosts_labels_delete(self.context, host_id, _dlabels)
+        host = dbapi.hosts_get_by_id(self.context, host_id)
+        self.assertEqual(host.labels, {"jerry", "jones"})

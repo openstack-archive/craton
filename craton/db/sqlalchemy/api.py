@@ -454,6 +454,47 @@ def hosts_data_delete(context, host_id, data):
     return host_ref
 
 
+def hosts_labels_update(context, host_id, labels):
+    """Update labels for host. Add the label if it is not present
+    in host labels list, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type='hosts')
+        query = query.filter_by(id=host_id)
+        try:
+            host = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        host.labels.update(labels["labels"])
+        host.save(session)
+        return host.labels
+
+
+def hosts_labels_delete(context, host_id, labels):
+    """Delete labels from the host labels list if it matches
+    the given label in the query, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type='hosts')
+        query = query.filter_by(id=host_id)
+        try:
+            host = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        for label in labels["labels"]:
+            host.labels.remove(label)
+        host.save(session)
+        return host.labels
+
+
 @require_admin_context
 def projects_get_all(context):
     """Get all the projects."""
@@ -672,6 +713,43 @@ def netdevices_delete(context, netdevice_id):
         query = query.filter_by(type='net_devices')
         query = query.filter_by(id=netdevice_id)
         query.delete()
+
+
+def netdevices_labels_update(context, device_id, labels):
+    """Update labels for a network device. Add the label if it is not present
+    in host labels list, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        net_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, net_devices, session=session,
+                            project_only=True).filter_by(id=device_id)
+        try:
+            netdevice = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        netdevice.labels.update(labels["labels"])
+        netdevice.save(session)
+        return netdevice.labels
+
+
+def netdevices_labels_delete(context, device_id, labels):
+    """Delete labels from the network device labels list if it matches
+    the given label in the query, otherwise do nothing."""
+    session = get_session()
+    with session.begin():
+        net_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, net_devices, session=session,
+                            project_only=True).filter_by(id=device_id)
+        try:
+            netdevice = query.one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NotFound()
+
+        for label in labels["labels"]:
+            netdevice.labels.remove(label)
+        netdevice.save(session)
+        return netdevice.labels
 
 
 def net_interfaces_get_by_device(context, device_id, filters):

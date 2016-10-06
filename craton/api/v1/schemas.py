@@ -20,7 +20,8 @@ DefinitionsHost = {'discriminator': 'name',
                                      'description': 'Parent Id of this host'},
                        'device_type': {'type': 'string',
                                        'description': 'Type of host'},
-                       'labels': {'type': 'allOf',
+                       'labels': {'type': 'array',
+                                  'items': 'string',
                                   'description': 'User defined labels'},
                        'data': {'type': 'allOf',
                                 'description': 'User defined information'},
@@ -36,7 +37,8 @@ DefinitionsHostId = {'discriminator': 'name',
                          'id': {'type': 'integer'},
                          'cell_id': {'type': 'integer'},
                          'project_id': {'type': 'integer'},
-                         'labels': {'type': 'allOf',
+                         'labels': {'type': 'array',
+                                    'items': 'string',
                                     'description': 'User defined labels'},
                          'data': {'type': 'allOf',
                                   'description': 'User defined information'},
@@ -75,6 +77,11 @@ DefinitionsCellId = {'discriminator': 'name',
 DefinitionsData = {'type': 'object',
                    'properties': {'key': {'type': 'string'},
                                   'value': {'type': 'object'}}}
+
+DefinitionsLabel = {'type': 'object',
+                    'properties': {'labels': {
+                                       'items': 'string',
+                                       'type': 'array'}}}
 
 DefinitionsError = {'type': 'object',
                     'properties': {'fields': {'type': 'string'},
@@ -284,6 +291,7 @@ validators = {
                          'description': 'Cell id to generate inventory for'}}}
     },
     ('hosts_id_data', 'PUT'): {'json': DefinitionsData},
+    ('hosts_id_labels', 'PUT'): {'json': DefinitionsLabel},
     ('hosts_id', 'GET'): {
         'args': {'required': [],
                  'properties': {
@@ -426,6 +434,7 @@ validators = {
                          'default': True,
                          'type': 'boolean'}}}},
     ('netdevices', 'POST'): {'json': DefinitionNetDevice},
+    ('netdevices_labels', 'PUT'): {'json': DefinitionsData},
     ('net_interfaces', 'GET'): {
         'args': {'required': ['device_id'],
                  'properties': {
@@ -622,6 +631,18 @@ filters = {
          405: {'headers': None, 'schema': None}},
     ('netdevices_id', 'GET'):
         {200: {'headers': None, 'schema': DefinitionNetDeviceId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('netdevices_labels', 'GET'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionsLabel, 'type': 'array'}},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('netdevices_labels', 'PUT'):
+        {200: {'headers': None,
+               'schema': {'items': DefinitionsLabel, 'type': 'array'}},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},

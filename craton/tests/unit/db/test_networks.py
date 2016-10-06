@@ -108,6 +108,22 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         self.assertRaises(exceptions.NotFound, dbapi.netdevices_get_by_id,
                           self.context, res.id)
 
+    def test_netdevice_labels_create(self):
+        device = dbapi.netdevices_create(self.context, device1)
+        labels = {"labels": ["tom", "jerry"]}
+        dbapi.netdevices_labels_update(self.context, device.id, labels)
+
+    def test_netdevice_labels_delete(self):
+        device = dbapi.netdevices_create(self.context, device1)
+        _labels = {"labels": ["tom", "jerry"]}
+        dbapi.netdevices_labels_update(self.context, device.id, _labels)
+        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        self.assertEqual(sorted(ndevice.labels), sorted(_labels["labels"]))
+        _dlabels = {"labels": ["tom"]}
+        dbapi.netdevices_labels_delete(self.context, ndevice.id, _dlabels)
+        ndevice = dbapi.netdevices_get_by_id(self.context, ndevice.id)
+        self.assertEqual(ndevice.labels, {"jerry"})
+
 
 class NetworkInterfacesDBTestCase(base.DBTestCase):
 

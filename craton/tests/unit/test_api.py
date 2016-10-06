@@ -35,6 +35,14 @@ class APIV1Test(TestCase):
         resp.json = jsonutils.loads(resp.data.decode('utf-8'))
         return resp
 
+    def put(self, path, data, **kw):
+        content = jsonutils.dumps(data)
+        content_type = 'application/json'
+        resp = self.client.put(path=path, content_type=content_type,
+                               data=content)
+        resp.json = jsonutils.loads(resp.data.decode('utf-8'))
+        return resp
+
     def delete(self, path):
         resp = self.client.delete(path=path)
         return resp
@@ -215,6 +223,20 @@ class APIV1HostsIDTest(APIV1Test):
         mock_host.return_value = host
         resp = self.get('v1/hosts/1?resolved-values=false')
         self.assertEqual(resp.json["data"], expected)
+
+    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    def test_get_hosts_labels(self, mock_host):
+        mock_host.return_value = fake_resources.HOST4
+        resp = self.get('v1/hosts/1/labels')
+        self.assertEqual(resp.json["labels"], ["a", "b"])
+
+    @mock.patch.object(dbapi, 'hosts_labels_update')
+    def test_put_hosts_labels(self, mock_host):
+        payload = {"labels": ["a", "b"]}
+        mock_host.return_value = payload
+        resp = self.put('v1/hosts/1/labels', data=payload)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.json, payload)
 
 
 class APIV1HostsTest(APIV1Test):
