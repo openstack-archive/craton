@@ -425,7 +425,7 @@ class Label(Base, VariableMixin):
     """
     __tablename__ = 'labels'
     id = Column(Integer, primary_key=True)
-    label = Column(String(255), unique=True)
+    label = Column(String(255), unique=False)
 
     _repr_columns = [label]
 

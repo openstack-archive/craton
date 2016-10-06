@@ -55,7 +55,6 @@ def upgrade():
         sa.Column('variable_association_id', sa.Integer),
         sa.Column('label', sa.String(length=255), nullable=True),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('label'),
         sa.ForeignKeyConstraint(
             ['variable_association_id'], ['variable_association.id'],
             'fk_labels_variable_association')
