@@ -18,6 +18,7 @@ device1 = {"hostname": "switch1",
            "ip_address": "192.168.1.1"}
 
 net_interface1 = {"device_id": 1,
+                  "project_id": 1,
                   "name": "eth1",
                   "ip_address": "192.168.0.2",
                   "interface_type": "ethernet"}

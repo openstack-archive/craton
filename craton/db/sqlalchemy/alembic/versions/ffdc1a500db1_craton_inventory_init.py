@@ -255,10 +255,12 @@ def upgrade():
         sa.Column('security', sa.String(length=255), nullable=True),
         sa.Column('device_id', sa.Integer, nullable=False),
         sa.Column('network_id', sa.Integer, nullable=True),
+        sa.Column('project_id', sa.Integer, nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint(
             'device_id', 'name', name='uq_netinter0deviceid0name'),
-        sa.ForeignKeyConstraint(['device_id'], ['net_devices.id'], ),
+        sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
+        sa.ForeignKeyConstraint(['device_id'], ['devices.id'], ),
         sa.ForeignKeyConstraint(['network_id'], ['networks.id'], ),
         sa.ForeignKeyConstraint(
             ['variable_association_id'], ['variable_association.id'],
