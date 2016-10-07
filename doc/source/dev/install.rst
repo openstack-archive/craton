@@ -22,6 +22,8 @@ Installing Environment from packages: Ubuntu
 
     # git clone https://github.com/openstack/craton.git
 
+.. Note:: Make sure to use Python3, as this is only a Python3 project.
+
 * Install the prerequisite packages::
 
     # sudo apt-get install python-dev
@@ -113,15 +115,15 @@ Database Setup
     # exit
 
 ------------------------------------
-Modify etc/inventory-api-conf.sample
+Modify etc/craton-api-conf.sample
 ------------------------------------
 
 * Make api_paste_config use a fully qualified path (not relative).
   This will be specific for your machine
 
-.. Note:: Make sure you have the proper path for inventory-api-conf.sample
+.. Note:: Make sure you have the proper path for craton-api-conf.sample
 
-    # api_paste_config=/home/cratonuser/craton/etc/inventory-api-paste.ini
+    # api_paste_config=/home/cratonuser/craton/etc/craton-api-paste.ini
 
 * Add the following line to the [database] section:
 
@@ -137,9 +139,9 @@ Run dbsync
 
 * Make sure to run dbsync to get the db tables created::
 
-    # craton-dbsync --config-file=etc/inventory
+    # craton-dbsync --config-file=etc/craton
     -api-conf.sample version
-    # craton-dbsync --config-file=etc/inventory
+    # craton-dbsync --config-file=etc/craton
     -api-conf.sample upgrade
 
 -----------------------
@@ -174,8 +176,8 @@ Start the API Service
 
 * To start the API service, run the following command::
 
-    # python craton/cmd/inventory-api.py --config-file=etc/
-    inventory-api-conf.sample
+    # python craton/cmd/craton-api.py --config-file=etc/
+    craton-api-conf.sample
 
 
 * Some examples of API calls are as below:
@@ -185,7 +187,7 @@ Create a Region
 ---------------
 
 * In order to create the region, export the IP address you set in
-  /etc/inventory-api-conf.sample::
+  /etc/craton-api-conf.sample::
 
     # export MY_IP=xxx.xxx.xxx.xxx
 
