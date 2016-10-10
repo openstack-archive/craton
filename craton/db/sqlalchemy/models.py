@@ -308,6 +308,16 @@ class Device(Base, VariableMixin):
     project = relationship('Project', back_populates='devices')
     access_secret = relationship('AccessSecret', back_populates='devices')
     interfaces = relationship('NetInterface', back_populates='device')
+    children = relationship('Device',
+                            backref=backref('parent', remote_side=[id]))
+    @property
+    def ancestors(self):
+        lineage = []
+        ancestor = self.parent
+        while ancestor:
+            lineage.append(ancestor)
+            ancestor = ancestor.parent
+        return lineage
 
     @property
     def resolved(self):
@@ -315,12 +325,14 @@ class Device(Base, VariableMixin):
         if self.cell:
             return ChainMap(
                 self.variables,
+                ChainMap(*[ancestor.variables for ancestor in self.ancestors]),
                 ChainMap(*[label.variables for label in self.labels]),
                 self.cell.variables,
                 self.region.variables)
         else:
             return ChainMap(
                 self.variables,
+                ChainMap(*[ancestor.variables for ancestor in self.ancestors]),
                 ChainMap(*[label.variables for label in self.labels]),
                 self.region.variables)
 
