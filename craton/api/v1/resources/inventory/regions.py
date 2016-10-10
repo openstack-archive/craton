@@ -4,6 +4,7 @@ from oslo_log import log
 
 from craton.api.v1 import base
 from craton import db as dbapi
+from craton import util
 
 
 LOG = log.getLogger(__name__)
@@ -41,7 +42,8 @@ class Regions(base.Resource):
     def post(self):
         """Create a new region."""
         context = request.environ.get('context')
-        region_obj = dbapi.regions_create(context, g.json)
+        json = util.copy_project_id_into_json(context, g.json)
+        region_obj = dbapi.regions_create(context, json)
         return jsonutils.to_primitive(region_obj), 200, None
 
 
