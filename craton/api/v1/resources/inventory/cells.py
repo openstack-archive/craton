@@ -4,6 +4,7 @@ from oslo_log import log
 
 from craton.api.v1 import base
 from craton import db as dbapi
+from craton import util
 
 
 LOG = log.getLogger(__name__)
@@ -34,7 +35,8 @@ class Cells(base.Resource):
     def post(self):
         """Create a new cell."""
         context = request.environ.get('context')
-        cell_obj = dbapi.cells_create(context, g.json)
+        json = util.copy_project_id_into_json(context, g.json)
+        cell_obj = dbapi.cells_create(context, json)
         return jsonutils.to_primitive(cell_obj), 200, None
 
 
