@@ -5,6 +5,7 @@ from oslo_utils import uuidutils
 
 from craton.api.v1 import base
 from craton import db as dbapi
+from craton import util
 
 
 LOG = log.getLogger(__name__)
@@ -36,11 +37,12 @@ class Users(base.Resource):
     def post(self):
         """Create a new user. Requires project admin privileges."""
         context = request.environ.get('context')
-        project_id = g.json["project_id"]
+        json = util.copy_project_id_into_json(context, g.json)
+        project_id = json["project_id"]
         dbapi.projects_get_by_id(context, project_id)
         api_key = uuidutils.generate_uuid()
         g.json["api_key"] = api_key
-        user_obj = dbapi.users_create(context, g.json)
+        user_obj = dbapi.users_create(context, json)
         return jsonutils.to_primitive(user_obj), 200, None
 
 

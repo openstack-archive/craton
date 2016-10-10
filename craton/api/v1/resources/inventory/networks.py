@@ -5,6 +5,7 @@ from oslo_log import log
 
 from craton.api.v1 import base
 from craton import db as dbapi
+from craton import util
 
 
 LOG = log.getLogger(__name__)
@@ -27,7 +28,8 @@ class Networks(base.Resource):
     def post(self):
         """Create a new network."""
         context = request.environ.get('context')
-        network_obj = dbapi.networks_create(context, g.json)
+        json = util.copy_project_id_into_json(context, g.json)
+        network_obj = dbapi.networks_create(context, json)
         return jsonutils.to_primitive(network_obj), 200, None
 
 
@@ -72,7 +74,8 @@ class NetDevices(base.Resource):
     def post(self):
         """Create a new network device."""
         context = request.environ.get('context')
-        obj = dbapi.netdevices_create(context, g.json)
+        json = util.copy_project_id_into_json(context, g.json)
+        obj = dbapi.netdevices_create(context, json)
         device = jsonutils.to_primitive(obj)
         return device, 200, None
 
@@ -149,7 +152,8 @@ class NetInterfaces(base.Resource):
     def post(self):
         """Create a new network interface."""
         context = request.environ.get('context')
-        obj = dbapi.net_interfaces_create(context, g.json)
+        json = util.copy_project_id_into_json(context, g.json)
+        obj = dbapi.net_interfaces_create(context, json)
         interface = jsonutils.to_primitive(obj)
         return interface, 200, None
 
