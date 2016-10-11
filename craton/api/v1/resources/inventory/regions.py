@@ -56,8 +56,9 @@ class RegionsById(base.Resource):
 
     def put(self, id):
         """Update existing region."""
-        # NOTE(sulo): we can only update `note` on region
-        return None, 200, None
+        context = request.environ.get('context')
+        region_obj = dbapi.regions_update(context, id, request.json)
+        return jsonutils.to_primitive(region_obj), 200, None
 
     @base.http_codes
     def delete(self, id):
