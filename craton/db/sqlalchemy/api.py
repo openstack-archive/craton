@@ -256,14 +256,10 @@ def cells_update(context, cell_id, values):
         query = model_query(context, models.Cell, session=session,
                             project_only=True)
         query = query.filter_by(id=cell_id)
-        try:
-            cell_ref = query.with_lockmode('update').one()
-        except Exception:
-            raise
-
+        cell_ref = query.with_for_update().one()
         cell_ref.update(values)
         cell_ref.save(session)
-    return cell_ref
+        return cell_ref
 
 
 def cells_delete(context, cell_id):
@@ -363,8 +359,15 @@ def regions_create(context, values):
 
 def regions_update(context, region_id, values):
     """Update an existing region."""
-    # We dont have anything to update right now
-    pass
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Region, session=session,
+                            project_only=True)
+        query = query.filter_by(id=region_id)
+        region_ref = query.with_for_update().one()
+        region_ref.update(values)
+        region_ref.save(session)
+        return region_ref
 
 
 def regions_delete(context, region_id):
@@ -485,7 +488,16 @@ def hosts_create(context, values):
 
 def hosts_update(context, host_id, values):
     """Update an existing host."""
-    return None
+    session = get_session()
+    with session.begin():
+        host_devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, host_devices, session=session,
+                            project_only=True)
+        query = query.filter_by(id=host_id)
+        host_ref = query.with_for_update().one()
+        host_ref.update(values)
+        host_ref.save(session)
+        return host_ref
 
 
 def hosts_delete(context, host_id):
@@ -691,6 +703,19 @@ def networks_create(context, values):
     return network
 
 
+def networks_update(context, network_id, values):
+    """Update an existing network."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Network, session=session,
+                            project_only=True)
+        query = query.filter_by(id=network_id)
+        network_ref = query.with_for_update().one()
+        network_ref.update(values)
+        network_ref.save(session)
+        return network_ref
+
+
 def networks_delete(context, network_id):
     """Delete existing network."""
     session = get_session()
@@ -778,6 +803,21 @@ def netdevices_create(context, values):
     return device
 
 
+def netdevices_update(context, netdevice_id, values):
+    """Update existing network device"""
+    session = get_session()
+    with session.begin():
+        device = with_polymorphic(models.Device, '*')
+        query = model_query(context, device, session=session,
+                            project_only=True)
+        query = query.filter_by(type='net_devices')
+        query = query.filter_by(id=netdevice_id)
+        netdevice_ref = query.with_for_update().one()
+        netdevice_ref.update(values)
+        netdevice_ref.save(session)
+        return netdevice_ref
+
+
 def netdevices_delete(context, netdevice_id):
     """Delete existing network device."""
     session = get_session()
@@ -847,6 +887,19 @@ def net_interfaces_create(context, values):
         interface.update(values)
         interface.save(session)
     return interface
+
+
+def net_interfaces_update(context, interface_id, values):
+    """Update an existing network interface."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.NetInterface, session=session,
+                            project_only=True)
+        query = query.filter_by(id=interface_id)
+        net_interface_ref = query.with_for_update().one()
+        net_interface_ref.update(values)
+        net_interface_ref.save(session)
+        return net_interface_ref
 
 
 def net_interfaces_delete(context, interface_id):

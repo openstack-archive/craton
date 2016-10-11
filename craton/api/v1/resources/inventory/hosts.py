@@ -44,11 +44,13 @@ class HostById(base.Resource):
         else:
             host_obj.data = host_obj.variables
         host_obj.labels = host_obj.labels
-        host = jsonutils.to_primitive(host_obj)
-        return host, 200, None
+        return jsonutils.to_primitive(host_obj), 200, None
 
     def put(self, id):
-        return None, 400, None
+        """Update existing host data, or create if it does not exist."""
+        context = request.environ.get('context')
+        host_obj = dbapi.hosts_update(context, id, request.json)
+        return jsonutils.to_primitive(host_obj), 200, None
 
     @base.http_codes
     def delete(self, id):
@@ -70,10 +72,7 @@ class HostsData(base.Resource):
 
     @base.http_codes
     def put(self, id):
-        """
-        Update existing host data, or create if it does
-        not exist.
-        """
+        """Update existing host data, or create if it does not exist."""
         context = request.environ.get('context')
         obj = dbapi.hosts_data_update(context, id, request.json)
         response = {"data": jsonutils.to_primitive(obj.variables)}
