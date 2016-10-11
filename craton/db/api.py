@@ -258,6 +258,11 @@ def networks_create(context, values):
     return IMPL.networks_create(context, values)
 
 
+def networks_update(context, network_id, values):
+    """Update an existing network."""
+    return IMPL.networks_update(context, network_id, values)
+
+
 def networks_delete(context, network_id):
     """Delete existing network."""
     return IMPL.networks_delete(context, network_id)
@@ -278,6 +283,11 @@ def netdevices_create(context, values):
     return IMPL.netdevices_create(context, values)
 
 
+def netdevices_update(context, netdevice_id, values):
+    """Update an existing network device"""
+    return IMPL.netdevices_update(context, netdevice_id, values)
+
+
 def netdevices_delete(context, netdevice_id):
     """Delete existing network device."""
     return IMPL.netdevices_delete(context, netdevice_id)
@@ -296,6 +306,11 @@ def net_interfaces_get_by_id(context, interface_id):
 def net_interfaces_create(context, values):
     """Create a new network interface."""
     return IMPL.net_interfaces_create(context, values)
+
+
+def net_interfaces_update(context, interface_id, values):
+    """Update an existing network interface."""
+    return IMPL.net_interfaces_create(context, interface_id, values)
 
 
 def net_interfaces_delete(context, interface_id):

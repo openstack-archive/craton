@@ -45,7 +45,9 @@ class NetworkById(base.Resource):
 
     def put(self, id):
         """Update existing network values."""
-        return None, 400, None
+        context = request.environ.get('context')
+        net_obj = dbapi.networks_update(context, id, request.json)
+        return jsonutils.to_primitive(net_obj), 200, None
 
     @base.http_codes
     def delete(self, id):
@@ -95,7 +97,9 @@ class NetDeviceById(base.Resource):
 
     def put(self, id):
         """Update existing device values."""
-        return None, 400, None
+        context = request.environ.get('context')
+        net_obj = dbapi.netdevices_update(context, id, request.json)
+        return jsonutils.to_primitive(net_obj), 200, None
 
     @base.http_codes
     def delete(self, id):
@@ -140,7 +144,9 @@ class NetInterfaceById(base.Resource):
 
     def put(self, id):
         """Update existing network interface values."""
-        return None, 400, None
+        context = request.environ.get('context')
+        net_obj = dbapi.net_interfaces_update(context, id, request.json)
+        return jsonutils.to_primitive(net_obj), 200, None
 
     @base.http_codes
     def delete(self, id):
