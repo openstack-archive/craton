@@ -14,18 +14,11 @@ Craton uses the following related aspects of inventory:
 
 """
 
-try:
-    from collections import ChainMap
-except ImportError:
-    # else get the backport of this Python 3 functionality
-    from chainmap import ChainMap
-from operator import attrgetter
+from collections import ChainMap
 
 from oslo_db.sqlalchemy import models
-from sortedcontainers import SortedSet
 from sqlalchemy import (
-    Boolean, Column, ForeignKey, Integer, String, Table, Text,
-    UniqueConstraint)
+    Boolean, Column, ForeignKey, Integer, String, Text, UniqueConstraint)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.declarative.api import _declarative_constructor
@@ -293,19 +286,13 @@ class Device(Base, VariableMixin):
 
     _repr_columns = [id, name]
 
-    # many-to-many relationship with labels; labels are sorted to
-    # ensure that variable resolution is stable if labels have
-    # conflicting settings for a given key
-    labels = relationship(
-        'Label',
-        secondary=lambda: device_labels,
-        collection_class=lambda: SortedSet(key=attrgetter('label')))
-    associated_labels = association_proxy('labels', 'label')
-
-    # relationships
+    project = relationship('Project', back_populates='devices')
     region = relationship('Region', back_populates='devices')
     cell = relationship('Cell', back_populates='devices')
-    project = relationship('Project', back_populates='devices')
+    related_labels = relationship(
+        'Label', back_populates='device', collection_class=set,
+        cascade='all, delete-orphan', lazy='joined')
+    labels = association_proxy('related_labels', 'label')
     access_secret = relationship('AccessSecret', back_populates='devices')
     interfaces = relationship('NetInterface', back_populates='device')
 
@@ -315,13 +302,11 @@ class Device(Base, VariableMixin):
         if self.cell:
             return ChainMap(
                 self.variables,
-                ChainMap(*[label.variables for label in self.labels]),
                 self.cell.variables,
                 self.region.variables)
         else:
             return ChainMap(
                 self.variables,
-                ChainMap(*[label.variables for label in self.labels]),
                 self.region.variables)
 
     __mapper_args__ = {
@@ -407,35 +392,20 @@ class NetDevice(Device):
     }
 
 
-device_labels = Table(
-    'device_labels', Base.metadata,
-    Column('device_id', ForeignKey('devices.id'), primary_key=True),
-    Column('label_id', ForeignKey('labels.id'), primary_key=True))
-
-
-class Label(Base, VariableMixin):
-    """Models a label on hosts, with a many-to-many relationship.
-    Such labels include groupings like Ansible groups; as well as
-    arbitrary other labels.
-    Rather than subclassing labels, we can use prefixes such as
-    "group-".
-    It is assumed that hierarchies for groups, if any, is represented
-    in an external format, such as a group-of-group inventory in
-    Ansible.
-    """
+class Label(Base):
+    """Models arbitrary labeling (aka tagging) of devices."""
     __tablename__ = 'labels'
-    id = Column(Integer, primary_key=True)
-    label = Column(String(255), unique=True)
-
-    _repr_columns = [label]
+    device_id = Column(
+        Integer,
+        ForeignKey(Device.id, name='fk_labels_devices'),
+        primary_key=True)
+    label = Column(String(255), primary_key=True)
+    _repr_columns = [device_id, label]
 
     def __init__(self, label):
         self.label = label
 
-    devices = relationship(
-        "Device",
-        secondary=device_labels,
-        back_populates="labels")
+    device = relationship("Device", back_populates="related_labels")
 
 
 class AccessSecret(Base):

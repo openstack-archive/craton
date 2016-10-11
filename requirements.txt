@@ -2,7 +2,6 @@
 # of appearance. Changing the order has an impact on the overall integration
 # process, which may cause wedges in the gate later.
 
-chainmap # PSF; backport would be an addition to global-requirements.txt
 decorator>=3.4.0 # BSD
 Flask!=0.11,<1.0,>=0.10 # BSD
 flask_restful
@@ -21,7 +20,6 @@ PasteDeploy>=1.5.0 # MIT
 Paste # MIT
 pbr>=1.6
 six>=1.9.0 # MIT
-sortedcontainers>=1.4.4 # Apache-2.0; addition to global-requirements.txt
 SQLAlchemy>=1.0.10,<1.1.0  # MIT
 sqlalchemy-utils  # BSD License
 stevedore>=1.5.0 # Apache-2.0

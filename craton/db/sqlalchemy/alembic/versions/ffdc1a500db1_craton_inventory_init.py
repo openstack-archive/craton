@@ -48,19 +48,6 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
     op.create_table(
-        'labels',
-        sa.Column('created_at', sa.DateTime, nullable=True),
-        sa.Column('updated_at', sa.DateTime, nullable=True),
-        sa.Column('id', sa.Integer, nullable=False),
-        sa.Column('variable_association_id', sa.Integer),
-        sa.Column('label', sa.String(length=255), nullable=True),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('label'),
-        sa.ForeignKeyConstraint(
-            ['variable_association_id'], ['variable_association.id'],
-            'fk_labels_variable_association')
-    )
-    op.create_table(
         'projects',
         sa.Column('created_at', sa.DateTime, nullable=True),
         sa.Column('updated_at', sa.DateTime, nullable=True),
@@ -214,14 +201,6 @@ def upgrade():
         op.f('ix_devices_region_id'), 'devices', ['region_id'],
         unique=False)
     op.create_table(
-        'device_labels',
-        sa.Column('device_id', sa.Integer, nullable=False),
-        sa.Column('label_id', sa.Integer, nullable=False),
-        sa.ForeignKeyConstraint(['device_id'], ['devices.id'], ),
-        sa.ForeignKeyConstraint(['label_id'], ['labels.id'], ),
-        sa.PrimaryKeyConstraint('device_id', 'label_id')
-    )
-    op.create_table(
         'hosts',
         sa.Column('id', sa.Integer, nullable=False),
         sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
@@ -236,6 +215,17 @@ def upgrade():
                   nullable=True),
         sa.ForeignKeyConstraint(['id'], ['devices.id']),
         sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table(
+        'labels',
+        sa.Column('created_at', sa.DateTime, nullable=True),
+        sa.Column('updated_at', sa.DateTime, nullable=True),
+        sa.Column('device_id', sa.Integer, nullable=False),
+        sa.Column('label', sa.String(length=255), nullable=False),
+        sa.PrimaryKeyConstraint('device_id', 'label'),
+        sa.ForeignKeyConstraint(
+            ['device_id'], ['devices.id'],
+            'fk_labels_devices')
     )
     op.create_table(
         'net_interfaces',
@@ -276,7 +266,6 @@ def downgrade():
     op.drop_index(op.f('ix_networks_project_id'), table_name='networks')
     op.drop_index(op.f('ix_networks_cell_id'), table_name='networks')
     op.drop_table('networks')
-    op.drop_table('device_labels')
     op.drop_index(op.f('ix_devices_region_id'), table_name='devices')
     op.drop_index(op.f('ix_devices_project_id'), table_name='devices')
     op.drop_index(op.f('ix_devices_cell_id'), table_name='devices')
