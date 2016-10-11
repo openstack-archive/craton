@@ -14,7 +14,7 @@ class RegionsDBTestCase(base.DBTestCase):
         except Exception:
             self.fail("Region create raised unexpected exception")
 
-    def test_reions_get_all(self):
+    def test_regions_get_all(self):
         dbapi.regions_create(self.context, region1)
         res = dbapi.regions_get_all(self.context)
         self.assertEqual(len(res), 1)
@@ -37,6 +37,15 @@ class RegionsDBTestCase(base.DBTestCase):
     def test_region_get_by_id_no_exist_raises(self):
         # TODO(sulo): fix sqlalchemy api first
         pass
+
+    def test_region_update(self):
+        dbapi.regions_create(self.context, region1)
+        res = dbapi.regions_get_by_id(self.context, 1)
+        self.assertEqual(res.name, 'region1')
+        new_name = "region_New1"
+        res = dbapi.regions_update(self.context, res.id,
+                                   {'name': 'region_New1'})
+        self.assertEqual(res.name, new_name)
 
     def test_region_delete(self):
         dbapi.regions_create(self.context, region1)
