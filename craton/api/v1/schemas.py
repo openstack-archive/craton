@@ -502,7 +502,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('hosts_id', 'PUT'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsHostId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -537,7 +537,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('cells_id', 'PUT'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsCellId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -592,7 +592,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions_id', 'PUT'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsRegionId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -654,6 +654,11 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('netdevices_id', 'PUT'):
+        {200: {'headers': None, 'schema': DefinitionNetDeviceId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
     ('networks', 'GET'):
         {200: {'headers': None,
                'schema': {'items': DefinitionNetwork, 'type': 'array'}},
@@ -665,6 +670,11 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('networks_id', 'PUT'):
+        {200: {'headers': None, 'schema': DefinitionNetworkId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
     ('net_interfaces', 'GET'):
         {200: {'headers': None,
                'schema': {'items': DefinitionNetInterface, 'type': 'array'}},
@@ -672,6 +682,11 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('net_interfaces_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionNetInterfaceId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('net_interfaces_id', 'PUT'):
         {200: {'headers': None, 'schema': DefinitionNetInterfaceId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},

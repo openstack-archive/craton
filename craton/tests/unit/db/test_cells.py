@@ -50,6 +50,18 @@ class CellsDBTestCase(base.DBTestCase):
         res = dbapi.cells_data_update(self.context, res.id, variables)
         self.assertEqual(res.variables, variables)
 
+    def test_cell_update(self):
+        dbapi.cells_update(self.context, cell1)
+        res = dbapi.cells_get_by_name(self.context, cell1['region_id'],
+                                      cell1['name'])
+        self.assertEqual(res.name, {})
+        name = "cell1"
+        res = dbapi.cells_update(self.context, res.id, name)
+        self.assertEqual(res.name, name)
+        new_name = 'cell1_New'
+        res = dbapi.cells_update(self.context, res.id, new_name)
+        self.assertEqual(res.name, new_name)
+
     def test_cell_data_update_does_update_variables(self):
         dbapi.cells_create(self.context, cell1)
         res = dbapi.cells_get_by_name(self.context, cell1['region_id'],
