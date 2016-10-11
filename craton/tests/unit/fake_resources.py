@@ -39,8 +39,8 @@ class Cell(object):
         self.variables = variables
         self.labels = labels
 
-CELL1 = Cell("cell1", "active", "1", "abcd", {"key1": "value1",
-                                              "key2": "value2"})
+CELL1 = Cell("cell1", "active", 1, 1, {"key1": "value1",
+                                       "key2": "value2"})
 CELL2 = Cell("cell2", "active", "2", "abcd", {"key3": "value3",
                                               "key4": "value4"})
 
@@ -71,7 +71,7 @@ class Host(object):
         self.device_type = device_type
         self.labels = labels
 
-HOST1 = Host("www.craton.com", "1", "1", "192.168.1.1", "server",
+HOST1 = Host("www.craton.com", 1, 1, "192.168.1.1", "server",
              {"key1": "value1", "key2": "value2"})
 HOST2 = Host("www.example.com", "1", "1", "192.168.1.2", "server",
              {"key1": "value1", "key2": "value2"})
