@@ -61,6 +61,15 @@ class NetworksDBTestCase(base.DBTestCase):
                                            filters)
         self.assertEqual(res, [])
 
+    def test_network_update(self):
+        network = dbapi.networks_create(self.context, network1)
+        res = dbapi.networks_get_by_id(self.context, network.id)
+        self.assertEqual(res.name, 'test network')
+        new_name = 'test_network1'
+        res = dbapi.networks_update(self.context, res.id,
+                                    {'name': 'test_network1'})
+        self.assertEqual(res.name, new_name)
+
     def test_networks_get_by_id_no_exist_raises(self):
         # Since no network is created, any id should raise
         self.assertRaises(exceptions.NotFound, dbapi.networks_get_by_id,
@@ -121,6 +130,15 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         labels = {"labels": ["tom", "jerry"]}
         dbapi.netdevices_labels_update(self.context, device.id, labels)
 
+    def test_netdevices_update(self):
+        device = dbapi.netdevices_create(self.context, device1)
+        res = dbapi.netdevices_get_by_id(self.context, device.id)
+        self.assertEqual(res.hostname, 'switch1')
+        new_name = 'switch2'
+        res = dbapi.netdevices_update(self.context, res.id,
+                                      {'name': 'switch2'})
+        self.assertEqual(res.name, new_name)
+
     def test_netdevice_labels_delete(self):
         device = dbapi.netdevices_create(self.context, device1)
         _labels = {"labels": ["tom", "jerry"]}
@@ -152,6 +170,15 @@ class NetworkInterfacesDBTestCase(base.DBTestCase):
         interface = dbapi.net_interfaces_create(self.context, net_interface1)
         res = dbapi.net_interfaces_get_by_id(self.context, interface.id)
         self.assertEqual(res.name, 'eth1')
+
+    def test_interface_update(self):
+        interface = dbapi.net_interfaces_create(self.context, net_interface1)
+        res = dbapi.net_interfaces_get_by_id(self.context, interface.id)
+        self.assertEqual(res.name, 'eth1')
+        new_name = 'eth2'
+        res = dbapi.net_interfaces_update(self.context, interface.id,
+                                          {'name': 'eth2'})
+        self.assertEqual(res.name, new_name)
 
     def test_interface_delete(self):
         interface = dbapi.net_interfaces_create(self.context, net_interface1)

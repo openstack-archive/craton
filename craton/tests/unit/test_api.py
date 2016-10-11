@@ -121,6 +121,16 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
 
+    @mock.patch.object(dbapi, 'cells_update')
+    def test_update_cell(self, mock_cell):
+        mock_cell.return_value = fake_resources.CELL1
+        payload = {'name': 'cell1-New', 'region_id': 1, 'project_id': 1}
+        resp = self.put('v1/cells/1', data=payload)
+        self.assertEqual(resp.json['region_id'], payload['region_id'])
+        self.assertEqual(resp.json['project_id'], payload['project_id'])
+        self.assertTrue(resp.json['name'], payload['name'])
+        self.assertEqual(200, resp.status_code)
+
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_fails_with_invalid_data(self, mock_cell):
         mock_cell.return_value = None
@@ -211,6 +221,14 @@ class APIV1RegionsTest(APIV1Test):
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
+
+    @mock.patch.object(dbapi, 'regions_update')
+    def test_update_region(self, mock_region):
+        mock_region.return_value = fake_resources.REGION1
+        payload = {"name": "region_New1"}
+        resp = self.put('v1/regions/1', data=payload)
+        self.assertTrue(resp.json['name'], payload['name'])
+        self.assertEqual(resp.status_code, 200)
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_invalid_data_fails(self, mock_region):
@@ -318,6 +336,17 @@ class APIV1HostsTest(APIV1Test):
                 'project_id': project_id1, 'ip_address': '10.0.0.1',
                 'device_type': 'server', 'active': True}
         resp = self.post('/v1/hosts', data=data)
+        self.assertEqual(200, resp.status_code)
+
+    @mock.patch.object(dbapi, 'hosts_update')
+    def test_update_host(self, mock_host):
+        mock_host.return_value = fake_resources.HOST1
+        payload = {'name': 'Host_New', 'project_id': 1, 'region_id': 1,
+                   'ip_address': "192.168.1.1", 'device_type': "server"}
+        resp = self.put('/v1/hosts/1', data=payload)
+        self.assertEqual(resp.json['project_id'], payload['project_id'])
+        self.assertEqual(resp.json['region_id'], payload['region_id'])
+        self.assertTrue(resp.json['name'], payload['name'])
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'hosts_create')

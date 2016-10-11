@@ -42,6 +42,8 @@ DefinitionsHostId = {'discriminator': 'name',
                                     'description': 'User defined labels'},
                          'data': {'type': 'allOf',
                                   'description': 'User defined information'},
+                         'device_type': {'type': 'string',
+                                         'description': 'Type of host'},
                          'region_id': {'type': 'integer'}}}
 
 DefinitionsCell = {'discriminator': 'name',
@@ -299,7 +301,20 @@ validators = {
                          'default': True,
                          'type': 'boolean'}}}
     },
-    ('hosts_id', 'PUT'): {'json': DefinitionsHost},
+    ('hosts_id', 'PUT'): {
+        'args': {'required': [],
+                 'properties': {
+                     'active': {'type': 'boolean'},
+                     'note': {'type': 'string'},
+                     'ip_address': {'type': 'string'},
+                     'name': {'type': 'string'},
+                     'labels': {'type': 'array', 'items': 'string',
+                                'description': 'User defined labels'},
+                     'data': {'type': 'allOf',
+                              'description': 'User defined information'},
+                     'device_type': {'type': 'string',
+                                     'description': 'Type of host'}}}
+        },
     ('regions', 'GET'): {
         'args': {'required': [],
                  'properties': {
@@ -349,7 +364,12 @@ validators = {
                          'type': 'integer',
                          'description': 'ID of host to get'}}
                  }},
-    ('cells_id', 'PUT'): {'json': DefinitionsCell},
+    ('cells_id', 'PUT'): {
+        'args': {'required': [],
+                 'properties': {
+                     'note': {'type': 'string'},
+                     'name': {'type': 'string'}}}
+        },
     ('cells', 'POST'): {'json': DefinitionsCell},
     ('cells', 'GET'): {
         'args': {'required': ['region_id'],
@@ -368,7 +388,12 @@ validators = {
                          'type': 'string',
                          'description': 'name of the cell to get'}}
                  }},
-    ('regions_id', 'PUT'): {'json': DefinitionsRegion},
+    ('regions_id', 'PUT'): {
+        'args': {'required': [],
+                 'properties': {
+                     'name': {'type': 'string'},
+                     'note': {'type': 'string'}}}
+        },
     ('cells_id_data', 'PUT'): {'json': DefinitionsData},
     ('projects', 'GET'): {
         'args': {'required': [],
@@ -433,6 +458,29 @@ validators = {
                      'resolved-values': {
                          'default': True,
                          'type': 'boolean'}}}},
+    ('networks_id', 'PUT'): {
+        'args': {'required': [],
+                 'properties': {
+                     'name': {'type': 'string'},
+                     'cidr': {'type': 'string'},
+                     'gateway': {'type': 'string'},
+                     'netmask': {'type': 'string'},
+                     'data': {'type': 'allOf'},
+                     'ip_block_type': {'type': 'string'},
+                     'nss': {'type': 'string'}}}
+        },
+    ('netdevices_id', 'PUT'): {
+        'args': {'required': [],
+                 'properties': {
+                     'ip_address': {'type': 'string'},
+                     'device_type': {'type': 'string'},
+                     'hostname': {'type': 'string'},
+                     'model_name': {'type': 'string'},
+                     'os_version': {'type': 'string'},
+                     'vlans': {'type': 'string'},
+                     'data': {'type': 'allOf',
+                              'description': 'User defined variables'}}}
+        },
     ('netdevices', 'POST'): {'json': DefinitionNetDevice},
     ('netdevices_labels', 'PUT'): {'json': DefinitionsLabel},
     ('net_interfaces', 'GET'): {
@@ -457,6 +505,20 @@ validators = {
                          'description': 'Type of the interface  to get'}}
                  }},
     ('net_interfaces', 'POST'): {'json': DefinitionNetInterface},
+    ('net_interfaces_id', 'PUT'): {
+        'args': {'required': [],
+                 'properties': {
+                     'name': {'type': 'string'},
+                     'interface_type': {'type': 'string'},
+                     'vlan': {'type': 'string'},
+                     'port': {'type': 'string'},
+                     'duplex': {'type': 'string'},
+                     'speed': {'type': 'integer'},
+                     'link': {'type': 'string'},
+                     'cdp': {'type': 'string'},
+                     'data': {'type': 'allOf'},
+                     'security': {'type': 'string'}}}
+        },
     ('networks', 'GET'): {
         'args': {'required': [],
                  'properties': {
@@ -482,7 +544,7 @@ validators = {
                          'type': 'string',
                          'description': 'cell idof the network to get'}}
                  }},
-    ('networks', 'POST'): {'json': DefinitionNetwork},
+    ('networks', 'POST'): {'json': DefinitionNetwork}
 }
 
 filters = {
@@ -502,7 +564,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('hosts_id', 'PUT'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsHostId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -537,7 +599,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('cells_id', 'PUT'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsCellId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -592,7 +654,7 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('regions_id', 'PUT'):
-        {200: {'headers': None, 'schema': None},
+        {200: {'headers': None, 'schema': DefinitionsRegionId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
@@ -654,6 +716,11 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('netdevices_id', 'PUT'):
+        {200: {'headers': None, 'schema': DefinitionNetDeviceId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
     ('networks', 'GET'):
         {200: {'headers': None,
                'schema': {'items': DefinitionNetwork, 'type': 'array'}},
@@ -665,6 +732,11 @@ filters = {
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
+    ('networks_id', 'PUT'):
+        {200: {'headers': None, 'schema': DefinitionNetworkId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
     ('net_interfaces', 'GET'):
         {200: {'headers': None,
                'schema': {'items': DefinitionNetInterface, 'type': 'array'}},
@@ -672,6 +744,11 @@ filters = {
          404: {'headers': None, 'schema': None},
          405: {'headers': None, 'schema': None}},
     ('net_interfaces_id', 'GET'):
+        {200: {'headers': None, 'schema': DefinitionNetInterfaceId},
+         400: {'headers': None, 'schema': None},
+         404: {'headers': None, 'schema': None},
+         405: {'headers': None, 'schema': None}},
+    ('net_interfaces_id', 'PUT'):
         {200: {'headers': None, 'schema': DefinitionNetInterfaceId},
          400: {'headers': None, 'schema': None},
          404: {'headers': None, 'schema': None},
