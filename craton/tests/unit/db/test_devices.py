@@ -81,6 +81,23 @@ class HostsDBTestCase(base.DBTestCase):
         self.assertEqual(blame['bar'].source.name, 'cell_1')
         self.assertEqual(blame['bar'].variable.value, 'C2')
 
+    def test_hosts_variable_resolved_with_parent(self):
+        region_id = self.make_region(
+            'region_1',
+            foo='R1', bar='R2', bax='R3')
+        cell_id = self.make_cell(region_id, 'cell_1', bar='C2')
+        host1_id = self.make_host(region_id, 'www1.example.com',
+                                  IPAddress(u'10.1.2.101'), 'server',
+                                  cell_id=cell_id, foo='H1', baz='H3')
+        host2_id = self.make_host(region_id, 'www1.example2.com',
+                                  IPAddress(u'10.1.2.102'), 'server',
+                                  cell_id=cell_id, parent_id=host1_id)
+        host2 = dbapi.hosts_get_by_id(self.context, host2_id)
+        # Verify resolved variables/blames override properly
+        self.assertEqual(
+            host2.resolved,
+            {'foo': 'H1', 'bar': 'C2', 'baz': 'H3', 'bax': 'R3'})
+
     def test_hosts_variables_no_resolved(self):
         region_id = self.make_region('region_1', foo='R1')
         host_id = self.make_host(region_id, 'www.example.xyz',

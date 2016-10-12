@@ -295,6 +295,17 @@ class Device(Base, VariableMixin):
     labels = association_proxy('related_labels', 'label')
     access_secret = relationship('AccessSecret', back_populates='devices')
     interfaces = relationship('NetInterface', back_populates='device')
+    children = relationship(
+        'Device', backref=backref('parent', remote_side=[id]))
+
+    @property
+    def ancestors(self):
+        lineage = []
+        ancestor = self.parent
+        while ancestor:
+            lineage.append(ancestor)
+            ancestor = ancestor.parent
+        return lineage
 
     @property
     def resolved(self):
@@ -302,11 +313,13 @@ class Device(Base, VariableMixin):
         if self.cell:
             return ChainMap(
                 self.variables,
+                ChainMap(*[ancestor.variables for ancestor in self.ancestors]),
                 self.cell.variables,
                 self.region.variables)
         else:
             return ChainMap(
                 self.variables,
+                ChainMap(*[ancestor.variables for ancestor in self.ancestors]),
                 self.region.variables)
 
     __mapper_args__ = {
