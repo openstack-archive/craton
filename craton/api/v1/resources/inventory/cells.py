@@ -63,14 +63,23 @@ class CellById(base.Resource):
 class CellsData(base.Resource):
 
     @base.http_codes
+    def get(self, id):
+        """Get data for given cell."""
+        context = request.environ.get('context')
+        obj = dbapi.cells_get_by_id(context, id)
+        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
     def put(self, id):
         """
         Update existing cell data, or create if it does
         not exist.
         """
         context = request.environ.get('context')
-        dbapi.cells_data_update(context, id, request.json)
-        return None, 200, None
+        obj = dbapi.cells_data_update(context, id, request.json)
+        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
 
     @base.http_codes
     def delete(self, id):

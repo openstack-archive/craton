@@ -59,14 +59,23 @@ class HostById(base.Resource):
 class HostsData(base.Resource):
 
     @base.http_codes
+    def get(self, id):
+        """Get data for given host."""
+        context = request.environ.get('context')
+        obj = dbapi.hosts_get_by_id(context, id)
+        response = {"data": jsonutils.to_primitive(obj.variables)}
+        return response, 200, None
+
+    @base.http_codes
     def put(self, id):
         """
         Update existing host data, or create if it does
         not exist.
         """
         context = request.environ.get('context')
-        dbapi.hosts_data_update(context, id, request.json)
-        return None, 200, None
+        obj = dbapi.hosts_data_update(context, id, request.json)
+        response = {"data": jsonutils.to_primitive(obj.variables)}
+        return response, 200, None
 
     @base.http_codes
     def delete(self, id):
