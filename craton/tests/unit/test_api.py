@@ -43,8 +43,12 @@ class APIV1Test(TestCase):
         resp.json = jsonutils.loads(resp.data.decode('utf-8'))
         return resp
 
-    def delete(self, path):
-        resp = self.client.delete(path=path)
+    def delete(self, path, data=None):
+        if data:
+            content = jsonutils.dumps(data)
+        else:
+            content = None
+        resp = self.client.delete(path=path, data=content)
         return resp
 
 
@@ -123,6 +127,28 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(422, resp.status_code)
 
 
+class APIV1CellsDataTest(APIV1Test):
+    @mock.patch.object(dbapi, 'cells_get_by_id')
+    def test_cells_get_data(self, mock_cell):
+        mock_cell.return_value = fake_resources.CELL1
+        resp = self.get('v1/cells/1/data')
+        expected = {"data": {"key1": "value1", "key2": "value2"}}
+        self.assertEqual(resp.json, expected)
+
+    @mock.patch.object(dbapi, 'cells_data_update')
+    def test_cells_put_data(self, mock_cell):
+        mock_cell.return_value = fake_resources.CELL1
+        payload = {"a": "b"}
+        resp = self.put('v1/cells/1/data', data=payload)
+        self.assertEqual(resp.status_code, 200)
+
+    @mock.patch.object(dbapi, 'cells_data_delete')
+    def test_cells_delete_data(self, mock_cell):
+        payload = {"key1": "value1"}
+        resp = self.delete('v1/cells/1/data', data=payload)
+        self.assertEqual(resp.status_code, 204)
+
+
 class APIV1RegionsIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_get_by_id')
     def test_regions_get_by_id(self, mock_regions):
@@ -189,6 +215,28 @@ class APIV1RegionsTest(APIV1Test):
         data = {'project_id': '1'}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(422, resp.status_code)
+
+
+class APIV1RegionsDataTest(APIV1Test):
+    @mock.patch.object(dbapi, 'regions_get_by_id')
+    def test_region_get_data(self, mock_region):
+        mock_region.return_value = fake_resources.REGION1
+        resp = self.get('v1/regions/1/data')
+        expected = {"data": {"key1": "value1", "key2": "value2"}}
+        self.assertEqual(resp.json, expected)
+
+    @mock.patch.object(dbapi, 'regions_data_update')
+    def test_regions_put_data(self, mock_region):
+        mock_region.return_value = fake_resources.REGION1
+        payload = {"a": "b"}
+        resp = self.put('v1/regions/1/data', data=payload)
+        self.assertEqual(resp.status_code, 200)
+
+    @mock.patch.object(dbapi, 'regions_data_delete')
+    def test_regions_delete_data(self, mock_region):
+        payload = {"key1": "value1"}
+        resp = self.delete('v1/regions/1/data', data=payload)
+        self.assertEqual(resp.status_code, 204)
 
 
 class APIV1HostsIDTest(APIV1Test):
@@ -280,6 +328,28 @@ class APIV1HostsTest(APIV1Test):
         resp = self.post('v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
+
+
+class APIV1HostsDataTest(APIV1Test):
+    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    def test_host_get_data(self, mock_host):
+        mock_host.return_value = fake_resources.HOST1
+        resp = self.get('v1/hosts/1/data')
+        expected = {"data": {"key1": "value1", "key2": "value2"}}
+        self.assertEqual(resp.json, expected)
+
+    @mock.patch.object(dbapi, 'hosts_data_update')
+    def test_hosts_put_data(self, mock_host):
+        mock_host.return_value = fake_resources.REGION1
+        payload = {"a": "b"}
+        resp = self.put('v1/hosts/1/data', data=payload)
+        self.assertEqual(resp.status_code, 200)
+
+    @mock.patch.object(dbapi, 'hosts_data_delete')
+    def test_regions_delete_data(self, mock_host):
+        payload = {"key1": "value1"}
+        resp = self.delete('v1/hosts/1/data', data=payload)
+        self.assertEqual(resp.status_code, 204)
 
 
 class APIV1ProjectsTest(APIV1Test):
