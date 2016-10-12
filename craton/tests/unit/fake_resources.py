@@ -77,6 +77,8 @@ HOST2 = Host("www.example.com", "1", "1", "192.168.1.2", "server",
              {"key1": "value1", "key2": "value2"})
 HOST3 = Host("www.example.net", "1", "2", "10.10.0.1", "server",
              {"key1": "value1", "key2": "value2"})
+HOST4 = Host("www.example.net", "1", "2", "10.10.0.1", "server",
+             {"key1": "value1", "key2": "value2"}, labels=["a", "b"])
 HOSTS_LIST_R1 = [HOST1, HOST2]
 HOSTS_LIST_R2 = [HOST3]
 

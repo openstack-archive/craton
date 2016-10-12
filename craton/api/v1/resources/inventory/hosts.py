@@ -77,3 +77,32 @@ class HostsData(base.Resource):
         context = request.environ.get('context')
         dbapi.hosts_data_delete(context, id, request.json)
         return None, 204, None
+
+
+class HostsLabels(base.Resource):
+
+    @base.http_codes
+    def get(self, id):
+        """Get labels for given host device."""
+        context = request.environ.get('context')
+        host_obj = dbapi.hosts_get_by_id(context, id)
+        response = {"labels": list(host_obj.labels)}
+        return response, 200, None
+
+    @base.http_codes
+    def put(self, id):
+        """
+        Update existing device label entirely, or add if it does
+        not exist.
+        """
+        context = request.environ.get('context')
+        resp = dbapi.hosts_labels_update(context, id, request.json)
+        response = {"labels": list(resp.labels)}
+        return response, 200, None
+
+    @base.http_codes
+    def delete(self, id):
+        """Delete device label entirely."""
+        context = request.environ.get('context')
+        dbapi.hosts_labels_delete(context, id, request.json)
+        return None, 204, None

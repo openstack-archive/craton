@@ -15,6 +15,9 @@ routes = [
     dict(resource=hosts.HostsData,
          urls=['/hosts/<id>/data'],
          endpoint='hosts_data'),
+    dict(resource=hosts.HostsLabels,
+         urls=['/hosts/<id>/labels'],
+         endpoint='hosts_labels'),
     dict(resource=hosts.HostById,
          urls=['/hosts/<id>'],
          endpoint='hosts_id'),
@@ -69,4 +72,7 @@ routes = [
     dict(resource=networks.NetDeviceById,
          urls=['/netdevices/<id>'],
          endpoint='netdevices_id'),
+    dict(resource=networks.NetDeviceLabels,
+         urls=['/netdevices/<id>/labels'],
+         endpoint='netdevices_labels'),
 ]
