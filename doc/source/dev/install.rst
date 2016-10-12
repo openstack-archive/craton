@@ -22,7 +22,7 @@ Installing Environment from packages: Ubuntu
 
     # git clone https://github.com/openstack/craton.git
 
-.. Note:: Make sure to use Python3, as this is only a Python3 project.
+.. note:: Make sure to use Python3, as this is only a Python3 project.
 
 * Install the prerequisite packages::
 
@@ -121,7 +121,7 @@ Modify etc/craton-api-conf.sample
 * Make api_paste_config use a fully qualified path (not relative).
   This will be specific for your machine
 
-.. Note:: Make sure you have the proper path for craton-api-conf.sample
+.. note:: Make sure you have the proper path for craton-api-conf.sample
 
     # api_paste_config=/home/cratonuser/craton/etc/craton-api-paste.ini
 
@@ -148,7 +148,7 @@ Run dbsync
 Create Project and User
 -----------------------
 
-.. Note:: These goes away once the API has been setup
+.. note:: These goes away once the API has been setup
 
 * Connect to database server as root user::
 
