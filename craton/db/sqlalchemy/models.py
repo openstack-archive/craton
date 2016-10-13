@@ -370,6 +370,10 @@ class NetInterface(Base):
 
 class Network(Base, VariableMixin):
     __tablename__ = 'networks'
+    __table_args__ = (
+            UniqueConstraint("name", "project_id", "region_id",
+                             name="uq_name0projectid0regionid"),
+    )
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=True)
     cidr = Column(String(255), nullable=True)
