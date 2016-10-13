@@ -176,7 +176,7 @@ Start the API Service
 
 * To start the API service, run the following command::
 
-    # python craton/cmd/craton-api.py --config-file=etc/
+    # craton-api --config-file=etc/
     craton-api-conf.sample
 
 
