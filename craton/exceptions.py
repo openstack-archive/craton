@@ -20,6 +20,11 @@ class Base(Exception):
             '%s: %s' % (self.code, self.message))
 
 
+class DuplicateNetwork(Base):
+    code = 409
+    message = "Network with the given name already exists in this region."
+
+
 class AdminRequired(Base):
     code = 401
     message = "This action requires the 'admin' role"

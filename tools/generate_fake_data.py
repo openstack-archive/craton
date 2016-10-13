@@ -217,7 +217,8 @@ if __name__ == "__main__":
             cell_name = list(cell.keys())[0]
             Inv.create_cell(cell_name, data=cell[cell_name])
             # Create a example private network for the cell
-            network = Inv.create_network("private_net",
+            network_name = "private_net_%s" % cell_name
+            network = Inv.create_network(network_name,
                                          "192.168.1.0",
                                          "192.168.1.1",
                                          "255.255.255.0",
