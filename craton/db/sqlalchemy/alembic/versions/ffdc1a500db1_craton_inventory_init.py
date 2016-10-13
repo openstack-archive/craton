@@ -144,6 +144,8 @@ def upgrade():
         sa.Column('ip_block_type', sa.String(length=255), nullable=True),
         sa.Column('nss', sa.String(length=255), nullable=True),
         sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint("name", "project_id", "region_id",
+                            name="uq_name0projectid0regionid"),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
         sa.ForeignKeyConstraint(['region_id'], ['regions.id']),
         sa.ForeignKeyConstraint(['cell_id'], ['cells.id']),

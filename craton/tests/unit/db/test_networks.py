@@ -32,6 +32,11 @@ class NetworksDBTestCase(base.DBTestCase):
         except Exception:
             self.fail("Networks create raised unexpected exception")
 
+    def test_network_create_duplicate_name_raises(self):
+        dbapi.networks_create(self.context, network1)
+        self.assertRaises(exceptions.DuplicateNetwork, dbapi.networks_create,
+                          self.context, network1)
+
     def test_networks_get_all(self):
         dbapi.networks_create(self.context, network1)
         filters = {}

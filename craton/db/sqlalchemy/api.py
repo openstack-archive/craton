@@ -3,6 +3,7 @@
 import sys
 
 from oslo_config import cfg
+from oslo_db import exception as db_exc
 from oslo_db import options as db_options
 from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
@@ -665,8 +666,11 @@ def networks_create(context, values):
     session = get_session()
     network = models.Network()
     with session.begin():
-        network.update(values)
-        network.save(session)
+        try:
+            network.update(values)
+            network.save(session)
+        except db_exc.DBDuplicateEntry:
+            raise exceptions.DuplicateNetwork()
     return network
 
 
