@@ -309,8 +309,11 @@ def regions_create(context, values):
     session = get_session()
     region = models.Region()
     with session.begin():
-        region.update(values)
-        region.save(session)
+        try:
+            region.update(values)
+            region.save(session)
+        except db_exc.DBDuplicateEntry:
+            raise exceptions.DuplicateRegion()
     return region
 
 
