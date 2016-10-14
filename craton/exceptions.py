@@ -1,4 +1,8 @@
 """Exceptions for Craton Inventory system."""
+from oslo_log import log as logging
+
+
+LOG = logging.getLogger(__name__)
 
 
 class Base(Exception):
@@ -9,12 +13,18 @@ class Base(Exception):
     def __str__(self):
         return self.message
 
-    def __init__(self, code=None, message=None):
+    def __init__(self, code=None, message=None, **kwargs):
         if code:
             self.code = code
 
-        if message:
-            self.message = message
+        if not message:
+            try:
+                message = self.msg % kwargs
+            except Exception:
+                LOG.exception('Error in formatting exception message')
+                message = self.msg
+
+        self.message = message
 
         super(Base, self).__init__(
             '%s: %s' % (self.code, self.message))
@@ -22,12 +32,22 @@ class Base(Exception):
 
 class DuplicateNetwork(Base):
     code = 409
-    message = "Network with the given name already exists in this region."
+    msg = "Network with the given name already exists in this region."
+
+
+class NetworkNotFound(Base):
+    code = 404
+    msg = "Network not found for ID %(id)s."
+
+
+class DeviceNotFound(Base):
+    code = 404
+    msg = "%(device_type)s device not found for ID %(id)s."
 
 
 class AdminRequired(Base):
     code = 401
-    message = "This action requires the 'admin' role"
+    msg = "This action requires the 'admin' role"
 
 
 class BadRequest(Base):
@@ -36,7 +56,7 @@ class BadRequest(Base):
 
 class NotFound(Base):
     code = 404
-    message = "Not Found"
+    msg = "Not Found"
 
 
 class UnknownException(Base):
