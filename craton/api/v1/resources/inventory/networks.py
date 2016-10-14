@@ -55,6 +55,33 @@ class NetworkById(base.Resource):
         return None, 204, None
 
 
+class NetworksData(base.Resource):
+    """Controller for networks data endpoints."""
+
+    @base.http_codes
+    def get(self, id):
+        """Get data for the given network."""
+        context = request.environ.get('context')
+        obj = dbapi.networks_get_by_id(context, id)
+        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def put(self, id):
+        """"Update existing variables, or create if it does not exist."""
+        context = request.environ.get('context')
+        obj = dbapi.networks_data_update(context, id, request.json)
+        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def delete(self, id):
+        """Delete networks variables."""
+        context = request.environ.get('context')
+        dbapi.networks_data_delete(context, id, request.json)
+        return None, 204, None
+
+
 class NetDevices(base.Resource):
     """Controller for Network Device resources."""
 
@@ -102,6 +129,33 @@ class NetDeviceById(base.Resource):
         """Delete existing network device."""
         context = request.environ.get('context')
         dbapi.netdevices_delete(context, id)
+        return None, 204, None
+
+
+class NetDevicesData(base.Resource):
+    """Controller for network device data endpoints."""
+
+    @base.http_codes
+    def get(self, id):
+        """Get data for the given network."""
+        context = request.environ.get('context')
+        obj = dbapi.netdevice_get_by_id(context, id)
+        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def put(self, id):
+        """"Update device variables, or create if it does not exist."""
+        context = request.environ.get('context')
+        obj = dbapi.netdevice_data_update(context, id, request.json)
+        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def delete(self, id):
+        """Delete network device variables."""
+        context = request.environ.get('context')
+        dbapi.netdevice_data_delete(context, id, request.json)
         return None, 204, None
 
 

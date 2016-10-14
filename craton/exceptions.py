@@ -25,6 +25,16 @@ class DuplicateNetwork(Base):
     message = "Network with the given name already exists in this region."
 
 
+class NetworkNotFound(Base):
+    code = 404
+    message = "Network not found for ID %(id)s."
+
+
+class DeviceNotFound(Base):
+    code = 404
+    message = "%(device_type)s device not found for ID %(id)s."
+
+
 class AdminRequired(Base):
     code = 401
     message = "This action requires the 'admin' role"

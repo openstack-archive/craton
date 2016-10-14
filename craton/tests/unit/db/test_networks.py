@@ -129,6 +129,24 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         ndevice = dbapi.netdevices_get_by_id(self.context, ndevice.id)
         self.assertEqual(ndevice.labels, {"jerry"})
 
+    def test_netdevice_data_create(self):
+        device = dbapi.netdevices_create(self.context, device1)
+        _data = {"hello": "hi"}
+        dbapi.netdevices_data_update(self.context, device.id, _data)
+        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        self.assertEqual(ndevice.variables, _data)
+
+    def test_netdevice_data_delete(self):
+        device = dbapi.netdevices_create(self.context, device1)
+        _data = {"hello": "hi", "a": "b"}
+        dbapi.netdevices_data_update(self.context, device.id, _data)
+        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        self.assertEqual(ndevice.variables, _data)
+        _del_data = {"key": "a"}
+        dbapi.netdevices_data_delete(self.context, device.id, _del_data)
+        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        self.assertEqual(ndevice.variables, {"hello": "hi"})
+
 
 class NetworkInterfacesDBTestCase(base.DBTestCase):
 
