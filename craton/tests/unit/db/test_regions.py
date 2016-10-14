@@ -17,7 +17,12 @@ class RegionsDBTestCase(base.DBTestCase):
         except Exception:
             self.fail("Region create raised unexpected exception")
 
-    def test_regions_get_all(self):
+    def test_region_create_duplicate_name_raises(self):
+        dbapi.regions_create(self.context, region1)
+        self.assertRaises(exceptions.DuplicateRegion, dbapi.regions_create,
+                          self.context, region1)
+
+    def test_reions_get_all(self):
         dbapi.regions_create(self.context, region1)
         res = dbapi.regions_get_all(self.context)
         self.assertEqual(len(res), 1)
