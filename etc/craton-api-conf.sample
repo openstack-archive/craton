@@ -6,11 +6,11 @@ log_file=craton-api.log
 
 [api]
 # Host IP to use for API service
-host=0.0.0.0
+host=127.0.0.1
 # Port to use for API service
 port=8080
 # Paste Config file to use
-api_paste_config=/craton/etc/craton-api-paste.ini
+api_paste_config=/home/ubuntu/craton/etc/craton-api-paste.ini
 
 
 # Keystone Middlewre settings
