@@ -433,6 +433,7 @@ def hosts_get_by_region(context, region_id, filters):
     host_devices = with_polymorphic(models.Device, [models.Host])
     query = model_query(context, host_devices, project_only=True)
     query = query.filter_by(region_id=region_id)
+    query = query.filter_by(type='hosts')
 
     if "name" in filters:
         query = query.filter_by(name=filters["name"])
@@ -459,6 +460,7 @@ def hosts_get_by_id(context, host_id):
     host_devices = with_polymorphic(models.Device, '*')
     query = model_query(context, host_devices, project_only=True).\
         filter_by(id=host_id)
+    query = query.filter_by(type='hosts')
     try:
         result = query.one()
         LOG.info("Result by host id %s" % result)
@@ -492,6 +494,7 @@ def hosts_delete(context, host_id):
         host_devices = with_polymorphic(models.Device, '*')
         query = model_query(context, host_devices, session=session,
                             project_only=True)
+        query = query.filter_by(type='hosts')
         query = query.filter_by(id=host_id)
         query.delete()
     return
