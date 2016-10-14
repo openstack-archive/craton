@@ -20,6 +20,11 @@ class Base(Exception):
             '%s: %s' % (self.code, self.message))
 
 
+class DuplicateRegion(Base):
+    code = 409
+    message = "A region with the given name already exists."
+
+
 class DuplicateNetwork(Base):
     code = 409
     message = "Network with the given name already exists in this region."
