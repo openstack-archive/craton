@@ -1,9 +1,12 @@
+import uuid
+
 from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
+project_id1 = uuid.uuid4().hex
 
-cell1 = {'region_id': 1, 'project_id': 1, 'name': 'cell1'}
+cell1 = {'region_id': 1, 'project_id': project_id1, 'name': 'cell1'}
 
 
 class CellsDBTestCase(base.DBTestCase):

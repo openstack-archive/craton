@@ -8,6 +8,7 @@ from oslo_db import options as db_options
 from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
+from oslo_utils import uuidutils
 
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
@@ -551,6 +552,8 @@ def projects_create(context, values):
     """Create a new project with given values."""
     session = get_session()
     project = models.Project()
+    if not values.get('id'):
+        values['id'] = uuidutils.generate_uuid()
     with session.begin():
         project.update(values)
         project.save(session)
