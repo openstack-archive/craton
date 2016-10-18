@@ -37,7 +37,7 @@ class NoAuthContextMiddleware(ContextMiddleware):
             request,
             auth_token='noauth-token',
             user='noauth-user',
-            tenant=1,
+            tenant=None,
             is_admin=True,
             is_admin_project=True,
         )
