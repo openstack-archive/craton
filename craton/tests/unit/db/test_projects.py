@@ -1,3 +1,5 @@
+from oslo_utils import uuidutils
+
 from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
@@ -7,13 +9,13 @@ project1 = {'name': 'project1'}
 project2 = {'name': 'project2'}
 
 
-class PrjectsDBTestCase(base.DBTestCase):
+class ProjectsDBTestCase(base.DBTestCase):
 
     def test_create_project(self):
         # Set root, as only admin project can create other projects
         self.context.is_admin_project = True
         project = dbapi.projects_create(self.context, project1)
-        self.assertEqual(project['id'], 1)
+        self.assertTrue(uuidutils.is_uuid_like(project['id']))
         self.assertEqual(project['name'], project1['name'])
 
     def test_create_project_no_root_fails(self):
@@ -45,4 +47,4 @@ class PrjectsDBTestCase(base.DBTestCase):
         self.context.is_admin_project = True
         project = dbapi.projects_create(self.context, project1)
         res = dbapi.projects_get_by_id(self.context, project['id'])
-        self.assertEqual(res['id'], project['id'])
+        self.assertEqual(str(res['id']), project['id'])

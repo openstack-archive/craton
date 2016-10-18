@@ -19,11 +19,15 @@ mysqladmin flush-privileges
 ##############
 /craton/bin/craton-dbsync --config-file=/craton/etc/craton-api-conf.sample upgrade
 
+USERNAME="demo"
+TOKEN="demo"
+PROJECT="b9f10eca66ac4c279c139d01e65f96b4"
+
 ###################################
 # Create initial project and user #
 ###################################
-mysql -u root craton -e "INSERT into projects (created_at, updated_at, name) values (NOW(), NOW(), 'demo')"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_admin) values (NOW(), NOW(), 1, 'demo', 'demo', False)"
+mysql -u root craton -e "INSERT into projects (created_at, updated_at, name, id) values (NOW(), NOW(), '$USERNAME', '$PROJECT')"
+mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_admin) values (NOW(), NOW(), '$PROJECT', '$USERNAME', '$TOKEN', False)"
 
 #########################
 # Start the API service #

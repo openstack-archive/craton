@@ -1,4 +1,5 @@
 import mock
+import uuid
 
 from oslo_serialization import jsonutils
 
@@ -8,6 +9,8 @@ from craton.api import middleware
 from craton.db.sqlalchemy import api as dbapi
 from craton.tests import TestCase
 from craton.tests.unit import fake_resources
+
+project_id1 = uuid.uuid4().hex
 
 
 class APIV1Test(TestCase):
@@ -104,16 +107,16 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_with_valid_data(self, mock_cell):
         mock_cell.return_value = None
-        data = {'name': 'cell1', 'region_id': 1, 'project_id': 1}
+        data = {'name': 'cell1', 'region_id': 1, 'project_id': project_id1}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_returns_cell_obj(self, mock_cell):
         return_value = {'name': 'cell1', 'region_id': 1,
-                        'project_id': 1, 'id': 1}
+                        'project_id': project_id1, 'id': 1}
         mock_cell.return_value = return_value
-        data = {'name': 'cell1', 'region_id': 1, 'project_id': 1}
+        data = {'name': 'cell1', 'region_id': 1, 'project_id': project_id1}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
@@ -122,7 +125,7 @@ class APIV1CellsTest(APIV1Test):
     def test_create_cell_fails_with_invalid_data(self, mock_cell):
         mock_cell.return_value = None
         # data is missing required cell name
-        data = {'region_id': 1, 'project_id': 1}
+        data = {'region_id': 1, 'project_id': project_id1}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(422, resp.status_code)
 
@@ -196,15 +199,15 @@ class APIV1RegionsTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_valid_data(self, mock_region):
         mock_region.return_value = None
-        data = {'name': 'region1', 'project_id': 1}
+        data = {'name': 'region1', 'project_id': project_id1}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_create_region_returns_region_obj(self, mock_region):
-        return_value = {'name': 'region1', 'project_id': 1, 'id': 1}
+        return_value = {'name': 'region1', 'project_id': project_id1, 'id': 1}
         mock_region.return_value = return_value
-        data = {'name': 'region1', 'project_id': 1}
+        data = {'name': 'region1', 'project_id': project_id1}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
@@ -212,7 +215,7 @@ class APIV1RegionsTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_invalid_data_fails(self, mock_region):
         mock_region.return_value = None
-        data = {'project_id': '1'}
+        data = {'project_id': project_id1}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(422, resp.status_code)
 
@@ -311,20 +314,21 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_with_valid_data(self, mock_host):
         mock_host.return_value = None
-        data = {'name': 'www.host1.com', 'region_id': 1, 'project_id': 1,
-                'ip_address': '10.0.0.1', 'device_type': 'server',
-                'active': True}
+        data = {'name': 'www.host1.com', 'region_id': 1,
+                'project_id': project_id1, 'ip_address': '10.0.0.1',
+                'device_type': 'server', 'active': True}
         resp = self.post('/v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_returns_host_obj(self, mock_host):
         return_value = {'name': 'www.host1.com', 'region_id': 1,
-                        'project_id': 1, 'ip_address': '10.0.0.1', 'id': 1,
-                        'device_type': 'server', 'active': True}
+                        'project_id': project_id1, 'ip_address': '10.0.0.1',
+                        'id': 1, 'device_type': 'server', 'active': True}
         mock_host.return_value = return_value
-        data = {'name': 'www.host1.com', 'region_id': 1, 'project_id': 1,
-                'ip_address': '10.0.0.1', 'device_type': 'server'}
+        data = {'name': 'www.host1.com', 'region_id': 1,
+                'project_id': project_id1, 'ip_address': '10.0.0.1',
+                'device_type': 'server'}
         resp = self.post('v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
@@ -385,10 +389,10 @@ class APIV1UsersTest(APIV1Test):
     @mock.patch.object(dbapi, 'users_create')
     def test_create_users(self, mock_project, mock_user):
         mock_project.return_value = {'id': 1, 'name': 'project1'}
-        return_value = {'name': 'user1', 'project_id': 1,
+        return_value = {'name': 'user1', 'project_id': project_id1,
                         'is_admin': False, 'id': 1, 'api_key': 'xxxx'}
         mock_user.return_value = return_value
-        data = {'name': 'user1', 'project_id': 1, 'is_admin': False}
+        data = {'name': 'user1', 'project_id': project_id1, 'is_admin': False}
         resp = self.post('v1/users', data=data)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json['id'], 1)
@@ -432,8 +436,8 @@ class APIV1NetworksTest(APIV1Test):
     @mock.patch.object(dbapi, 'networks_create')
     def test_create_networks_with_valid_data(self, mock_network):
         mock_network.return_value = None
-        data = {'name': 'some network', 'region_id': 1, 'project_id': 1,
-                'cidr': '10.10.1.0/24', 'gateway': '192.168.1.1',
-                'netmask': '255.255.255.0'}
+        data = {'name': 'some network', 'region_id': 1,
+                'project_id': project_id1, 'cidr': '10.10.1.0/24',
+                'gateway': '192.168.1.1', 'netmask': '255.255.255.0'}
         resp = self.post('/v1/networks', data=data)
         self.assertEqual(200, resp.status_code)

@@ -26,6 +26,7 @@ from sqlalchemy.orm import backref, object_mapper, relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
+from sqlalchemy_utils.types.uuid import UUIDType
 
 
 # TODO(jimbaker) set up table args for a given database/storage
@@ -184,7 +185,7 @@ class VariableMixin(object):
 class Project(Base):
     """Supports multitenancy for all other schema elements."""
     __tablename__ = 'projects'
-    id = Column(Integer, primary_key=True)
+    id = Column(UUIDType(binary=False), primary_key=True)
     name = Column(String(255))
     _repr_columns = [id, name]
 
@@ -207,7 +208,8 @@ class User(Base, VariableMixin):
     )
     id = Column(Integer, primary_key=True)
     project_id = Column(
-        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+        UUIDType(binary=False), ForeignKey('projects.id'), index=True,
+        nullable=False)
     username = Column(String(255))
     api_key = Column(String(36))
     # root = craton admin that can create other pojects/usrs
@@ -227,7 +229,8 @@ class Region(Base, VariableMixin):
     )
     id = Column(Integer, primary_key=True)
     project_id = Column(
-        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+        UUIDType(binary=False), ForeignKey('projects.id'), index=True,
+        nullable=False)
     name = Column(String(255))
     note = Column(Text)
     _repr_columns = [id, name]
@@ -248,7 +251,8 @@ class Cell(Base, VariableMixin):
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
     project_id = Column(
-        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+        UUIDType(binary=False), ForeignKey('projects.id'), index=True,
+        nullable=False)
     name = Column(String(255))
     note = Column(Text)
     _repr_columns = [id, name]
@@ -275,7 +279,8 @@ class Device(Base, VariableMixin):
     cell_id = Column(
         Integer, ForeignKey('cells.id'), index=True, nullable=True)
     project_id = Column(
-        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+        UUIDType(binary=False), ForeignKey('projects.id'), index=True,
+        nullable=False)
     access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
     parent_id = Column(Integer, ForeignKey('devices.id'))
     ip_address = Column(IPAddressType, nullable=False)
@@ -357,7 +362,7 @@ class NetInterface(Base):
     link = Column(String(255), nullable=True)
     cdp = Column(String(255), nullable=True)
     security = Column(String(255), nullable=True)
-    project_id = Column(Integer, ForeignKey('projects.id'),
+    project_id = Column(UUIDType(binary=False), ForeignKey('projects.id'),
                         index=True, nullable=False)
     device_id = Column(Integer, ForeignKey('devices.id'))
     network_id = Column(Integer, ForeignKey('networks.id'), nullable=True)
@@ -386,7 +391,8 @@ class Network(Base, VariableMixin):
     cell_id = Column(
         Integer, ForeignKey('cells.id'), index=True, nullable=True)
     project_id = Column(
-        Integer, ForeignKey('projects.id'), index=True, nullable=False)
+        UUIDType(binary=False), ForeignKey('projects.id'), index=True,
+        nullable=False)
 
     devices = relationship('NetInterface', back_populates='network')
     region = relationship('Region', back_populates='networks')

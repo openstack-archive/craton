@@ -1,11 +1,16 @@
+import uuid
+
 from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
 
-root = {'project_id': 1, 'username': 'root', "is_admin": True, "is_root": True}
-user1 = {'project_id': 2, 'username': 'user1', "is_admin": True}
-user2 = {'project_id': 2, 'username': 'user2', "is_admin": False}
+project_id1 = uuid.uuid4().hex
+project_id2 = uuid.uuid4().hex
+root = {'project_id': project_id1, 'username': 'root', "is_admin": True,
+        "is_root": True}
+user1 = {'project_id': project_id2, 'username': 'user1', "is_admin": True}
+user2 = {'project_id': project_id2, 'username': 'user2', "is_admin": False}
 
 
 class UsersDBTestCase(base.DBTestCase):
@@ -41,7 +46,7 @@ class UsersDBTestCase(base.DBTestCase):
         # Ensure when request has no root context and the request
         # is not for the same project no user info is given back.
         self.make_user(user1)
-        self.context.tenant = '12345'
+        self.context.tenant = uuid.uuid4().hex
         res = dbapi.users_get_all(self.context)
         self.assertEqual(len(res), 0)
 
