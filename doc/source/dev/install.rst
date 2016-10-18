@@ -160,11 +160,11 @@ Create Project and User
 
 * Modify the projects and users as following::
 
-    # insert into projects (created_at, updated_at, name) values
-    (NOW(), NOW(), "osic");
+    # insert into projects (created_at, updated_at, name, id) values
+    (NOW(), NOW(), "osic", "717e9a216e2d44e0bc848398563bda06");
     # insert into users (created_at, updated_at, project_id, username
     , api_key, is_admin)
-    values (NOW(), NOW(), 1, "demo", "demo", False);
+    values (NOW(), NOW(), "717e9a216e2d44e0bc848398563bda06", "demo", "demo", False);
 
 * Logout from the database server::
 
@@ -193,9 +193,12 @@ Create a Region
 
 * To create region, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/regions" -XPOST -d
-    '{"name": "DFW", "project_id": 1}' -H "Content-Type: application/json"
-    -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: 1"
+    # curl -i "http://${MY_IP}:8080/v1/regions" \
+           -d '{"name": "DFW", "project_id": "717e9a216e2d44e0bc848398563bda06"}' \
+           -H "Content-Type: application/json" \
+           -H "X-Auth-Token: demo" \
+           -H "X-Auth-User: demo" \
+           -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 ------------------
 Get created Region
@@ -203,9 +206,11 @@ Get created Region
 
 * To get the created region, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/regions" -H "Content-Type:
-    application/json" -H "X-Auth-Token: demo" -H "X-Auth-User:
-    demo" -H "X-Auth-Project: 1"
+    # curl -i "http://${MY_IP}:8080/v1/regions" \
+           -H "Content-Type: application/json" \
+           -H "X-Auth-Token: demo" \
+           -H "X-Auth-User: demo" \
+           -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 --------------------------
 Get all hosts for Region 1
@@ -213,9 +218,11 @@ Get all hosts for Region 1
 
 * To get all hosts for region 1, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/hosts?region_id=1"
-    -H "Content-Type: application/json" -H "X-Auth-Token: demo"
-    -H "X-Auth-User: demo" -H "X-Auth-Project: 1"
+    # curl -i "http://${MY_IP}:8080/v1/hosts?region_id=1" \
+           -H "Content-Type: application/json" \
+           -H "X-Auth-Token: demo" \
+           -H "X-Auth-User: demo" \
+           -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 ---------------------
 Get a particular host
@@ -223,6 +230,8 @@ Get a particular host
 
 * To get a particular host, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/hosts/33" -H
-    "Content-Type: application/json" -H "X-Auth-Token: demo"
-    -H "X-Auth-User: demo" -H "X-Auth-Project: 1"
+    # curl -i "http://${MY_IP}:8080/v1/hosts/33" \
+           -H "Content-Type: application/json" \
+           -H "X-Auth-Token: demo" \
+           -H "X-Auth-User: demo" \
+           -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"

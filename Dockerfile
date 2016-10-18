@@ -14,8 +14,8 @@
 # Usage:
 # docker build -t craton-api:latest .
 # docker run -t --name craton-api -p 127.0.0.1:8080:8080 -d craton-api:latest
-# python tools/generate_fake_data.py --url http://127.0.0.1:8080/v1 --user demo --project 1 --key demo
-# curl http://127.0.0.1:8080/v1/regions -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: 1"
+# python tools/generate_fake_data.py --url http://127.0.0.1:8080/v1 --user demo --project b9f10eca66ac4c279c139d01e65f96b4 --key demo
+# curl http://127.0.0.1:8080/v1/regions -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: b9f10eca66ac4c279c139d01e65f96b4"
 #############################################################################
 
 # Get Ubuntu base image

@@ -1,3 +1,5 @@
+import uuid
+
 from netaddr import IPAddress
 
 from craton.db import api as dbapi
@@ -6,7 +8,7 @@ from craton.tests.unit.db import base
 
 class HostsDBTestCase(base.DBTestCase):
 
-    project_id = 42
+    project_id = uuid.uuid4().hex
 
     def make_region(self, name, **variables):
         region = dbapi.regions_create(

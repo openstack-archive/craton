@@ -44,13 +44,13 @@ class Inventory(object):
         self.url = url
         self.auth_user = auth_user
         self.auth_key = auth_key
-        self.project_id = project_id or 1
+        self.project_id = project_id
         self.region = None
         self.cell = None
         self.ip_addresses = self.generate_ip_addresses(16)
 
         self.headers = {"Content-Type": "application/json",
-                        "X-Auth-Project": str(self.project_id),
+                        "X-Auth-Project": self.project_id,
                         "X-Auth-User": self.auth_user,
                         "X-Auth-Token": self.auth_key}
 
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', help='Endpoint for Craton Service')
     parser.add_argument('--user', help='User id')
-    parser.add_argument('--project', type=int, help='Project id')
+    parser.add_argument('--project', help='Project id')
     parser.add_argument('--key', help='Auth Key for the sevice')
     args = parser.parse_args()
 

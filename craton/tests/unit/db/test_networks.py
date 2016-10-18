@@ -1,24 +1,27 @@
+import uuid
+
 from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
 
+project_id1 = uuid.uuid4().hex
 network1 = {"name": "test network",
             "cidr": "192.168.1.0/24",
             "gateway": "192.168.1.1",
             "netmask": "255.255.255.0",
             "region_id": 1,
-            "project_id": 1}
+            "project_id": project_id1}
 
 device1 = {"hostname": "switch1",
            "model_name": "Model-X",
            "region_id": 1,
-           "project_id": 1,
+           "project_id": project_id1,
            "device_type": "switch",
            "ip_address": "192.168.1.1"}
 
 net_interface1 = {"device_id": 1,
-                  "project_id": 1,
+                  "project_id": project_id1,
                   "name": "eth1",
                   "ip_address": "192.168.0.2",
                   "interface_type": "ethernet"}
