@@ -61,7 +61,7 @@ class Inventory(object):
 
     def create_region(self, region, data=None):
         region_url = self.url + "/regions"
-        payload = {"name": region, "project_id": self.project_id}
+        payload = {"name": region}
 
         print("Creating region entry for %s with data %s" % (payload, data))
         resp = requests.post(region_url, headers=self.headers,
@@ -79,8 +79,7 @@ class Inventory(object):
 
     def create_cell(self, cell, data=None):
         region_url = self.url + "/cells"
-        payload = {"region_id": self.region.get("id"), "name": cell,
-                   "project_id": self.project_id}
+        payload = {"region_id": self.region.get("id"), "name": cell}
 
         print("Creating cell entry %s with data %s" % (payload, data))
         resp = requests.post(region_url, headers=self.headers,
@@ -100,7 +99,6 @@ class Inventory(object):
         region_url = self.url + "/hosts"
         payload = {"region_id": self.region.get("id"),
                    "cell_id": self.cell.get("id"),
-                   "project_id": self.project_id,
                    "name": host,
                    "ip_address": self.ip_addresses.pop(0),
                    "device_type": device_type}
@@ -130,8 +128,7 @@ class Inventory(object):
                    "netmask": netmask,
                    "ip_block_type": block_type,
                    "region_id": self.region.get("id"),
-                   "cell_id": self.cell.get("id"),
-                   "project_id": self.project_id}
+                   "cell_id": self.cell.get("id")}
 
         print("Creating new network: %s" % payload)
         resp = requests.post(networks_url, headers=self.headers,
@@ -150,8 +147,7 @@ class Inventory(object):
                    "ip_address": "10.10.1.1",
                    "active": True,
                    "region_id": self.region.get("id"),
-                   "cell_id": self.cell.get("id"),
-                   "project_id": self.project_id}
+                   "cell_id": self.cell.get("id")}
 
         resp = requests.post(netdevices_url, headers=self.headers,
                              data=json.dumps(payload), verify=False)
@@ -170,7 +166,6 @@ class Inventory(object):
                    "duplex": "full",
                    "speed": 1000,
                    "link": "up",
-                   "project_id": self.project_id,
                    "device_id": device.get("id")}
         if network:
             payload["network_id"] = network.get("id")
