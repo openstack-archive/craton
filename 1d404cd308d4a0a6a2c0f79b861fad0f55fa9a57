@@ -1,0 +1,8 @@
+Code-Review+2: Ian Cordasco <sigmavirus24@gmail.com>
+Workflow+1: sulochan-acharya <sulochan@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 19 Oct 2016 09:42:23 +0000
+Reviewed-on: https://review.openstack.org/386583
+Project: openstack/craton
+Branch: refs/heads/master
