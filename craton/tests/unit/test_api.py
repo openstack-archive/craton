@@ -55,6 +55,41 @@ class APIV1Test(TestCase):
         return resp
 
 
+class APIV1WithContextTest(TestCase):
+    def setUp(self):
+        super(APIV1WithContextTest, self).setUp()
+        self.app = api.setup_app()
+        self.app.wsgi_app = middleware.LocalAuthContextMiddleware(
+                self.app.wsgi_app)
+        self.client = self.app.test_client()
+
+    def get(self, path, **kw):
+        resp = self.client.get(path=path, **kw)
+        resp.json = jsonutils.loads(resp.data.decode('utf-8'))
+        return resp
+
+
+class APIV1MiddlewareTest(APIV1WithContextTest):
+    def test_no_auth_token_returns_401(self):
+        resp = self.get('v1/cells/1')
+        self.assertEqual(401, resp.status_code)
+
+    def test_ensure_non_uuid_token_returns_401(self):
+        headers = {"X-Auth-Project": "abcd", "X-Auth-Token": "abcd123"}
+        resp = self.get('v1/cells/1', headers=headers)
+        self.assertEqual(401, resp.status_code)
+
+    @mock.patch.object(dbapi, 'cells_get_by_id')
+    @mock.patch.object(dbapi, 'get_user_info')
+    def test_ensure_valid_uuid_is_processed(self, mock_user, mock_cell):
+        mock_user.return_value = fake_resources.USER1
+        mock_cell.return_value = fake_resources.CELL1
+        headers = {"X-Auth-Project": "2757a1b4-cd90-4891-886c-a246fd4e7064",
+                   "X-Auth-Token": "xx-yy-zz"}
+        resp = self.get('v1/cells/1', headers=headers)
+        self.assertEqual(200, resp.status_code)
+
+
 class APIV1CellsIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_get_by_id')
     def test_get_cells_by_id(self, mock_cells):

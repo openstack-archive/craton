@@ -2,9 +2,11 @@ from oslo_middleware import base
 from oslo_middleware import request_id
 from oslo_context import context
 from oslo_log import log
+from oslo_utils import uuidutils
 
 import flask
 from flask import request
+import json
 
 from craton.db import api as dbapi
 from craton import exceptions
@@ -57,6 +59,10 @@ class LocalAuthContextMiddleware(ContextMiddleware):
 
     def process_request(self, request):
         headers = request.headers
+        if not uuidutils.is_uuid_like(headers.get('X-Auth-Project')):
+            err_msg = json.dumps({"message": "Non uuid like project id"})
+            return flask.Response(response=err_msg, status=401)
+
         ctx = self.make_context(
             request,
             auth_token=headers.get('X-Auth-Token', None),
@@ -71,10 +77,10 @@ class LocalAuthContextMiddleware(ContextMiddleware):
                                             headers.get('X-Auth-User', None))
             if user_info.api_key != headers.get('X-Auth-Token', None):
                 return flask.Response(status=401)
-            if user_info["is_root"]:
+            if user_info.is_root:
                 ctx.is_admin = True
                 ctx.is_admin_project = True
-            elif user_info["is_admin"]:
+            elif user_info.is_admin:
                 ctx.is_admin = True
                 ctx.is_admin_project = False
             else:
@@ -105,6 +111,9 @@ class KeystoneAuthContextMiddleware(ContextMiddleware):
 
     def process_request(self, request):
         headers = request.headers
+        if not uuidutils.is_uuid_like(headers.get('X-Auth-Project')):
+            err_msg = json.dumps({"message": "Non uuid like project id"})
+            return flask.Response(response=err_msg, status=401)
 
         try:
             if headers["X-Identity-Status"] == "Invalid":
