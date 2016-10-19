@@ -15,17 +15,14 @@ api_paste_config=/craton/etc/craton-api-paste.ini
 
 # Keystone Middlewre settings
 [keystone_authtoken]
-#auth_host = 127.0.0.1
-##auth_port = 35357
-##auth_version = 3
-##auth_protocol = http
-##project_name = service
-##username = craton
-##password = craton
-##project_domain_id = default
-##user_domain_id = default
-##memcached_servers = localhost:11211
-##auth_type = password
+#auth_uri = https://127.0.0.1:5000
+#auth_url = https://127.0.0.1:35357/v3
+#project_name = service
+#username = craton
+#password = <required>
+#project_domain_id = default
+#user_domain_id = default
+#auth_type = password
 
 [database]
 backend = sqlalchemy

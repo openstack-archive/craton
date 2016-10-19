@@ -24,6 +24,7 @@ Getting Started
    :maxdepth: 1
 
    installation
+   keystone
    cratoncli
    usage
 

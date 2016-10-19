@@ -4,7 +4,6 @@ from oslo_context import context
 from oslo_log import log
 
 import flask
-from flask import request
 
 from craton.db import api as dbapi
 from craton import exceptions
@@ -93,35 +92,23 @@ class LocalAuthContextMiddleware(ContextMiddleware):
         return _factory
 
 
-class KeystoneAuthContextMiddleware(ContextMiddleware):
-
-    def __init__(self, application):
-        self.application = application
-
-    def __call__(self, environ, start_response):
-        with self.application.request_context(environ):
-            self.process_request(request)
-        return self.application(environ, start_response)
+class KeystoneContextMiddleware(ContextMiddleware):
 
     def process_request(self, request):
         headers = request.headers
-
-        try:
-            if headers["X-Identity-Status"] == "Invalid":
-                return flask.Response(status=401)
-        except KeyError:
-            # See: keystone middleware #exchanging-user-information
-            pass
-
-        project_id = headers.get('X-Project-ID')
-        if project_id is None:
+        environ = request.environ
+        if headers.get('X-Identity-Status', '').lower() != 'confirmed':
             return flask.Response(status=401)
 
+        token_info = environ['keystone.token_info']['token']
+        roles = (role['name'] for role in token_info['roles'])
         self.make_context(
             request,
             auth_token=headers.get('X-Auth-Token'),
-            user=headers.get('X-User-ID'),
-            tenant=project_id,
+            is_admin=any(name == 'admin' for name in roles),
+            is_admin_project=environ['HTTP_X_IS_ADMIN_PROJECT'],
+            user=token_info['user']['name'],
+            tenant=token_info['project']['id'],
         )
 
     @classmethod
