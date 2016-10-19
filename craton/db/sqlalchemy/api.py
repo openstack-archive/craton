@@ -158,6 +158,52 @@ def _device_labels_delete(context, device_type, device_id, labels):
         return device
 
 
+def _device_data_update(context, device_type, device_id, data):
+    """Update existing device variables or create when its not present."""
+    session = get_session()
+    with session.begin():
+        _devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, _devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type=device_type)
+        query = query.filter_by(id=device_id)
+
+        try:
+            ref = query.with_lockmode('update').one()
+        except sa_exc.NoResultFound:
+            raise exceptions.DeviceNotFound(device_type=device_type,
+                                            id=device_id)
+
+        for key in data:
+            ref.variables[key] = data[key]
+
+        return ref
+
+
+def _device_data_delete(context, device_type, device_id, data):
+    """Delete the existing key (variable) from device data."""
+    session = get_session()
+    with session.begin():
+        _devices = with_polymorphic(models.Device, '*')
+        query = model_query(context, _devices, session=session,
+                            project_only=True)
+        query = query.filter_by(type=device_type)
+        query = query.filter_by(id=device_id)
+
+        try:
+            ref = query.with_lockmode('update').one()
+        except sa_exc.NoResultFound:
+            raise exceptions.DeviceNotFound(device_type=device_type,
+                                            id=device_id)
+        for key in data:
+            try:
+                del ref.variables[data[key]]
+            except KeyError:
+                pass
+
+        return ref
+
+
 def cells_get_all(context, region):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
@@ -453,48 +499,13 @@ def hosts_delete(context, host_id):
 
 
 def hosts_data_update(context, host_id, data):
-    """
-    Update existing host variables or create when its not present.
-    """
-    session = get_session()
-    with session.begin():
-        host_devices = with_polymorphic(models.Device, '*')
-        query = model_query(context, host_devices, session=session,
-                            project_only=True)
-        query = query.filter_by(id=host_id)
-
-        try:
-            host_ref = query.with_lockmode('update').one()
-        except sa_exc.NoResultFound:
-            raise exceptions.NotFound()
-
-        for key in data:
-            host_ref.variables[key] = data[key]
-
-    return host_ref
+    """Update existing host variables or create when its not present."""
+    return _device_data_update(context, 'hosts', host_id, data)
 
 
 def hosts_data_delete(context, host_id, data):
     """Delete the existing key (variable) from region data."""
-    session = get_session()
-    with session.begin():
-        host_devices = with_polymorphic(models.Device, '*')
-        query = model_query(context, host_devices, session=session,
-                            project_only=True)
-        query = query.filter_by(id=host_id)
-
-        try:
-            host_ref = query.with_lockmode('update').one()
-        except sa_exc.NoResultFound:
-            raise exceptions.NotFound()
-
-        for key in data:
-            try:
-                del host_ref.variables[data[key]]
-            except KeyError:
-                pass
-
-    return host_ref
+    return _device_data_delete(context, 'hosts', host_id, data)
 
 
 def hosts_labels_update(context, host_id, labels):
@@ -688,6 +699,48 @@ def networks_delete(context, network_id):
     return
 
 
+def networks_data_update(context, network_id, data):
+    """Update/create networks variables data."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Network, session=session,
+                            project_only=True)
+        query = query.filter_by(id=network_id)
+
+        try:
+            ref = query.with_lockmode('update').one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NetworkNotFound(id=network_id)
+
+        for key in data:
+            ref.variables[key] = data[key]
+
+        return ref
+
+
+def networks_data_delete(context, network_id, data):
+    """Delete the existing key (variable) from networks data."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Network, session=session,
+                            project_only=True)
+        query = query.filter_by(id=network_id)
+
+        try:
+            ref = query.with_lockmode('update').one()
+        except sa_exc.NoResultFound:
+            raise exceptions.NetworkNotFound(id=network_id)
+
+        for key in data:
+            try:
+                del ref.variables[data[key]]
+            except KeyError:
+                # This key does not exist so just ignore
+                pass
+
+        return ref
+
+
 def netdevices_get_by_region(context, region_id, filters):
     """Get all network devices for the given region."""
     devices = with_polymorphic(models.Device, [models.NetDevice])
@@ -744,6 +797,16 @@ def netdevices_labels_delete(context, device_id, labels):
     """Delete labels from the network device labels list if it matches
     the given label in the query, otherwise do nothing."""
     return _device_labels_delete(context, 'net_devices', device_id, labels)
+
+
+def netdevices_data_update(context, device_id, data):
+    """Update/create network device variables data."""
+    return _device_data_update(context, 'net_devices', device_id, data)
+
+
+def netdevices_data_delete(context, device_id, data):
+    """Delete the existing key (variable) from network device data."""
+    return _device_data_delete(context, 'net_devices', device_id, data)
 
 
 def net_interfaces_get_by_device(context, device_id, filters):

@@ -273,6 +273,16 @@ def networks_delete(context, network_id):
     return IMPL.networks_delete(context, network_id)
 
 
+def networks_data_update(context, network_id, data):
+    """Update/create network variables data."""
+    return IMPL.networks_data_update(context, network_id, data)
+
+
+def networks_data_delete(context, network_id, data):
+    """Delete network variables data."""
+    return IMPL.networks_data_delete(context, network_id, data)
+
+
 def netdevices_get_by_region(context, region_id, filters):
     """Get all network devices for the given region id."""
     return IMPL.netdevices_get_by_region(context, region_id, filters)
@@ -291,6 +301,16 @@ def netdevices_create(context, values):
 def netdevices_delete(context, netdevice_id):
     """Delete existing network device."""
     return IMPL.netdevices_delete(context, netdevice_id)
+
+
+def netdevices_data_delete(context, netdevice_id, data):
+    """Delete network device data."""
+    return IMPL.netdevices_data_delete(context, netdevice_id, data)
+
+
+def netdevices_data_update(context, netdevice_id, data):
+    """Update network device data."""
+    return IMPL.netdevices_data_update(context, netdevice_id, data)
 
 
 def netdevices_labels_delete(context, netdevice_id, labels):
