@@ -167,9 +167,8 @@ def _device_data_update(context, device_type, device_id, data):
                             project_only=True)
         query = query.filter_by(type=device_type)
         query = query.filter_by(id=device_id)
-
         try:
-            ref = query.with_lockmode('update').one()
+            ref = query.with_for_update().one()
         except sa_exc.NoResultFound:
             raise exceptions.DeviceNotFound(device_type=device_type,
                                             id=device_id)
@@ -191,7 +190,7 @@ def _device_data_delete(context, device_type, device_id, data):
         query = query.filter_by(id=device_id)
 
         try:
-            ref = query.with_lockmode('update').one()
+            ref = query.with_for_update().one()
         except sa_exc.NoResultFound:
             raise exceptions.DeviceNotFound(device_type=device_type,
                                             id=device_id)
@@ -281,17 +280,10 @@ def cells_data_update(context, cell_id, data):
         query = model_query(context, models.Cell, session=session,
                             project_only=True)
         query = query.filter_by(id=cell_id)
-
-        try:
-            cell_ref = query.with_lockmode('update').one()
-        except sa_exc.NoResultFound:
-            # cell does not exist so can't do this
-            raise
-
+        cell_ref = query.with_for_update().one()
         for key in data:
             cell_ref.variables[key] = data[key]
-
-    return cell_ref
+        return cell_ref
 
 
 def cells_data_delete(context, cell_id, data):
@@ -301,21 +293,14 @@ def cells_data_delete(context, cell_id, data):
         query = model_query(context, models.Cell, session=session,
                             project_only=True)
         query = query.filter_by(id=cell_id)
-
-        try:
-            cell_ref = query.with_lockmode('update').one()
-        except sa_exc.NoResultFound:
-            # cell does not exist so can't do this
-            raise
-
+        cell_ref = query.with_for_update().one()
         for key in data:
             try:
                 del cell_ref.variables[data[key]]
             except KeyError:
                 # This key does not exist so just ignore
                 pass
-
-    return cell_ref
+        return cell_ref
 
 
 def regions_get_all(context):
@@ -390,17 +375,10 @@ def regions_data_update(context, region_id, data):
         query = model_query(context, models.Region, session=session,
                             project_only=True)
         query = query.filter_by(id=region_id)
-
-        try:
-            region_ref = query.with_lockmode('update').one()
-        except sa_exc.NoResultFound:
-            # region does not exist so can't do this
-            raise
-
+        region_ref = query.with_for_update().one()
         for key in data:
             region_ref.variables[key] = data[key]
-
-    return region_ref
+        return region_ref
 
 
 def regions_data_delete(context, region_id, data):
@@ -410,21 +388,14 @@ def regions_data_delete(context, region_id, data):
         query = model_query(context, models.Region, session=session,
                             project_only=True)
         query = query.filter_by(id=region_id)
-
-        try:
-            region_ref = query.with_lockmode('update').one()
-        except sa_exc.NoResultFound:
-            # region does not exist so can't do this
-            raise
-
+        region_ref = query.with_for_update().one()
         for key in data:
             try:
                 del region_ref.variables[data[key]]
             except KeyError:
                 # This key does not exist so just ignore
                 pass
-
-    return region_ref
+        return region_ref
 
 
 def hosts_get_by_region(context, region_id, filters):
@@ -736,7 +707,7 @@ def networks_data_update(context, network_id, data):
         query = query.filter_by(id=network_id)
 
         try:
-            ref = query.with_lockmode('update').one()
+            ref = query.with_for_update().one()
         except sa_exc.NoResultFound:
             raise exceptions.NetworkNotFound(id=network_id)
 
@@ -755,7 +726,7 @@ def networks_data_delete(context, network_id, data):
         query = query.filter_by(id=network_id)
 
         try:
-            ref = query.with_lockmode('update').one()
+            ref = query.with_for_update().one()
         except sa_exc.NoResultFound:
             raise exceptions.NetworkNotFound(id=network_id)
 
