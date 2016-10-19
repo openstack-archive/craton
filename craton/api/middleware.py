@@ -2,8 +2,10 @@ from oslo_middleware import base
 from oslo_middleware import request_id
 from oslo_context import context
 from oslo_log import log
+from oslo_utils import uuidutils
 
 import flask
+import json
 
 from craton.db import api as dbapi
 from craton import exceptions
@@ -23,6 +25,14 @@ class ContextMiddleware(base.Middleware):
         ctxt = context.RequestContext(*args, **kwargs)
         request.environ['context'] = ctxt
         return ctxt
+
+    def _invalid_project_id(self, project_id):
+        err_msg = json.dumps({
+            "message": "Project ID ('{}') is not a valid UUID".format(
+                project_id)
+        })
+        return flask.Response(response=err_msg, status=401,
+                              headers={'Content-Type': 'application/json'})
 
 
 class NoAuthContextMiddleware(ContextMiddleware):
@@ -56,11 +66,15 @@ class LocalAuthContextMiddleware(ContextMiddleware):
 
     def process_request(self, request):
         headers = request.headers
+        project_id = headers.get('X-Auth-Project')
+        if not uuidutils.is_uuid_like(project_id):
+            return self._invalid_project_id(project_id)
+
         ctx = self.make_context(
             request,
             auth_token=headers.get('X-Auth-Token', None),
             user=headers.get('X-Auth-User', None),
-            tenant=headers.get('X-Auth-Project', None)
+            tenant=project_id,
             )
 
         # NOTE(sulo): this means every api call hits the db
@@ -70,10 +84,10 @@ class LocalAuthContextMiddleware(ContextMiddleware):
                                             headers.get('X-Auth-User', None))
             if user_info.api_key != headers.get('X-Auth-Token', None):
                 return flask.Response(status=401)
-            if user_info["is_root"]:
+            if user_info.is_root:
                 ctx.is_admin = True
                 ctx.is_admin_project = True
-            elif user_info["is_admin"]:
+            elif user_info.is_admin:
                 ctx.is_admin = True
                 ctx.is_admin_project = False
             else:
