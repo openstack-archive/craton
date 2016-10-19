@@ -25,8 +25,10 @@ class User(object):
         self.api_key = api_key
         self.roles = roles
 
-USER1 = User('user1', 1, True, False, 'xx-yy-zz')
-USER2 = User('user2', 1, False, False, 'aa-bb-cc')
+USER1 = User('user1', "2757a1b4-cd90-4891-886c-a246fd4e7064", True, False,
+             'xx-yy-zz')
+USER2 = User('user2', "05d081ca-dcf5-4e96-b132-23b94d665799", False, False,
+             'aa-bb-cc')
 
 
 class Cell(object):
