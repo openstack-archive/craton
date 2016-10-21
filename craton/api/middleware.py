@@ -12,6 +12,14 @@ from craton import exceptions
 LOG = log.getLogger(__name__)
 
 
+class RequestContext(context.RequestContext):
+
+    def __init__(self, **kwargs):
+        self.using_keystone = kwargs.pop('using_keystone', False)
+        self.token_info = kwargs.pop('token_info', None)
+        super(RequestContext, self).__init__(**kwargs)
+
+
 class ContextMiddleware(base.Middleware):
 
     def make_context(self, request, *args, **kwargs):
@@ -20,7 +28,7 @@ class ContextMiddleware(base.Middleware):
 
         # TODO(sulo): Insert Craton specific context here if needed,
         # for now we are using generic context object.
-        ctxt = context.RequestContext(*args, **kwargs)
+        ctxt = RequestContext(*args, **kwargs)
         request.environ['context'] = ctxt
         return ctxt
 
@@ -109,6 +117,8 @@ class KeystoneContextMiddleware(ContextMiddleware):
             is_admin_project=environ['HTTP_X_IS_ADMIN_PROJECT'],
             user=token_info['user']['name'],
             tenant=token_info['project']['id'],
+            using_keystone=True,
+            token_info=token_info,
         )
 
     @classmethod

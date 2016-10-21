@@ -9,10 +9,16 @@ from flask import request, g, current_app, json
 from flask_restful import abort
 from flask_restful.utils import unpack
 from jsonschema import Draft4Validator
+from oslo_log import log
 import six
 
 from craton.api.v1.schemas import (
     validators, filters, scopes, security, merge_default, normalize)
+from craton import db as dbapi
+from craton import exceptions
+
+
+LOG = log.getLogger(__name__)
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -94,6 +100,18 @@ def request_validate(view):
     return wrapper
 
 
+def ensure_project_exists(view):
+
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        context = request.environ['context']
+        if context.using_keystone:
+            find_or_create_project(request, context)
+        return view(*args, **kwargs)
+
+    return wrapper
+
+
 def response_filter(view):
 
     @wraps(view)
@@ -140,3 +158,15 @@ def response_filter(view):
         )
 
     return wrapper
+
+
+def find_or_create_project(request, context):
+    project_id = context.tenant
+    token_info = context.token_info
+    try:
+        dbapi.projects_get_by_id(context, project_id)
+    except exceptions.NotFound:
+        LOG.info('Adding Project "%s" to projects table', project_id)
+        dbapi.projects_create(context,
+                              {'id': project_id,
+                               'name': token_info['project']['name']})
