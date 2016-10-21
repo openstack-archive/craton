@@ -11,6 +11,16 @@ host=0.0.0.0
 port=8080
 # Paste Config file to use
 api_paste_config=/craton/etc/craton-api-paste.ini
+# The name of the Paste pipeline to use for Craton.
+#
+# Pipelines are organized according to authentication scheme. The available
+# choices are:
+#
+# - ``local-auth`` (the default) Uses Craton's default authentication and
+#   authorization scheme
+# - ``keystone-auth`` Uses Keystone for identity, authentication, and
+#   authorization
+paste_pipeline = local-auth
 
 
 # Keystone Middlewre settings

@@ -2,7 +2,7 @@
 Using Keystone for Identity
 ===========================
 
-By default, Craton uses it's own local authentication mechanism. It also 
+By default, Craton uses it's own local authentication mechanism. It also
 supports using Keystone for identity and authentication.
 
 Before you can proceed, you need to first create a user for Craton, e.g.,
@@ -35,18 +35,15 @@ And then you must create the service and endpoints:
       openstack endpoint create fleet_management $endpoint_type http://<ip>:<port>/v1
     done
 
-Then you need to edit your Craton Paste configuration, e.g., 
-``etc/craton-api-paste.ini``, to use a pipeline like this:
-
-.. code-block:: ini
-
-    pipeline = request_id authtoken keystonecontext api_v1
-
-After configuring that, you also need to configure the usual Keystone auth 
-token middleware options in the Craton API config file, e.g., 
+Then you need to select the ``keystone-auth`` pipeline and configure the usual
+Keystone auth token middleware options in the Craton API config file, e.g.,
 ``etc/craton-api-conf.sample``:
 
 .. code-block:: ini
+
+    [api]
+    # ...
+    paste_pipeline = keystone-auth
 
     [keystone_authtoken]
     auth_uri = https://<keystone-ip>:5000
@@ -58,9 +55,9 @@ token middleware options in the Craton API config file, e.g.,
     user_domain_id = default
     auth_type = password
 
-Now with an appropriate identity in Keystone, one can use either the python 
-craton client or another client that can retrieve tokens from Keystone. For 
-example, if you use the openstack client to grab a token, you can use curl to 
+Now with an appropriate identity in Keystone, one can use either the python
+craton client or another client that can retrieve tokens from Keystone. For
+example, if you use the openstack client to grab a token, you can use curl to
 talk to Craton:
 
 .. code-block:: bash
