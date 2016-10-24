@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to Craton's documentation!
-========================================================
+==================================
 
 Craton is a new project planned for OpenStack inclusion.
 Craton supports deploying and operating OpenStack clouds by providing
@@ -49,5 +49,5 @@ Indices and Tables
 
 
 License
-==================
+=======
 Craton is licensed under the `Apache license <http://www.apache.org/licenses/LICENSE-2.0>`_

@@ -25,6 +25,7 @@ on_read_the_docs = os.environ.get('READTHEDOCS') == 'True'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.graphviz',
+    'sphinx.ext.todo'
 ]
 if not on_read_the_docs:
     extensions.append('oslosphinx')
@@ -79,6 +80,9 @@ latex_documents = [
      u'%s Documentation' % project,
      u'OpenStack Foundation', 'manual'),
 ]
+
+# If true, todo and todolist produce output.
+todo_include_todos = True
 
 # Example configuration for intersphinx: refer to the Python standard library.
 #intersphinx_mapping = {'http://docs.python.org/': None}
