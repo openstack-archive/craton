@@ -32,12 +32,13 @@ And then you must create the service and endpoints:
                              --enable \
                              fleet_management
     for endpoint_type in "admin internal public" ; do
-      openstack endpoint create fleet_management $endpoint_type http://<ip>:<port>/v1
+      openstack endpoint create \
+        fleet_management $endpoint_type http://<ip>:<port>/v1 \
+        --region RegionOne
     done
 
 Then you need to select the ``keystone-auth`` pipeline and configure the usual
 Keystone auth token middleware options in the Craton API config file, e.g.,
-``etc/craton-api-conf.sample``:
 
 .. code-block:: ini
 
@@ -54,6 +55,9 @@ Keystone auth token middleware options in the Craton API config file, e.g.,
     project_domain_id = default
     user_domain_id = default
     auth_type = password
+
+You may need to either not use ``https`` in your URL or set ``insecure =
+True`` to avoid SSL errors.
 
 Now with an appropriate identity in Keystone, one can use either the python
 craton client or another client that can retrieve tokens from Keystone. For
