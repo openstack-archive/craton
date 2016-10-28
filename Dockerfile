@@ -52,8 +52,7 @@ RUN pip3 install virtualenv
 # Expose port
 EXPOSE 8080 3306
 
-# Add Craton
-ADD . /craton
+Add ./requirements.txt /requirements.txt
 
 # Init virutalenv
 RUN virtualenv -p /usr/bin/python3.5 /craton
@@ -61,11 +60,14 @@ RUN virtualenv -p /usr/bin/python3.5 /craton
 # Change Working Dir
 WORKDIR /craton
 
+# Install requirements
+RUN bin/pip install -r /requirements.txt
+
 # pip install mysql-python
 RUN bin/pip install mysqlclient
 
-# Install requirements
-RUN bin/pip install -r /craton/requirements.txt
+# Add Craton
+ADD . /craton
 
 # Install Craton
 RUN bin/pip install .
