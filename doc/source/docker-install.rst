@@ -52,16 +52,20 @@ Run the Craton Docker Image
 
 * First, go to craton directory and build the Docker image::
 
-    $ sudo docker build -t craton-api .
+    S sudo docker build -t craton-api:latest .
 
 * And finally, run the docker image::
 
-    $ sudo docker run craton-api -d
+    $ sudo docker run -t --name craton-api -p 127.0.0.1:8080:8080 -d craton-api:latest
 
 
 -------------------
 Calling into Craton
 -------------------
+
+* To generate a sample data set, use the following command::
+
+    $ python tools/generate_fake_data.py --url http://127.0.0.1:8080/v1 --user demo --project b9f10eca66ac4c279c139d01e65f96b4 --key demo
 
 * Now, let's run an API call against Craton running in the container. First, we need to enumerate the running Docker images::
 
