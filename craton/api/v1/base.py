@@ -5,13 +5,15 @@ import decorator
 import flask
 import flask_restful as restful
 
+from craton.api.v1.validators import ensure_project_exists
 from craton.api.v1.validators import request_validate
 from craton.api.v1.validators import response_filter
 from craton import exceptions
 
 
 class Resource(restful.Resource):
-    method_decorators = [request_validate, response_filter]
+    method_decorators = [request_validate, ensure_project_exists,
+                         response_filter]
 
     def error_response(self, status_code, message):
         resp = flask.jsonify({
