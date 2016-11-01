@@ -56,7 +56,7 @@ Run the Craton Docker Image
 
 * And finally, run the docker image::
 
-    $ sudo docker run -t --name craton-api -p 127.0.0.1:8080:8080 -d craton-api:latest
+    $ sudo docker run -t --name craton-api -d craton-api:latest
 
 
 -------------------
@@ -65,7 +65,7 @@ Calling into Craton
 
 * To generate a sample data set, use the following command::
 
-    $ python tools/generate_fake_data.py --url http://127.0.0.1:8080/v1 --user demo --project b9f10eca66ac4c279c139d01e65f96b4 --key demo
+    $ python tools/generate_fake_data.py --url http://{Container_IP}:8080/v1 --user demo --project b9f10eca66ac4c279c139d01e65f96b4 --key demo
 
 * Now, let's run an API call against Craton running in the container. First, we need to enumerate the running Docker images::
 
@@ -77,8 +77,7 @@ Calling into Craton
 
 * Now that you know the IP address, you can run a curl command like the one below to query Craton::
 
-    $ curl -i "http://172.17.0.11:8080/v1/hosts?region_id=1" -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: 1"
-
+    $ curl -i "http://{Container_IP}:8080/v1/hosts?region_id=1" -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: b9f10eca66ac4c279c139d01e65f96b4"
 
 
 -------------------
@@ -87,15 +86,15 @@ Command Cheat-Sheet
 
 * Get the Craton logs::
 
-    $ docker logs -f craton-api
+    $ docker logs -f {Container_ID}
 
 * Open mysql in the Craton container::
 
-    $ docker exec -it craton-api mysql -ucraton -pcraton craton
+    $ docker exec -it {Container_ID} mysql -ucraton -pcraton craton
 
 * Get a bash shell from the Craton container::
 
-    $ docker exec -it craton-api bash # for a bash shell, etc
+    $ docker exec -it {Container_ID} bash # for a bash shell, etc
 
 
 
