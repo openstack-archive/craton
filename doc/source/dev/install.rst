@@ -22,7 +22,7 @@ Installing Environment from packages: Ubuntu
 
     # git clone https://github.com/openstack/craton.git
 
-.. note:: Make sure to use Python3, as this is only a Python3 project.
+.. note:: This is a Python3 project only, the minimum support version is Python 3.5.
 
 * Install the prerequisite packages::
 
