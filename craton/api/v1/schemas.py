@@ -333,6 +333,10 @@ validators = {
                          'default': None,
                          'type': 'string',
                          'description': 'Type of host to get'},
+                     'label': {
+                         'default': None,
+                         'type': 'string',
+                         'description': 'label to get host by'},
                      'limit': {
                          'minimum': 1,
                          'description': 'number of hosts to return',
