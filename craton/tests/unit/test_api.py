@@ -363,6 +363,14 @@ class APIV1HostsTest(APIV1Test):
         self.assertEqual(len(resp.json), len(host_resp))
         self.assertEqual(resp.json[0]["name"], host_resp[0].name)
 
+    @mock.patch.object(dbapi, 'hosts_get_by_region')
+    def test_get_host_by_label_filters(self, fake_hosts):
+        fake_hosts.return_value = fake_resources.HOSTS_LIST_R2
+        resp = self.get('/v1/hosts?region_id=1&label=somelabel')
+        host_resp = fake_resources.HOSTS_LIST_R2
+        self.assertEqual(len(resp.json), len(host_resp))
+        self.assertEqual(resp.json[0]["name"], host_resp[0].name)
+
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_with_valid_data(self, mock_host):
         mock_host.return_value = None
