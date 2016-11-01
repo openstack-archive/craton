@@ -1,10 +1,7 @@
 import abc
 
-import six
 
-
-@six.add_metaclass(abc.ABCMeta)
-class WorkflowFactory(object):
+class WorkflowFactory(object, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def workflow(self):
