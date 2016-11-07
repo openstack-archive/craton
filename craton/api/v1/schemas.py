@@ -299,6 +299,13 @@ validators = {
                      'device_type': {'type': 'string',
                                      'description': 'Type of host'}}}
         },
+    ('hosts_data', 'GET'): {
+        'args': {'required': [],
+                 'properties': {
+                     'resolved-values': {
+                         'default': True,
+                         'type': 'boolean'}}}
+    },
     ('regions', 'GET'): {
         'args': {'required': [],
                  'properties': {
