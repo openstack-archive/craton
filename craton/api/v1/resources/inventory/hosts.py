@@ -32,18 +32,23 @@ class Hosts(base.Resource):
         return jsonutils.to_primitive(host_obj), 200, None
 
 
+def format_variables(args, obj):
+    resolved_values = args["resolved-values"]
+    if resolved_values:
+        obj.data = obj.resolved
+    else:
+        obj.data = obj.variables
+    return obj
+
+
 class HostById(base.Resource):
 
     @base.http_codes
     def get(self, id):
         """Get host by given id"""
         context = request.environ.get('context')
-        resolved_values = g.args["resolved-values"]
         host_obj = dbapi.hosts_get_by_id(context, id)
-        if resolved_values:
-            host_obj.data = host_obj.resolved
-        else:
-            host_obj.data = host_obj.variables
+        host_obj = format_variables(g.args, host_obj)
         host_obj.labels = host_obj.labels
         return jsonutils.to_primitive(host_obj), 200, None
 
@@ -68,7 +73,8 @@ class HostsData(base.Resource):
         """Get data for given host."""
         context = request.environ.get('context')
         obj = dbapi.hosts_get_by_id(context, id)
-        response = {"data": jsonutils.to_primitive(obj.variables)}
+        obj = format_variables(g.args, obj)
+        response = {"data": jsonutils.to_primitive(obj.data)}
         return response, 200, None
 
     @base.http_codes
