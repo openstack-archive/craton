@@ -423,6 +423,9 @@ def hosts_get_by_region(context, region_id, filters):
         query = query.filter_by(cell_id=filters["cell"])
     if "device_type" in filters:
         query = query.filter_by(device_type=filters["device_type"])
+    if "label" in filters:
+        query = query.join(models.Device.related_labels).filter(
+            models.Label.label == filters["label"])
 
     try:
         result = query.all()
