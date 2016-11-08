@@ -9,6 +9,7 @@ from craton.api.v1.validators import security
 def current_scopes():
     return []
 
+
 bp = Blueprint('v1', __name__)
 api = restful.Api(bp, catch_all_404s=True)
 
