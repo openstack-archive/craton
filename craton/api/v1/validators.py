@@ -12,13 +12,157 @@ from jsonschema import Draft4Validator
 from oslo_log import log
 import six
 
-from craton.api.v1.schemas import (
-    validators, filters, scopes, security, merge_default, normalize)
+from craton.api.v1.schemas import filters
+from craton.api.v1.schemas import scopes
+from craton.api.v1.schemas import validators
 from craton import db as dbapi
 from craton import exceptions
 
 
 LOG = log.getLogger(__name__)
+
+
+class Security(object):
+
+    def __init__(self):
+        super(Security, self).__init__()
+        self._loader = lambda: []
+
+    @property
+    def scopes(self):
+        return self._loader()
+
+    def scopes_loader(self, func):
+        self._loader = func
+        return func
+
+security = Security()
+
+
+def merge_default(schema, value):
+    # TODO: more types support
+    type_defaults = {
+        'integer': 9573,
+        'string': 'something',
+        'object': {},
+        'array': [],
+        'boolean': False
+    }
+
+    return normalize(schema, value, type_defaults)[0]
+
+
+def normalize(schema, data, required_defaults=None):
+
+    if required_defaults is None:
+        required_defaults = {}
+    errors = []
+
+    class DataWrapper(object):
+
+        def __init__(self, data):
+            super(DataWrapper, self).__init__()
+            self.data = data
+
+        def get(self, key, default=None):
+            if isinstance(self.data, dict):
+                return self.data.get(key, default)
+            if hasattr(self.data, key):
+                return getattr(self.data, key)
+            else:
+                return default
+
+        def has(self, key):
+            if isinstance(self.data, dict):
+                return key in self.data
+            return hasattr(self.data, key)
+
+        def keys(self):
+            if isinstance(self.data, dict):
+                return self.data.keys()
+            return vars(self.data).keys()
+
+    def _normalize_dict(schema, data):
+        result = {}
+        if not isinstance(data, DataWrapper):
+            data = DataWrapper(data)
+
+        for pattern, _schema in (schema.get('patternProperties', {})).items():
+            if pattern == "^*":
+                for key in data.keys():
+                    result[key] = _normalize(_schema, data.get(key))
+
+        for key, _schema in six.iteritems(schema.get('properties', {})):
+            # set default
+            type_ = _schema.get('type', 'object')
+            if ('default' not in _schema and
+                key in schema.get('required', []) and
+                    type_ in required_defaults):
+                _schema['default'] = required_defaults[type_]
+
+            # get value
+            if data.has(key):
+                result[key] = _normalize(_schema, data.get(key))
+            elif 'default' in _schema:
+                result[key] = _schema['default']
+            elif key in schema.get('required', []):
+                errors.append(dict(name='property_missing',
+                                   message='`%s` is required' % key))
+
+        for _schema in schema.get('allOf', []):
+            rs_component = _normalize(_schema, data)
+            rs_component.update(result)
+            result = rs_component
+
+        for _schema in schema.get('anyOf', []):
+            result = _normalize_anyOf(_schema, data.data)
+
+        additional_properties_schema = schema.get('additionalProperties',
+                                                  False)
+        if additional_properties_schema:
+            aproperties_set = set(data.keys()) - set(result.keys())
+            for pro in aproperties_set:
+                result[pro] = _normalize(additional_properties_schema,
+                                         data.get(pro))
+
+        return result
+
+    def _normalize_list(schema, data):
+        result = []
+        if hasattr(data, '__iter__') and not isinstance(data, dict):
+            for item in data:
+                result.append(_normalize(schema.get('items'), item))
+        elif 'default' in schema:
+            result = schema['default']
+        return result
+
+    def _normalize_default(schema, data):
+        if data is None:
+            return schema.get('default')
+        else:
+            return data
+
+    def _normalize_anyOf(schema, data):
+        # In case of anyOf simply return data, since we dont
+        # care in normalization what the data is as long as
+        # its been verified.
+        return data
+
+    def _normalize(schema, data):
+        if not schema:
+            return None
+        funcs = {
+            'object': _normalize_dict,
+            'array': _normalize_list,
+            'default': _normalize_default,
+        }
+        type_ = schema.get('type', 'object')
+        if type_ not in funcs:
+            type_ = 'default'
+
+        return funcs[type_](schema, data)
+
+    return _normalize(schema, data), errors
 
 
 class JSONEncoder(json.JSONEncoder):
