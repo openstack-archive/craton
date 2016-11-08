@@ -68,6 +68,7 @@ def main(args):
 
     return resp.json()
 
+
 if __name__ == '__main__':
     args = parse_args()
     output = main(args)
