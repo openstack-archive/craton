@@ -28,7 +28,8 @@ class Networks(base.Resource):
     def post(self):
         """Create a new network."""
         context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
+        _json = util.copy_project_id_into_json(context, g.json)
+        json = util.ensure_user_variables_in_json(_json)
         network_obj = dbapi.networks_create(context, json)
         return jsonutils.to_primitive(network_obj), 200, None
 
@@ -103,7 +104,8 @@ class NetDevices(base.Resource):
     def post(self):
         """Create a new network device."""
         context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
+        _json = util.copy_project_id_into_json(context, g.json)
+        json = util.ensure_user_variables_in_json(_json)
         obj = dbapi.netdevices_create(context, json)
         device = jsonutils.to_primitive(obj)
         return device, 200, None

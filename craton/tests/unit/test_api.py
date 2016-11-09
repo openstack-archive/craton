@@ -155,6 +155,16 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
 
+    @mock.patch.object(dbapi, 'cells_create')
+    def test_create_cell_returns_cell_obj_with_data(self, mock_cell):
+        return_value = {'name': 'cell1', 'region_id': 1, 'id': 1,
+                        'data': {'a': 'b'}}
+        mock_cell.return_value = return_value
+        data = {'name': 'cell1', 'region_id': 1, 'data': {'a': 'b'}}
+        resp = self.post('v1/cells', data=data)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(return_value, resp.json)
+
     @mock.patch.object(dbapi, 'cells_update')
     def test_update_cell(self, mock_cell):
         mock_cell.return_value = fake_resources.CELL1
@@ -252,6 +262,15 @@ class APIV1RegionsTest(APIV1Test):
         return_value = {'name': 'region1', 'id': 1}
         mock_region.return_value = return_value
         data = {'name': 'region1'}
+        resp = self.post('v1/regions', data=data)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(return_value, resp.json)
+
+    @mock.patch.object(dbapi, 'regions_create')
+    def test_create_region_returns_region_obj_with_data(self, mock_region):
+        return_value = {'name': 'region1', 'id': 1, 'data': {'a': 'b'}}
+        mock_region.return_value = return_value
+        data = {'name': 'region1', 'data': {'a': 'b'}}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
@@ -399,6 +418,20 @@ class APIV1HostsTest(APIV1Test):
         mock_host.return_value = return_value
         data = {'name': 'www.host1.com', 'region_id': 1,
                 'ip_address': '10.0.0.1', 'device_type': 'server'}
+        resp = self.post('v1/hosts', data=data)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(return_value, resp.json)
+
+    @mock.patch.object(dbapi, 'hosts_create')
+    def test_create_host_returns_host_obj_with_data(self, mock_host):
+        return_value = {'name': 'www.host1.com', 'region_id': 1,
+                        'ip_address': '10.0.0.1', 'id': 1,
+                        'device_type': 'server', 'active': True,
+                        'data': {'a': 'b'}}
+        mock_host.return_value = return_value
+        data = {'name': 'www.host1.com', 'region_id': 1,
+                'ip_address': '10.0.0.1', 'device_type': 'server',
+                'data': {'a': 'b'}}
         resp = self.post('v1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)

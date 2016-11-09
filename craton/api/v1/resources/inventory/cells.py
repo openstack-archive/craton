@@ -35,7 +35,8 @@ class Cells(base.Resource):
     def post(self):
         """Create a new cell."""
         context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
+        _json = util.copy_project_id_into_json(context, g.json)
+        json = util.ensure_user_variables_in_json(_json)
         cell_obj = dbapi.cells_create(context, json)
         return jsonutils.to_primitive(cell_obj), 200, None
 

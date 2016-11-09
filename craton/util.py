@@ -16,3 +16,12 @@ def copy_project_id_into_json(context, json, project_id_key='project_id'):
     """
     json[project_id_key] = getattr(context, 'tenant', '')
     return json
+
+
+def ensure_user_variables_in_json(json):
+    """Ensure that we pass `variables` in the create json
+    requests. Request has `data` which needs to be seen
+    as variables by the db api."""
+    if json.get('data'):
+        json['variables'] = json['data']
+    return json
