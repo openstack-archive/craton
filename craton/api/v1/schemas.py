@@ -400,8 +400,8 @@ validators = {
                      "id": {
                          "default": None,
                          "type": "integer",
-                         "description": "ID of the region to get"}}}
-        },
+                         "description": "ID of the region to get"}},
+                 "additionalProperties": {"type": "string"}}},
     ("regions", "POST"): {"json": DefinitionsRegion},
     ("regions_id_data", "PUT"): {"json": DefinitionsData},
     ("hosts", "POST"): {"json": DefinitionsHost},
@@ -441,8 +441,8 @@ validators = {
                      "id": {
                          "default": None,
                          "type": "integer",
-                         "description": "ID of host to get"}}
-                 }},
+                         "description": "ID of host to get"}},
+                 "additionalProperties": {"type": "string"}}},
     ("cells_id", "PUT"): {
         "args": {"required": [],
                  "properties": {
@@ -465,8 +465,8 @@ validators = {
                      "name": {
                          "default": None,
                          "type": "string",
-                         "description": "name of the cell to get"}}
-                 }},
+                         "description": "name of the cell to get"}},
+                 "additionalProperties": {"type": "string"}}},
     ("regions_id", "PUT"): {
         "args": {"required": [],
                  "properties": {
@@ -529,8 +529,8 @@ validators = {
                      "cell_id": {
                          "default": None,
                          "type": "string",
-                         "description": "cell id of the device to get"}}
-                 }},
+                         "description": "cell id of the device to get"}},
+                 "additionalProperties": {"type": "string"}}},
     ("netdevices_id", "GET"): {
         "args": {"required": [],
                  "properties": {

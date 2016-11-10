@@ -13,19 +13,17 @@ LOG = log.getLogger(__name__)
 class Regions(base.Resource):
 
     @base.http_codes
-    def get(self, id=None):
+    @base.filtered_context(filters=["id", "name"])
+    def get(self, context, filters):
         """Get region(s) for the project. Get region details if
         for a particular region.
         """
-        _id = g.args["id"]
-        _name = g.args["name"]
-        region_id = id or _id
-        region_name = _name
-        context = request.environ.get('context')
+        region_id = filters.get('id')
+        region_name = filters.get('name')
 
         if not region_id and not region_name:
             # Get all regions for this tenant
-            regions_obj = dbapi.regions_get_all(context)
+            regions_obj = dbapi.regions_get_all(context, filters)
             return jsonutils.to_primitive(regions_obj), 200, None
 
         if region_name:

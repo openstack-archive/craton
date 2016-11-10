@@ -105,6 +105,25 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
+def add_var_filters_to_query(query, filters):
+    if filters.get('vars_filters'):
+        query = query.join('variable_association', 'variables')
+        for k, v in filters["vars_filters"].items():
+            if ':' in v:
+                oper, values = v.split(':')
+                # NOTE(sulo): we only support in operation right now we
+                # can expand this for others if we decide to do so later
+                if oper != 'in':
+                    raise exceptions.UnSupportedFilterOperator()
+                query = query.filter(models.Variable.key == k)
+                q_values = values.split(',')
+                query = query.filter(models.Variable.value.in_(q_values))
+            else:
+                query = query.filter(models.Variable.key == k)
+                query = query.filter(models.Variable.value == v)
+    return query
+
+
 def get_user_info(context, username):
     """Get user info."""
     query = model_query(context, models.User, project_only=True)
@@ -203,11 +222,13 @@ def _device_data_delete(context, device_type, device_id, data):
         return ref
 
 
-def cells_get_all(context, region):
+def cells_get_all(context, region, filters):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
     if region is not None:
         query = query.filter_by(region_id=region)
+
+    query = add_var_filters_to_query(query, filters)
 
     try:
         return query.all()
@@ -303,9 +324,10 @@ def cells_data_delete(context, cell_id, data):
         return cell_ref
 
 
-def regions_get_all(context):
+def regions_get_all(context, filters):
     """Get all available regions."""
     query = model_query(context, models.Region, project_only=True)
+    query = add_var_filters_to_query(query, filters)
     try:
         return query.all()
     except sa_exc.NoResultFound:
@@ -426,6 +448,8 @@ def hosts_get_by_region(context, region_id, filters):
     if "label" in filters:
         query = query.join(models.Device.related_labels).filter(
             models.Label.label == filters["label"])
+
+    query = add_var_filters_to_query(query, filters)
 
     try:
         result = query.all()
@@ -752,6 +776,7 @@ def netdevices_get_by_region(context, region_id, filters):
     query = model_query(context, devices, project_only=True)
     query = query.filter_by(region_id=region_id)
     query = query.filter_by(type='net_devices')
+    query = add_var_filters_to_query(query, filters)
     result = query.all()
     return result
 
