@@ -17,3 +17,6 @@ testtools>=1.4.0
 # Documentation
 oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
 
+# Functional testing
+docker-py
+-e git+https://github.com/openstack/python-cratonclient.git#egg=cratonclient
