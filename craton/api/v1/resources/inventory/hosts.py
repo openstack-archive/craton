@@ -16,8 +16,8 @@ class Hosts(base.Resource):
     @base.http_codes
     @base.filtered_context(
         required='region_id',
-        filters=['id', 'name', 'ip_address', 'cell_id',
-                 'device_type', 'label'])
+        reserved_keys=['id', 'name', 'ip_address', 'cell_id', 'vars',
+                       'device_type', 'label', 'limit', 'region_id'])
     def get(self, context, region_id, filters):
         """Get all hosts for region, with optional filtering."""
         hosts_obj = dbapi.hosts_get_by_region(context, region_id, filters)

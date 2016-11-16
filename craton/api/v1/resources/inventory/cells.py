@@ -15,7 +15,7 @@ class Cells(base.Resource):
     @base.http_codes
     @base.filtered_context(
         required='region_id',
-        filters=['id', 'name'])
+        reserved_keys=['id', 'name', 'region_id', 'vars'])
     def get(self, context, region_id, filters):
         """Get cells for the region, with optional filtering."""
         if 'name' in filters:
@@ -28,7 +28,7 @@ class Cells(base.Resource):
             cell_obj.data = cell_obj.variables
             cells_obj = [cell_obj]
         else:
-            cells_obj = dbapi.cells_get_all(context, region_id)
+            cells_obj = dbapi.cells_get_all(context, region_id, filters)
         return jsonutils.to_primitive(cells_obj), 200, None
 
     @base.http_codes
