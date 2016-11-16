@@ -132,6 +132,13 @@ class APIV1CellsTest(APIV1Test):
         # Ensure we got the right cell
         self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
 
+    @mock.patch.object(dbapi, 'cells_get_all')
+    def test_get_cells_with_vars_filters(self, mock_cells):
+        mock_cells.return_value = [fake_resources.CELL1]
+        resp = self.get('v1/cells?region_id=1&vars=somekey:somevalue')
+        self.assertEqual(len(resp.json), 1)
+        self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
+
     @mock.patch.object(dbapi, 'cells_get_by_name')
     def test_get_cell_no_exist_by_name_fails(self, mock_cell):
         err = exceptions.NotFound()
@@ -232,6 +239,13 @@ class APIV1RegionsTest(APIV1Test):
     def test_regions_get_by_id_filters(self, mock_regions):
         mock_regions.return_value = fake_resources.REGION1
         resp = self.get('v1/regions?id=1')
+        self.assertEqual(resp.json[0]["name"], fake_resources.REGION1.name)
+
+    @mock.patch.object(dbapi, 'regions_get_all')
+    def test_regions_get_by_vars_filters(self, mock_regions):
+        mock_regions.return_value = [fake_resources.REGION1]
+        resp = self.get('v1/regions?vars=somekey:somevalue')
+        self.assertEqual(len(resp.json), 1)
         self.assertEqual(resp.json[0]["name"], fake_resources.REGION1.name)
 
     @mock.patch.object(dbapi, 'regions_get_by_name')
@@ -362,6 +376,13 @@ class APIV1HostsTest(APIV1Test):
         host_resp = fake_resources.HOSTS_LIST_R2
         self.assertEqual(len(resp.json), len(host_resp))
         self.assertEqual(resp.json[0]["name"], host_resp[0].name)
+
+    @mock.patch.object(dbapi, 'hosts_get_by_region')
+    def test_get_host_by_vars_filters(self, fake_hosts):
+        fake_hosts.return_value = [fake_resources.HOST1]
+        resp = self.get('/v1/hosts?region_id=1&vars=somekey:somevalue')
+        self.assertEqual(len(resp.json), 1)
+        self.assertEqual(resp.json[0]["name"], fake_resources.HOST1.name)
 
     @mock.patch.object(dbapi, 'hosts_get_by_region')
     def test_get_host_by_label_filters(self, fake_hosts):

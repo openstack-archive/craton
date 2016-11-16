@@ -322,6 +322,10 @@ validators = {
                          "default": None,
                          "type": "string",
                          "description": "name of the region to get"},
+                     "vars": {
+                         "default": None,
+                         "type": "string",
+                         "description": "variable filters to get a region"},
                      "id": {
                          "default": None,
                          "type": "integer",
@@ -363,6 +367,10 @@ validators = {
                          "default": None,
                          "type": "string",
                          "description": "ip_address of the hosts to get"},
+                     "vars": {
+                         "default": None,
+                         "type": "string",
+                         "description": "variable filters to get a host"},
                      "id": {
                          "default": None,
                          "type": "integer",
@@ -387,6 +395,10 @@ validators = {
                          "type": "integer",
                          "description": "id of the cell to get"
                          },
+                     "vars": {
+                         "default": None,
+                         "type": "string",
+                         "description": "variable filters to get a cell"},
                      "name": {
                          "default": None,
                          "type": "string",
@@ -451,6 +463,10 @@ validators = {
                          "default": None,
                          "type": "string",
                          "description": "type of the device to get"},
+                     "vars": {
+                         "default": None,
+                         "type": "string",
+                         "description": "variable filters to get device"},
                      "cell_id": {
                          "default": None,
                          "type": "string",
@@ -539,6 +555,10 @@ validators = {
                          "default": None,
                          "type": "string",
                          "description": "region id of the network to get"},
+                     "vars": {
+                         "default": None,
+                         "type": "string",
+                         "description": "variable filters to get networks"},
                      "cell_id": {
                          "default": None,
                          "type": "string",
