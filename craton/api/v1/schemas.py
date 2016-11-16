@@ -1,5 +1,13 @@
 import six
 
+DefinitionDataSource = {'type': 'object',
+                        'patternProperties': {
+                            '^.+': {
+                                'anyOf': [
+                                    {'type': 'string'},
+                                    {'type': 'integer'},
+                                    {'type': 'array'},
+                                    {'type': 'object'}]}}}
 
 DefinitionsHost = {'discriminator': 'name',
                    'required': ['name',
@@ -21,9 +29,9 @@ DefinitionsHost = {'discriminator': 'name',
                        'labels': {'type': 'array',
                                   'items': 'string',
                                   'description': 'User defined labels'},
-                       'data': {'type': 'allOf',
-                                'description': 'User defined information'},
-                       'region_id': {'type': 'integer'}}}
+                       'region_id': {'type': 'integer'},
+                       'data': DefinitionDataSource}}
+
 
 DefinitionsHostId = {'discriminator': 'name',
                      'type': 'object',
@@ -38,11 +46,11 @@ DefinitionsHostId = {'discriminator': 'name',
                          'labels': {'type': 'array',
                                     'items': 'string',
                                     'description': 'User defined labels'},
-                         'data': {'type': 'allOf',
-                                  'description': 'User defined information'},
                          'device_type': {'type': 'string',
                                          'description': 'Type of host'},
-                         'region_id': {'type': 'integer'}}}
+                         'region_id': {'type': 'integer'},
+                         'data': DefinitionDataSource}}
+
 
 DefinitionsCell = {'discriminator': 'name',
                    'required': ['name',
@@ -53,10 +61,10 @@ DefinitionsCell = {'discriminator': 'name',
                        'note': {'type': 'string'},
                        'name': {'type': 'string'},
                        'region_id': {'type': 'integer'},
-                       'data': {'type': 'allOf',
-                                'description': 'User defined information'},
                        'id': {'type': 'integer',
-                              'description': 'Unique ID of the cell'}}}
+                              'description': 'Unique ID of the cell'},
+                       'data': DefinitionDataSource}}
+
 
 DefinitionsCellId = {'discriminator': 'name',
                      'type': 'object',
@@ -66,26 +74,28 @@ DefinitionsCellId = {'discriminator': 'name',
                                         'description': 'UUID of the project'},
                          'name': {'type': 'string'},
                          'region_id': {'type': 'integer'},
-                         'data': {'type': 'allOf',
-                                  'description': 'User defined information'},
                          'id': {'type': 'integer',
-                                'description': 'Unique ID of the cell'}}}
+                                'description': 'Unique ID of the cell'},
+                         'data': DefinitionDataSource}}
+
 
 DefinitionsData = {'type': 'object',
                    'properties': {'key': {'type': 'string'},
                                   'value': {'type': 'object'}}}
+
 
 DefinitionsLabel = {'type': 'object',
                     'properties': {'labels': {
                                    'type': 'array',
                                    'items': {'type': 'string'}}}}
 
+
 DefinitionsError = {'type': 'object',
                     'properties': {'fields': {'type': 'string'},
                                    'message': {'type': 'string'},
                                    'code': {'type': 'integer',
-                                            'format': 'int32'}
-                                   }}
+                                            'format': 'int32'}}}
+
 
 DefinitionsRegion = {'discriminator': 'name',
                      'required': ['name'],
@@ -101,12 +111,11 @@ DefinitionsRegion = {'discriminator': 'name',
                              'items': DefinitionsCell,
                              'type': 'array',
                              'description': 'List of cells in this region'},
-                         'data': {
-                             'type': 'allOf',
-                             'description': 'User defined information'},
                          'id': {
                              'type': 'integer',
-                             'description': 'Unique ID for the region.'}}}
+                             'description': 'Unique ID for the region.'},
+                         'data': DefinitionDataSource}}
+
 
 DefinitionsRegionId = {'discriminator': 'name',
                        'type': 'object',
@@ -124,12 +133,11 @@ DefinitionsRegionId = {'discriminator': 'name',
                                'items': DefinitionsCell,
                                'type': 'array',
                                'description': 'List of cells in this region'},
-                           'data': {
-                               'type': 'allOf',
-                               'description': 'User defined information'},
                            'id': {
                                'type': 'integer',
-                               'description': 'Unique ID for the region.'}}}
+                               'description': 'Unique ID for the region.'},
+                           'data': DefinitionDataSource}}
+
 
 DefinitionUser = {'discriminator': 'name',
                   'type': 'object',
@@ -161,9 +169,10 @@ DefinitionNetwork = {'discriminator': 'name',
                          'cidr': {'type': 'string'},
                          'gateway': {'type': 'string'},
                          'netmask': {'type': 'string'},
-                         'data': {'type': 'allOf'},
                          "ip_block_type": {'type': 'string'},
-                         "nss": {'type': 'string'}}}
+                         "nss": {'type': 'string'},
+                         'data': DefinitionDataSource}}
+
 
 DefinitionNetworkId = {'discriminator': 'name',
                        'type': 'object',
@@ -176,9 +185,10 @@ DefinitionNetworkId = {'discriminator': 'name',
                            'cidr': {'type': 'string'},
                            'gateway': {'type': 'string'},
                            'netmask': {'type': 'string'},
-                           'data': {'type': 'allOf'},
                            "ip_block_type": {'type': 'string'},
-                           "nss": {'type': 'string'}}}
+                           "nss": {'type': 'string'},
+                           'data': DefinitionDataSource}}
+
 
 DefinitionNetInterface = {'discriminator': 'name',
                           'required': ['name',
@@ -201,8 +211,9 @@ DefinitionNetInterface = {'discriminator': 'name',
                               'speed': {'type': 'integer'},
                               'link': {'type': 'string'},
                               'cdp': {'type': 'string'},
-                              'data': {'type': 'allOf'},
-                              'security': {'type': 'string'}}}
+                              'security': {'type': 'string'},
+                              'data': DefinitionDataSource}}
+
 
 DefinitionNetInterfaceId = {'discriminator': 'name',
                             'type': 'object',
@@ -220,8 +231,9 @@ DefinitionNetInterfaceId = {'discriminator': 'name',
                                 'speed': {'type': 'integer'},
                                 'link': {'type': 'string'},
                                 'cdp': {'type': 'string'},
-                                'data': {'type': 'allOf'},
-                                'security': {'type': 'string'}}}
+                                'security': {'type': 'string'},
+                                'data': DefinitionDataSource}}
+
 
 DefinitionNetDevice = {'discriminator': 'hostname',
                        'required': ['hostname',
@@ -241,10 +253,10 @@ DefinitionNetDevice = {'discriminator': 'hostname',
                            'model_name': {'type': 'string'},
                            'os_version': {'type': 'string'},
                            'vlans': {'type': 'string'},
-                           'data': {'type': 'allOf',
-                                    'description': 'User defined variables'},
                            'interface_id': {'type': 'integer'},
-                           'network_id': {'type': 'integer'}}}
+                           'network_id': {'type': 'integer'},
+                           'data': DefinitionDataSource}}
+
 
 DefinitionNetDeviceId = {'discriminator': 'hostname',
                          'type': 'object',
@@ -262,9 +274,8 @@ DefinitionNetDeviceId = {'discriminator': 'hostname',
                              'os_version': {'type': 'string'},
                              'vlans': {'type': 'string'},
                              'interface_id': {'type': 'integer'},
-                             'data': {'type': 'allOf',
-                                      'description': 'User defined variables'},
-                             'network_id': {'type': 'integer'}}}
+                             'network_id': {'type': 'integer'},
+                             'data': DefinitionDataSource}}
 
 
 validators = {
@@ -789,6 +800,7 @@ class Security(object):
         self._loader = func
         return func
 
+
 security = Security()
 
 
@@ -840,6 +852,11 @@ def normalize(schema, data, required_defaults=None):
         if not isinstance(data, DataWrapper):
             data = DataWrapper(data)
 
+        for pattern, _schema in (schema.get('patternProperties', {})).items():
+            if pattern == "^.+":
+                for key in data.keys():
+                    result[key] = _normalize(_schema, data.get(key))
+
         for key, _schema in six.iteritems(schema.get('properties', {})):
             # set default
             type_ = _schema.get('type', 'object')
@@ -861,6 +878,12 @@ def normalize(schema, data, required_defaults=None):
             rs_component = _normalize(_schema, data)
             rs_component.update(result)
             result = rs_component
+
+        if schema.get('anyOf'):
+            # In case of anyOf simply return data, since we dont
+            # care in normalization of the data as long as
+            # its been verified.
+            result = data.data
 
         additional_properties_schema = schema.get('additionalProperties',
                                                   False)
