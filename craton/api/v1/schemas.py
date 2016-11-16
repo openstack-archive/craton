@@ -25,7 +25,7 @@ DefinitionsHost = {"discriminator": "name",
                        "device_type": {"type": "string",
                                        "description": "Type of host"},
                        "labels": {"type": "array",
-                                  "items": "string",
+                                  "items": {"type": "string"},
                                   "description": "User defined labels"},
                        "region_id": {"type": "integer"},
                        "data": DefinitionDataSource}}
@@ -42,7 +42,7 @@ DefinitionsHostId = {"discriminator": "name",
                          "cell_id": {"type": "integer"},
                          "project_id": {"type": "string"},
                          "labels": {"type": "array",
-                                    "items": "string",
+                                    "items": {"type": "string"},
                                     "description": "User defined labels"},
                          "device_type": {"type": "string",
                                          "description": "Type of host"},
@@ -145,7 +145,9 @@ DefinitionUser = {"discriminator": "name",
                       "username": {"type": "string"},
                       "is_admin": {"type": "boolean"},
                       "project_id": {"type": "string"},
-                      "roles": {"type": "allOf"}}}
+                      "roles": {
+                          "type": "array",
+                          "items": {"type": "string"}}}}
 
 DefinitionProject = {"discriminator": "name",
                      "type": "object",
