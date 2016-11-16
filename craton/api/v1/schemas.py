@@ -25,7 +25,7 @@ DefinitionsHost = {"discriminator": "name",
                        "device_type": {"type": "string",
                                        "description": "Type of host"},
                        "labels": {"type": "array",
-                                  "items": "string",
+                                  "items": {"type": "string"},
                                   "description": "User defined labels"},
                        "region_id": {"type": "integer"},
                        "data": DefinitionDataSource}}
@@ -42,7 +42,7 @@ DefinitionsHostId = {"discriminator": "name",
                          "cell_id": {"type": "integer"},
                          "project_id": {"type": "string"},
                          "labels": {"type": "array",
-                                    "items": "string",
+                                    "items": {"type": "string"},
                                     "description": "User defined labels"},
                          "device_type": {"type": "string",
                                          "description": "Type of host"},
@@ -145,7 +145,9 @@ DefinitionUser = {"discriminator": "name",
                       "username": {"type": "string"},
                       "is_admin": {"type": "boolean"},
                       "project_id": {"type": "string"},
-                      "roles": {"type": "allOf"}}}
+                      "roles": {
+                          "type": "array",
+                          "items": {"type": "string"}}}}
 
 DefinitionProject = {"discriminator": "name",
                      "type": "object",
@@ -292,44 +294,44 @@ validators = {
     ("hosts_id_data", "PUT"): {"json": DefinitionsData},
     ("hosts_labels", "PUT"): {"json": DefinitionsLabel},
     ("hosts_id", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "resolved-values": {
-                         "default": True,
-                         "type": "boolean"}}}
+        "args": {
+            "properties": {
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean"}}}
     },
     ("hosts_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
-                     "active": {"type": "boolean"},
-                     "note": {"type": "string"},
-                     "ip_address": {"type": "string"},
-                     "name": {"type": "string"},
-                     "device_type": {"type": "string",
-                                     "description": "Type of host"}}}
+        "args": {
+            "properties": {
+                "active": {"type": "boolean"},
+                "note": {"type": "string"},
+                "ip_address": {"type": "string"},
+                "name": {"type": "string"},
+                "device_type": {"type": "string",
+                                "description": "Type of host"}}}
         },
     ("hosts_data", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "resolved-values": {
-                         "default": True,
-                         "type": "boolean"}}}
+        "args": {
+            "properties": {
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean"}}}
     },
     ("regions", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "name": {
-                         "default": None,
-                         "type": "string",
-                         "description": "name of the region to get"},
-                     "vars": {
-                         "default": None,
-                         "type": "string",
-                         "description": "variable filters to get a region"},
-                     "id": {
-                         "default": None,
-                         "type": "integer",
-                         "description": "ID of the region to get"}}}
+        "args": {
+            "properties": {
+                "name": {
+                    "default": None,
+                    "type": "string",
+                    "description": "name of the region to get"},
+                "vars": {
+                    "default": None,
+                    "type": "string",
+                    "description": "variable filters to get a region"},
+                "id": {
+                    "default": None,
+                    "type": "integer",
+                    "description": "ID of the region to get"}}}
         },
     ("regions", "POST"): {"json": DefinitionsRegion},
     ("regions_id_data", "PUT"): {"json": DefinitionsData},
@@ -377,10 +379,10 @@ validators = {
                          "description": "ID of host to get"}}
                  }},
     ("cells_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
-                     "note": {"type": "string"},
-                     "name": {"type": "string"}}}
+        "args": {
+            "properties": {
+                "note": {"type": "string"},
+                "name": {"type": "string"}}}
         },
     ("cells", "POST"): {"json": DefinitionsCell},
     ("cells", "GET"): {
@@ -405,98 +407,98 @@ validators = {
                          "description": "name of the cell to get"}}
                  }},
     ("regions_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
-                     "name": {"type": "string"},
-                     "note": {"type": "string"}}}
+        "args": {
+            "properties": {
+                "name": {"type": "string"},
+                "note": {"type": "string"}}}
         },
     ("cells_id_data", "PUT"): {"json": DefinitionsData},
     ("projects", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "id": {
-                         "default": None,
-                         "type": "integer",
-                         "description": "id of the project to get"
-                         },
-                     "name": {
-                         "default": None,
-                         "type": "string",
-                         "description": "name of the project to get"}}
-                 }},
+        "args": {
+            "properties": {
+                "id": {
+                    "default": None,
+                    "type": "integer",
+                    "description": "id of the project to get"
+                    },
+                "name": {
+                    "default": None,
+                    "type": "string",
+                    "description": "name of the project to get"}}
+        }},
     ("projects", "POST"): {"json": DefinitionProject},
     ("users", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "id": {
-                         "default": None,
-                         "type": "integer",
-                         "description": "id of the user to get"
-                         },
-                     "name": {
-                         "default": None,
-                         "type": "string",
-                         "description": "name of the user to get"}}
-                 }},
+        "args": {
+            "properties": {
+                "id": {
+                    "default": None,
+                    "type": "integer",
+                    "description": "id of the user to get"
+                    },
+                "name": {
+                    "default": None,
+                    "type": "string",
+                    "description": "name of the user to get"}}
+        }},
     ("users", "POST"): {"json": DefinitionUser},
     ("netdevices", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "id": {
-                         "default": None,
-                         "type": "integer",
-                         "description": "id of the net device to get"
-                         },
-                     "ip": {
-                         "default": None,
-                         "type": "string",
-                         "description": "IP of the device to get"},
-                     "region_id": {
-                         "default": None,
-                         "type": "string",
-                         "description": "region id of the device to get"},
-                     "name": {
-                         "default": None,
-                         "type": "string",
-                         "description": "name of the device to get"},
-                     "device_type": {
-                         "default": None,
-                         "type": "string",
-                         "description": "type of the device to get"},
-                     "vars": {
-                         "default": None,
-                         "type": "string",
-                         "description": "variable filters to get device"},
-                     "cell_id": {
-                         "default": None,
-                         "type": "string",
-                         "description": "cell id of the device to get"}}
-                 }},
+        "args": {
+            "properties": {
+                "id": {
+                    "default": None,
+                    "type": "integer",
+                    "description": "id of the net device to get"
+                    },
+                "ip": {
+                    "default": None,
+                    "type": "string",
+                    "description": "IP of the device to get"},
+                "region_id": {
+                    "default": None,
+                    "type": "string",
+                    "description": "region id of the device to get"},
+                "name": {
+                    "default": None,
+                    "type": "string",
+                    "description": "name of the device to get"},
+                "device_type": {
+                    "default": None,
+                    "type": "string",
+                    "description": "type of the device to get"},
+                "vars": {
+                    "default": None,
+                    "type": "string",
+                    "description": "variable filters to get device"},
+                "cell_id": {
+                    "default": None,
+                    "type": "string",
+                    "description": "cell id of the device to get"}}
+        }},
     ("netdevices_id", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "resolved-values": {
-                         "default": True,
-                         "type": "boolean"}}}},
+        "args": {
+            "properties": {
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean"}}}},
     ("networks_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
-                     "name": {"type": "string"},
-                     "cidr": {"type": "string"},
-                     "gateway": {"type": "string"},
-                     "netmask": {"type": "string"},
-                     "ip_block_type": {"type": "string"},
-                     "nss": {"type": "string"}}}
+        "args": {
+            "properties": {
+                "name": {"type": "string"},
+                "cidr": {"type": "string"},
+                "gateway": {"type": "string"},
+                "netmask": {"type": "string"},
+                "ip_block_type": {"type": "string"},
+                "nss": {"type": "string"}}}
         },
     ("netdevices_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
-                     "ip_address": {"type": "string"},
-                     "device_type": {"type": "string"},
-                     "hostname": {"type": "string"},
-                     "model_name": {"type": "string"},
-                     "os_version": {"type": "string"},
-                     "vlans": {"type": "string"}}}
+        "args": {
+            "properties": {
+                "ip_address": {"type": "string"},
+                "device_type": {"type": "string"},
+                "hostname": {"type": "string"},
+                "model_name": {"type": "string"},
+                "os_version": {"type": "string"},
+                "vlans": {"type": "string"}}}
         },
     ("netdevices", "POST"): {"json": DefinitionNetDevice},
     ("netdevices_labels", "PUT"): {"json": DefinitionsLabel},
@@ -523,47 +525,47 @@ validators = {
                  }},
     ("net_interfaces", "POST"): {"json": DefinitionNetInterface},
     ("net_interfaces_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
-                     "name": {"type": "string"},
-                     "interface_type": {"type": "string"},
-                     "vlan": {"type": "string"},
-                     "port": {"type": "string"},
-                     "duplex": {"type": "string"},
-                     "speed": {"type": "integer"},
-                     "link": {"type": "string"},
-                     "cdp": {"type": "string"},
-                     "security": {"type": "string"}}}
+        "args": {
+            "properties": {
+                "name": {"type": "string"},
+                "interface_type": {"type": "string"},
+                "vlan": {"type": "string"},
+                "port": {"type": "string"},
+                "duplex": {"type": "string"},
+                "speed": {"type": "integer"},
+                "link": {"type": "string"},
+                "cdp": {"type": "string"},
+                "security": {"type": "string"}}}
         },
     ("networks", "GET"): {
-        "args": {"required": [],
-                 "properties": {
-                     "id": {
-                         "default": None,
-                         "type": "integer",
-                         "description": "id of the network to get"
-                         },
-                     "network_type": {
-                         "default": None,
-                         "type": "string",
-                         "description": "type of the network to get"},
-                     "name": {
-                         "default": None,
-                         "type": "string",
-                         "description": "name of the network to get"},
-                     "region_id": {
-                         "default": None,
-                         "type": "string",
-                         "description": "region id of the network to get"},
-                     "vars": {
-                         "default": None,
-                         "type": "string",
-                         "description": "variable filters to get networks"},
-                     "cell_id": {
-                         "default": None,
-                         "type": "string",
-                         "description": "cell idof the network to get"}}
-                 }},
+        "args": {
+            "properties": {
+                "id": {
+                    "default": None,
+                    "type": "integer",
+                    "description": "id of the network to get"
+                    },
+                "network_type": {
+                    "default": None,
+                    "type": "string",
+                    "description": "type of the network to get"},
+                "name": {
+                    "default": None,
+                    "type": "string",
+                    "description": "name of the network to get"},
+                "region_id": {
+                    "default": None,
+                    "type": "string",
+                    "description": "region id of the network to get"},
+                "vars": {
+                    "default": None,
+                    "type": "string",
+                    "description": "variable filters to get networks"},
+                "cell_id": {
+                    "default": None,
+                    "type": "string",
+                    "description": "cell idof the network to get"}}
+        }},
     ("networks", "POST"): {"json": DefinitionNetwork}
 }
 
