@@ -104,14 +104,14 @@ DefinitionsRegion = {"discriminator": "name",
                              "description": "Region Note"},
                          "name": {
                              "type": "string",
-                             "description": "Region Name."},
+                             "description": "Region Name"},
                          "cells": {
                              "items": DefinitionsCell,
                              "type": "array",
                              "description": "List of cells in this region"},
                          "id": {
                              "type": "integer",
-                             "description": "Unique ID for the region."},
+                             "description": "Unique ID for the region"},
                          "data": DefinitionDataSource}}
 
 
@@ -133,7 +133,7 @@ DefinitionsRegionId = {"discriminator": "name",
                                "description": "List of cells in this region"},
                            "id": {
                                "type": "integer",
-                               "description": "Unique ID for the region."},
+                               "description": "Unique ID for the region"},
                            "data": DefinitionDataSource}}
 
 
