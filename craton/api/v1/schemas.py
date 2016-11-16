@@ -25,7 +25,7 @@ DefinitionsHost = {"discriminator": "name",
                        "device_type": {"type": "string",
                                        "description": "Type of host"},
                        "labels": {"type": "array",
-                                  "items": "string",
+                                  "items": {"type": "string"},
                                   "description": "User defined labels"},
                        "region_id": {"type": "integer"},
                        "data": DefinitionDataSource}}
@@ -42,7 +42,7 @@ DefinitionsHostId = {"discriminator": "name",
                          "cell_id": {"type": "integer"},
                          "project_id": {"type": "string"},
                          "labels": {"type": "array",
-                                    "items": "string",
+                                    "items": {"type": "string"},
                                     "description": "User defined labels"},
                          "device_type": {"type": "string",
                                          "description": "Type of host"},
@@ -145,7 +145,9 @@ DefinitionUser = {"discriminator": "name",
                       "username": {"type": "string"},
                       "is_admin": {"type": "boolean"},
                       "project_id": {"type": "string"},
-                      "roles": {"type": "allOf"}}}
+                      "roles": {
+                          "type": "array",
+                          "items": {"type": "string"}}}}
 
 DefinitionProject = {"discriminator": "name",
                      "type": "object",
@@ -292,15 +294,13 @@ validators = {
     ("hosts_id_data", "PUT"): {"json": DefinitionsData},
     ("hosts_labels", "PUT"): {"json": DefinitionsLabel},
     ("hosts_id", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "resolved-values": {
                          "default": True,
                          "type": "boolean"}}}
     },
     ("hosts_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "active": {"type": "boolean"},
                      "note": {"type": "string"},
                      "ip_address": {"type": "string"},
@@ -309,15 +309,13 @@ validators = {
                                      "description": "Type of host"}}}
         },
     ("hosts_data", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "resolved-values": {
                          "default": True,
                          "type": "boolean"}}}
     },
     ("regions", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "name": {
                          "default": None,
                          "type": "string",
@@ -369,8 +367,7 @@ validators = {
                          "description": "ID of host to get"}}
                  }},
     ("cells_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "note": {"type": "string"},
                      "name": {"type": "string"}}}
         },
@@ -393,15 +390,13 @@ validators = {
                          "description": "name of the cell to get"}}
                  }},
     ("regions_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "name": {"type": "string"},
                      "note": {"type": "string"}}}
         },
     ("cells_id_data", "PUT"): {"json": DefinitionsData},
     ("projects", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "id": {
                          "default": None,
                          "type": "integer",
@@ -414,8 +409,7 @@ validators = {
                  }},
     ("projects", "POST"): {"json": DefinitionProject},
     ("users", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "id": {
                          "default": None,
                          "type": "integer",
@@ -428,8 +422,7 @@ validators = {
                  }},
     ("users", "POST"): {"json": DefinitionUser},
     ("netdevices", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "id": {
                          "default": None,
                          "type": "integer",
@@ -457,14 +450,12 @@ validators = {
                          "description": "cell id of the device to get"}}
                  }},
     ("netdevices_id", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "resolved-values": {
                          "default": True,
                          "type": "boolean"}}}},
     ("networks_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "name": {"type": "string"},
                      "cidr": {"type": "string"},
                      "gateway": {"type": "string"},
@@ -473,8 +464,7 @@ validators = {
                      "nss": {"type": "string"}}}
         },
     ("netdevices_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "ip_address": {"type": "string"},
                      "device_type": {"type": "string"},
                      "hostname": {"type": "string"},
@@ -507,8 +497,7 @@ validators = {
                  }},
     ("net_interfaces", "POST"): {"json": DefinitionNetInterface},
     ("net_interfaces_id", "PUT"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "name": {"type": "string"},
                      "interface_type": {"type": "string"},
                      "vlan": {"type": "string"},
@@ -520,8 +509,7 @@ validators = {
                      "security": {"type": "string"}}}
         },
     ("networks", "GET"): {
-        "args": {"required": [],
-                 "properties": {
+        "args": {"properties": {
                      "id": {
                          "default": None,
                          "type": "integer",
