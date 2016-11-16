@@ -36,6 +36,7 @@ class Security(object):
         self._loader = func
         return func
 
+
 security = Security()
 
 
