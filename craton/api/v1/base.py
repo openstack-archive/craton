@@ -36,26 +36,30 @@ def http_codes(f, *args, **kwargs):
         return args[0].error_response(500, 'Unknown Error')
 
 
-def filtered_context(required=None, filters=None):
+def filtered_context(required=None, reserved_keys=None):
     def decorator(f):
         objname = f.__qualname__.split('.')[0].rstrip('s').lower()
 
         @functools.wraps(f)
         def method_wrapper(self):
             context = flask.request.environ.get("context")
-            query_required = flask.g.args[required]
-            if not query_required:
-                return self.error_response(
-                    400, 'Missing `%s` in query' % required)
+            if required:
+                query_required = flask.g.args[required]
+                if not query_required:
+                    return self.error_response(
+                        400, 'Missing `%s` in query' % required)
             query_filters = {}
-            for key in filters:
+            for key in reserved_keys:
                 value = flask.g.args.get(key)
                 if value is not None:
                     query_filters[key] = value
             inspect.getmodule(f).LOG.info(
                 "Getting all %s objects that match filters %s" % (
                     objname, query_filters))
-            return f(self, context, query_required, query_filters)
+            if required:
+                return f(self, context, query_required, query_filters)
+            else:
+                return f(self, context, query_filters)
 
         return method_wrapper
     return decorator
