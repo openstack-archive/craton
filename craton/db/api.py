@@ -87,16 +87,16 @@ def cells_delete(context, cell_id):
     return IMPL.cells_delete(context, cell_id)
 
 
-def cells_data_update(context, cell_id, data):
+def cells_variables_update(context, cell_id, data):
     """Update existing cells variables or create when
     its not present.
     """
-    return IMPL.cells_data_update(context, cell_id, data)
+    return IMPL.cells_variables_update(context, cell_id, data)
 
 
-def cells_data_delete(context, cell_id, data_key):
-    """Delete the existing key (variable) from cells data."""
-    return IMPL.cells_data_delete(context, cell_id, data_key)
+def cells_variables_delete(context, cell_id, data_key):
+    """Delete the existing variable from cells data."""
+    return IMPL.cells_variables_delete(context, cell_id, data_key)
 
 # Regions
 
@@ -131,16 +131,16 @@ def regions_delete(context, region_id):
     return IMPL.regions_delete(context, region_id)
 
 
-def regions_data_update(context, region_id, data):
+def regions_variables_update(context, region_id, data):
     """
     Update existing region variables or create when its not present.
     """
-    return IMPL.regions_data_update(context, region_id, data)
+    return IMPL.regions_variables_update(context, region_id, data)
 
 
-def regions_data_delete(context, region_id, data_key):
-    """Delete the existing key (variable) from region data."""
-    return IMPL.regions_data_delete(context, region_id, data_key)
+def regions_variables_delete(context, region_id, data_key):
+    """Delete the existing variables from region data."""
+    return IMPL.regions_variables_delete(context, region_id, data_key)
 
 # Hosts
 
@@ -175,16 +175,16 @@ def hosts_delete(context, host_id):
     return IMPL.hosts_delete(context, host_id)
 
 
-def hosts_data_update(context, host_id, data):
+def hosts_variables_update(context, host_id, data):
     """
     Update existing host variables or create them when not present.
     """
-    return IMPL.hosts_data_update(context, host_id, data)
+    return IMPL.hosts_variables_update(context, host_id, data)
 
 
-def hosts_data_delete(context, host_id, data_key):
+def hosts_variables_delete(context, host_id, data_key):
     """Delete the existing key (variable) from region data."""
-    return IMPL.hosts_data_delete(context, host_id, data_key)
+    return IMPL.hosts_variables_delete(context, host_id, data_key)
 
 
 def hosts_labels_delete(context, host_id, labels):
@@ -278,14 +278,14 @@ def networks_delete(context, network_id):
     return IMPL.networks_delete(context, network_id)
 
 
-def networks_data_update(context, network_id, data):
+def networks_variables_update(context, network_id, data):
     """Update/create network variables data."""
-    return IMPL.networks_data_update(context, network_id, data)
+    return IMPL.networks_variables_update(context, network_id, data)
 
 
-def networks_data_delete(context, network_id, data):
+def networks_variables_delete(context, network_id, data):
     """Delete network variables data."""
-    return IMPL.networks_data_delete(context, network_id, data)
+    return IMPL.networks_variables_delete(context, network_id, data)
 
 
 def netdevices_get_by_region(context, region_id, filters):
@@ -313,14 +313,14 @@ def netdevices_delete(context, netdevice_id):
     return IMPL.netdevices_delete(context, netdevice_id)
 
 
-def netdevices_data_delete(context, netdevice_id, data):
-    """Delete network device data."""
-    return IMPL.netdevices_data_delete(context, netdevice_id, data)
+def netdevices_variables_delete(context, netdevice_id, data):
+    """Delete network device variables."""
+    return IMPL.netdevices_variables_delete(context, netdevice_id, data)
 
 
-def netdevices_data_update(context, netdevice_id, data):
-    """Update network device data."""
-    return IMPL.netdevices_data_update(context, netdevice_id, data)
+def netdevices_variables_update(context, netdevice_id, data):
+    """Update network device variables."""
+    return IMPL.netdevices_variables_update(context, netdevice_id, data)
 
 
 def netdevices_labels_delete(context, netdevice_id, labels):

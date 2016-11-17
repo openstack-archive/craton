@@ -21,11 +21,9 @@ class Cells(base.Resource):
         if 'name' in filters:
             cell_obj = dbapi.cells_get_by_name(
                 context, region_id, filters['name'])
-            cell_obj.data = cell_obj.variables
             cells_obj = [cell_obj]
         elif 'id' in filters:
             cell_obj = dbapi.cells_get_by_id(context, filters['id'])
-            cell_obj.data = cell_obj.variables
             cells_obj = [cell_obj]
         else:
             cells_obj = dbapi.cells_get_all(context, region_id, filters)
@@ -46,8 +44,8 @@ class CellById(base.Resource):
     def get(self, id):
         context = request.environ.get('context')
         cell_obj = dbapi.cells_get_by_id(context, id)
-        cell_obj.data = cell_obj.variables
-        cell = jsonutils.to_primitive(cell_obj)
+        cell = jsonutils.to_primitive(cell_obj, convert_instances=True)
+        cell['variables'] = jsonutils.to_primitive(cell_obj.variables)
         return cell, 200, None
 
     def put(self, id):
@@ -64,33 +62,33 @@ class CellById(base.Resource):
         return None, 204, None
 
 
-class CellsData(base.Resource):
+class CellsVariables(base.Resource):
 
     @base.http_codes
     def get(self, id):
-        """Get data for given cell."""
+        """Get variables for given cell."""
         context = request.environ.get('context')
         obj = dbapi.cells_get_by_id(context, id)
-        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
     def put(self, id):
         """
-        Update existing cell data, or create if it does
+        Update existing cell variables, or create if it does
         not exist.
         """
         context = request.environ.get('context')
-        obj = dbapi.cells_data_update(context, id, request.json)
-        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        obj = dbapi.cells_variables_update(context, id, request.json)
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
     def delete(self, id):
-        """Delete cell data."""
+        """Delete cell variables."""
         # NOTE(sulo): this is not that great. Find a better way to do this.
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
         context = request.environ.get('context')
-        dbapi.cells_data_delete(context, id, request.json)
+        dbapi.cells_variables_delete(context, id, request.json)
         return None, 204, None
