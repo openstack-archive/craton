@@ -42,8 +42,8 @@ class NetworkById(base.Resource):
         """Get network by given id"""
         context = request.environ.get('context')
         obj = dbapi.networks_get_by_id(context, id)
-        obj.data = obj.variables
         device = jsonutils.to_primitive(obj)
+        device['variables'] = jsonutils.to_primitive(obj.variables)
         return device, 200, None
 
     def put(self, id):
@@ -60,30 +60,30 @@ class NetworkById(base.Resource):
         return None, 204, None
 
 
-class NetworksData(base.Resource):
-    """Controller for networks data endpoints."""
+class NetworksVariables(base.Resource):
+    """Controller for networks variables endpoints."""
 
     @base.http_codes
     def get(self, id):
-        """Get data for the given network."""
+        """Get variables for the given network."""
         context = request.environ.get('context')
         obj = dbapi.networks_get_by_id(context, id)
-        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
     def put(self, id):
         """"Update existing variables, or create if it does not exist."""
         context = request.environ.get('context')
-        obj = dbapi.networks_data_update(context, id, request.json)
-        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        obj = dbapi.networks_variables_update(context, id, request.json)
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
     def delete(self, id):
         """Delete networks variables."""
         context = request.environ.get('context')
-        dbapi.networks_data_delete(context, id, request.json)
+        dbapi.networks_variables_delete(context, id, request.json)
         return None, 204, None
 
 
@@ -121,10 +121,11 @@ class NetDeviceById(base.Resource):
         resolved_values = g.args["resolved-values"]
         obj = dbapi.netdevices_get_by_id(context, id)
         if resolved_values:
-            obj.data = obj.resolved
+            obj.vars = obj.resolved
         else:
-            obj.data = obj.variables
+            obj.vars = obj.variables
         device = jsonutils.to_primitive(obj)
+        device['variables'] = jsonutils.to_primitive(obj.vars)
         return device, 200, None
 
     def put(self, id):
@@ -141,30 +142,30 @@ class NetDeviceById(base.Resource):
         return None, 204, None
 
 
-class NetDevicesData(base.Resource):
-    """Controller for network device data endpoints."""
+class NetDevicesVariables(base.Resource):
+    """Controller for network device variables endpoints."""
 
     @base.http_codes
     def get(self, id):
-        """Get data for the given network."""
+        """Get variables for the given network."""
         context = request.environ.get('context')
         obj = dbapi.netdevice_get_by_id(context, id)
-        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
     def put(self, id):
         """"Update device variables, or create if it does not exist."""
         context = request.environ.get('context')
-        obj = dbapi.netdevice_data_update(context, id, request.json)
-        resp = {"data": jsonutils.to_primitive(obj.variables)}
+        obj = dbapi.netdevice_variables_update(context, id, request.json)
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
     def delete(self, id):
         """Delete network device variables."""
         context = request.environ.get('context')
-        dbapi.netdevice_data_delete(context, id, request.json)
+        dbapi.netdevice_variables_delete(context, id, request.json)
         return None, 204, None
 
 
@@ -226,8 +227,8 @@ class NetInterfaceById(base.Resource):
         """Get network interface by given id"""
         context = request.environ.get('context')
         obj = dbapi.net_interface_get_by_id(context, id)
-        obj.data = obj.variables
         interface = jsonutils.to_primitive(obj)
+        interface['variables'] = jsonutils.to_primitive(obj.variables)
         return interface, 200, None
 
     def put(self, id):

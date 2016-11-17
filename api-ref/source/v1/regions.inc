@@ -1,5 +1,4 @@
 .. -*- rst -*-
-
 =======
 Regions
 =======
@@ -46,7 +45,7 @@ Response
     - name: region_name
     - project_id: project_id
     - cells: cells
-    - data: data
+    - variables: variables
 
 **Example Create Region**
 
@@ -90,7 +89,7 @@ Response
     - name: region_name
     - project_id: project_id
     - cells: cells
-    - data: data
+    - variables: variables
 
 **Example List Regions**
 
@@ -122,7 +121,7 @@ Request
     - name: region_name
     - project_id: project_id
     - cells: cells
-    - data: data
+    - variables: variables
     - region_id: region_id
 
 Required Header
@@ -146,7 +145,7 @@ Response
     - name: region_name
     - project_id: project_id
     - cells: cells
-    - data: data
+    - variables: variables
 
 **Example Update Region**  (TO-DO)
 
@@ -156,9 +155,9 @@ Response
 Update Region Data
 ==================
 
-.. rest_method:: PUT /v1/regions/{region_id}/data
+.. rest_method:: PUT /v1/regions/{region_id}/variables
 
-Update user defined data for the region
+Update user defined variables for the region
 
 Normal response codes: OK(200)
 
@@ -231,9 +230,9 @@ No body content is returned on a successful DELETE
 Delete Region Data
 ==================
 
-.. rest_method:: DELETE /v1/regions/{region_id}/data
+.. rest_method:: DELETE /v1/regions/{region_id}/variables
 
-Delete existing key/value data for the region
+Delete existing key/value variables for the region
 
 Normal response codes: OK(200)
 

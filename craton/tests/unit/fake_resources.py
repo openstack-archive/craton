@@ -11,6 +11,9 @@ class Project(object):
     def __init__(self, name):
         self.name = name
 
+    def items(self):
+        return iter(self.__dict__.items())
+
 
 PROJECT1 = Project("project1")
 PROJECT2 = Project("project2")
@@ -25,6 +28,9 @@ class User(object):
         self.is_root = is_root
         self.api_key = api_key
         self.roles = roles
+
+    def items(self):
+        return iter(self.__dict__.items())
 
 
 USER1 = User('user1', "2757a1b4-cd90-4891-886c-a246fd4e7064", True, False,
@@ -43,6 +49,9 @@ class Cell(object):
         self.variables = variables
         self.labels = labels
 
+    def items(self):
+        return iter(self.__dict__.items())
+
 
 CELL1 = Cell("cell1", "active", 1, 1, {"key1": "value1",
                                        "key2": "value2"})
@@ -58,6 +67,9 @@ class Region(object):
         self.project_id = project_id
         self.variables = variables
         self.labels = labels
+
+    def items(self):
+        return iter(self.__dict__.items())
 
 
 REGION1 = Region("region1", "abcd", {"key1": "value1", "key2": "value2"})
@@ -76,6 +88,9 @@ class Host(object):
         self.resolved = copy.copy(variables)
         self.device_type = device_type
         self.labels = labels
+
+    def items(self):
+        return iter(self.__dict__.items())
 
 
 HOST1 = Host("www.craton.com", 1, 1, "192.168.1.1", "server",
@@ -100,6 +115,9 @@ class Networks(object):
         self.netmask = netmask
         self.variables = variables
         self.labels = labels
+
+    def items(self):
+        return iter(self.__dict__.items())
 
 
 NETWORK1 = Networks("PrivateNetwork", 1, "192.168.1.0/24", "192.168.1.1",

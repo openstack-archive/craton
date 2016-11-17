@@ -155,7 +155,7 @@ class HostsDBTestCase(base.DBTestCase):
                                  IPAddress(u'10.1.2.101'),
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}
-        dbapi.hosts_data_update(self.context, host_id, variables)
+        dbapi.hosts_variables_update(self.context, host_id, variables)
         filters = {}
         filters["vars"] = "key2:value2"
         res = dbapi.hosts_get_by_region(self.context, region_id, filters)
@@ -168,7 +168,7 @@ class HostsDBTestCase(base.DBTestCase):
                                  IPAddress(u'10.1.2.101'),
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}
-        dbapi.hosts_data_update(self.context, host_id, variables)
+        dbapi.hosts_variables_update(self.context, host_id, variables)
         filters = {}
         filters["vars"] = "key1:value5"
         res = dbapi.hosts_get_by_region(self.context, region_id, filters)

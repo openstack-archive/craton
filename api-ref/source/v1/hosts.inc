@@ -1,5 +1,4 @@
 .. -*- rst -*-
-
 =====
 Hosts
 =====
@@ -57,7 +56,7 @@ Response
     - device_type: device_type
     - labels: labels
     - note: note
-    - data: data
+    - variables: variables
 
 **Example Create Host** (TO-DO)
 
@@ -114,7 +113,7 @@ Response
     - device_type: device_type
     - labels: labels
     - note: note
-    - data: data
+    - variables: variables
 
 **Example List Host** (TO-DO)
 
@@ -152,7 +151,7 @@ Request
     - device_type: device_type
     - labels: labels
     - note: note
-    - data: data
+    - variables: variables
     - host_id: host_id
 
 
@@ -185,7 +184,7 @@ Response
     - device_type: device_type
     - labels: labels
     - note: note
-    - data: data
+    - variables: variables
 
 **Example Update Host**  (TO-DO)
 
@@ -195,9 +194,9 @@ Response
 Update Host Data
 ==================
 
-.. rest_method:: PUT /v1/hosts/{host_id}/data
+.. rest_method:: PUT /v1/hosts/{host_id}/variables
 
-Update user defined data for the host
+Update user defined variables for the host
 
 Normal response codes: OK(200)
 
@@ -272,9 +271,9 @@ No body content is returned on a successful DELETE
 Delete Host Data
 ================
 
-.. rest_method:: DELETE /v1/hosts/{host_id}/data
+.. rest_method:: DELETE /v1/hosts/{host_id}/variables
 
-Delete existing key/value data for the Host
+Delete existing key/value variables for the Host
 
 Normal response codes: OK(200)
 

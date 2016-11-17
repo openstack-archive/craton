@@ -1,11 +1,11 @@
-DefinitionDataSource = {"type": "object",
-                        "patternProperties": {
-                            "^.+": {
-                                "anyOf": [
-                                    {"type": "string"},
-                                    {"type": "integer"},
-                                    {"type": "array"},
-                                    {"type": "object"}]}}}
+DefinitionVariablesSource = {"type": "object",
+                             "patternProperties": {
+                                 "^.+": {
+                                     "anyOf": [
+                                         {"type": "string"},
+                                         {"type": "integer"},
+                                         {"type": "array"},
+                                         {"type": "object"}]}}}
 
 DefinitionsHost = {"discriminator": "name",
                    "required": ["name",
@@ -28,7 +28,7 @@ DefinitionsHost = {"discriminator": "name",
                                   "items": {"type": "string"},
                                   "description": "User defined labels"},
                        "region_id": {"type": "integer"},
-                       "data": DefinitionDataSource}}
+                       "variables": DefinitionVariablesSource}}
 
 
 DefinitionsHostId = {"discriminator": "name",
@@ -47,7 +47,7 @@ DefinitionsHostId = {"discriminator": "name",
                          "device_type": {"type": "string",
                                          "description": "Type of host"},
                          "region_id": {"type": "integer"},
-                         "data": DefinitionDataSource}}
+                         "variables": DefinitionVariablesSource}}
 
 
 DefinitionsCell = {"discriminator": "name",
@@ -61,7 +61,7 @@ DefinitionsCell = {"discriminator": "name",
                        "region_id": {"type": "integer"},
                        "id": {"type": "integer",
                               "description": "Unique ID of the cell"},
-                       "data": DefinitionDataSource}}
+                       "variables": DefinitionVariablesSource}}
 
 
 DefinitionsCellId = {"discriminator": "name",
@@ -74,7 +74,7 @@ DefinitionsCellId = {"discriminator": "name",
                          "region_id": {"type": "integer"},
                          "id": {"type": "integer",
                                 "description": "Unique ID of the cell"},
-                         "data": DefinitionDataSource}}
+                         "variables": DefinitionVariablesSource}}
 
 
 DefinitionsData = {"type": "object",
@@ -112,7 +112,7 @@ DefinitionsRegion = {"discriminator": "name",
                          "id": {
                              "type": "integer",
                              "description": "Unique ID for the region"},
-                         "data": DefinitionDataSource}}
+                         "variables": DefinitionVariablesSource}}
 
 
 DefinitionsRegionId = {"discriminator": "name",
@@ -134,7 +134,7 @@ DefinitionsRegionId = {"discriminator": "name",
                            "id": {
                                "type": "integer",
                                "description": "Unique ID for the region"},
-                           "data": DefinitionDataSource}}
+                           "variables": DefinitionVariablesSource}}
 
 
 DefinitionUser = {"discriminator": "name",
@@ -171,7 +171,7 @@ DefinitionNetwork = {"discriminator": "name",
                          "netmask": {"type": "string"},
                          "ip_block_type": {"type": "string"},
                          "nss": {"type": "string"},
-                         "data": DefinitionDataSource}}
+                         "variables": DefinitionVariablesSource}}
 
 
 DefinitionNetworkId = {"discriminator": "name",
@@ -187,7 +187,7 @@ DefinitionNetworkId = {"discriminator": "name",
                            "netmask": {"type": "string"},
                            "ip_block_type": {"type": "string"},
                            "nss": {"type": "string"},
-                           "data": DefinitionDataSource}}
+                           "variables": DefinitionVariablesSource}}
 
 
 DefinitionNetInterface = {"discriminator": "name",
@@ -212,7 +212,7 @@ DefinitionNetInterface = {"discriminator": "name",
                               "link": {"type": "string"},
                               "cdp": {"type": "string"},
                               "security": {"type": "string"},
-                              "data": DefinitionDataSource}}
+                              "variables": DefinitionVariablesSource}}
 
 
 DefinitionNetInterfaceId = {"discriminator": "name",
@@ -232,7 +232,7 @@ DefinitionNetInterfaceId = {"discriminator": "name",
                                 "link": {"type": "string"},
                                 "cdp": {"type": "string"},
                                 "security": {"type": "string"},
-                                "data": DefinitionDataSource}}
+                                "variables": DefinitionVariablesSource}}
 
 
 DefinitionNetDevice = {"discriminator": "hostname",
@@ -255,7 +255,7 @@ DefinitionNetDevice = {"discriminator": "hostname",
                            "vlans": {"type": "string"},
                            "interface_id": {"type": "integer"},
                            "network_id": {"type": "integer"},
-                           "data": DefinitionDataSource}}
+                           "variables": DefinitionVariablesSource}}
 
 
 DefinitionNetDeviceId = {"discriminator": "hostname",
@@ -275,7 +275,7 @@ DefinitionNetDeviceId = {"discriminator": "hostname",
                              "vlans": {"type": "string"},
                              "interface_id": {"type": "integer"},
                              "network_id": {"type": "integer"},
-                             "data": DefinitionDataSource}}
+                             "variables": DefinitionVariablesSource}}
 
 
 validators = {
@@ -291,7 +291,7 @@ validators = {
                          "type": "string",
                          "description": "Cell id to generate inventory for"}}}
     },
-    ("hosts_id_data", "PUT"): {"json": DefinitionsData},
+    ("hosts_id_variables", "PUT"): {"json": DefinitionsData},
     ("hosts_labels", "PUT"): {"json": DefinitionsLabel},
     ("hosts_id", "GET"): {
         "args": {
@@ -310,7 +310,7 @@ validators = {
                 "device_type": {"type": "string",
                                 "description": "Type of host"}}}
         },
-    ("hosts_data", "GET"): {
+    ("hosts_variables", "GET"): {
         "args": {
             "properties": {
                 "resolved-values": {
@@ -334,7 +334,7 @@ validators = {
                     "description": "ID of the region to get"}}}
         },
     ("regions", "POST"): {"json": DefinitionsRegion},
-    ("regions_id_data", "PUT"): {"json": DefinitionsData},
+    ("regions_id_variables", "PUT"): {"json": DefinitionsData},
     ("hosts", "POST"): {"json": DefinitionsHost},
     ("hosts", "GET"): {
         "args": {"required": ["region_id"],
@@ -412,7 +412,7 @@ validators = {
                 "name": {"type": "string"},
                 "note": {"type": "string"}}}
         },
-    ("cells_id_data", "PUT"): {"json": DefinitionsData},
+    ("cells_id_variables", "PUT"): {"json": DefinitionsData},
     ("projects", "GET"): {
         "args": {
             "properties": {
@@ -570,12 +570,12 @@ validators = {
 }
 
 filters = {
-    ("hosts_id_data", "PUT"):
+    ("hosts_id_variables", "PUT"):
         {200: {"headers": None, "schema": None},
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
          405: {"headers": None, "schema": None}},
-    ("hosts_id_data", "DELETE"):
+    ("hosts_id_variables", "DELETE"):
         {204: {"headers": None, "schema": None},
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
@@ -630,12 +630,12 @@ filters = {
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
          405: {"headers": None, "schema": None}},
-    ("cells_id_data", "PUT"):
+    ("cells_id_variables", "PUT"):
         {200: {"headers": None, "schema": None},
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
          405: {"headers": None, "schema": None}},
-    ("cells_id_data", "DELETE"):
+    ("cells_id_variables", "DELETE"):
         {204: {"headers": None, "schema": None},
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
@@ -660,12 +660,12 @@ filters = {
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
          405: {"headers": None, "schema": None}},
-    ("regions_id_data", "PUT"):
+    ("regions_id_variables", "PUT"):
         {200: {"headers": None, "schema": None},
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
          405: {"headers": None, "schema": None}},
-    ("regions_id_data", "DELETE"):
+    ("regions_id_variables", "DELETE"):
         {204: {"headers": None, "schema": None},
          400: {"headers": None, "schema": None},
          404: {"headers": None, "schema": None},
@@ -779,13 +779,13 @@ filters = {
 
 
 scopes = {
-    ("hosts_id_data", "PUT"): [],
-    ("hosts_id_data", "DELETE"): [],
+    ("hosts_id_variables", "PUT"): [],
+    ("hosts_id_variables", "DELETE"): [],
     ("hosts_id", "PUT"): [],
     ("hosts_id", "DELETE"): [],
     ("regions", "GET"): [],
-    ("regions_id_data", "PUT"): [],
-    ("regions_id_data", "DELETE"): [],
+    ("regions_id_variables", "PUT"): [],
+    ("regions_id_variables", "DELETE"): [],
     ("hosts", "POST"): [],
     ("hosts", "GET"): [],
     ("cells_id", "PUT"): [],
@@ -793,8 +793,8 @@ scopes = {
     ("cells", "POST"): [],
     ("cells", "GET"): [],
     ("regions_id", "PUT"): [],
-    ("cells_id_data", "PUT"): [],
-    ("cells_id_data", "DELETE"): [],
+    ("cells_id_variables", "PUT"): [],
+    ("cells_id_variables", "DELETE"): [],
     ("projects", "GET"): [],
     ("projects_id", "GET"): [],
     ("projects_id", "DELETE"): [],
