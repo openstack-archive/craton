@@ -35,9 +35,9 @@ class Hosts(base.Resource):
 def format_variables(args, obj):
     resolved_values = args["resolved-values"]
     if resolved_values:
-        obj.data = obj.resolved
+        obj.vars = obj.resolved
     else:
-        obj.data = obj.variables
+        obj.vars = obj.variables
     return obj
 
 
@@ -49,8 +49,9 @@ class HostById(base.Resource):
         context = request.environ.get('context')
         host_obj = dbapi.hosts_get_by_id(context, id)
         host_obj = format_variables(g.args, host_obj)
-        host_obj.labels = host_obj.labels
-        return jsonutils.to_primitive(host_obj), 200, None
+        host = jsonutils.to_primitive(host_obj)
+        host['variables'] = jsonutils.to_primitive(host_obj.vars)
+        return host, 200, None
 
     def put(self, id):
         """Update existing host data, or create if it does not exist."""
@@ -66,33 +67,33 @@ class HostById(base.Resource):
         return None, 204, None
 
 
-class HostsData(base.Resource):
+class HostsVariables(base.Resource):
 
     @base.http_codes
     def get(self, id):
-        """Get data for given host."""
+        """Get variables for given host."""
         context = request.environ.get('context')
         obj = dbapi.hosts_get_by_id(context, id)
         obj = format_variables(g.args, obj)
-        response = {"data": jsonutils.to_primitive(obj.data)}
+        response = {"variables": jsonutils.to_primitive(obj.vars)}
         return response, 200, None
 
     @base.http_codes
     def put(self, id):
-        """Update existing host data, or create if it does not exist."""
+        """Update existing host variables, or create if it does not exist."""
         context = request.environ.get('context')
-        obj = dbapi.hosts_data_update(context, id, request.json)
-        response = {"data": jsonutils.to_primitive(obj.variables)}
+        obj = dbapi.hosts_variables_update(context, id, request.json)
+        response = {"variables": jsonutils.to_primitive(obj.variables)}
         return response, 200, None
 
     @base.http_codes
     def delete(self, id):
-        """Delete host  data."""
+        """Delete host  variables."""
         # NOTE(sulo): this is not that great. Find a better way to do this.
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
         context = request.environ.get('context')
-        dbapi.hosts_data_delete(context, id, request.json)
+        dbapi.hosts_variables_delete(context, id, request.json)
         return None, 204, None
 
 
