@@ -181,25 +181,25 @@ class APIV1CellsTest(APIV1Test):
         self.assertEqual(422, resp.status_code)
 
 
-class APIV1CellsDataTest(APIV1Test):
+class APIV1CellsVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_get_by_id')
-    def test_cells_get_data(self, mock_cell):
+    def test_cells_get_variables(self, mock_cell):
         mock_cell.return_value = fake_resources.CELL1
-        resp = self.get('v1/cells/1/data')
-        expected = {"data": {"key1": "value1", "key2": "value2"}}
+        resp = self.get('v1/cells/1/variables')
+        expected = {"variables": {"key1": "value1", "key2": "value2"}}
         self.assertEqual(resp.json, expected)
 
-    @mock.patch.object(dbapi, 'cells_data_update')
-    def test_cells_put_data(self, mock_cell):
+    @mock.patch.object(dbapi, 'cells_variables_update')
+    def test_cells_put_variables(self, mock_cell):
         mock_cell.return_value = fake_resources.CELL1
         payload = {"a": "b"}
-        resp = self.put('v1/cells/1/data', data=payload)
+        resp = self.put('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
 
-    @mock.patch.object(dbapi, 'cells_data_delete')
-    def test_cells_delete_data(self, mock_cell):
+    @mock.patch.object(dbapi, 'cells_variables_delete')
+    def test_cells_delete_variables(self, mock_cell):
         payload = {"key1": "value1"}
-        resp = self.delete('v1/cells/1/data', data=payload)
+        resp = self.delete('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
 
 
@@ -208,7 +208,7 @@ class APIV1RegionsIDTest(APIV1Test):
     def test_regions_get_by_id(self, mock_regions):
         mock_regions.return_value = fake_resources.REGION1
         resp = self.get('v1/regions/1')
-        self.assertEqual(resp.json["name"], fake_resources.REGION1.name)
+        self.assertEqual(resp.json['name'], fake_resources.REGION1.name)
 
     @mock.patch.object(dbapi, 'regions_get_by_id')
     def test_regions_get_by_bad_id_is_404(self, mock_regions):
@@ -286,25 +286,25 @@ class APIV1RegionsTest(APIV1Test):
         self.assertEqual(422, resp.status_code)
 
 
-class APIV1RegionsDataTest(APIV1Test):
+class APIV1RegionsVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_get_by_id')
-    def test_region_get_data(self, mock_region):
+    def test_region_get_variables(self, mock_region):
         mock_region.return_value = fake_resources.REGION1
-        resp = self.get('v1/regions/1/data')
-        expected = {"data": {"key1": "value1", "key2": "value2"}}
+        resp = self.get('v1/regions/1/variables')
+        expected = {"variables": {"key1": "value1", "key2": "value2"}}
         self.assertEqual(resp.json, expected)
 
-    @mock.patch.object(dbapi, 'regions_data_update')
-    def test_regions_put_data(self, mock_region):
+    @mock.patch.object(dbapi, 'regions_variables_update')
+    def test_regions_put_variables(self, mock_region):
         mock_region.return_value = fake_resources.REGION1
         payload = {"a": "b"}
-        resp = self.put('v1/regions/1/data', data=payload)
+        resp = self.put('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
 
-    @mock.patch.object(dbapi, 'regions_data_delete')
-    def test_regions_delete_data(self, mock_region):
+    @mock.patch.object(dbapi, 'regions_variables_delete')
+    def test_regions_delete_variables(self, mock_region):
         payload = {"key1": "value1"}
-        resp = self.delete('v1/regions/1/data', data=payload)
+        resp = self.delete('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
 
 
@@ -329,7 +329,7 @@ class APIV1HostsIDTest(APIV1Test):
         expected = {"r_var": "one", "key1": "value1", "key2": "value2"}
         mock_host.return_value = host
         resp = self.get('v1/hosts/1')
-        self.assertEqual(resp.json["data"], expected)
+        self.assertEqual(resp.json["variables"], expected)
 
     @mock.patch.object(dbapi, 'hosts_get_by_id')
     def test_get_hosts_no_resolved_vars(self, mock_host):
@@ -339,7 +339,7 @@ class APIV1HostsIDTest(APIV1Test):
         expected = {"key1": "value1", "key2": "value2"}
         mock_host.return_value = host
         resp = self.get('v1/hosts/1?resolved-values=false')
-        self.assertEqual(resp.json["data"], expected)
+        self.assertEqual(resp.json["variables"], expected)
 
     @mock.patch.object(dbapi, 'hosts_get_by_id')
     def test_get_hosts_labels(self, mock_host):
@@ -425,35 +425,35 @@ class APIV1HostsTest(APIV1Test):
         self.assertEqual(return_value, resp.json)
 
 
-class APIV1HostsDataTest(APIV1Test):
+class APIV1HostsVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_get_by_id')
-    def test_host_get_data(self, mock_host):
+    def test_host_get_variables(self, mock_host):
         mock_host.return_value = fake_resources.HOST1
-        resp = self.get('v1/hosts/1/data')
-        expected = {"data": {"key1": "value1", "key2": "value2"}}
+        resp = self.get('v1/hosts/1/variables?resolved-values=false')
+        expected = {"variables": {"key1": "value1", "key2": "value2"}}
         self.assertEqual(resp.json, expected)
 
     @mock.patch.object(dbapi, 'hosts_get_by_id')
-    def test_host_get_resolved_data(self, mock_host):
+    def test_host_get_resolved_variables(self, mock_host):
         region_vars = {"r_var": "somevar"}
         host = fake_resources.HOST1
         host.resolved.update(region_vars)
         expected = {"r_var": "somevar", "key1": "value1", "key2": "value2"}
         mock_host.return_value = host
-        resp = self.get('v1/hosts/1/data')
-        self.assertEqual(resp.json["data"], expected)
+        resp = self.get('v1/hosts/1/variables')
+        self.assertEqual(resp.json["variables"], expected)
 
-    @mock.patch.object(dbapi, 'hosts_data_update')
+    @mock.patch.object(dbapi, 'hosts_variables_update')
     def test_hosts_put_data(self, mock_host):
         mock_host.return_value = fake_resources.REGION1
         payload = {"a": "b"}
-        resp = self.put('v1/hosts/1/data', data=payload)
+        resp = self.put('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
 
-    @mock.patch.object(dbapi, 'hosts_data_delete')
+    @mock.patch.object(dbapi, 'hosts_variables_delete')
     def test_regions_delete_data(self, mock_host):
         payload = {"key1": "value1"}
-        resp = self.delete('v1/hosts/1/data', data=payload)
+        resp = self.delete('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
 
 

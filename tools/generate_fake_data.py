@@ -71,7 +71,7 @@ class Inventory(object):
 
         self.region = resp.json()
         if data:
-            region_data_url = self.url + "/regions/%s/data" % self.region["id"]
+            region_data_url = self.url + "/regions/%s/variables" % self.region["id"]
             resp = requests.put(region_data_url, headers=self.headers,
                                 data=json.dumps(data), verify=False)
             if resp.status_code != 200:
@@ -89,7 +89,7 @@ class Inventory(object):
 
         self.cell = resp.json()
         if data:
-            region_data_url = self.url + "/cells/%s/data" % resp.json()["id"]
+            region_data_url = self.url + "/cells/%s/variables" % resp.json()["id"]
             resp = requests.put(region_data_url, headers=self.headers,
                                 data=json.dumps(data), verify=False)
             if resp.status_code != 200:
@@ -112,7 +112,7 @@ class Inventory(object):
 
         if data:
             device_id = device_obj.json()["id"]
-            region_data_url = self.url + "/hosts/%s/data" % device_id
+            region_data_url = self.url + "/hosts/%s/variables" % device_id
             resp = requests.put(region_data_url, headers=self.headers,
                                 data=json.dumps(data), verify=False)
             if resp.status_code != 200:

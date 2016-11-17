@@ -64,7 +64,7 @@ cells:
   in: body
   required: false
   type: array
-data:
+variables:
   description: |
     User defined information
   in: body

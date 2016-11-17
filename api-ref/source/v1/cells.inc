@@ -50,7 +50,7 @@ Response
     - region_id: region_id_body
     - project_id: project_id
     - note: note
-    - data: data
+    - variables: variables
 
 **Example Create Cell** (TO-DO)
 
@@ -97,7 +97,7 @@ Response
     - region_id: region_id_body
     - project_id: project_id
     - note: note
-    - data: data
+    - variables: variables
 
 **Example List Cells** (TO-DO)
 
@@ -130,7 +130,7 @@ Request
     - region_id: region_id_body
     - project_id: project_id
     - note: note
-    - data: data
+    - variables: variables
     - cell_id: cell_id
 
 Required Header
@@ -157,7 +157,7 @@ Response
     - region_id: region_id_body
     - project_id: project_id
     - note: note
-    - data: data
+    - variables: variables
 
 **Example Update Cell**  (TO-DO)
 
@@ -167,9 +167,9 @@ Response
 Update Cell Data
 ==================
 
-.. rest_method:: PUT /v1/cells/{cell_id}/data
+.. rest_method:: PUT /v1/cells/{cell_id}/variables
 
-Update user defined data for the cell
+Update user defined variables for the cell
 
 Normal response codes: OK(200)
 
@@ -244,9 +244,9 @@ No body content is returned on a successful DELETE
 Delete Cell Data
 ================
 
-.. rest_method:: DELETE /v1/cells/{cell_id}/data
+.. rest_method:: DELETE /v1/cells/{cell_id}/variables
 
-Delete existing key/value data for the cell
+Delete existing key/value variable for the cell
 
 Normal response codes: OK(200)
 
