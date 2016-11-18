@@ -19,40 +19,15 @@ IMPL = db_api.DBAPI.from_config(cfg.CONF, backend_mapping=BACKEND_MAPPING,
                                 lazy=True)
 
 
-def get_user_info(context, user):
-    return IMPL.get_user_info(context, user)
-
-
-# Devices
+# Blame supports generic blame tracking for variables
+# TODO(jimbaker) add additional governance support, such as
+# versioning, user, notes
 
 Blame = namedtuple('Blame', ['source', 'variable'])
 
 
-def device_blame_variables(device, keys=None):
-    """Determines the sources of how variables have been set for a device.
-    :param device: device to get blame information
-    :param keys: keys to check sourcing, or all keys if None
-
-    Returns the (source, variable) in a named tuple; note that
-    variable contains certain audit/governance information
-    (created_at, modified_at).
-
-    TODO(jimbaker) further extend schema on mixed-in variable tables
-    to capture additional governance, such as user who set the key;
-    this will then transparently become available in the blame.
-    """
-    if keys is None:
-        keys = device.resolved.keys()
-    sources = [device] + list(device.labels) + [device.cell, device.region]
-    blamed = {}
-    for key in keys:
-        for source in sources:
-            try:
-                blamed[key] = Blame(source, source._variables[key])
-                break
-            except KeyError:
-                pass
-    return blamed
+def get_user_info(context, user):
+    return IMPL.get_user_info(context, user)
 
 
 # Cells

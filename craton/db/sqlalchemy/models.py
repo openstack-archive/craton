@@ -15,6 +15,7 @@ Craton uses the following related aspects of inventory:
 """
 
 from collections import ChainMap
+import itertools
 
 from oslo_db.sqlalchemy import models
 from sqlalchemy import (
@@ -27,6 +28,8 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
 from sqlalchemy_utils.types.uuid import UUIDType
+
+from craton.db.api import Blame
 
 
 # TODO(jimbaker) set up table args for a given database/storage
@@ -127,6 +130,7 @@ class VariableMixin(object):
     the variable_association table for each parent.
 
     """
+
     @declared_attr
     def variable_association_id(cls):
         return Column(
@@ -180,6 +184,47 @@ class VariableMixin(object):
             backref=backref('parent', uselist=False))
 
         return rel
+
+    # For resolution ordering, the default is to just include
+    # self. Override as desired for other resolution policy.
+
+    @property
+    def resolution_order(self):
+        return [self]
+
+    @property
+    def resolution_order_variables(self):
+        return [obj.variables for obj in self.resolution_order]
+
+    @property
+    def resolved(self):
+        """Provides a mapping that uses scope resolution for variables"""
+        return ChainMap(*self.resolution_order_variables)
+
+    def blame(self, keys=None):
+        """Determines the sources of how variables have been set.
+        :param keys: keys to check sourcing, or all keys if None
+
+        Returns the (source, variable) in a named tuple; note that
+        variable contains certain audit/governance information
+        (created_at, modified_at).
+
+        TODO(jimbaker) further extend schema on mixed-in variable tables
+        to capture additional governance, such as user who set the key;
+        this will then transparently become available in the blame.
+        """
+
+        if keys is None:
+            keys = self.resolved.keys()
+        blamed = {}
+        for key in keys:
+            for source in self.resolution_order:
+                try:
+                    blamed[key] = Blame(source, source._variables[key])
+                    break
+                except KeyError:
+                    pass
+        return blamed
 
 
 class Project(Base):
@@ -313,19 +358,13 @@ class Device(Base, VariableMixin):
         return lineage
 
     @property
-    def resolved(self):
-        """Provides a mapping that uses scope resolution for variables"""
-        if self.cell:
-            return ChainMap(
-                self.variables,
-                ChainMap(*[ancestor.variables for ancestor in self.ancestors]),
-                self.cell.variables,
-                self.region.variables)
-        else:
-            return ChainMap(
-                self.variables,
-                ChainMap(*[ancestor.variables for ancestor in self.ancestors]),
-                self.region.variables)
+    def resolution_order(self):
+        # TODO(jimbaker) add self.project to resolution_order
+        return list(itertools.chain(
+            [self],
+            self.ancestors,
+            [self.cell] if self.cell else [],
+            [self.region]))
 
     __mapper_args__ = {
         'polymorphic_on': type,
