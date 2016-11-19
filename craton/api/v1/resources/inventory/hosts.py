@@ -14,11 +14,8 @@ LOG = log.getLogger(__name__)
 class Hosts(base.Resource):
 
     @base.http_codes
-    @base.filtered_context(
-        required='region_id',
-        reserved_keys=['id', 'name', 'ip_address', 'cell_id', 'vars',
-                       'device_type', 'label', 'limit', 'region_id'])
-    def get(self, context, region_id, filters):
+    @base.filtered_context()
+    def get(self, context, region_id, **filters):
         """Get all hosts for region, with optional filtering."""
         hosts_obj = dbapi.hosts_get_by_region(context, region_id, filters)
         return jsonutils.to_primitive(hosts_obj), 200, None

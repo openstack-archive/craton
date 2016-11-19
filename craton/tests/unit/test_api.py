@@ -527,6 +527,12 @@ class APIV1NetworksTest(APIV1Test):
         self.assertEqual(404, resp.status_code)
 
     @mock.patch.object(dbapi, 'networks_get_by_region')
+    def test_get_networks_without_region_raises422(self, fake_network):
+        resp = self.get('/v1/networks')
+        self.assertEqual(422, resp.status_code)
+        fake_network.assert_not_called()
+
+    @mock.patch.object(dbapi, 'networks_get_by_region')
     def test_get_networks_by_filters(self, fake_networks):
         fake_networks.return_value = [fake_resources.NETWORK1]
         resp = self.get('/v1/networks?region_id=1&name=PrivateNetwork')

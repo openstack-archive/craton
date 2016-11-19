@@ -13,8 +13,8 @@ LOG = log.getLogger(__name__)
 class Regions(base.Resource):
 
     @base.http_codes
-    @base.filtered_context(reserved_keys=["id", "name"])
-    def get(self, context, filters):
+    @base.filtered_context()
+    def get(self, context, **filters):
         """Get region(s) for the project. Get region details if
         for a particular region.
         """

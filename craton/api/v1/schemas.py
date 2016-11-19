@@ -443,6 +443,7 @@ validators = {
     ("users", "POST"): {"json": DefinitionUser},
     ("netdevices", "GET"): {
         "args": {
+            "required": ["region_id"],
             "properties": {
                 "id": {
                     "default": None,
@@ -539,6 +540,7 @@ validators = {
         },
     ("networks", "GET"): {
         "args": {
+            "required": ["region_id"],
             "properties": {
                 "id": {
                     "default": None,
