@@ -378,6 +378,24 @@ class APIV1HostsTest(APIV1Test):
         self.assertEqual(resp.json[0]["name"], host_resp[0].name)
 
     @mock.patch.object(dbapi, 'hosts_get_by_region')
+    def test_get_host_by_ip_address_filter(self, fake_hosts):
+        region_id = 1
+        ip_address = '10.10.0.1'
+        filters = {
+            'region_id': region_id, 'ip_address': ip_address, 'limit': 1000
+        }
+        path_query = '/v1/hosts?region_id={}&ip_address={}'.format(
+            region_id, ip_address
+        )
+        fake_hosts.return_value = fake_resources.HOSTS_LIST_R2
+        resp = self.get(path_query)
+        host_resp = fake_resources.HOSTS_LIST_R2
+        self.assertEqual(len(resp.json), 1)
+        self.assertEqual(resp.json[0]["name"], host_resp[0].name)
+
+        fake_hosts.assert_called_once_with(mock.ANY, region_id, filters)
+
+    @mock.patch.object(dbapi, 'hosts_get_by_region')
     def test_get_host_by_vars_filters(self, fake_hosts):
         fake_hosts.return_value = [fake_resources.HOST1]
         resp = self.get('/v1/hosts?region_id=1&vars=somekey:somevalue')
@@ -542,3 +560,39 @@ class APIV1NetworksTest(APIV1Test):
                 'netmask': '255.255.255.0'}
         resp = self.post('/v1/networks', data=data)
         self.assertEqual(200, resp.status_code)
+
+
+class APIV1NetDevicesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'netdevices_get_by_region')
+    def test_get_netdevices_by_ip_address_filter(self, fake_devices):
+        region_id = '1'
+        ip_address = '10.10.0.1'
+        filters = {'region_id': region_id, 'ip_address': ip_address}
+        path_query = '/v1/netdevices?region_id={}&ip_address={}'.format(
+            region_id, ip_address
+        )
+        fake_devices.return_value = fake_resources.NETDEVICE_LIST1
+        resp = self.get(path_query)
+        device_resp = fake_resources.NETDEVICE_LIST1
+        self.assertEqual(len(resp.json), 1)
+        self.assertEqual(resp.json[0]["ip_address"], device_resp[0].ip_address)
+
+        fake_devices.assert_called_once_with(mock.ANY, region_id, filters)
+
+
+class APIV1NetInterfacesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'net_interfaces_get_by_device')
+    def test_get_netinterfaces_by_ip_address_filter(self, fake_interfaces):
+        device_id = 1
+        ip_address = '10.10.0.1'
+        filters = {'device_id': device_id, 'ip_address': ip_address}
+        path_query = '/v1/net_interfaces?device_id={}&ip_address={}'.format(
+            device_id, ip_address
+        )
+        fake_interfaces.return_value = fake_resources.NETINTERFACE_LIST1
+        resp = self.get(path_query)
+        interface_resp = fake_resources.NETINTERFACE_LIST1
+        self.assertEqual(len(resp.json), 1)
+        self.assertEqual(resp.json[0]["name"], interface_resp[0].name)
+
+        fake_interfaces.assert_called_once_with(mock.ANY, device_id, filters)

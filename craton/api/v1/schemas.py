@@ -365,7 +365,7 @@ validators = {
                          "default": 1000,
                          "type": "integer",
                          "maximum": 10000},
-                     "ip": {
+                     "ip_address": {
                          "default": None,
                          "type": "string",
                          "description": "ip_address of the hosts to get"},
@@ -449,7 +449,7 @@ validators = {
                     "type": "integer",
                     "description": "id of the net device to get"
                     },
-                "ip": {
+                "ip_address": {
                     "default": None,
                     "type": "string",
                     "description": "IP of the device to get"},
@@ -514,7 +514,7 @@ validators = {
                          "default": None,
                          "type": "integer",
                          "description": "device id of the interface to get"},
-                     "ip": {
+                     "ip_address": {
                          "default": None,
                          "type": "string",
                          "description": "IP of the interface to get"},

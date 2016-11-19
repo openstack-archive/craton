@@ -125,3 +125,33 @@ NETWORK1 = Networks("PrivateNetwork", 1, "192.168.1.0/24", "192.168.1.1",
 NETWORK2 = Networks("PublicNetwork", 1, "10.10.1.0/24", "10.10.1.1",
                     "255.255.255.0", {"pkey1": "pvalue1"})
 NETWORKS_LIST = [NETWORK1, NETWORK2]
+
+
+class NetDevice():
+    def __init__(self, region_id, ip_address):
+        self.region_id = region_id
+        self.ip_address = ip_address
+
+    def items(self):
+        return iter(self.__dict__.items())
+
+
+NETDEVICE1 = NetDevice(1, '10.10.0.1')
+NETDEVICE_LIST1 = [NETDEVICE1]
+
+
+class NetInterface():
+    def __init__(self, name, device_id, interface_type, ip_address):
+        self.name = name
+        self.device_id = device_id
+        self.interface_type = interface_type
+        self.ip_address = ip_address
+
+    def items(self):
+        return iter(self.__dict__.items())
+
+
+NETINTERFACE1 = NetInterface(
+    'NetworkDevice1', 1, 'interface_type1', '10.10.0.1'
+)
+NETINTERFACE_LIST1 = [NETINTERFACE1]
