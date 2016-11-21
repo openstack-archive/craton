@@ -108,7 +108,7 @@ Database Setup
 
 * Create the Craton database::
 
-    # create database craton;
+    # create database craton CHARACTER SET='utf8';
 
 * Logout from the database server::
 
