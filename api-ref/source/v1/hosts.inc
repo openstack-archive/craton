@@ -9,7 +9,7 @@ Definition of host
 Create Host
 ============
 
-.. rest_method:: POST /v1/hosts
+.. rest_method:: POST /v1/regions/{region_id}/hosts
 
 Create a new host
 
@@ -23,7 +23,6 @@ Request
 .. rest_parameters:: parameters.yaml
 
     - name: host_name
-    - region_id: region_id_body
     - project_id: project_id
     - ip_address: ip_address
     - device_type: device_type
@@ -67,7 +66,7 @@ Response
 List Hosts
 ==========
 
-.. rest_method::  GET /v1/hosts
+.. rest_method::  GET /v1/regions/{region_id}/hosts
 
 Gets all Host
 
@@ -85,7 +84,6 @@ Request
     - limit: limit
     - name: host_name_query
     - id: host_id_query
-    - region: region_name_query
     - cell: cell_name_query
     - ip_address: ip_address_query
     - service: service

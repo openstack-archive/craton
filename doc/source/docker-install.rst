@@ -77,7 +77,7 @@ Calling into Craton
 
 * Now that you know the IP address, you can run a curl command like the one below to query Craton::
 
-    $ curl -i "http://{Container_IP}:8080/v1/hosts?region_id=1" -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: b9f10eca66ac4c279c139d01e65f96b4"
+    $ curl -i "http://{Container_IP}:8080/v1/regions/1/hosts" -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: b9f10eca66ac4c279c139d01e65f96b4"
 
 
 -------------------

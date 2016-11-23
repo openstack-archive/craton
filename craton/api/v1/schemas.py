@@ -1,3 +1,5 @@
+import copy
+
 DefinitionVariablesSource = {
     "type": "object",
     "patternProperties": {
@@ -20,7 +22,7 @@ DefinitionVariablesSource = {
     },
 }
 
-DefinitionsHost = {
+DefinitionsResponseHost = {
     "discriminator": "name",
     "required": [
         "name",
@@ -69,6 +71,10 @@ DefinitionsHost = {
         "variables": DefinitionVariablesSource,
     },
 }
+
+DefinitionsPostHost = copy.deepcopy(DefinitionsResponseHost)
+DefinitionsPostHost["required"].remove("region_id")
+del DefinitionsPostHost["properties"]["region_id"]
 
 DefinitionsHostId = {
     "discriminator": "name",
@@ -686,36 +692,24 @@ validators = {
         "json": DefinitionsData,
     },
     ("hosts", "POST"): {
-        "json": DefinitionsHost,
+        "json": DefinitionsPostHost,
     },
     ("hosts", "GET"): {
         "args": {
-            "required": [
-                "region_id",
-            ],
             "properties": {
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the hosts to get",
                 },
-                "region_id": {
-                    "default": None,
-                    "type": "integer",
-                    "description": "ID of the region to get hosts",
-                },
                 "cell_id": {
-                    "default": None,
                     "type": "integer",
                     "description": "ID of the cell to get hosts",
                 },
                 "device_type": {
-                    "default": None,
                     "type": "string",
                     "description": "Type of host to get",
                 },
                 "label": {
-                    "default": None,
                     "type": "string",
                     "description": "label to get host by",
                 },
@@ -727,17 +721,14 @@ validators = {
                     "maximum": 10000,
                 },
                 "ip_address": {
-                    "default": None,
                     "type": "string",
                     "description": "ip_address of the hosts to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get a host",
                 },
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "ID of host to get",
                 },
@@ -1182,7 +1173,7 @@ filters = {
     ("hosts", "POST"): {
         200: {
             "headers": None,
-            "schema": DefinitionsHost,
+            "schema": DefinitionsResponseHost,
         },
         400: {
             "headers": None,
@@ -1197,7 +1188,7 @@ filters = {
         200: {
             "headers": None,
             "schema": {
-                "items": DefinitionsHost,
+                "items": DefinitionsResponseHost,
                 "type": "array",
             },
         },

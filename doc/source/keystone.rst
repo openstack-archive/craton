@@ -69,4 +69,4 @@ talk to Craton:
     export AUTH_TOKEN="$(openstack token issue -c id -f value)"
     curl -i \
          -H"X-Auth-Token: $AUTH_TOKEN" \
-         http://<ip>:<port>/v1/hosts?region_id=1
+         http://<ip>:<port>/v1/regions/1/hosts

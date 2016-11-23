@@ -9,7 +9,7 @@ Definition of host
 Create Host
 ===========
 
-:POST: /v1/hosts
+:POST: /v1/regions/{region_id}/hosts
 
 Create a new host
 
@@ -26,8 +26,6 @@ Request
 | name       | body | string  | Unique name of the host       |
 +------------+------+---------+-------------------------------+
 | cell_id    | body | integer | Unique ID of the host's cell  |
-+------------+------+---------+-------------------------------+
-| region_id  | body | integer | Unique ID of the host's region|
 +------------+------+---------+-------------------------------+
 | parent_id  | body | integer | ID of the host's parent       |
 +------------+------+---------+-------------------------------+
@@ -106,7 +104,7 @@ Response
 List Hosts
 ==========
 
-:GET: /v1/hosts?region_id=
+:GET: /v1/regions/{region_id}/hosts
 
 Gets all Host
 
@@ -122,8 +120,6 @@ Request
 +------------+------+---------+---------+------------------------------+
 | Name       | In   | Type    | Required| Description                  |
 +============+======+=========+=========+==============================+
-| region_id  | query| integer | Yes     | ID of the region to get hosts|
-+------------+------+---------+---------+------------------------------+
 | limit      | query| integer | No      | Number of host to return     |
 |            |      |         |         | Ranging from 1 - 10000       |
 +------------+------+---------+---------+------------------------------+
