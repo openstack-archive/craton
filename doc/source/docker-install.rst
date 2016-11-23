@@ -52,7 +52,7 @@ Run the Craton Docker Image
 
 * First, go to craton directory and build the Docker image::
 
-    $ sudo docker build -t craton-api:latest .
+    $ sudo docker build --pull -t craton-api:latest .
 
 * And finally, run the docker image::
 
