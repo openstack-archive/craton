@@ -246,9 +246,9 @@ def ensure_project_exists(view):
 
     @wraps(view)
     def wrapper(*args, **kwargs):
-        context = request.environ['context']
-        if context.using_keystone:
-            find_or_create_project(request, context)
+        g.context = request.environ['context']
+        if g.context.using_keystone:
+            find_or_create_project(request, g.context)
         return view(*args, **kwargs)
 
     return wrapper

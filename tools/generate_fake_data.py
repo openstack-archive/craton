@@ -98,12 +98,13 @@ class Inventory(object):
                 print(resp.text)
 
     def create_device(self, host, device_type, data=None):
-        region_url = self.url + "/hosts"
-        payload = {"region_id": self.region.get("id"),
-                   "cell_id": self.cell.get("id"),
-                   "name": host,
-                   "ip_address": self.ip_addresses.pop(0),
-                   "device_type": device_type}
+        region_url = self.url + "/regions/{}/hosts".format(self.region['id'])
+        payload = {
+            "cell_id": self.cell.get("id"),
+            "name": host,
+            "ip_address": self.ip_addresses.pop(0),
+            "device_type": device_type
+        }
 
         print("Creating host entry %s with data %s" % (payload, data))
         device_obj = requests.post(region_url, headers=self.headers,
@@ -114,7 +115,7 @@ class Inventory(object):
 
         if data:
             device_id = device_obj.json()["id"]
-            region_data_url = self.url + "/hosts/%s/variables" % device_id
+            region_data_url = region_url + "/%s/variables" % device_id
             resp = requests.put(region_data_url, headers=self.headers,
                                 data=json.dumps(data), verify=False)
             if resp.status_code != 200:

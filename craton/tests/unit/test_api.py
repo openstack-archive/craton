@@ -360,7 +360,7 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_get_by_region')
     def test_get_hosts_by_region_gets_all_hosts(self, fake_hosts):
         fake_hosts.return_value = fake_resources.HOSTS_LIST_R1
-        resp = self.get('/v1/hosts?region_id=1')
+        resp = self.get('/v1/regions/1/hosts')
         self.assertEqual(len(resp.json), 2)
 
     @mock.patch.object(dbapi, 'hosts_get_by_region')
@@ -372,7 +372,7 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_get_by_region')
     def test_get_host_by_name_filters(self, fake_hosts):
         fake_hosts.return_value = fake_resources.HOSTS_LIST_R2
-        resp = self.get('/v1/hosts?region_id=1&name=www.example.net')
+        resp = self.get('/v1/regions/1/hosts?name=www.example.net')
         host_resp = fake_resources.HOSTS_LIST_R2
         self.assertEqual(len(resp.json), len(host_resp))
         self.assertEqual(resp.json[0]["name"], host_resp[0].name)
@@ -382,9 +382,10 @@ class APIV1HostsTest(APIV1Test):
         region_id = 1
         ip_address = '10.10.0.1'
         filters = {
-            'region_id': region_id, 'ip_address': ip_address, 'limit': 1000
+            'ip_address': ip_address,
+            'limit': 1000
         }
-        path_query = '/v1/hosts?region_id={}&ip_address={}'.format(
+        path_query = '/v1/regions/{}/hosts?ip_address={}'.format(
             region_id, ip_address
         )
         fake_hosts.return_value = fake_resources.HOSTS_LIST_R2
@@ -398,25 +399,34 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_get_by_region')
     def test_get_host_by_vars_filters(self, fake_hosts):
         fake_hosts.return_value = [fake_resources.HOST1]
-        resp = self.get('/v1/hosts?region_id=1&vars=somekey:somevalue')
+        resp = self.get('/v1/regions/1/hosts?vars=somekey:somevalue')
         self.assertEqual(len(resp.json), 1)
         self.assertEqual(resp.json[0]["name"], fake_resources.HOST1.name)
 
     @mock.patch.object(dbapi, 'hosts_get_by_region')
     def test_get_host_by_label_filters(self, fake_hosts):
         fake_hosts.return_value = fake_resources.HOSTS_LIST_R2
-        resp = self.get('/v1/hosts?region_id=1&label=somelabel')
+        resp = self.get('/v1/regions/1/hosts?label=somelabel')
         host_resp = fake_resources.HOSTS_LIST_R2
         self.assertEqual(len(resp.json), len(host_resp))
         self.assertEqual(resp.json[0]["name"], host_resp[0].name)
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_with_valid_data(self, mock_host):
-        mock_host.return_value = None
-        data = {'name': 'www.host1.com', 'region_id': 1,
-                'ip_address': '10.0.0.1', 'device_type': 'server',
-                'active': True}
-        resp = self.post('/v1/hosts', data=data)
+        region_id = 1
+
+        data = {
+            'name': 'www.host1.com',
+            'ip_address': '10.0.0.1',
+            'device_type': 'server',
+            'active': True,
+        }
+
+        return_data = data.copy()
+        return_data['region_id'] = region_id
+        mock_host.return_value = return_data
+
+        resp = self.post('/v1/regions/{}/hosts'.format(region_id), data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'hosts_update')
@@ -432,13 +442,21 @@ class APIV1HostsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_returns_host_obj(self, mock_host):
-        return_value = {'name': 'www.host1.com', 'region_id': 1,
-                        'ip_address': '10.0.0.1', 'id': 1,
-                        'device_type': 'server', 'active': True}
+        return_value = {
+            'name': 'www.host1.com',
+            'ip_address': '10.0.0.1',
+            'id': 1,
+            'device_type': 'server',
+            'active': True,
+            'region_id': 1,
+        }
         mock_host.return_value = return_value
-        data = {'name': 'www.host1.com', 'region_id': 1,
-                'ip_address': '10.0.0.1', 'device_type': 'server'}
-        resp = self.post('v1/hosts', data=data)
+        data = {
+            'name': 'www.host1.com',
+            'ip_address': '10.0.0.1',
+            'device_type': 'server'
+        }
+        resp = self.post('v1/regions/1/hosts', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
 
