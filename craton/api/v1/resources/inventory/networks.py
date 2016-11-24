@@ -15,22 +15,19 @@ class Networks(base.Resource):
     """Controller for Networks resources."""
 
     @base.http_codes
-    @base.filtered_context(
-        required='region_id',
-        reserved_keys=['id', 'name', 'cell_id', 'network_type',
-                       'region_id', 'vars'])
-    def get(self, context, region_id, filters):
+    def get(self, region_id):
         """Get all networks for this region, with optional filtering."""
+        filters = g.args
         networks_obj = dbapi.networks_get_by_region(
-            context, region_id, filters)
+            g.context, region_id, filters)
         return jsonutils.to_primitive(networks_obj), 200, None
 
     @base.http_codes
-    def post(self):
+    def post(self, region_id):
         """Create a new network."""
-        context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
-        network_obj = dbapi.networks_create(context, json)
+        json = util.copy_project_id_into_json(g.context, g.json)
+        json['region_id'] = region_id
+        network_obj = dbapi.networks_create(g.context, json)
         return jsonutils.to_primitive(network_obj), 200, None
 
 

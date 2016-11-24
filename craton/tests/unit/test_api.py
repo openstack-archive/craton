@@ -555,7 +555,7 @@ class APIV1NetworksTest(APIV1Test):
     @mock.patch.object(dbapi, 'networks_get_by_region')
     def test_networks_by_region_gets_all_networks(self, fake_network):
         fake_network.return_value = fake_resources.NETWORKS_LIST
-        resp = self.get('/v1/networks?region_id=1')
+        resp = self.get('/v1/regions/1/networks')
         self.assertEqual(len(resp.json), 2)
 
     @mock.patch.object(dbapi, 'networks_get_by_region')
@@ -567,7 +567,7 @@ class APIV1NetworksTest(APIV1Test):
     @mock.patch.object(dbapi, 'networks_get_by_region')
     def test_get_networks_by_filters(self, fake_networks):
         fake_networks.return_value = [fake_resources.NETWORK1]
-        resp = self.get('/v1/networks?region_id=1&name=PrivateNetwork')
+        resp = self.get('/v1/regions/1/networks?name=PrivateNetwork')
         net_resp = fake_resources.NETWORK1
         self.assertEqual(len(resp.json), 1)
         self.assertEqual(resp.json[0]["name"], net_resp.name)
@@ -578,7 +578,7 @@ class APIV1NetworksTest(APIV1Test):
         data = {'name': 'some network', 'region_id': 1,
                 'cidr': '10.10.1.0/24', 'gateway': '192.168.1.1',
                 'netmask': '255.255.255.0'}
-        resp = self.post('/v1/networks', data=data)
+        resp = self.post('/v1/regions/1/networks', data=data)
         self.assertEqual(200, resp.status_code)
 
 
