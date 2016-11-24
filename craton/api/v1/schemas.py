@@ -144,6 +144,10 @@ DefinitionsCell = {
     },
 }
 
+DefinitionsPostCell = copy.deepcopy(DefinitionsCell)
+DefinitionsPostCell["required"].remove("region_id")
+del DefinitionsPostCell["properties"]["region_id"]
+
 DefinitionsCellId = {
     "discriminator": "name",
     "type": "object",
@@ -748,31 +752,20 @@ validators = {
         },
     },
     ("cells", "POST"): {
-        "json": DefinitionsCell,
+        "json": DefinitionsPostCell,
     },
     ("cells", "GET"): {
         "args": {
-            "required": [
-                "region_id",
-            ],
             "properties": {
-                "region_id": {
-                    "default": None,
-                    "type": "string",
-                    "description": "name of the region to get cells for",
-                },
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the cell to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get a cell",
                 },
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the cell to get",
                 },

@@ -79,8 +79,8 @@ class Inventory(object):
                 print(resp.text)
 
     def create_cell(self, cell, data=None):
-        region_url = self.url + "/cells"
-        payload = {"region_id": self.region.get("id"), "name": cell}
+        region_url = self.url + "/regions/{}/cells".format(self.region['id'])
+        payload = {"name": cell}
 
         print("Creating cell entry %s with data %s" % (payload, data))
         resp = requests.post(region_url, headers=self.headers,
