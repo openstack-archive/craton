@@ -352,6 +352,9 @@ DefinitionNetwork = {
     },
 }
 
+DefinitionPostNetwork = copy.deepcopy(DefinitionNetwork)
+del DefinitionPostNetwork["properties"]["region_id"]
+
 DefinitionNetworkId = {
     "discriminator": "name",
     "type": "object",
@@ -999,32 +1002,22 @@ validators = {
         "args": {
             "properties": {
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the network to get",
                 },
                 "network_type": {
-                    "default": None,
                     "type": "string",
                     "description": "type of the network to get",
                 },
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the network to get",
                 },
-                "region_id": {
-                    "default": None,
-                    "type": "string",
-                    "description": "region id of the network to get",
-                },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get networks",
                 },
                 "cell_id": {
-                    "default": None,
                     "type": "string",
                     "description": "cell idof the network to get",
                 },

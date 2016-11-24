@@ -124,13 +124,14 @@ class Inventory(object):
         return device_obj.json()
 
     def create_network(self, name, cidr, gateway, netmask, block_type):
-        networks_url = self.url + "/networks"
+        networks_url = "{}/regions/{}/networks".format(
+            self.url, self.region['id']
+        )
         payload = {"name": name,
                    "cidr": cidr,
                    "gateway": gateway,
                    "netmask": netmask,
                    "ip_block_type": block_type,
-                   "region_id": self.region.get("id"),
                    "cell_id": self.cell.get("id")}
 
         print("Creating new network: %s" % payload)
