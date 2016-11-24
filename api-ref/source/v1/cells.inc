@@ -9,7 +9,7 @@ Definition of cell
 Create Cell
 ============
 
-.. rest_method:: POST /v1/cells
+.. rest_method:: POST /v1/regions/{region_id}/cells
 
 Create a new Cell
 
@@ -23,7 +23,6 @@ Request
 .. rest_parameters:: parameters.yaml
 
     - name : cell_name
-    - region_id: region_id_body
     - project_id: project_id
 
 Required Header
@@ -60,7 +59,7 @@ Response
 List Cells
 ==========
 
-.. rest_method::  GET /v1/cells
+.. rest_method::  GET /v1/regions/{region_id}/cells
 
 Gets all Cells
 
@@ -76,7 +75,6 @@ Request
 .. rest_parameters:: parameters.yaml
 
     - cell: cell_name_query
-    - region: region_name_query
 
 Required Header
 ^^^^^^^^^^^^^^^

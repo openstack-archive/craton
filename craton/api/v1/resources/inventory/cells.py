@@ -13,28 +13,26 @@ LOG = log.getLogger(__name__)
 class Cells(base.Resource):
 
     @base.http_codes
-    @base.filtered_context(
-        required='region_id',
-        reserved_keys=['id', 'name', 'region_id', 'vars'])
-    def get(self, context, region_id, filters):
+    def get(self, region_id):
         """Get cells for the region, with optional filtering."""
+        filters = g.args
         if 'name' in filters:
             cell_obj = dbapi.cells_get_by_name(
-                context, region_id, filters['name'])
+                g.context, region_id, filters['name'])
             cells_obj = [cell_obj]
         elif 'id' in filters:
-            cell_obj = dbapi.cells_get_by_id(context, filters['id'])
+            cell_obj = dbapi.cells_get_by_id(g.context, filters['id'])
             cells_obj = [cell_obj]
         else:
-            cells_obj = dbapi.cells_get_all(context, region_id, filters)
+            cells_obj = dbapi.cells_get_all(g.context, region_id, filters)
         return jsonutils.to_primitive(cells_obj), 200, None
 
     @base.http_codes
-    def post(self):
+    def post(self, region_id):
         """Create a new cell."""
-        context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
-        cell_obj = dbapi.cells_create(context, json)
+        json = util.copy_project_id_into_json(g.context, g.json)
+        json['region_id'] = region_id
+        cell_obj = dbapi.cells_create(g.context, json)
         return jsonutils.to_primitive(cell_obj), 200, None
 
 

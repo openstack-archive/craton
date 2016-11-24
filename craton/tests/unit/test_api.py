@@ -113,13 +113,13 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_get_all')
     def test_get_cells(self, mock_cells):
         mock_cells.return_value = fake_resources.CELL_LIST
-        resp = self.get('v1/cells')
+        resp = self.get('v1/regions/1/cells')
         self.assertEqual(len(resp.json), len(fake_resources.CELL_LIST))
 
     @mock.patch.object(dbapi, 'cells_get_by_name')
     def test_get_cells_with_name_filters(self, mock_cells):
         mock_cells.return_value = fake_resources.CELL1
-        resp = self.get('v1/cells?region_id=1&name=cell1')
+        resp = self.get('v1/regions/1/cells?name=cell1')
         self.assertEqual(len(resp.json), 1)
         # Ensure we got the right cell
         self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
@@ -127,7 +127,7 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_get_by_id')
     def test_get_cells_with_id_filters(self, mock_cells):
         mock_cells.return_value = fake_resources.CELL1
-        resp = self.get('v1/cells?region_id=1&id=1')
+        resp = self.get('v1/regions/1/cells?id=1')
         self.assertEqual(len(resp.json), 1)
         # Ensure we got the right cell
         self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
@@ -135,7 +135,7 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_get_all')
     def test_get_cells_with_vars_filters(self, mock_cells):
         mock_cells.return_value = [fake_resources.CELL1]
-        resp = self.get('v1/cells?region_id=1&vars=somekey:somevalue')
+        resp = self.get('v1/regions/1/cells?vars=somekey:somevalue')
         self.assertEqual(len(resp.json), 1)
         self.assertEqual(resp.json[0]["name"], fake_resources.CELL1.name)
 
@@ -143,22 +143,25 @@ class APIV1CellsTest(APIV1Test):
     def test_get_cell_no_exist_by_name_fails(self, mock_cell):
         err = exceptions.NotFound()
         mock_cell.side_effect = err
-        resp = self.get('v1/cells?region_id=1&name=dontexist')
+        resp = self.get('v1/regions/1/cells?name=dontexist')
         self.assertEqual(404, resp.status_code)
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_with_valid_data(self, mock_cell):
-        mock_cell.return_value = None
-        data = {'name': 'cell1', 'region_id': 1}
-        resp = self.post('v1/cells', data=data)
+        mock_cell.return_value = {
+            'name': 'cell1',
+            'region_id': 1
+        }
+        data = {'name': 'cell1'}
+        resp = self.post('v1/regions/1/cells', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_returns_cell_obj(self, mock_cell):
         return_value = {'name': 'cell1', 'region_id': 1, 'id': 1}
         mock_cell.return_value = return_value
-        data = {'name': 'cell1', 'region_id': 1}
-        resp = self.post('v1/cells', data=data)
+        data = {'name': 'cell1'}
+        resp = self.post('v1/regions/1/cells', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
 
@@ -176,8 +179,7 @@ class APIV1CellsTest(APIV1Test):
     def test_create_cell_fails_with_invalid_data(self, mock_cell):
         mock_cell.return_value = None
         # data is missing required cell name
-        data = {'region_id': 1}
-        resp = self.post('v1/cells', data=data)
+        resp = self.post('v1/regions/1/cells', data={})
         self.assertEqual(422, resp.status_code)
 
 

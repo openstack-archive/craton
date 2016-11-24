@@ -8,7 +8,7 @@ Definition of cell
 
 Create Cell
 ===========
-:POST: /v1/cells
+:POST: /v1/regions/{region_id}/cells
 
 Create a new Cell
 
@@ -23,8 +23,6 @@ Request
 | Name       | In   | Type    | Description             |
 +============+======+=========+=========================+
 | name       | boody| string  | Unique name of the cell |
-+------------+------+---------+-------------------------+
-| region_id  | body | integer | Unique ID of the region |
 +------------+------+---------+-------------------------+
 | labels     | body | string  | User defined labels     |
 +------------+------+---------+-------------------------+
@@ -80,7 +78,7 @@ Response
 List Cells
 ==========
 
-:GET: /v1/cells?region_id=
+:GET: /v1/regions/{region_id}/cells
 
 Gets all Cells
 
@@ -89,15 +87,6 @@ Normal response codes: OK(200)
 Error response codes: invalid request(400), cell not found(404), validation exception(405)
 
 Default response: unexpected error
-
-Request
--------
-
-+-----------+-------+--------+---------+----------------------------------+
-| Name      | In    | Type   | Required| Description                      |
-+===========+=======+========+=========+==================================+
-| region_id | query | string | No      | ID of the region to get cells for|
-+-----------+-------+--------+---------+----------------------------------+
 
 Required Header
 ^^^^^^^^^^^^^^^
