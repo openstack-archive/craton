@@ -88,22 +88,19 @@ class NetDevices(base.Resource):
     """Controller for Network Device resources."""
 
     @base.http_codes
-    @base.filtered_context(
-        required='region_id',
-        reserved_keys=['id', 'name', 'ip_address', 'cell_id',
-                       'device_type', 'region_id', 'vars'])
-    def get(self, context, region_id, filters):
+    def get(self, region_id):
         """Get all network devices for this region."""
+        filters = g.args
         devices_obj = dbapi.netdevices_get_by_region(
-            context, region_id, filters)
+            g.context, region_id, filters)
         return jsonutils.to_primitive(devices_obj), 200, None
 
     @base.http_codes
-    def post(self):
+    def post(self, region_id):
         """Create a new network device."""
-        context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
-        obj = dbapi.netdevices_create(context, json)
+        json = util.copy_project_id_into_json(g.context, g.json)
+        json['region_id'] = region_id
+        obj = dbapi.netdevices_create(g.context, json)
         device = jsonutils.to_primitive(obj)
         return device, 200, None
 

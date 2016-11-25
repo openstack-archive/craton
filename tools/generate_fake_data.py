@@ -143,14 +143,15 @@ class Inventory(object):
         return resp.json()
 
     def create_netdevice(self, name, device_type):
-        netdevices_url = self.url + "/netdevices"
+        netdevices_url = "{}/regions/{}/netdevices".format(
+            self.url, self.region['id']
+        )
         payload = {"hostname": name,
                    "model_name": "model-x",
                    "os_version": "version-1",
                    "device_type": device_type,
                    "ip_address": "10.10.1.1",
                    "active": True,
-                   "region_id": self.region.get("id"),
                    "cell_id": self.cell.get("id")}
 
         resp = requests.post(netdevices_url, headers=self.headers,

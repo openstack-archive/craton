@@ -585,10 +585,10 @@ class APIV1NetworksTest(APIV1Test):
 class APIV1NetDevicesTest(APIV1Test):
     @mock.patch.object(dbapi, 'netdevices_get_by_region')
     def test_get_netdevices_by_ip_address_filter(self, fake_devices):
-        region_id = '1'
+        region_id = 1
         ip_address = '10.10.0.1'
-        filters = {'region_id': region_id, 'ip_address': ip_address}
-        path_query = '/v1/netdevices?region_id={}&ip_address={}'.format(
+        filters = {'ip_address': ip_address}
+        path_query = '/v1/regions/{}/netdevices?&ip_address={}'.format(
             region_id, ip_address
         )
         fake_devices.return_value = fake_resources.NETDEVICE_LIST1

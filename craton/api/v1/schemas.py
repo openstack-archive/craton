@@ -504,16 +504,12 @@ DefinitionNetDevice = {
     "discriminator": "hostname",
     "required": [
         "hostname",
-        "region_id",
         "device_type",
         "ip_address",
     ],
     "type": "object",
     "properties": {
         "id": {
-            "type": "integer",
-        },
-        "region_id": {
             "type": "integer",
         },
         "cell_id": {
@@ -832,37 +828,26 @@ validators = {
         "args": {
             "properties": {
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the net device to get",
                 },
                 "ip_address": {
-                    "default": None,
                     "type": "string",
                     "description": "IP of the device to get",
                 },
-                "region_id": {
-                    "default": None,
-                    "type": "string",
-                    "description": "region id of the device to get",
-                },
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the device to get",
                 },
                 "device_type": {
-                    "default": None,
                     "type": "string",
                     "description": "type of the device to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get device",
                 },
                 "cell_id": {
-                    "default": None,
                     "type": "string",
                     "description": "cell id of the device to get",
                 },
