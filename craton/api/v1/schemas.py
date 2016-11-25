@@ -666,17 +666,14 @@ validators = {
         "args": {
             "properties": {
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the region to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get a region",
                 },
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "ID of the region to get",
                 },

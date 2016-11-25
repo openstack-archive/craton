@@ -13,35 +13,34 @@ LOG = log.getLogger(__name__)
 class Regions(base.Resource):
 
     @base.http_codes
-    @base.filtered_context(reserved_keys=["id", "name"])
-    def get(self, context, filters):
+    def get(self):
         """Get region(s) for the project. Get region details if
         for a particular region.
         """
+        filters = g.args
         region_id = filters.get("id")
         region_name = filters.get("name")
 
         if not region_id and not region_name:
             # Get all regions for this tenant
-            regions_obj = dbapi.regions_get_all(context, filters)
+            regions_obj = dbapi.regions_get_all(g.context, filters)
             return jsonutils.to_primitive(regions_obj), 200, None
 
         if region_name:
-            region_obj = dbapi.regions_get_by_name(context, region_name)
+            region_obj = dbapi.regions_get_by_name(g.context, region_name)
             region_obj.data = region_obj.variables
             return jsonutils.to_primitive([region_obj]), 200, None
 
         if region_id:
-            region_obj = dbapi.regions_get_by_id(context, region_id)
+            region_obj = dbapi.regions_get_by_id(g.context, region_id)
             region_obj.data = region_obj.variables
             return jsonutils.to_primitive([region_obj]), 200, None
 
     @base.http_codes
     def post(self):
         """Create a new region."""
-        context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
-        region_obj = dbapi.regions_create(context, json)
+        json = util.copy_project_id_into_json(g.context, g.json)
+        region_obj = dbapi.regions_create(g.context, json)
         return jsonutils.to_primitive(region_obj), 200, None
 
 
