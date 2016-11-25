@@ -162,16 +162,19 @@ class Inventory(object):
         return resp.json()
 
     def create_net_interface(self, device, int_num, network=None):
-        netinterfaces_url = self.url + "/net_interfaces"
+        netinterfaces_url = "{}/devices/{}/net_interfaces".format(
+            self.url, device['id']
+        )
         name = "eth%s" % int_num
-        payload = {"name": name,
-                   "interface_type": "ethernet",
-                   "vlan_id": 1,
-                   "port": int_num,
-                   "duplex": "full",
-                   "speed": 1000,
-                   "link": "up",
-                   "device_id": device.get("id")}
+        payload = {
+            "name": name,
+            "interface_type": "ethernet",
+            "vlan_id": 1,
+            "port": int_num,
+            "duplex": "full",
+            "speed": 1000,
+            "link": "up",
+        }
         if network:
             payload["network_id"] = network.get("id")
 

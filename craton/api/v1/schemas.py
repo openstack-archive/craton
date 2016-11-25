@@ -397,7 +397,6 @@ DefinitionNetInterface = {
     "discriminator": "name",
     "required": [
         "name",
-        "device_id",
         "interface_type",
     ],
     "type": "object",
@@ -407,10 +406,6 @@ DefinitionNetInterface = {
         },
         "name": {
             "type": "string",
-        },
-        "device_id": {
-            "type": "integer",
-            "default": None,
         },
         "network_id": {
             "type": "integer",
@@ -920,27 +915,16 @@ validators = {
     },
     ("net_interfaces", "GET"): {
         "args": {
-            "required": [
-                "device_id",
-            ],
             "properties": {
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the net interface to get",
                 },
-                "device_id": {
-                    "default": None,
-                    "type": "integer",
-                    "description": "device id of the interface to get",
-                },
                 "ip_address": {
-                    "default": None,
                     "type": "string",
                     "description": "IP of the interface to get",
                 },
                 "interface_type": {
-                    "default": None,
                     "type": "string",
                     "description": "Type of the interface  to get",
                 },

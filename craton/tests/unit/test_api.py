@@ -605,8 +605,8 @@ class APIV1NetInterfacesTest(APIV1Test):
     def test_get_netinterfaces_by_ip_address_filter(self, fake_interfaces):
         device_id = 1
         ip_address = '10.10.0.1'
-        filters = {'device_id': device_id, 'ip_address': ip_address}
-        path_query = '/v1/net_interfaces?device_id={}&ip_address={}'.format(
+        filters = {'ip_address': ip_address}
+        path_query = '/v1/devices/{}/net_interfaces?ip_address={}'.format(
             device_id, ip_address
         )
         fake_interfaces.return_value = fake_resources.NETINTERFACE_LIST1

@@ -194,22 +194,19 @@ class NetInterfaces(base.Resource):
     """Controller for Netowrk Interfaces."""
 
     @base.http_codes
-    @base.filtered_context(
-        required='device_id',
-        reserved_keys=['id', 'ip_address', 'interface_type',
-                       'device_id', 'vars'])
-    def get(self, context, device_id, filters):
+    def get(self, device_id):
         """Get all network interfaces for a given network device."""
+        filters = g.args
         interfaces_obj = dbapi.net_interfaces_get_by_device(
-            context, device_id, filters)
+            g.context, device_id, filters)
         return jsonutils.to_primitive(interfaces_obj), 200, None
 
     @base.http_codes
-    def post(self):
+    def post(self, device_id):
         """Create a new network interface."""
-        context = request.environ.get('context')
-        json = util.copy_project_id_into_json(context, g.json)
-        obj = dbapi.net_interfaces_create(context, json)
+        json = util.copy_project_id_into_json(g.context, g.json)
+        json['device_id'] = device_id
+        obj = dbapi.net_interfaces_create(g.context, json)
         interface = jsonutils.to_primitive(obj)
         return interface, 200, None
 
