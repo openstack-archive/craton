@@ -1,0 +1,9 @@
+Code-Review+2: Jim Baker <jim.baker@python.org>
+Workflow+1: Jim Baker <jim.baker@python.org>
+Code-Review+2: Ian Cordasco <sigmavirus24@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 28 Nov 2016 15:19:22 +0000
+Reviewed-on: https://review.openstack.org/401974
+Project: openstack/craton
+Branch: refs/heads/master
