@@ -344,7 +344,7 @@ class Device(Base, VariableMixin):
         cascade='all, delete-orphan', lazy='joined')
     labels = association_proxy('related_labels', 'label')
     access_secret = relationship('AccessSecret', back_populates='devices')
-    interfaces = relationship('NetInterface', back_populates='device')
+    interfaces = relationship('NetworkInterface', back_populates='device')
     children = relationship(
         'Device', backref=backref('parent', remote_side=[id]))
 
@@ -384,8 +384,8 @@ class Host(Device):
     }
 
 
-class NetInterface(Base):
-    __tablename__ = 'net_interfaces'
+class NetworkInterface(Base):
+    __tablename__ = 'network_interfaces'
     __table_args__ = (
         UniqueConstraint("device_id", "name",
                          name="uq_netinter0deviceid0name"),
@@ -433,14 +433,14 @@ class Network(Base, VariableMixin):
         UUIDType(binary=False), ForeignKey('projects.id'), index=True,
         nullable=False)
 
-    devices = relationship('NetInterface', back_populates='network')
+    devices = relationship('NetworkInterface', back_populates='network')
     region = relationship('Region', back_populates='networks')
     cell = relationship('Cell', back_populates='networks')
     project = relationship('Project', back_populates='networks')
 
 
-class NetDevice(Device):
-    __tablename__ = 'net_devices'
+class NetworkDevice(Device):
+    __tablename__ = 'network_devices'
     id = Column(Integer, ForeignKey('devices.id'), primary_key=True)
     hostname = Device.name
     # network device specific properties
@@ -449,7 +449,7 @@ class NetDevice(Device):
     vlans = Column(JSONType)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'net_devices',
+        'polymorphic_identity': 'network_devices',
         'inherit_condition': (id == Device.id)
     }
 

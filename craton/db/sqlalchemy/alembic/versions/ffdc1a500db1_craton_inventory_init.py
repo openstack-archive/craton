@@ -215,7 +215,7 @@ def upgrade():
         sa.PrimaryKeyConstraint('id')
     )
     op.create_table(
-        'net_devices',
+        'network_devices',
         sa.Column('id', sa.Integer, nullable=False),
         sa.Column('model_name', sa.String(length=255), nullable=True),
         sa.Column('os_version', sa.String(length=255), nullable=True),
@@ -236,7 +236,7 @@ def upgrade():
             'fk_labels_devices')
     )
     op.create_table(
-        'net_interfaces',
+        'network_interfaces',
         sa.Column('created_at', sa.DateTime, nullable=True),
         sa.Column('updated_at', sa.DateTime, nullable=True),
         sa.Column('id', sa.Integer, nullable=False),
@@ -263,13 +263,13 @@ def upgrade():
         sa.ForeignKeyConstraint(['network_id'], ['networks.id'], ),
         sa.ForeignKeyConstraint(
             ['variable_association_id'], ['variable_association.id'],
-            'fk_net_interfaces_variable_association')
+            'fk_network_interfaces_variable_association')
     )
 
 
 def downgrade():
-    op.drop_table('net_interfaces')
-    op.drop_table('net_devices')
+    op.drop_table('network_interfaces')
+    op.drop_table('network_devices')
     op.drop_table('hosts')
     op.drop_index(op.f('ix_networks_region_id'), table_name='networks')
     op.drop_index(op.f('ix_networks_project_id'), table_name='networks')
