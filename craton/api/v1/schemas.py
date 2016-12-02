@@ -380,7 +380,7 @@ DefinitionNetworkId = {
     },
 }
 
-DefinitionNetInterface = {
+DefinitionNetworkInterface = {
     "discriminator": "name",
     "required": [
         "name",
@@ -437,7 +437,7 @@ DefinitionNetInterface = {
     },
 }
 
-DefinitionNetInterfaceId = {
+DefinitionNetworkInterfaceId = {
     "discriminator": "name",
     "type": "object",
     "properties": {
@@ -487,7 +487,7 @@ DefinitionNetInterfaceId = {
     },
 }
 
-DefinitionNetDevice = {
+DefinitionNetworkDevice = {
     "discriminator": "hostname",
     "required": [
         "hostname",
@@ -540,7 +540,7 @@ DefinitionNetDevice = {
     },
 }
 
-DefinitionNetDeviceId = {
+DefinitionNetworkDeviceId = {
     "discriminator": "hostname",
     "type": "object",
     "properties": {
@@ -841,7 +841,7 @@ validators = {
     ("users", "POST"): {
         "json": DefinitionUser,
     },
-    ("netdevices", "GET"): {
+    ("network_devices", "GET"): {
         "args": {
             "properties": {
                 "id": {
@@ -882,7 +882,7 @@ validators = {
             },
         },
     },
-    ("netdevices_id", "GET"): {
+    ("network_devices_id", "GET"): {
         "args": {
             "properties": {
                 "resolved-values": {
@@ -892,7 +892,7 @@ validators = {
             },
         },
     },
-    ("netdevices_id_variables", "PUT"): {
+    ("network_devices_id_variables", "PUT"): {
         "json": DefinitionsData
     },
     ("networks_id", "PUT"): {
@@ -919,7 +919,7 @@ validators = {
             },
         },
     },
-    ("netdevices_id", "PUT"): {
+    ("network_devices_id", "PUT"): {
         "args": {
             "properties": {
                 "ip_address": {
@@ -943,13 +943,13 @@ validators = {
             },
         },
     },
-    ("netdevices", "POST"): {
-        "json": DefinitionNetDevice,
+    ("network_devices", "POST"): {
+        "json": DefinitionNetworkDevice,
     },
-    ("netdevices_labels", "PUT"): {
+    ("network_devices_labels", "PUT"): {
         "json": DefinitionsLabel,
     },
-    ("net_interfaces", "GET"): {
+    ("network_interfaces", "GET"): {
         "args": {
             "required": [
                 "device_id",
@@ -978,10 +978,10 @@ validators = {
             },
         },
     },
-    ("net_interfaces", "POST"): {
-        "json": DefinitionNetInterface,
+    ("network_interfaces", "POST"): {
+        "json": DefinitionNetworkInterface,
     },
-    ("net_interfaces_id", "PUT"): {
+    ("network_interfaces_id", "PUT"): {
         "args": {
             "properties": {
                 "name": {
@@ -1584,11 +1584,11 @@ filters = {
             "schema": None,
         },
     },
-    ("netdevices", "GET"): {
+    ("network_devices", "GET"): {
         200: {
             "headers": None,
             "schema": {
-                "items": DefinitionNetDeviceId,
+                "items": DefinitionNetworkDeviceId,
                 "type": "array",
             },
         },
@@ -1605,10 +1605,10 @@ filters = {
             "schema": None,
         },
     },
-    ("netdevices_id", "GET"): {
+    ("network_devices_id", "GET"): {
         200: {
             "headers": None,
-            "schema": DefinitionNetDeviceId,
+            "schema": DefinitionNetworkDeviceId,
         },
         400: {
             "headers": None,
@@ -1623,25 +1623,7 @@ filters = {
             "schema": None,
         },
     },
-    ("netdevices_labels", "GET"): {
-        200: {
-            "headers": None,
-            "schema": DefinitionsLabel,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("netdevices_labels", "PUT"): {
+    ("network_devices_labels", "GET"): {
         200: {
             "headers": None,
             "schema": DefinitionsLabel,
@@ -1659,10 +1641,10 @@ filters = {
             "schema": None,
         },
     },
-    ("netdevices_id", "PUT"): {
+    ("network_devices_labels", "PUT"): {
         200: {
             "headers": None,
-            "schema": DefinitionNetDeviceId,
+            "schema": DefinitionsLabel,
         },
         400: {
             "headers": None,
@@ -1677,7 +1659,25 @@ filters = {
             "schema": None,
         },
     },
-    ("netdevices_id_variables", "PUT"): {
+    ("network_devices_id", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionNetworkDeviceId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("network_devices_id_variables", "PUT"): {
         200: {
             "headers": None,
             "schema": None,
@@ -1695,7 +1695,7 @@ filters = {
             "schema": None,
         },
     },
-    ("netdevices_id_variables", "DELETE"): {
+    ("network_devices_id_variables", "DELETE"): {
         200: {
             "headers": None,
             "schema": None,
@@ -1806,11 +1806,11 @@ filters = {
             "schema": None,
         },
     },
-    ("net_interfaces", "GET"): {
+    ("network_interfaces", "GET"): {
         200: {
             "headers": None,
             "schema": {
-                "items": DefinitionNetInterface,
+                "items": DefinitionNetworkInterface,
                 "type": "array",
             },
         },
@@ -1827,10 +1827,10 @@ filters = {
             "schema": None,
         },
     },
-    ("net_interfaces_id", "GET"): {
+    ("network_interfaces_id", "GET"): {
         200: {
             "headers": None,
-            "schema": DefinitionNetInterfaceId,
+            "schema": DefinitionNetworkInterfaceId,
         },
         400: {
             "headers": None,
@@ -1845,10 +1845,10 @@ filters = {
             "schema": None,
         },
     },
-    ("net_interfaces_id", "PUT"): {
+    ("network_interfaces_id", "PUT"): {
         200: {
             "headers": None,
-            "schema": DefinitionNetInterfaceId,
+            "schema": DefinitionNetworkInterfaceId,
         },
         400: {
             "headers": None,
@@ -1889,8 +1889,8 @@ scopes = {
     ("users", "GET"): [],
     ("users", "POST"): [],
     ("users_id", "GET"): [],
-    ("netdevices_id_variables", "PUT"): [],
-    ("netdevices_id_variables", "DELETE"): [],
+    ("network_devices_id_variables", "PUT"): [],
+    ("network_devices_id_variables", "DELETE"): [],
     ("networks_id_variables", "PUT"): [],
     ("networks_id_variables", "DELETE"): [],
 }

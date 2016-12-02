@@ -562,36 +562,40 @@ class APIV1NetworksTest(APIV1Test):
         self.assertEqual(200, resp.status_code)
 
 
-class APIV1NetDevicesTest(APIV1Test):
-    @mock.patch.object(dbapi, 'netdevices_get_by_region')
-    def test_get_netdevices_by_ip_address_filter(self, fake_devices):
+class APIV1NetworkDevicesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'network_devices_get_by_region')
+    def test_get_network_devices_by_ip_address_filter(self, fake_devices):
         region_id = '1'
         ip_address = '10.10.0.1'
         filters = {'region_id': region_id, 'ip_address': ip_address}
-        path_query = '/v1/netdevices?region_id={}&ip_address={}'.format(
-            region_id, ip_address
+        path_query = (
+            '/v1/network_devices?region_id={}&ip_address={}'.format(
+                region_id, ip_address
+            )
         )
-        fake_devices.return_value = fake_resources.NETDEVICE_LIST1
+        fake_devices.return_value = fake_resources.NETWORK_DEVICE_LIST1
         resp = self.get(path_query)
-        device_resp = fake_resources.NETDEVICE_LIST1
+        device_resp = fake_resources.NETWORK_DEVICE_LIST1
         self.assertEqual(len(resp.json), 1)
         self.assertEqual(resp.json[0]["ip_address"], device_resp[0].ip_address)
 
         fake_devices.assert_called_once_with(mock.ANY, region_id, filters)
 
 
-class APIV1NetInterfacesTest(APIV1Test):
-    @mock.patch.object(dbapi, 'net_interfaces_get_by_device')
+class APIV1NetworkInterfacesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'network_interfaces_get_by_device')
     def test_get_netinterfaces_by_ip_address_filter(self, fake_interfaces):
         device_id = 1
         ip_address = '10.10.0.1'
         filters = {'device_id': device_id, 'ip_address': ip_address}
-        path_query = '/v1/net_interfaces?device_id={}&ip_address={}'.format(
-            device_id, ip_address
+        path_query = (
+            '/v1/network_interfaces?device_id={}&ip_address={}'.format(
+                device_id, ip_address
+            )
         )
-        fake_interfaces.return_value = fake_resources.NETINTERFACE_LIST1
+        fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE_LIST1
         resp = self.get(path_query)
-        interface_resp = fake_resources.NETINTERFACE_LIST1
+        interface_resp = fake_resources.NETWORK_INTERFACE_LIST1
         self.assertEqual(len(resp.json), 1)
         self.assertEqual(resp.json[0]["name"], interface_resp[0].name)
 

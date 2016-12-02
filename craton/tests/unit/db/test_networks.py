@@ -20,11 +20,11 @@ device1 = {"hostname": "switch1",
            "device_type": "switch",
            "ip_address": "192.168.1.1"}
 
-net_interface1 = {"device_id": 1,
-                  "project_id": project_id1,
-                  "name": "eth1",
-                  "ip_address": "192.168.0.2",
-                  "interface_type": "ethernet"}
+network_interface1 = {"device_id": 1,
+                      "project_id": project_id1,
+                      "name": "eth1",
+                      "ip_address": "192.168.0.2",
+                      "interface_type": "ethernet"}
 
 
 class NetworksDBTestCase(base.DBTestCase):
@@ -88,84 +88,85 @@ class NetworksDBTestCase(base.DBTestCase):
 
 class NetworkDevicesDBTestCase(base.DBTestCase):
 
-    def test_netdevices_create(self):
+    def test_network_devices_create(self):
         try:
-            dbapi.netdevices_create(self.context, device1)
+            dbapi.network_devices_create(self.context, device1)
         except Exception:
             self.fail("Network device create raised unexpected exception")
 
-    def test_netdevice_get_all(self):
-        dbapi.netdevices_create(self.context, device1)
+    def test_network_device_get_all(self):
+        dbapi.network_devices_create(self.context, device1)
         filters = {}
-        res = dbapi.netdevices_get_by_region(self.context,
-                                             device1['region_id'],
-                                             filters)
+        res = dbapi.network_devices_get_by_region(self.context,
+                                                  device1['region_id'],
+                                                  filters)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['hostname'], 'switch1')
 
-    def test_netdevices_get_by_id(self):
-        device = dbapi.netdevices_create(self.context, device1)
-        res = dbapi.netdevices_get_by_id(self.context, device.id)
+    def test_network_devices_get_by_id(self):
+        device = dbapi.network_devices_create(self.context, device1)
+        res = dbapi.network_devices_get_by_id(self.context, device.id)
         self.assertEqual(res.hostname, 'switch1')
 
-    def test_netdevices_get_by_filter_no_exit(self):
+    def test_network_devices_get_by_filter_no_exit(self):
         filters = {"id": 5}
         res = dbapi.networks_get_by_region(self.context,
                                            device1['region_id'],
                                            filters)
         self.assertEqual(res, [])
 
-    def test_netdevices_delete(self):
-        device = dbapi.netdevices_create(self.context, device1)
+    def test_network_devices_delete(self):
+        device = dbapi.network_devices_create(self.context, device1)
         # First make sure we have the device
-        res = dbapi.netdevices_get_by_id(self.context, device.id)
+        res = dbapi.network_devices_get_by_id(self.context, device.id)
         self.assertEqual(res.id, device.id)
         # Delete the device
-        dbapi.netdevices_delete(self.context, res.id)
-        self.assertRaises(exceptions.NotFound, dbapi.netdevices_get_by_id,
+        dbapi.network_devices_delete(self.context, res.id)
+        self.assertRaises(exceptions.NotFound, dbapi.network_devices_get_by_id,
                           self.context, res.id)
 
-    def test_netdevice_labels_create(self):
-        device = dbapi.netdevices_create(self.context, device1)
+    def test_network_device_labels_create(self):
+        device = dbapi.network_devices_create(self.context, device1)
         labels = {"labels": ["tom", "jerry"]}
-        dbapi.netdevices_labels_update(self.context, device.id, labels)
+        dbapi.network_devices_labels_update(self.context, device.id, labels)
 
-    def test_netdevices_update(self):
-        device = dbapi.netdevices_create(self.context, device1)
-        res = dbapi.netdevices_get_by_id(self.context, device.id)
+    def test_network_devices_update(self):
+        device = dbapi.network_devices_create(self.context, device1)
+        res = dbapi.network_devices_get_by_id(self.context, device.id)
         self.assertEqual(res.hostname, 'switch1')
         new_name = 'switch2'
-        res = dbapi.netdevices_update(self.context, res.id,
-                                      {'name': 'switch2'})
+        res = dbapi.network_devices_update(self.context, res.id,
+                                           {'name': 'switch2'})
         self.assertEqual(res.name, new_name)
 
-    def test_netdevice_labels_delete(self):
-        device = dbapi.netdevices_create(self.context, device1)
+    def test_network_device_labels_delete(self):
+        device = dbapi.network_devices_create(self.context, device1)
         _labels = {"labels": ["tom", "jerry"]}
-        dbapi.netdevices_labels_update(self.context, device.id, _labels)
-        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        dbapi.network_devices_labels_update(self.context, device.id, _labels)
+        ndevice = dbapi.network_devices_get_by_id(self.context, device.id)
         self.assertEqual(sorted(ndevice.labels), sorted(_labels["labels"]))
         _dlabels = {"labels": ["tom"]}
-        dbapi.netdevices_labels_delete(self.context, ndevice.id, _dlabels)
-        ndevice = dbapi.netdevices_get_by_id(self.context, ndevice.id)
+        dbapi.network_devices_labels_delete(self.context, ndevice.id, _dlabels)
+        ndevice = dbapi.network_devices_get_by_id(self.context, ndevice.id)
         self.assertEqual(ndevice.labels, {"jerry"})
 
-    def test_netdevice_variables_create(self):
-        device = dbapi.netdevices_create(self.context, device1)
+    def test_network_device_variables_create(self):
+        device = dbapi.network_devices_create(self.context, device1)
         _data = {"hello": "hi"}
-        dbapi.netdevices_variables_update(self.context, device.id, _data)
-        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        dbapi.network_devices_variables_update(self.context, device.id, _data)
+        ndevice = dbapi.network_devices_get_by_id(self.context, device.id)
         self.assertEqual(ndevice.variables, _data)
 
-    def test_netdevice_variables_delete(self):
-        device = dbapi.netdevices_create(self.context, device1)
+    def test_network_device_variables_delete(self):
+        device = dbapi.network_devices_create(self.context, device1)
         _data = {"hello": "hi", "a": "b"}
-        dbapi.netdevices_variables_update(self.context, device.id, _data)
-        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        dbapi.network_devices_variables_update(self.context, device.id, _data)
+        ndevice = dbapi.network_devices_get_by_id(self.context, device.id)
         self.assertEqual(ndevice.variables, _data)
         _del_data = {"key": "a"}
-        dbapi.netdevices_variables_delete(self.context, device.id, _del_data)
-        ndevice = dbapi.netdevices_get_by_id(self.context, device.id)
+        dbapi.network_devices_variables_delete(self.context, device.id,
+                                               _del_data)
+        ndevice = dbapi.network_devices_get_by_id(self.context, device.id)
         self.assertEqual(ndevice.variables, {"hello": "hi"})
 
 
@@ -173,37 +174,41 @@ class NetworkInterfacesDBTestCase(base.DBTestCase):
 
     def test_interface_create(self):
         try:
-            dbapi.net_interfaces_create(self.context, net_interface1)
+            dbapi.network_interfaces_create(self.context, network_interface1)
         except Exception:
             self.fail("Network interface create raised unexpected exception")
 
     def test_interface_get_all(self):
-        dbapi.net_interfaces_create(self.context, net_interface1)
+        dbapi.network_interfaces_create(self.context, network_interface1)
         filters = {}
-        res = dbapi.net_interfaces_get_by_device(self.context, 1, filters)
+        res = dbapi.network_interfaces_get_by_device(self.context, 1, filters)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'eth1')
 
     def test_interface_get_by_id(self):
-        interface = dbapi.net_interfaces_create(self.context, net_interface1)
-        res = dbapi.net_interfaces_get_by_id(self.context, interface.id)
+        interface = dbapi.network_interfaces_create(self.context,
+                                                    network_interface1)
+        res = dbapi.network_interfaces_get_by_id(self.context, interface.id)
         self.assertEqual(res.name, 'eth1')
 
     def test_interface_update(self):
-        interface = dbapi.net_interfaces_create(self.context, net_interface1)
-        res = dbapi.net_interfaces_get_by_id(self.context, interface.id)
+        interface = dbapi.network_interfaces_create(self.context,
+                                                    network_interface1)
+        res = dbapi.network_interfaces_get_by_id(self.context, interface.id)
         self.assertEqual(res.name, 'eth1')
         new_name = 'eth2'
-        res = dbapi.net_interfaces_update(self.context, interface.id,
-                                          {'name': 'eth2'})
+        res = dbapi.network_interfaces_update(self.context, interface.id,
+                                              {'name': 'eth2'})
         self.assertEqual(res.name, new_name)
 
     def test_interface_delete(self):
-        interface = dbapi.net_interfaces_create(self.context, net_interface1)
+        interface = dbapi.network_interfaces_create(self.context,
+                                                    network_interface1)
         # First make sure we have the interface created
-        res = dbapi.net_interfaces_get_by_id(self.context, interface.id)
+        res = dbapi.network_interfaces_get_by_id(self.context, interface.id)
         self.assertEqual(res.id, interface.id)
         # Delete the device
-        dbapi.net_interfaces_delete(self.context, res.id)
-        self.assertRaises(exceptions.NotFound, dbapi.net_interfaces_get_by_id,
+        dbapi.network_interfaces_delete(self.context, res.id)
+        self.assertRaises(exceptions.NotFound,
+                          dbapi.network_interfaces_get_by_id,
                           self.context, res.id)
