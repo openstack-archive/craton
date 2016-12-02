@@ -235,3 +235,19 @@ Get a particular host
            -H "X-Auth-Token: demo" \
            -H "X-Auth-User: demo" \
            -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
+
+-------------
+Running Tests
+-------------
+
+* To run unit tests, execute the following command::
+
+    # tox
+
+.. note:: In order for debugging the tox tests, use tox -e py35 -- -s
+
+* To run functional tests, execute the following command::
+
+    # tox -e functional
+
+.. note:: Make sure to get inside the cloned directory of Craton
