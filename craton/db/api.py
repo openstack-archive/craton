@@ -263,71 +263,71 @@ def networks_variables_delete(context, network_id, data):
     return IMPL.networks_variables_delete(context, network_id, data)
 
 
-def netdevices_get_by_region(context, region_id, filters):
+def network_devices_get_by_region(context, region_id, filters):
     """Get all network devices for the given region id."""
-    return IMPL.netdevices_get_by_region(context, region_id, filters)
+    return IMPL.network_devices_get_by_region(context, region_id, filters)
 
 
-def netdevices_get_by_id(context, netdevice_id):
+def network_devices_get_by_id(context, netdevice_id):
     """Get a given network device by its id."""
-    return IMPL.netdevices_get_by_id(context, netdevice_id)
+    return IMPL.network_devices_get_by_id(context, netdevice_id)
 
 
-def netdevices_create(context, values):
+def network_devices_create(context, values):
     """Create a new network device."""
-    return IMPL.netdevices_create(context, values)
+    return IMPL.network_devices_create(context, values)
 
 
-def netdevices_update(context, netdevice_id, values):
+def network_devices_update(context, netdevice_id, values):
     """Update an existing network device"""
-    return IMPL.netdevices_update(context, netdevice_id, values)
+    return IMPL.network_devices_update(context, netdevice_id, values)
 
 
-def netdevices_delete(context, netdevice_id):
+def network_devices_delete(context, netdevice_id):
     """Delete existing network device."""
-    return IMPL.netdevices_delete(context, netdevice_id)
+    return IMPL.network_devices_delete(context, netdevice_id)
 
 
-def netdevices_variables_delete(context, netdevice_id, data):
+def network_devices_variables_delete(context, netdevice_id, data):
     """Delete network device variables."""
-    return IMPL.netdevices_variables_delete(context, netdevice_id, data)
+    return IMPL.network_devices_variables_delete(context, netdevice_id, data)
 
 
-def netdevices_variables_update(context, netdevice_id, data):
+def network_devices_variables_update(context, netdevice_id, data):
     """Update network device variables."""
-    return IMPL.netdevices_variables_update(context, netdevice_id, data)
+    return IMPL.network_devices_variables_update(context, netdevice_id, data)
 
 
-def netdevices_labels_delete(context, netdevice_id, labels):
+def network_devices_labels_delete(context, netdevice_id, labels):
     """Delete network device labels."""
-    return IMPL.netdevices_labels_delete(context, netdevice_id, labels)
+    return IMPL.network_devices_labels_delete(context, netdevice_id, labels)
 
 
-def netdevices_labels_update(context, netdevice_id, labels):
+def network_devices_labels_update(context, netdevice_id, labels):
     """Update network device labels."""
-    return IMPL.netdevices_labels_update(context, netdevice_id, labels)
+    return IMPL.network_devices_labels_update(context, netdevice_id, labels)
 
 
-def net_interfaces_get_by_device(context, device_id, filters):
+def network_interfaces_get_by_device(context, device_id, filters):
     """Get all network interfaces for the given device."""
-    return IMPL.net_interfaces_get_by_device(context, device_id, filters)
+    return IMPL.network_interfaces_get_by_device(context, device_id, filters)
 
 
-def net_interfaces_get_by_id(context, interface_id):
+def network_interfaces_get_by_id(context, interface_id):
     """Get a given network interface by its id."""
-    return IMPL.net_interfaces_get_by_id(context, interface_id)
+    return IMPL.network_interfaces_get_by_id(context, interface_id)
 
 
-def net_interfaces_create(context, values):
+def network_interfaces_create(context, values):
     """Create a new network interface."""
-    return IMPL.net_interfaces_create(context, values)
+    return IMPL.network_interfaces_create(context, values)
 
 
-def net_interfaces_update(context, interface_id, values):
+def network_interfaces_update(context, interface_id, values):
     """Update an existing network interface."""
-    return IMPL.net_interfaces_update(context, interface_id, values)
+    return IMPL.network_interfaces_update(context, interface_id, values)
 
 
-def net_interfaces_delete(context, interface_id):
+def network_interfaces_delete(context, interface_id):
     """Delete existing network interface."""
-    return IMPL.net_interfaces_delete(context, interface_id)
+    return IMPL.network_interfaces_delete(context, interface_id)

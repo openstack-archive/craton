@@ -766,9 +766,9 @@ def networks_variables_delete(context, network_id, data):
         return ref
 
 
-def netdevices_get_by_region(context, region_id, filters):
+def network_devices_get_by_region(context, region_id, filters):
     """Get all network devices for the given region."""
-    devices = with_polymorphic(models.Device, [models.NetDevice])
+    devices = with_polymorphic(models.Device, [models.NetworkDevice])
     query = model_query(context, devices, project_only=True)
     query = query.filter_by(region_id=region_id)
     query = query.filter_by(type='net_devices')
@@ -780,9 +780,9 @@ def netdevices_get_by_region(context, region_id, filters):
     return result
 
 
-def netdevices_get_by_id(context, netdevice_id):
+def network_devices_get_by_id(context, netdevice_id):
     """Get a given network device by its id."""
-    devices = with_polymorphic(models.Device, [models.NetDevice])
+    devices = with_polymorphic(models.Device, [models.NetworkDevice])
     query = model_query(context, devices, project_only=True)
     query = query.filter_by(type='net_devices')
     query = query.filter_by(id=netdevice_id)
@@ -794,17 +794,17 @@ def netdevices_get_by_id(context, netdevice_id):
     return result
 
 
-def netdevices_create(context, values):
+def network_devices_create(context, values):
     """Create a new network device."""
     session = get_session()
-    device = models.NetDevice()
+    device = models.NetworkDevice()
     with session.begin():
         device.update(values)
         device.save(session)
     return device
 
 
-def netdevices_update(context, netdevice_id, values):
+def network_devices_update(context, netdevice_id, values):
     """Update existing network device"""
     session = get_session()
     with session.begin():
@@ -819,7 +819,7 @@ def netdevices_update(context, netdevice_id, values):
         return netdevice_ref
 
 
-def netdevices_delete(context, netdevice_id):
+def network_devices_delete(context, netdevice_id):
     """Delete existing network device."""
     session = get_session()
     with session.begin():
@@ -831,31 +831,31 @@ def netdevices_delete(context, netdevice_id):
         query.delete()
 
 
-def netdevices_labels_update(context, device_id, labels):
+def network_devices_labels_update(context, device_id, labels):
     """Update labels for a network device. Add the label if it is not present
     in host labels list, otherwise do nothing."""
     return _device_labels_update(context, 'net_devices', device_id, labels)
 
 
-def netdevices_labels_delete(context, device_id, labels):
+def network_devices_labels_delete(context, device_id, labels):
     """Delete labels from the network device labels list if it matches
     the given label in the query, otherwise do nothing."""
     return _device_labels_delete(context, 'net_devices', device_id, labels)
 
 
-def netdevices_variables_update(context, device_id, data):
+def network_devices_variables_update(context, device_id, data):
     """Update/create network device variables."""
     return _device_variables_update(context, 'net_devices', device_id, data)
 
 
-def netdevices_variables_delete(context, device_id, data):
+def network_devices_variables_delete(context, device_id, data):
     """Delete the existing key from network device variables."""
     return _device_variables_delete(context, 'net_devices', device_id, data)
 
 
-def net_interfaces_get_by_device(context, device_id, filters):
+def network_interfaces_get_by_device(context, device_id, filters):
     """Get all network interfaces for the given host."""
-    query = model_query(context, models.NetInterface, project_only=True)
+    query = model_query(context, models.NetworkInterface, project_only=True)
     query = query.filter_by(device_id=device_id)
 
     if "id" in filters:
@@ -868,9 +868,9 @@ def net_interfaces_get_by_device(context, device_id, filters):
     return query.all()
 
 
-def net_interfaces_get_by_id(context, interface_id):
+def network_interfaces_get_by_id(context, interface_id):
     """Get a given network interface by its id."""
-    query = model_query(context, models.NetInterface, project_only=True)
+    query = model_query(context, models.NetworkInterface, project_only=True)
     query = query.filter_by(id=interface_id)
     try:
         result = query.one()
@@ -880,21 +880,21 @@ def net_interfaces_get_by_id(context, interface_id):
     return result
 
 
-def net_interfaces_create(context, values):
+def network_interfaces_create(context, values):
     """Create a new network interface."""
     session = get_session()
-    interface = models.NetInterface()
+    interface = models.NetworkInterface()
     with session.begin():
         interface.update(values)
         interface.save(session)
     return interface
 
 
-def net_interfaces_update(context, interface_id, values):
+def network_interfaces_update(context, interface_id, values):
     """Update an existing network interface."""
     session = get_session()
     with session.begin():
-        query = model_query(context, models.NetInterface, session=session,
+        query = model_query(context, models.NetworkInterface, session=session,
                             project_only=True)
         query = query.filter_by(id=interface_id)
         net_interface_ref = query.with_for_update().one()
@@ -903,11 +903,11 @@ def net_interfaces_update(context, interface_id, values):
         return net_interface_ref
 
 
-def net_interfaces_delete(context, interface_id):
+def network_interfaces_delete(context, interface_id):
     """Delete existing network interface."""
     session = get_session()
     with session.begin():
-        query = model_query(context, models.NetInterface, session=session,
+        query = model_query(context, models.NetworkInterface, session=session,
                             project_only=True)
         query = query.filter_by(id=interface_id)
         query.delete()
