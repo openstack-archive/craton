@@ -4,7 +4,7 @@ To create alembic migrations use:
 $ craton-dbsync --config-file=craton.conf revision --message "revision description" --autogenerate
 
 Stamp db with most recent migration version, without actually running migrations
-$ craton-dbsync --config-file=crton.conf stamp head
+$ craton-dbsync --config-file=craton.conf stamp head
 
 Upgrade can be performed by:
 $ craton-dbsync --config-file=craton.conf upgrade
