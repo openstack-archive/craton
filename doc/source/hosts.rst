@@ -41,7 +41,7 @@ Request
 +------------+------+---------+-------------------------------+
 | note       | body | string  | Note used for governance      |
 +------------+------+---------+-------------------------------+
-| data       | body | object  | User defined data             |
+| variables  | body | object  | User defined variables        |
 +------------+------+---------+-------------------------------+
 
 Required Header
@@ -52,10 +52,17 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Create Host**
+Example Host Create
+*******************
 
- ..literalinclude:: ./api_samples/hosts/hosts-create-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/hosts" \
+        -d '{"name": "fooHost", "region_id": 1, "ip_address": "11.11.11.14", "device_type": "Phone", "project_id": "717e9a216e2d44e0bc848398563bda06"}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -73,7 +80,7 @@ Response
 |            |      |         | - active                      |
 |            |      |         | - labels                      |
 |            |      |         | - note                        |
-|            |      |         | - data                        |
+|            |      |         | - variables                   |
 +------------+------+---------+-------------------------------+
 | id         | body | integer | Unique ID of the host         |
 +------------+------+---------+-------------------------------+
@@ -95,13 +102,25 @@ Response
 +------------+------+---------+-------------------------------+
 | note       | body | string  | Note used for governance      |
 +------------+------+---------+-------------------------------+
-| data       | body | object  | User defined data             |
+| variables  | body | object  | User defined variables        |
 +------------+------+---------+-------------------------------+
 
-.. todo:: **Example Create Host**
+Examples Host Create
+********************
 
- ..literalinclude:: ./api_samples/hosts/hosts-create-resp.json
-    :language: javascript
+.. code-block:: json
+
+   {
+      "active": true,
+      "cell_id": null,
+      "device_type": "Phone",
+      "id": 1,
+      "ip_address": "11.11.11.14",
+      "name": "fooHost",
+      "note": null,
+      "parent_id": null,
+      "region_id": 1
+   }
 
 List Hosts
 ==========
@@ -144,6 +163,17 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
+Examples Host List
+******************
+
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/hosts?region_id=1" \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
+
 Response
 --------
 
@@ -172,13 +202,36 @@ Response
 +------------+------+---------+-------------------------------+
 | note       | body | string  | Note used for governance      |
 +------------+------+---------+-------------------------------+
-| data       | body | object  | User defined data             |
+| variables  | body | object  | User defined variables        |
 +------------+------+---------+-------------------------------+
 
-.. todo:: **Example List Host**
+Examples Host List
+******************
 
- ..literalinclude:: ./api_samples/hosts/hosts-list-resp.json
-     :language: javascript
+.. code-block:: json
+
+   {
+      "active": true,
+      "cell_id": null,
+      "device_type": "Computer", 
+      "id": 2,
+      "ip_address": "12.12.12.15",
+      "name": "foo2Host",
+      "note": null,
+      "parent_id": null,
+      "region_id": 1
+   }, 
+   {
+      "active": true,
+      "cell_id": null,
+      "device_type": "Phone",
+      "id": 1,
+      "ip_address": "11.11.11.14",
+      "name": "fooHost",
+      "note": null,
+      "parent_id": null,
+      "region_id": 1
+   }
 
 .. todo:: **Example Unexpected Error**
 
@@ -220,7 +273,7 @@ Request
 +------------+------+---------+------------------------------------+
 | note       | body | string  | Note used for governance           |
 +------------+------+---------+------------------------------------+
-| data       | body | object  | User defined data                  |
+| variables  | body | object  | User defined variables             |
 +------------+------+---------+------------------------------------+
 | id         | path | integer | Unique ID of the host to be updated|
 +------------+------+---------+------------------------------------+
@@ -233,10 +286,18 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Update Host**
+Examples Host Update
+********************
 
- ..literalinclude:: ./api_samples/hosts/hosts-update-req.json
-    :language: javascript
+.. code-block:: bash 
+
+   curl -i "http://${MY_IP}:8080/v1/hosts/2" \
+        -XPUT \
+        -d '{"name": "changedName"}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -254,7 +315,7 @@ Response
 |            |      |         | - active                      |
 |            |      |         | - labels                      |
 |            |      |         | - note                        |
-|            |      |         | - data                        |
+|            |      |         | - variables                   |
 +------------+------+---------+-------------------------------+
 | id         | body | integer | Unique ID of the host         |
 +------------+------+---------+-------------------------------+
@@ -276,20 +337,32 @@ Response
 +------------+------+---------+-------------------------------+
 | note       | body | string  | Note used for governance      |
 +------------+------+---------+-------------------------------+
-| data       | body | object  | User defined data             |
+| variables  | body | object  | User defined variables        |
 +------------+------+---------+-------------------------------+
 
-.. todo:: **Example Update Host**
+Example Host Update
+*******************
 
-  ..literalinclude:: ./api_samples/hosts/hosts-update-resp.json
-     :language: javascript
+.. code-block:: json
 
-Update Host Data
-================
+   {
+      "active": true,
+      "cell_id": null,
+      "device_type": "Computer",
+      "id": 2, 
+      "ip_address": "12.12.12.15",
+      "name": "changedName", 
+      "note": null, 
+      "project_id": "717e9a21-6e2d-44e0-bc84-8398563bda06", 
+      "region_id": 1
+   }
 
-:PUT: /v1/hosts/{id}/data
+Update Host variables
+=====================
 
-Update user defined data for the host
+:PUT: /v1/hosts/{id}/variables
+
+Update user defined variables for the host
 
 Normal response codes: OK(200)
 
@@ -316,10 +389,18 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Update Host Data**
+Example Host Variables Update
+*****************************
 
- ..literalinclude:: ./api_samples/hosts/hosts-upadate—data-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/hosts/1/variables" \
+        -XPUT \
+        -d '{"newVar": "sample variable"}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -332,11 +413,16 @@ Response
 | value  | body | object  | Data                    |
 +--------+------+---------+-------------------------+
 
+Example Host Variables Update
+*****************************
 
-.. todo:: **Example Update Host Data**
+.. code-block:: json
 
- ..literalinclude:: ./api_samples/hosts/hosts-update-data-resp.json
-    :language: javascript
+   {
+      "variables": {
+                      "newVar": "sample variable"
+                   }
+   }
 
 Delete Host
 ===========
@@ -371,12 +457,12 @@ Response
 
 No body content is returned on a successful DELETE
 
-Delete Host Data
-================
+Delete Host Variables
+=====================
 
-:DELETE: /v1/hosts/{id}/data
+:DELETE: /v1/hosts/{id}/variables
 
-Delete existing key/value data for the Host
+Delete existing key/value variables for the Host
 
 Normal response codes: no content(204)
 
