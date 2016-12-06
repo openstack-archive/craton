@@ -30,7 +30,7 @@ Request
 +------------+------+---------+-------------------------+
 | note       | body | string  | Note used for governance|
 +------------+------+---------+-------------------------+
-| data       | body | object  | User defined data       |
+| variables  | body | object  | User defined variables  |
 +------------+------+---------+-------------------------+
 
 Required Header
@@ -41,10 +41,17 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Create Cell**
+Example Cell Create
+*******************
 
- ..literalinclude:: ./doc/api_samples/cells/cells-create-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/cells" \
+        -d '{"name": "myCell", "region_id": 1}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -57,7 +64,7 @@ Response
 |           |      |         | - region_id                   |
 |           |      |         | - labels                      |
 |           |      |         | - note                        |
-|           |      |         | - data                        |
+|           |      |         | - variables                   |
 +-----------+------+---------+-------------------------------+
 | id        | body | integer | Unique ID of the cell         |
 +-----------+------+---------+-------------------------------+
@@ -69,14 +76,21 @@ Response
 +-----------+------+---------+-------------------------------+
 | note      | body | string  | Note used for governance      |
 +-----------+------+---------+-------------------------------+
-| data      | body | object  | User defined data             |
+| variables | body | object  | User defined variables        |
 +-----------+------+---------+-------------------------------+
 
-.. todo:: **Example Create Cell**
+Example Cell Create
+*******************
 
- ..literalinclude:: ./doc/api_samples/cells/cells-create-resp.json
-    :language: javascript
+.. code-block:: json
 
+   {
+      "id": 1,
+      "name": "myCell",
+      "note": null,
+      "region_id": 1
+   }
+ 
 List Cells
 ==========
 
@@ -96,7 +110,7 @@ Request
 +-----------+-------+--------+---------+----------------------------------+
 | Name      | In    | Type   | Required| Description                      |
 +===========+=======+========+=========+==================================+
-| region_id | query | string | No      | ID of the region to get cells for|
+| region_id | query | string | Yes     | ID of the region to get cells for|
 +-----------+-------+--------+---------+----------------------------------+
 
 Required Header
@@ -106,6 +120,17 @@ Required Header
 - X-Auth-Token
 - X-Auth-User
 - X-Auth-Project
+
+Example Cell List
+*****************
+
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/cells?region_id=1" \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -125,13 +150,28 @@ Response
 +------------+------+---------+-------------------------------+
 | note       | body | string  | Note used for governance      |
 +------------+------+---------+-------------------------------+
-| data       | body | object  | User defined data             |
+| variables  | body | object  | User defined variables        |
 +------------+------+---------+-------------------------------+
 
-.. todo:: **Example List Cells**
+Example Cell List
+*****************
 
- ..literalinclude:: ./doc/api_samples/cells/cells-list-resp.json
-    :language: javascript
+.. code-block:: json
+
+   [
+      {
+         "id": 2,
+         "name": "cellJr",
+         "note": null,
+         "region_id": 1
+      },
+      {
+         "id": 1,
+         "name": "myCell",
+         "note": null,
+         "region_id": 1
+      }
+   ]
 
 .. todo:: **Example Unexpected Error**
 
@@ -157,16 +197,11 @@ Request
 +==========+======+=========+====================================+
 | name     | body | string  | Unique name of the cell            |
 +----------+------+---------+------------------------------------+
-| region_id| body | integer | Unique ID of the cell's region     |
-+----------+------+---------+------------------------------------+
 | labels   | body | string  | User defined labels                |
 +----------+------+---------+------------------------------------+
 | note     | body | string  | Note used for governance           |
 +----------+------+---------+------------------------------------+
-| data     | body | object  | User defined data                  |
-+----------+------+---------+------------------------------------+
-| id       | path | integer | Unique ID of the cell to be updated|
-+----------+------+---------+------------------------------------+
+
 
 Required Header
 ^^^^^^^^^^^^^^^
@@ -176,10 +211,18 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Update Cell**
+Example Cell Update
+*******************
 
- ..literalinclude:: ./api_samples/cells/cells-update-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/cells/1" \
+        -XPUT \
+        -d '{"name": "changedName"}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -192,7 +235,7 @@ Response
 |          |      |         | - region_id                   |
 |          |      |         | - labels                      |
 |          |      |         | - note                        |
-|          |      |         | - data                        |
+|          |      |         | - variables                   |
 +----------+------+---------+-------------------------------+
 | id       | body | integer | Unique ID of the cell         |
 +----------+------+---------+-------------------------------+
@@ -204,20 +247,28 @@ Response
 +----------+------+---------+-------------------------------+
 | note     | body | string  | Note used for governance      |
 +----------+------+---------+-------------------------------+
-| data     | body | object  | User defined data             |
+| variables| body | object  | User defined variables        |
 +----------+------+---------+-------------------------------+
 
-.. todo:: **Example Update Cell**
+Examples Cell Update
+********************
 
- ..literalinclude:: ./api_samples/cells/cells-update-resp.json
-   :language: javascript
+.. code-block:: json
 
-Update Cell Data
-================
+   {
+      "id": 1,
+      "name": "changedName",
+      "note": null,
+      "project_id": "717e9a21-6e2d-44e0-bc84-8398563bda06",
+      "region_id": 1
+   }
 
-:PUT: /v1/cells/{id}/data
+Update Cell Variables
+=====================
 
-Update user defined data for the cell
+:PUT: /v1/cells/{id}/variables
+
+Update user defined variables for the cell
 
 Normal response codes: OK(200)
 
@@ -244,10 +295,18 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Update Cell Data**
+Example Cell Update Variables
+*****************************
 
- ..literalinclude:: ./api_samples/cells/cells-upadate—data-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/cells/1/variables" \
+        -XPUT \
+        -d '{"newKey": "sampleKey"}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -260,10 +319,17 @@ Response
 | value  | body | object  | Data                    |
 +--------+------+---------+-------------------------+
 
-.. todo:: **Example Update Cell Data**
+Example Cell Update Variables
+*****************************
 
- ..literalinclude:: ./api_samples/cells/cells-update-data-resp.json
-    :language: javascript
+.. code-block:: json
+
+   {
+      "variables": 
+      {
+         "newKey": “sampleKey”
+      }
+   }
 
 Delete Cell
 ===========
@@ -298,12 +364,12 @@ Response
 
 No body content is returned on a successful DELETE
 
-Delete Cell Data
-================
+Delete Cell Variables
+=====================
 
-:DELETE: /v1/cells/{id}/data
+:DELETE: /v1/cells/{id}/variables
 
-Delete existing key/value data for the cell
+Delete existing key/value variables for the cell
 
 Normal response codes: no content(204)
 

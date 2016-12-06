@@ -20,17 +20,17 @@ Error response codes: invalid request(400), validation exception(405)
 Request
 -------
 
-+-------+------+---------+--------------------------+
-| Name  | In   | Type    | Description              |
-+=======+======+=========+==========================+
-| name  | body | string  | Unique name of the region|
-+-------+------+---------+--------------------------+
-| labels| body | string  | User defined labels      |
-+-------+------+---------+--------------------------+
-| note  | body | string  | Note used for governance |
-+-------+------+---------+--------------------------+
-| data  | body | object  | User defined data        |
-+-------+------+---------+--------------------------+
++----------+------+---------+--------------------------+
+| Name     | In   | Type    | Description              |
++==========+======+=========+==========================+
+| name     | body | string  | Unique name of the region|
++----------+------+---------+--------------------------+
+| labels   | body | string  | User defined labels      |
++----------+------+---------+--------------------------+
+| note     | body | string  | Note used for governance |
++----------+------+---------+--------------------------+
+| variables| body | object  | User defined variables   |
++----------+------+---------+--------------------------+
 
 Required Header
 ^^^^^^^^^^^^^^^
@@ -40,10 +40,17 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Create Region**
+Example Region Create
+*********************
 
- ..literalinclude:: ./api_samples/regions/regions-create-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/regions" \
+        -d '{"name": "DFW"}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"   
 
 Response
 --------
@@ -56,7 +63,7 @@ Response
 |           |      |         | - cells                  |
 |           |      |         | - labels                 |
 |           |      |         | - note                   |
-|           |      |         | - data                   |
+|           |      |         | - variables              |
 +-----------+------+---------+--------------------------+
 | id        | body | integer | Unique ID of the region  |
 +-----------+------+---------+--------------------------+
@@ -68,13 +75,19 @@ Response
 +-----------+------+---------+--------------------------+
 | note      | body | string  | Note used for governance |
 +-----------+------+---------+--------------------------+
-| data      | body | object  | User defined data        |
+| variables | body | object  | User defined variables   |
 +-----------+------+---------+--------------------------+
 
-.. todo:: **Example Create Region**
+Example Region Create 
+*********************
 
- ..literalinclude:: ./api_samples/regions/regions-create-resp.json
-    :language: javascript
+.. code-block:: json
+
+   {
+      "id": 1,
+      "name": "DFW",
+      "note": null
+   }
 
 List Regions
 ============
@@ -91,7 +104,7 @@ Default response: unexpected error
 
 Request
 -------
-No parameters
+No parameters 
 
 Required Header
 ^^^^^^^^^^^^^^^
@@ -100,6 +113,17 @@ Required Header
 - X-Auth-Token
 - X-Auth-User
 - X-Auth-Project
+
+Example Region List
+*******************
+
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/regions" \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -119,13 +143,31 @@ Response
 +-----------+------+---------+--------------------------+
 | note      | body | string  | Note used for governance |
 +-----------+------+---------+--------------------------+
-| data      | body | object  | User defined data        |
+| variables | body | object  | User defined variables   |
 +-----------+------+---------+--------------------------+
 
-.. todo:: **Example List Regions**
+Example Region List
+*******************
 
- ..literalinclude:: ./api_samples/regions/regions-list-resp.json
-    :language: javascript
+.. code-block:: bash
+
+   [
+      {
+         "id": 1,
+         "name": "DFW",
+         "note": null
+      }, 
+      {
+         "id": 2, 
+         "name": "DFW2",
+         "note": null
+      }, 
+      {
+         "id": 3,
+         "name": "fooRegion",
+         "note": null
+      }
+   ]
 
 .. todo:: **Example Unexpected Error**
 
@@ -157,8 +199,6 @@ Request
 +-----------+------+---------+--------------------------------------+
 | note      | body | string  | Note used for governance             |
 +-----------+------+---------+--------------------------------------+
-| data      | body | object  | User defined data                    |
-+-----------+------+---------+--------------------------------------+
 | id        | path | integer | Unique ID of the region to be updated|
 +-----------+------+---------+--------------------------------------+
 
@@ -170,10 +210,18 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Update Region**
+Example Region Update
+*********************
 
- ..literalinclude:: ./api_samples/regions/regions-update-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/regions/3" \
+        -XPUT \
+        -d '{"name": "DFW3"}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -186,7 +234,7 @@ Response
 |           |      |         | - cells                  |
 |           |      |         | - labels                 |
 |           |      |         | - note                   |
-|           |      |         | - data                   |
+|           |      |         | - variables              |
 +-----------+------+---------+--------------------------+
 | id        | body | integer | Unique ID of the region  |
 +-----------+------+---------+--------------------------+
@@ -198,20 +246,27 @@ Response
 +-----------+------+---------+--------------------------+
 | note      | body | string  | Note used for governance |
 +-----------+------+---------+--------------------------+
-| data      | body | object  | User defined data        |
+| variables | body | object  | User defined variables   |
 +-----------+------+---------+--------------------------+
 
-.. todo:: **Example Update Region**
+Example Region Update
+*********************
 
- ..literalinclude:: ./api_samples/regions/regions-update-resp.json
-    :language: javascript
+.. code-block:: json
 
-Update Region Data
-==================
+   {
+      "id": 3,
+      "name": "DFW3",
+      "note": null,
+      "project_id": "717e9a21-6e2d-44e0-bc84-8398563bda06"
+   }
 
-:PUT: /v1/regions/{id}/data
+Update Region Variables
+=======================
 
-Update user defined data for the region
+:PUT: /v1/regions/{id}/variables
+
+Update user defined variables for the region
 
 Normal response codes: OK(200)
 
@@ -238,10 +293,18 @@ Required Header
 - X-Auth-User
 - X-Auth-Project
 
-.. todo:: **Example Update Region Data**
+Example Region Variables Update
+*******************************
 
- ..literalinclude:: ./api_samples/regions/regions-upadate—data-req.json
-    :language: javascript
+.. code-block:: bash
+
+   curl -i "http://${MY_IP}:8080/v1/regions/3/variables" \
+        -XPUT \
+        -d '{“array”: [2]}' \
+        -H "Content-Type: application/json" \
+        -H "X-Auth-Token: demo" \
+        -H "X-Auth-User: demo" \
+        -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
 
 Response
 --------
@@ -254,11 +317,19 @@ Response
 | value  | body | object  | Data                    |
 +--------+------+---------+-------------------------+
 
+Example Region Variables Update
+*******************************
 
-.. todo:: **Example Update Region Data**
+.. code-block:: json
 
- ..literalinclude:: ./api_samples/regions/regions-update-data-resp.json
-    :language: javascript
+   {
+      "variables": 
+      {
+         "string": "sample text",
+         "value": 24,
+         "array": [2]
+      }
+   }
 
 Delete Region
 =============
@@ -293,12 +364,12 @@ Response
 
 No body content is returned on a successful DELETE
 
-Delete Region Data
-==================
+Delete Region Variables
+=======================
 
-:DELETE: /v1/regions/{id}/data
+:DELETE: /v1/regions/{id}/variables
 
-Delete existing key/value data for the region
+Delete existing key/value variables for the region
 
 Normal response codes: no content(204)
 
