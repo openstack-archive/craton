@@ -892,6 +892,9 @@ validators = {
             },
         },
     },
+    ("netdevices_id_variables", "PUT"): {
+        "json": DefinitionsData
+    },
     ("networks_id", "PUT"): {
         "args": {
             "properties": {
@@ -1046,6 +1049,9 @@ validators = {
                 },
             },
         },
+    },
+    ("networks_id_variables", "PUT"): {
+        "json": DefinitionsData
     },
     ("networks", "POST"): {
         "json": DefinitionNetwork,
@@ -1671,6 +1677,42 @@ filters = {
             "schema": None,
         },
     },
+    ("netdevices_id_variables", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("netdevices_id_variables", "DELETE"): {
+        200: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("networks", "GET"): {
         200: {
             "headers": None,
@@ -1714,6 +1756,42 @@ filters = {
         200: {
             "headers": None,
             "schema": DefinitionNetworkId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("networks_id_variables", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("networks_id_variables", "DELETE"): {
+        200: {
+            "headers": None,
+            "schema": None,
         },
         400: {
             "headers": None,
@@ -1811,4 +1889,8 @@ scopes = {
     ("users", "GET"): [],
     ("users", "POST"): [],
     ("users_id", "GET"): [],
+    ("netdevices_id_variables", "PUT"): [],
+    ("netdevices_id_variables", "DELETE"): [],
+    ("networks_id_variables", "PUT"): [],
+    ("networks_id_variables", "DELETE"): [],
 }
