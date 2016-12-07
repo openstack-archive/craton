@@ -214,12 +214,14 @@ def _device_variables_delete(context, device_type, device_id, data):
         return ref
 
 
-def cells_get_all(context, region, filters):
+def cells_get_all(context, filters):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
-    if region is not None:
-        query = query.filter_by(region_id=region)
 
+    if "region_id" in filters:
+        query = query.filter_by(region_id=filters["region_id"])
+    if "name" in filters:
+        query = query.filter_by(name=filters["name"])
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
@@ -229,17 +231,6 @@ def cells_get_all(context, region, filters):
         raise exceptions.NotFound()
     except Exception as err:
         raise exceptions.UnknownException(message=err)
-
-
-def cells_get_by_name(context, region_id, cell_id):
-    """Get cell details given for a given cell in a region."""
-    try:
-        query = model_query(context, models.Cell).\
-            filter_by(region_id=region_id).\
-            filter_by(name=cell_id)
-        return query.one()
-    except sa_exc.NoResultFound:
-        raise exceptions.NotFound()
 
 
 def cells_get_by_id(context, cell_id):
@@ -419,18 +410,19 @@ def regions_variables_delete(context, region_id, data):
         return region_ref
 
 
-def hosts_get_by_region(context, region_id, filters):
-    """Get all hosts for this region.
+def hosts_get_all(context, filters):
+    """Get all hosts matching filters.
 
-    :param region_id: ID for the region
-    :param filters: filters wich contains differnt keys/values to match.
-    Supported filters are by name, ip_address, id and cell_id.
+    :param filters: filters which contains different keys/values to match.
+    Supported filters are region_id, name, ip_address, id, cell, device_type,
+    label and vars.
     """
     host_devices = with_polymorphic(models.Device, [models.Host])
     query = model_query(context, host_devices, project_only=True)
-    query = query.filter_by(region_id=region_id)
     query = query.filter_by(type='hosts')
 
+    if "region_id" in filters:
+        query = query.filter_by(region_id=filters["region_id"])
     if "name" in filters:
         query = query.filter_by(name=filters["name"])
     if "ip_address" in filters:
@@ -657,11 +649,12 @@ def users_delete(context, user_id):
     return
 
 
-def networks_get_by_region(context, region_id, filters):
-    """Get all networks for the given region."""
+def networks_get_all(context, filters):
+    """Get all networks."""
     query = model_query(context, models.Network, project_only=True)
-    query = query.filter_by(region_id=region_id)
 
+    if "region_id" in filters:
+        query = query.filter_by(region_id=filters["region_id"])
     if "id" in filters:
         query = query.filter_by(id=filters["id"])
     if "network_type" in filters:
@@ -766,13 +759,14 @@ def networks_variables_delete(context, network_id, data):
         return ref
 
 
-def network_devices_get_by_region(context, region_id, filters):
-    """Get all network devices for the given region."""
+def network_devices_get_all(context, filters):
+    """Get all network devices."""
     devices = with_polymorphic(models.Device, [models.NetworkDevice])
     query = model_query(context, devices, project_only=True)
-    query = query.filter_by(region_id=region_id)
     query = query.filter_by(type='network_devices')
 
+    if "region_id" in filters:
+        query = query.filter_by(region_id=filters["region_id"])
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
@@ -855,11 +849,12 @@ def network_devices_variables_delete(context, device_id, data):
                                     device_id, data)
 
 
-def network_interfaces_get_by_device(context, device_id, filters):
-    """Get all network interfaces for the given host."""
+def network_interfaces_get_all(context, filters):
+    """Get all network interfaces."""
     query = model_query(context, models.NetworkInterface, project_only=True)
-    query = query.filter_by(device_id=device_id)
 
+    if "device_id" in filters:
+        query = query.filter_by(device_id=filters["device_id"])
     if "id" in filters:
         query = query.filter_by(id=filters["id"])
     if "ip_address" in filters:

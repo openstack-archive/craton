@@ -88,15 +88,15 @@ class AnsibleInventory(base.Resource):
         cell_id = g.args["cell_id"]
 
         filters = {}
-        if not region_id:
-            return self.error_response(400, "Missing `region_id` in query")
+        if region_id:
+            filters['region_id'] = region_id
 
         # TODO(sulo): allow other filters based on services
         if cell_id:
             filters['cell_id'] = cell_id
 
         try:
-            hosts_obj = dbapi.hosts_get_by_region(context, region_id, filters)
+            hosts_obj = dbapi.hosts_get_all(context, filters)
         except exceptions.NotFound:
             return self.error_response(404, 'Not Found')
         except Exception as err:

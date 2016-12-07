@@ -32,14 +32,9 @@ def get_user_info(context, user):
 
 # Cells
 
-def cells_get_all(context, region, filters):
+def cells_get_all(context, filters):
     """Get all available cells."""
-    return IMPL.cells_get_all(context, region, filters)
-
-
-def cells_get_by_name(context, region, cell):
-    """Get cell detail for the cell in given region."""
-    return IMPL.cells_get_by_name(context, region, cell)
+    return IMPL.cells_get_all(context, filters)
 
 
 def cells_get_by_id(context, cell_id):
@@ -125,9 +120,9 @@ def hosts_get_by_region_cell(context, region_id, cell_id, filters):
     return IMPL.hosts_get_by_region_cell(context, region_id, cell_id, filters)
 
 
-def hosts_get_by_region(context, region_id, filters):
-    """Get all hosts for this region."""
-    return IMPL.hosts_get_by_region(context, region_id, filters)
+def hosts_get_all(context, filters):
+    """Get all hosts."""
+    return IMPL.hosts_get_all(context, filters)
 
 
 def hosts_get_by_id(context, host_id):
@@ -228,9 +223,9 @@ def users_delete(context, user_id):
 
 # Networks
 
-def networks_get_by_region(context, region_id, filters):
+def networks_get_all(context, filters):
     """Get all networks for the given region."""
-    return IMPL.networks_get_by_region(context, region_id, filters)
+    return IMPL.networks_get_all(context, filters)
 
 
 def networks_get_by_id(context, network_id):
@@ -263,9 +258,9 @@ def networks_variables_delete(context, network_id, data):
     return IMPL.networks_variables_delete(context, network_id, data)
 
 
-def network_devices_get_by_region(context, region_id, filters):
-    """Get all network devices for the given region id."""
-    return IMPL.network_devices_get_by_region(context, region_id, filters)
+def network_devices_get_all(context, filters):
+    """Get all network devices."""
+    return IMPL.network_devices_get_all(context, filters)
 
 
 def network_devices_get_by_id(context, network_device_id):
@@ -312,9 +307,9 @@ def network_devices_labels_update(context, network_device_id, labels):
                                               labels)
 
 
-def network_interfaces_get_by_device(context, device_id, filters):
-    """Get all network interfaces for the given device."""
-    return IMPL.network_interfaces_get_by_device(context, device_id, filters)
+def network_interfaces_get_all(context, filters):
+    """Get all network interfaces."""
+    return IMPL.network_interfaces_get_all(context, filters)
 
 
 def network_interfaces_get_by_id(context, interface_id):
