@@ -593,9 +593,6 @@ DefinitionNetDeviceId = {
 validators = {
     ("ansible_inventory", "GET"): {
         "args": {
-            "required": [
-                "region_id",
-            ],
             "properties": {
                 "region_id": {
                     "default": None,
@@ -690,9 +687,6 @@ validators = {
     },
     ("hosts", "GET"): {
         "args": {
-            "required": [
-                "region_id",
-            ],
             "properties": {
                 "name": {
                     "default": None,
@@ -761,9 +755,6 @@ validators = {
     },
     ("cells", "GET"): {
         "args": {
-            "required": [
-                "region_id",
-            ],
             "properties": {
                 "region_id": {
                     "default": None,
@@ -951,9 +942,6 @@ validators = {
     },
     ("net_interfaces", "GET"): {
         "args": {
-            "required": [
-                "device_id",
-            ],
             "properties": {
                 "id": {
                     "default": None,

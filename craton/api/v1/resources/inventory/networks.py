@@ -16,13 +16,11 @@ class Networks(base.Resource):
 
     @base.http_codes
     @base.filtered_context(
-        required='region_id',
         reserved_keys=['id', 'name', 'cell_id', 'network_type',
                        'region_id', 'vars'])
-    def get(self, context, region_id, filters):
-        """Get all networks for this region, with optional filtering."""
-        networks_obj = dbapi.networks_get_by_region(
-            context, region_id, filters)
+    def get(self, context, **filters):
+        """Get all networks, with optional filtering."""
+        networks_obj = dbapi.networks_get_all(context, filters)
         return jsonutils.to_primitive(networks_obj), 200, None
 
     @base.http_codes
@@ -92,13 +90,11 @@ class NetDevices(base.Resource):
 
     @base.http_codes
     @base.filtered_context(
-        required='region_id',
         reserved_keys=['id', 'name', 'ip_address', 'cell_id',
                        'device_type', 'region_id', 'vars'])
-    def get(self, context, region_id, filters):
-        """Get all network devices for this region."""
-        devices_obj = dbapi.netdevices_get_by_region(
-            context, region_id, filters)
+    def get(self, context, **filters):
+        """Get all network devices."""
+        devices_obj = dbapi.netdevices_get_all(context, filters)
         return jsonutils.to_primitive(devices_obj), 200, None
 
     @base.http_codes
@@ -201,13 +197,11 @@ class NetInterfaces(base.Resource):
 
     @base.http_codes
     @base.filtered_context(
-        required='device_id',
         reserved_keys=['id', 'ip_address', 'interface_type',
                        'device_id', 'vars'])
-    def get(self, context, device_id, filters):
-        """Get all network interfaces for a given network device."""
-        interfaces_obj = dbapi.net_interfaces_get_by_device(
-            context, device_id, filters)
+    def get(self, context, **filters):
+        """Get all network interfaces."""
+        interfaces_obj = dbapi.net_interfaces_get_all(context, filters)
         return jsonutils.to_primitive(interfaces_obj), 200, None
 
     @base.http_codes
