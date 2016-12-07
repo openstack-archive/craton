@@ -18,6 +18,7 @@ class DockerSetup(threading.Thread):
         self.container_is_ready = threading.Event()
         self.error = None
         self.client = None
+        self.repo_dir = './'
         super(DockerSetup, self).__init__()
 
     def run(self):
@@ -37,7 +38,7 @@ class DockerSetup(threading.Thread):
             return
 
         # Create Docker image for Craton
-        build_output = self.client.build(path='github.com/openstack/craton',
+        build_output = self.client.build(path=self.repo_dir,
                                          tag='craton-functional-testing-api',
                                          dockerfile='Dockerfile',
                                          pull=True,
