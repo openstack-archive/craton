@@ -57,8 +57,11 @@ CELL1 = Cell("cell1", "active", 1, 1, {"key1": "value1",
                                        "key2": "value2"})
 CELL2 = Cell("cell2", "active", "2", "abcd", {"key3": "value3",
                                               "key4": "value4"})
+CELL3 = Cell("cell1", "active", 2, 1, {"key1": "value1",
+                                       "key2": "value2"})
 
 CELL_LIST = [CELL1, CELL2]
+CELL_LIST2 = [CELL1, CELL3]
 
 
 class Region(object):
@@ -103,11 +106,12 @@ HOST4 = Host("www.example.net", "1", "2", "10.10.0.1", "server",
              {"key1": "value1", "key2": "value2"}, labels=["a", "b"])
 HOSTS_LIST_R1 = [HOST1, HOST2]
 HOSTS_LIST_R2 = [HOST3]
+HOSTS_LIST_R3 = [HOST1, HOST2, HOST3]
 
 
 class Networks(object):
     def __init__(self, name, project_id, cidr, gateway, netmask,
-                 variables, labels=None):
+                 variables, region_id, labels=None):
         self.name = name
         self.project_id = project_id
         self.cidr = cidr
@@ -115,16 +119,20 @@ class Networks(object):
         self.netmask = netmask
         self.variables = variables
         self.labels = labels
+        self.region_id = region_id
 
     def items(self):
         return iter(self.__dict__.items())
 
 
 NETWORK1 = Networks("PrivateNetwork", 1, "192.168.1.0/24", "192.168.1.1",
-                    "255.255.255.0", {"key1": "value1"})
+                    "255.255.255.0", {"key1": "value1"}, 1)
 NETWORK2 = Networks("PublicNetwork", 1, "10.10.1.0/24", "10.10.1.1",
-                    "255.255.255.0", {"pkey1": "pvalue1"})
+                    "255.255.255.0", {"pkey1": "pvalue1"}, 1)
+NETWORK3 = Networks("OtherNetwork", 1, "10.10.1.0/24", "10.10.1.2",
+                    "255.255.255.0", {"okey1": "ovalue1"}, 2)
 NETWORKS_LIST = [NETWORK1, NETWORK2]
+NETWORKS_LIST2 = [NETWORK1, NETWORK2, NETWORK3]
 
 
 class NetworkDevice():
@@ -137,7 +145,10 @@ class NetworkDevice():
 
 
 NETWORK_DEVICE1 = NetworkDevice(1, '10.10.0.1')
+NETWORK_DEVICE2 = NetworkDevice(2, '10.10.0.2')
+
 NETWORK_DEVICE_LIST1 = [NETWORK_DEVICE1]
+NETWORK_DEVICE_LIST2 = [NETWORK_DEVICE1, NETWORK_DEVICE2]
 
 
 class NetworkInterface():
@@ -154,4 +165,8 @@ class NetworkInterface():
 NETWORK_INTERFACE1 = NetworkInterface(
     'NetworkDevice1', 1, 'interface_type1', '10.10.0.1'
 )
+NETWORK_INTERFACE2 = NetworkInterface(
+    'NetworkDevice2', 2, 'interface_type2', '10.10.0.2'
+)
 NETWORK_INTERFACE_LIST1 = [NETWORK_INTERFACE1]
+NETWORK_INTERFACE_LIST2 = [NETWORK_INTERFACE1, NETWORK_INTERFACE2]

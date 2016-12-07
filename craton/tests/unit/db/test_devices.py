@@ -219,9 +219,11 @@ class HostsDBTestCase(base.DBTestCase):
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}
         dbapi.hosts_variables_update(self.context, host_id, variables)
-        filters = {}
-        filters["vars"] = "key2:value2"
-        res = dbapi.hosts_get_by_region(self.context, region_id, filters)
+        filters = {
+            "region_id": region_id,
+            "vars": "key2:value2",
+        }
+        res = dbapi.hosts_get_all(self.context, filters)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0].name, 'www.example.xyz')
 
@@ -232,7 +234,9 @@ class HostsDBTestCase(base.DBTestCase):
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}
         dbapi.hosts_variables_update(self.context, host_id, variables)
-        filters = {}
-        filters["vars"] = "key1:value5"
-        res = dbapi.hosts_get_by_region(self.context, region_id, filters)
+        filters = {
+            "region_id": "region_1",
+            "vars": "key1:value5",
+        }
+        res = dbapi.hosts_get_all(self.context, filters)
         self.assertEqual(len(res), 0)
