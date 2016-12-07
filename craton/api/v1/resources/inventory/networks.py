@@ -242,4 +242,4 @@ class NetworkInterfaceById(base.Resource):
         """Delete existing network interface."""
         context = request.environ.get('context')
         dbapi.network_interfaces_delete(context, id)
-        return None, 204, None
+        return None, 203, None
