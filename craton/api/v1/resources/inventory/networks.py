@@ -149,7 +149,7 @@ class NetDevicesVariables(base.Resource):
     def get(self, id):
         """Get variables for the given network."""
         context = request.environ.get('context')
-        obj = dbapi.netdevice_get_by_id(context, id)
+        obj = dbapi.netdevices_get_by_id(context, id)
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
@@ -157,7 +157,7 @@ class NetDevicesVariables(base.Resource):
     def put(self, id):
         """"Update device variables, or create if it does not exist."""
         context = request.environ.get('context')
-        obj = dbapi.netdevice_variables_update(context, id, request.json)
+        obj = dbapi.netdevices_variables_update(context, id, request.json)
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
@@ -165,7 +165,7 @@ class NetDevicesVariables(base.Resource):
     def delete(self, id):
         """Delete network device variables."""
         context = request.environ.get('context')
-        dbapi.netdevice_variables_delete(context, id, request.json)
+        dbapi.netdevices_variables_delete(context, id, request.json)
         return None, 204, None
 
 
@@ -226,7 +226,7 @@ class NetInterfaceById(base.Resource):
     def get(self, id):
         """Get network interface by given id"""
         context = request.environ.get('context')
-        obj = dbapi.net_interface_get_by_id(context, id)
+        obj = dbapi.net_interfaces_get_by_id(context, id)
         interface = jsonutils.to_primitive(obj)
         interface['variables'] = jsonutils.to_primitive(obj.variables)
         return interface, 200, None
