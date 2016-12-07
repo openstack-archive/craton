@@ -34,6 +34,13 @@ device2 = {"hostname": "switch2",
            "device_type": "switch",
            "ip_address": "192.168.1.1"}
 
+device3 = {"hostname": "foo1",
+           "model_name": "Model-Bar",
+           "region_id": 1,
+           "project_id": project_id1,
+           "device_type": "foo",
+           "ip_address": "192.168.1.2"}
+
 net_interface1 = {"device_id": 1,
                   "project_id": project_id1,
                   "name": "eth1",
@@ -137,6 +144,116 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         res = dbapi.netdevices_get_all(self.context, filters)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['hostname'], 'switch1')
+
+    def test_netdevice_get_all_filter_name(self):
+        dbapi.netdevices_create(self.context, device1)
+        dbapi.netdevices_create(self.context, device2)
+
+        name = device1['hostname']
+        setup_res = dbapi.netdevices_get_all(self.context, {})
+
+        self.assertEqual(len(setup_res), 2)
+        matches = [dev for dev in setup_res if dev['hostname'] == name]
+        self.assertEqual(len(matches), 1)
+
+        filters = {
+            'name': name,
+        }
+        res = dbapi.netdevices_get_all(self.context, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['hostname'], name)
+
+    def test_netdevice_get_all_filter_cell_id(self):
+        region_id = 1
+        cell1 = dbapi.cells_create(
+            self.context,
+            {
+                'name': 'cell1',
+                'project_id': project_id1,
+                'region_id': region_id,
+            }
+        )
+        cell2 = dbapi.cells_create(
+            self.context,
+            {
+                'name': 'cell2',
+                'project_id': project_id1,
+                'region_id': region_id,
+            }
+        )
+        dbapi.netdevices_create(
+            self.context, dict(cell_id=cell1.id, **device1)
+        )
+        dbapi.netdevices_create(
+            self.context, dict(cell_id=cell2.id, **device2)
+        )
+
+        setup_res = dbapi.netdevices_get_all(self.context, {})
+
+        self.assertEqual(len(setup_res), 2)
+        matches = [dev for dev in setup_res if dev['cell_id'] == cell1.id]
+        self.assertEqual(len(matches), 1)
+
+        filters = {
+            'cell_id': cell1.id,
+        }
+        res = dbapi.netdevices_get_all(self.context, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['cell_id'], cell1.id)
+
+    def test_netdevice_get_all_filter_device_type(self):
+        dbapi.netdevices_create(self.context, device1)
+        dbapi.netdevices_create(self.context, device3)
+
+        dev_type = device1['device_type']
+        setup_res = dbapi.netdevices_get_all(self.context, {})
+
+        self.assertEqual(len(setup_res), 2)
+        matches = [dev for dev in setup_res if dev['device_type'] == dev_type]
+        self.assertEqual(len(matches), 1)
+
+        filters = {
+            'device_type': dev_type,
+        }
+        res = dbapi.netdevices_get_all(self.context, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['device_type'], dev_type)
+
+    def test_netdevice_get_all_filter_id(self):
+        dbapi.netdevices_create(self.context, device1)
+        dbapi.netdevices_create(self.context, device2)
+
+        setup_res = dbapi.netdevices_get_all(self.context, {})
+
+        self.assertEqual(len(setup_res), 2)
+
+        dev_id = setup_res[0]['id']
+        self.assertNotEqual(dev_id, setup_res[1]['id'])
+
+        filters = {
+            'id': dev_id
+        }
+        res = dbapi.netdevices_get_all(self.context, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], dev_id)
+
+    def test_netdevice_get_all_filter_ip_address(self):
+        dbapi.netdevices_create(self.context, device1)
+        dbapi.netdevices_create(self.context, device3)
+
+        ip = device1['ip_address']
+        setup_res = dbapi.netdevices_get_all(self.context, {})
+
+        self.assertEqual(len(setup_res), 2)
+        matches = [dev for dev in setup_res if str(dev['ip_address']) == ip]
+        self.assertEqual(len(matches), 1)
+
+        filters = {
+            'ip_address': ip,
+        }
+        res = dbapi.netdevices_get_all(self.context, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(str(res[0]['ip_address']), ip)
 
     def test_netdevices_get_by_id(self):
         device = dbapi.netdevices_create(self.context, device1)

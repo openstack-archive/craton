@@ -218,6 +218,8 @@ def cells_get_all(context, filters):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
 
+    if "id" in filters:
+        query = query.filter_by(id=filters["id"])
     if "region_id" in filters:
         query = query.filter_by(region_id=filters["region_id"])
     if "name" in filters:
@@ -429,8 +431,8 @@ def hosts_get_all(context, filters):
         query = query.filter_by(ip_address=filters["ip_address"])
     if "id" in filters:
         query = query.filter_by(id=filters["id"])
-    if "cell" in filters:
-        query = query.filter_by(cell_id=filters["cell"])
+    if "cell_id" in filters:
+        query = query.filter_by(cell_id=filters["cell_id"])
     if "device_type" in filters:
         query = query.filter_by(device_type=filters["device_type"])
     if "label" in filters:
@@ -663,6 +665,8 @@ def networks_get_all(context, filters):
         query = query.filter_by(cell_id=filters["cell_id"])
     if "name" in filters:
         query = query.filter_by(name=filters["name"])
+    if "vars" in filters:
+        query = add_var_filters_to_query(query, filters)
 
     result = query.all()
     return result
@@ -767,6 +771,16 @@ def netdevices_get_all(context, filters):
 
     if "region_id" in filters:
         query = query.filter_by(region_id=filters["region_id"])
+    if "name" in filters:
+        query = query.filter_by(name=filters["name"])
+    if "ip_address" in filters:
+        query = query.filter_by(ip_address=filters["ip_address"])
+    if "id" in filters:
+        query = query.filter_by(id=filters["id"])
+    if "cell_id" in filters:
+        query = query.filter_by(cell_id=filters["cell_id"])
+    if "device_type" in filters:
+        query = query.filter_by(device_type=filters["device_type"])
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
