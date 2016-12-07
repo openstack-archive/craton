@@ -128,30 +128,44 @@ NETWORKS_LIST = [NETWORK1, NETWORK2]
 
 
 class NetworkDevice():
-    def __init__(self, region_id, ip_address):
+    def __init__(self, hostname, project_id, region_id,
+                 device_type, ip_address, variables, labels=None):
+        self.hostname = hostname
+        self.project_id = project_id
         self.region_id = region_id
+        self.device_type = device_type
         self.ip_address = ip_address
+        self.variables = variables
+        self.resolved = copy.copy(variables)
+        self.labels = labels
 
     def items(self):
         return iter(self.__dict__.items())
 
 
-NETWORK_DEVICE1 = NetworkDevice(1, '10.10.0.1')
+NETWORK_DEVICE1 = NetworkDevice("NetDevices1", 1, 1, "Server", "10.10.0.1",
+                                {"key1": "value1", "key2": "value2"},
+                                labels=["a", "b"])
+
 NETWORK_DEVICE_LIST1 = [NETWORK_DEVICE1]
 
 
 class NetworkInterface():
-    def __init__(self, name, device_id, interface_type, ip_address):
+    def __init__(self, name, device_id, project_id, interface_type,
+                 ip_address, variables):
         self.name = name
         self.device_id = device_id
+        self.project_id = project_id
         self.interface_type = interface_type
         self.ip_address = ip_address
+        self.variables = variables
 
     def items(self):
         return iter(self.__dict__.items())
 
 
-NETWORK_INTERFACE1 = NetworkInterface(
-    'NetworkDevice1', 1, 'interface_type1', '10.10.0.1'
-)
+NETWORK_INTERFACE1 = NetworkInterface("NetInterface", 1, 1, "interface_type1",
+                                      "10.10.0.1",
+                                      {"key1": "value1", "key2": "value2"})
+
 NETWORK_INTERFACE_LIST1 = [NETWORK_INTERFACE1]
