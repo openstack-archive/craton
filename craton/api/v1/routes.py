@@ -7,6 +7,9 @@ from craton.api.v1.resources.inventory import hosts
 from craton.api.v1.resources.inventory import regions
 from craton.api.v1.resources.inventory import networks
 
+from craton.api.v1.resources.workflow import task_defs
+from craton.api.v1.resources.workflow import workflow_defs
+
 
 routes = [
     dict(resource=ansible_inventory.AnsibleInventory,
@@ -81,4 +84,16 @@ routes = [
     dict(resource=networks.NetDeviceLabels,
          urls=['/netdevices/<id>/labels'],
          endpoint='netdevices_labels'),
+    dict(resource=task_defs.TaskDefs,
+         urls=['/tasks'],
+         endpoint='tasks'),
+    dict(resource=task_defs.TaskDefById,
+         urls=['/tasks/<id>'],
+         endpoint='tasks_id'),
+    dict(resource=workflow_defs.WorkflowDefs,
+         urls=['/workflows'],
+         endpoint='workflows'),
+    dict(resource=workflow_defs.WorkflowDefById,
+         urls=['/workflows/<id>'],
+         endpoint='workflows_id'),
 ]

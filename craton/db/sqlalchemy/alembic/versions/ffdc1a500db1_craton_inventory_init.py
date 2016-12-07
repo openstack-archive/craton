@@ -265,7 +265,76 @@ def upgrade():
             ['variable_association_id'], ['variable_association.id'],
             'fk_net_interfaces_variable_association')
     )
-
+    op.create_table(
+        'task_defs',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(length=255), nullable=False),
+        sa.Column('note', sa.Text(), nullable=True),
+        sa.Column('command_spec', sqlalchemy_utils.types.json.JSONType, nullable=True),
+        sa.Column('task_module', sa.Text(), nullable=False),
+        sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False), nullable=False),
+        sa.Column('status', sa.Enum('BUILDING', 'BUILD PENDING', 'BUILD FAILED', 'READY', name='states'), nullable=True),
+        sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_task_defs_project_id'), 'task_defs', ['project_id'], unique=False)
+    op.create_table(
+        'workflow_defs',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False), nullable=False),
+        sa.Column('name', sa.String(length=255), nullable=False),
+        sa.Column('note', sa.Text(), nullable=True),
+        sa.Column('variable_association_id', sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
+        sa.ForeignKeyConstraint(['variable_association_id'], ['variable_association.id'], name='fk_workflowdefs_variable_association'),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('name')
+    )
+    op.create_index(op.f('ix_workflow_defs_project_id'), 'workflow_defs', ['project_id'], unique=False)
+    op.create_table(
+        'workflows',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('workflow_def_id', sa.Integer(), nullable=False),
+        sa.Column('inventory', sqlalchemy_utils.types.json.JSONType(), nullable=False),
+        sa.Column('note', sa.Text(), nullable=True),
+        sa.Column('variable_association_id', sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(['variable_association_id'], ['variable_association.id'], name='fk_workflows_variable_association'),
+        sa.ForeignKeyConstraint(['workflow_def_id'], ['workflow_defs.id'], ),
+        sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table(
+        'workflow_tasks',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('workflow_defs_id', sa.Integer(), nullable=False),
+        sa.Column('task_defs_id', sa.Integer(), nullable=False),
+        sa.Column('position', sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(['task_defs_id'], ['task_defs.id'], ),
+        sa.ForeignKeyConstraint(['workflow_defs_id'], ['workflow_defs.id'], ),
+        sa.PrimaryKeyConstraint('workflow_defs_id', 'task_defs_id')
+    )
+    op.create_table(
+        'tasks',
+        sa.Column('created_at', sa.DateTime(), nullable=True),
+        sa.Column('updated_at', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('task_def_id', sa.Integer(), nullable=False),
+        sa.Column('workflow_id', sa.Integer(), nullable=False),
+        sa.Column('device_id', sa.Integer(), nullable=False),
+        sa.Column('taskflow_name', sa.String(length=255), nullable=False),
+        sa.Column('taskflow_result', sqlalchemy_utils.types.json.JSONType(), nullable=True),
+        sa.Column('taskflow_state', sa.Enum('CLAIMED', 'IGNORE', 'PAUSED', 'PENDING', 'RUNNING', 'FAILED', 'SUCCESS', name='states'), nullable=True),
+        sa.ForeignKeyConstraint(['device_id'], ['devices.id'], ),
+        sa.ForeignKeyConstraint(['task_def_id'], ['task_defs.id'], ),
+        sa.ForeignKeyConstraint(['workflow_id'], ['workflows.id'], ),
+        sa.PrimaryKeyConstraint('id')
+    )
 
 def downgrade():
     op.drop_table('net_interfaces')
@@ -291,3 +360,8 @@ def downgrade():
     op.drop_table('access_secrets')
     op.drop_table('variables')
     op.drop_table('variable_association')
+    op.drop_table('task_defs')
+    op.drop_table('workflow_defs')
+    op.drop_table('workflows')
+    op.drop_table('workflow_tasks')
+    op.drop_table('tasks')

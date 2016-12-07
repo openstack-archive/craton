@@ -331,3 +331,23 @@ def net_interfaces_update(context, interface_id, values):
 def net_interfaces_delete(context, interface_id):
     """Delete existing network interface."""
     return IMPL.net_interfaces_delete(context, interface_id)
+
+
+def taskdefs_get_all(context):
+    """Get all task defs available to the user."""
+    return IMPL.taskdefs_get_all(context)
+
+
+def taskdefs_create(context, values):
+    """Create new taskdef."""
+    return IMPL.taskdefs_create(context, values)
+
+
+def workflow_defs_get_all(context):
+    """Get all workflow defs available to the user."""
+    return IMPL.workflow_defs_get_all(context)
+
+
+def workflow_defs_create(context, values):
+    """Create new workflow def."""
+    return IMPL.workflow_defs_create(context, values)

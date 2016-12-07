@@ -590,6 +590,64 @@ DefinitionNetDeviceId = {
     },
 }
 
+DefinitionsTaskDef = {
+    "type": "object",
+    "required": ["name", "command", "task_module"],
+    "properties": {
+        "id": {
+            "type": "integer",
+        },
+        "name": {
+            "type": "string",
+        },
+        "note": {
+            "type": "string",
+        },
+        "project_id": {
+            "type": "string",
+        },
+        "command": {
+            "type": "string",
+        },
+        "task_module": {
+            "type": "string",
+        },
+    },
+}
+
+DefinitionsWorkflowDef = {
+    "type": "object",
+    "required": ["name", "tasks"],
+    "properties": {
+        "id": {
+            "type": "integer",
+        },
+        "name": {
+            "type": "string",
+        },
+        "note": {
+            "type": "string",
+        },
+        "project_id": {
+            "type": "string",
+        },
+        "tasks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "task_id": {
+                        "type": "integer",
+                    },
+                    "position": {
+                        "type": "integer"
+                    },
+                },
+            },
+        },
+    },
+}
+
 validators = {
     ("ansible_inventory", "GET"): {
         "args": {
@@ -1056,6 +1114,44 @@ validators = {
     ("networks", "POST"): {
         "json": DefinitionNetwork,
     },
+    ("tasks", "GET"): {
+        "args": {
+            "properties": {
+                "id": {
+                    "default": None,
+                    "type": "integer",
+                    "description": "id of the task to get",
+                },
+                "name": {
+                    "default": None,
+                    "type": "string",
+                    "description": "name of the task to get",
+                },
+            },
+        },
+    },
+    ("tasks", "POST"): {
+        "json": DefinitionsTaskDef,
+    },
+    ("workflows", "GET"): {
+        "args": {
+            "properties": {
+                "id": {
+                    "default": None,
+                    "type": "integer",
+                    "description": "id of the workflow to get",
+                },
+                "name": {
+                    "default": None,
+                    "type": "string",
+                    "description": "name of the workflow to get",
+                },
+            },
+        },
+    },
+    ("workflows", "POST"): {
+        "json": DefinitionsWorkflowDef,
+    },    
 }
 
 filters = {
@@ -1863,6 +1959,48 @@ filters = {
             "schema": None,
         },
     },
+    ("tasks", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "items": DefinitionsTaskDef,
+                "type": "array",
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        }, 
+    },
+    ("workflows", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "items": DefinitionsWorkflowDef,
+                "type": "array",
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
 }
 
 scopes = {
@@ -1893,4 +2031,6 @@ scopes = {
     ("netdevices_id_variables", "DELETE"): [],
     ("networks_id_variables", "PUT"): [],
     ("networks_id_variables", "DELETE"): [],
+    ("tasks", "GET"): [],
+    ("workflows", "GET"): [],
 }

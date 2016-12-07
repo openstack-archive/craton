@@ -911,3 +911,42 @@ def net_interfaces_delete(context, interface_id):
                             project_only=True)
         query = query.filter_by(id=interface_id)
         query.delete()
+
+
+def taskdefs_get_all(context):
+    """Get all taskdefs."""
+    query = model_query(context, models.TaskDef, project_only=True)
+
+    try:
+        return query.all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+
+def taskdefs_create(context, values):
+    """Create new taskdef."""
+    session = get_session()
+    taskdef = models.TaskDef()
+    with session.begin():
+        taskdef.update(values)
+        taskdef.save(session)
+    return taskdef
+
+
+def workflow_defs_get_all(context):
+    """Get all workflow defs available to the user."""
+    query = model_query(context, models.WorkflowDef, project_only=True)
+    try:
+        return query.all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+
+def workflow_defs_create(context, values):
+    """Create new workflow def."""
+    session = get_session()
+    workflow_def = models.WorkflowDef()
+    with session.begin():
+        workflow_def.update(values)
+        workflow_def.save(session)
+    return workflow_def
