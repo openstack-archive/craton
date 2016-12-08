@@ -256,16 +256,20 @@ class APIV1RegionsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_valid_data(self, mock_region):
-        mock_region.return_value = None
+        mock_region.return_value = fake_resources.REGION1
         data = {'name': 'region1'}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_create_region_returns_region_obj(self, mock_region):
-        return_value = {'name': 'region1', 'id': 1}
-        mock_region.return_value = return_value
-        data = {'name': 'region1'}
+        return_value = {'name': 'region1',
+                        'variables': {"key1": "value1", "key2": "value2"}}
+        fake_region = fake_resources.REGION1
+        fake_region.variables = {"key1": "value1", "key2": "value2"}
+        mock_region.return_value = fake_region
+        data = {'name': 'region1',
+                'variables': {"key1": "value1", "key2": "value2"}}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
