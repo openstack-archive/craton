@@ -36,18 +36,14 @@ def http_codes(f, *args, **kwargs):
         return args[0].error_response(500, 'Unknown Error')
 
 
-def filtered_context(reserved_keys=None):
+def filtered_context():
     def decorator(f):
         objname = f.__qualname__.split('.')[0].rstrip('s').lower()
 
         @functools.wraps(f)
         def method_wrapper(self):
             context = flask.request.environ.get("context")
-            query_filters = {}
-            for key in reserved_keys:
-                value = flask.g.args.get(key)
-                if value is not None:
-                    query_filters[key] = value
+            query_filters = flask.g.args
             inspect.getmodule(f).LOG.info(
                 "Getting all %s objects that match filters %s" % (
                     objname, query_filters))
