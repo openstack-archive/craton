@@ -37,6 +37,12 @@ if not on_read_the_docs:
 # The suffix of source filenames.
 source_suffix = '.rst'
 
+# List of patterns (relative to the source directory) used to ignore matching
+# files.
+exclude_patterns = [
+    '**/template.rst',
+]
+
 # The master toctree document.
 master_doc = 'index'
 

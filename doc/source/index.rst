@@ -35,6 +35,7 @@ Developer Guide
 .. toctree::
    :maxdepth: 1
 
+   specs/index
    contributing
    architecture
    api-reference
