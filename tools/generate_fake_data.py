@@ -141,7 +141,7 @@ class Inventory(object):
         return resp.json()
 
     def create_netdevice(self, name, device_type):
-        netdevices_url = self.url + "/netdevices"
+        network_devices_url = self.url + "/network_devices"
         payload = {"hostname": name,
                    "model_name": "model-x",
                    "os_version": "version-1",
@@ -151,7 +151,7 @@ class Inventory(object):
                    "region_id": self.region.get("id"),
                    "cell_id": self.cell.get("id")}
 
-        resp = requests.post(netdevices_url, headers=self.headers,
+        resp = requests.post(network_devices_url, headers=self.headers,
                              data=json.dumps(payload), verify=False)
         if resp.status_code != 200:
             raise Exception(resp.text)
@@ -159,7 +159,7 @@ class Inventory(object):
         return resp.json()
 
     def create_net_interface(self, device, int_num, network=None):
-        netinterfaces_url = self.url + "/net_interfaces"
+        netinterfaces_url = self.url + "/network_interfaces"
         name = "eth%s" % int_num
         payload = {"name": name,
                    "interface_type": "ethernet",

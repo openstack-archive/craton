@@ -127,7 +127,7 @@ NETWORK2 = Networks("PublicNetwork", 1, "10.10.1.0/24", "10.10.1.1",
 NETWORKS_LIST = [NETWORK1, NETWORK2]
 
 
-class NetDevice():
+class NetworkDevice():
     def __init__(self, region_id, ip_address):
         self.region_id = region_id
         self.ip_address = ip_address
@@ -136,11 +136,11 @@ class NetDevice():
         return iter(self.__dict__.items())
 
 
-NETDEVICE1 = NetDevice(1, '10.10.0.1')
-NETDEVICE_LIST1 = [NETDEVICE1]
+NETWORK_DEVICE1 = NetworkDevice(1, '10.10.0.1')
+NETWORK_DEVICE_LIST1 = [NETWORK_DEVICE1]
 
 
-class NetInterface():
+class NetworkInterface():
     def __init__(self, name, device_id, interface_type, ip_address):
         self.name = name
         self.device_id = device_id
@@ -151,7 +151,7 @@ class NetInterface():
         return iter(self.__dict__.items())
 
 
-NETINTERFACE1 = NetInterface(
+NETWORK_INTERFACE1 = NetworkInterface(
     'NetworkDevice1', 1, 'interface_type1', '10.10.0.1'
 )
-NETINTERFACE_LIST1 = [NETINTERFACE1]
+NETWORK_INTERFACE_LIST1 = [NETWORK_INTERFACE1]
