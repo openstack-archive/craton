@@ -42,7 +42,12 @@ class Regions(base.Resource):
         context = request.environ.get('context')
         json = util.copy_project_id_into_json(context, g.json)
         region_obj = dbapi.regions_create(context, json)
-        return jsonutils.to_primitive(region_obj), 200, None
+        region = jsonutils.to_primitive(region_obj)
+        if 'variables' in json:
+            region["variables"] = jsonutils.to_primitive(region_obj.variables)
+        else:
+            region["variables"] = {}
+        return region, 200, None
 
 
 class RegionsById(base.Resource):
