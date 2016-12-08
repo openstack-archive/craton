@@ -161,10 +161,15 @@ class TestCase(testtools.TestCase):
         return resp
 
     def post(self, url, **data):
-        return None
+        resp = requests.post(url, verify=False, headers=self.headers,
+                             json=data)
+        return resp
 
     def put(self, url, **data):
-        return None
+        resp = requests.put(url, verify=False, headers=self.headers,
+                            json=data)
+        return resp
 
-    def delete(self, url, **data):
-        return None
+    def delete(self, url):
+        resp = requests.delete(url, verify=False, headers=self.headers)
+        return resp
