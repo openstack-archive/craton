@@ -29,7 +29,12 @@ class Hosts(base.Resource):
         context = request.environ.get('context')
         json = util.copy_project_id_into_json(context, g.json)
         host_obj = dbapi.hosts_create(context, json)
-        return jsonutils.to_primitive(host_obj), 200, None
+        host = jsonutils.to_primitive(host_obj)
+        if 'variables' in json:
+            host["variables"] = jsonutils.to_primitive(host_obj.variables)
+        else:
+            host["variables"] = {}
+        return host, 200, None
 
 
 def format_variables(args, obj):

@@ -148,14 +148,15 @@ class APIV1CellsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_with_valid_data(self, mock_cell):
-        mock_cell.return_value = None
+        mock_cell.return_value = fake_resources.CELL1
         data = {'name': 'cell1', 'region_id': 1}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_returns_cell_obj(self, mock_cell):
-        return_value = {'name': 'cell1', 'region_id': 1, 'id': 1}
+        return_value = {'name': 'cell1', 'region_id': 1, 'id': 1,
+                        'variables': {}}
         mock_cell.return_value = return_value
         data = {'name': 'cell1', 'region_id': 1}
         resp = self.post('v1/cells', data=data)
@@ -256,16 +257,20 @@ class APIV1RegionsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_valid_data(self, mock_region):
-        mock_region.return_value = None
+        mock_region.return_value = fake_resources.REGION1
         data = {'name': 'region1'}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_create_region_returns_region_obj(self, mock_region):
-        return_value = {'name': 'region1', 'id': 1}
-        mock_region.return_value = return_value
-        data = {'name': 'region1'}
+        return_value = {'name': 'region1',
+                        'variables': {"key1": "value1", "key2": "value2"}}
+        fake_region = fake_resources.REGION1
+        fake_region.variables = {"key1": "value1", "key2": "value2"}
+        mock_region.return_value = fake_region
+        data = {'name': 'region1',
+                'variables': {"key1": "value1", "key2": "value2"}}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(return_value, resp.json)
@@ -412,7 +417,7 @@ class APIV1HostsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_with_valid_data(self, mock_host):
-        mock_host.return_value = None
+        mock_host.return_value = fake_resources.HOST1
         data = {'name': 'www.host1.com', 'region_id': 1,
                 'ip_address': '10.0.0.1', 'device_type': 'server',
                 'active': True}
@@ -433,7 +438,7 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_returns_host_obj(self, mock_host):
         return_value = {'name': 'www.host1.com', 'region_id': 1,
-                        'ip_address': '10.0.0.1', 'id': 1,
+                        'ip_address': '10.0.0.1', 'id': 1, 'variables': {},
                         'device_type': 'server', 'active': True}
         mock_host.return_value = return_value
         data = {'name': 'www.host1.com', 'region_id': 1,

@@ -35,7 +35,12 @@ class Cells(base.Resource):
         context = request.environ.get('context')
         json = util.copy_project_id_into_json(context, g.json)
         cell_obj = dbapi.cells_create(context, json)
-        return jsonutils.to_primitive(cell_obj), 200, None
+        cell = jsonutils.to_primitive(cell_obj)
+        if 'variables' in json:
+            cell["variables"] = jsonutils.to_primitive(cell_obj.variables)
+        else:
+            cell["variables"] = {}
+        return cell, 200, None
 
 
 class CellById(base.Resource):
