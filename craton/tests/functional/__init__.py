@@ -3,6 +3,7 @@ import requests
 from retrying import retry
 import testtools
 import threading
+import unittest
 import subprocess
 
 
@@ -146,14 +147,17 @@ class TestCase(testtools.TestCase):
         """Base setup provides container data back individual tests."""
         super(TestCase, self).setUp()
         self.container_setup_error = _container.error
-        if not self.container_setup_error:
-            data = _container.container_data
-            self.service_ip = data['NetworkSettings']['IPAddress']
-            self.url = 'http://{}:8080/'.format(self.service_ip)
-            self.headers = {'Content-Type': 'application/json'}
-            self.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
-            self.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
-            self.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
+        if self.container_setup_error:
+            raise unittest.SkipTest(
+                'There was an error setting up the container'
+            )
+        data = _container.container_data
+        self.service_ip = data['NetworkSettings']['IPAddress']
+        self.url = 'http://{}:8080/'.format(self.service_ip)
+        self.headers = {'Content-Type': 'application/json'}
+        self.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
+        self.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
+        self.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
 
     def get(self, url, **data):
         resp = requests.get(url, verify=False, headers=self.headers,
