@@ -146,25 +146,35 @@ class TestCase(testtools.TestCase):
         """Base setup provides container data back individual tests."""
         super(TestCase, self).setUp()
         self.container_setup_error = _container.error
+        self.session = requests.Session()
         if not self.container_setup_error:
             data = _container.container_data
             self.service_ip = data['NetworkSettings']['IPAddress']
             self.url = 'http://{}:8080/'.format(self.service_ip)
-            self.headers = {'Content-Type': 'application/json'}
-            self.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
-            self.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
-            self.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
+            self.session.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
+            self.session.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
+            self.session.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
 
-    def get(self, url, **data):
-        resp = requests.get(url, verify=False, headers=self.headers,
-                            json=data)
+    def get(self, url, headers=None, **params):
+        resp = self.session.get(
+            url, verify=False, headers=headers, params=params,
+        )
         return resp
 
-    def post(self, url, **data):
-        return None
+    def post(self, url, headers=None, **data):
+        resp = self.session.post(
+            url, verify=False, headers=headers, json=data,
+        )
+        return resp
 
-    def put(self, url, **data):
-        return None
+    def put(self, url, headers, **data):
+        resp = self.session.put(
+            url, verify=False, headers=headers, json=data,
+        )
+        return resp
 
-    def delete(self, url, **data):
-        return None
+    def delete(self, url, headers, **body):
+        resp = self.session.delete(
+            url, verify=False, headers=headers, json=body,
+        )
+        return resp
