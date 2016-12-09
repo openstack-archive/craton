@@ -648,7 +648,7 @@ validators = {
             },
         },
     },
-    ("hosts_variables", "GET"): {
+    ("hosts_id_variables", "GET"): {
         "args": {
             "properties": {
                 "resolved-values": {
