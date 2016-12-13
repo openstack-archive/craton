@@ -3,7 +3,6 @@ import requests
 from retrying import retry
 import testtools
 import threading
-import subprocess
 
 
 FAKE_DATA_GEN_USERNAME = 'demo'
@@ -11,30 +10,32 @@ FAKE_DATA_GEN_TOKEN = 'demo'
 FAKE_DATA_GEN_PROJECT_ID = 'b9f10eca66ac4c279c139d01e65f96b4'
 
 
-class DockerSetup(threading.Thread):
+def get_client():
+    client = docker.Client(version='auto')
+    is_ok = client.ping()
+    if is_ok != 'OK':
+        msg = 'Docker daemon ping failed.'
+        raise Exception(msg)
+    return client
+
+
+class DockerImageSetup(threading.Thread):
 
     def __init__(self):
-        self.container = None
-        self.container_is_ready = threading.Event()
+        self.image_is_ready = threading.Event()
         self.error = None
         self.client = None
         self.repo_dir = './'
-        super(DockerSetup, self).__init__()
+        super(DockerImageSetup, self).__init__()
 
     def run(self):
         """Build a docker container from the given Dockerfile and start
         the container in a separate thread."""
         try:
-            self.client = docker.Client(version='auto')
-            is_ok = self.client.ping()
-            if is_ok != 'OK':
-                msg = 'Docker daemon ping failed.'
-                self.error = msg
-                self.container_is_ready.set()
-                return
+            self.client = get_client()
         except Exception as err:
             self.error = err
-            self.container_is_ready.set()
+            self.image_is_ready.set()
             return
 
         # Create Docker image for Craton
@@ -51,47 +52,41 @@ class DockerSetup(threading.Thread):
         if "Successfully built" not in message:
             msg = 'Failed to build docker image.'
             self.error = msg
-            self.container_is_ready.set()
-            return
 
-        # create and start the container
-        container_tag = 'craton-functional-testing-api'
-        self.container = self.client.create_container(container_tag)
-        self.client.start(self.container)
-        self.container_data = self.client.inspect_container(self.container)
-        if self.container_data['State']['Status'] != 'running':
-            msg = 'Container is not running.'
-            self.error = msg
-            self.container_is_ready.set()
-            return
-
-        self.container_is_ready.set()
-
-    def stop(self):
-        """Stop a running container."""
-        if self.container is not None:
-            self.client.stop(self.container, timeout=30)
-
-    def remove(self):
-        """Remove/Delete a stopped container."""
-        if self.container is not None:
-            self.client.remove_container(self.container)
-
-    def remove_image(self):
-        """Remove the image we created."""
-        if self.client:
-            self.client.remove_image('craton-functional-testing-api')
+        self.image_is_ready.set()
 
 
-def generate_fake_data(container_data):
-    """Run data generation script."""
-    service_ip = container_data['NetworkSettings']['IPAddress']
-    url = 'http://{}:8080/v1'.format(service_ip)
+def start_container():
+    # create and start the container
+    client = get_client()
+    container_tag = 'craton-functional-testing-api'
+    container = client.create_container(container_tag)
+    client.start(container)
+    container_data = client.inspect_container(container)
+    if container_data['State']['Status'] != 'running':
+        msg = 'Container is not running.'
+        raise Exception(msg)
+    return container, container_data
 
-    subprocess.run(["python", "./tools/generate_fake_data.py", "--url",
-                   url, "--user", FAKE_DATA_GEN_USERNAME, "--key",
-                   FAKE_DATA_GEN_TOKEN, "--project",
-                   FAKE_DATA_GEN_PROJECT_ID], check=True)
+
+def stop_container(container):
+    """Stop a running container."""
+    client = get_client()
+    if container is not None:
+        client.stop(container, timeout=30)
+
+
+def remove_container(container):
+    """Remove/Delete a stopped container."""
+    client = get_client()
+    if container is not None:
+        client.remove_container(container)
+
+
+def remove_image():
+    """Remove the image we created."""
+    client = get_client()
+    client.remove_image('craton-functional-testing-api')
 
 
 @retry(wait_fixed=1000, stop_max_attempt_number=20)
@@ -102,42 +97,31 @@ def ensure_running_endpoint(container_data):
     requests.get(url, headers=headers)
 
 
-_container = None
+_image = None
 
 
-def setup_container():
-    global _container
+def setup_image():
+    global _image
 
-    _container = DockerSetup()
-    _container.daemon = True
-    _container.start()
-    _container.container_is_ready.wait()
+    _image = DockerImageSetup()
+    _image.daemon = True
+    _image.start()
+    _image.image_is_ready.wait()
 
-    if _container.error:
-        teardown_container()
-    else:
-        try:
-            ensure_running_endpoint(_container.container_data)
-            generate_fake_data(_container.container_data)
-        except Exception:
-            msg = 'Error during data generation script run.'
-            _container.error = msg
-            teardown_container()
+    if _image.error:
+        teardown_image()
 
 
-def teardown_container():
-    if _container:
-        _container.stop()
-        _container.remove()
-        _container.remove_image()
+def teardown_image():
+    remove_image()
 
 
 def setUpModule():
-    setup_container()
+    setup_image()
 
 
 def tearDownModule():
-    teardown_container()
+    teardown_image()
 
 
 class TestCase(testtools.TestCase):
@@ -145,26 +129,44 @@ class TestCase(testtools.TestCase):
     def setUp(self):
         """Base setup provides container data back individual tests."""
         super(TestCase, self).setUp()
-        self.container_setup_error = _container.error
-        if not self.container_setup_error:
-            data = _container.container_data
-            self.service_ip = data['NetworkSettings']['IPAddress']
-            self.url = 'http://{}:8080/'.format(self.service_ip)
+        self.image_build_error = _image.error
+        self.error = None
+        if not self.image_build_error:
+            try:
+                self.container, self.data = start_container()
+                try:
+                    ensure_running_endpoint(self.data)
+                except Exception as err:
+                    self.error = err
+            except Exception as err:
+                self.error = err
+
+            self.service_ip = self.data['NetworkSettings']['IPAddress']
+            self.url = 'http://{}:8080'.format(self.service_ip)
             self.headers = {'Content-Type': 'application/json'}
             self.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
             self.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
             self.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
 
-    def get(self, url, **data):
-        resp = requests.get(url, verify=False, headers=self.headers,
-                            json=data)
+    def tearDown(self):
+        super(TestCase, self).tearDown()
+        stop_container(self.container)
+        remove_container(self.container)
+
+    def get(self, url):
+        resp = requests.get(url, verify=False, headers=self.headers)
         return resp
 
     def post(self, url, **data):
-        return None
+        resp = requests.post(url, verify=False, headers=self.headers,
+                             json=data)
+        return resp
 
     def put(self, url, **data):
-        return None
+        resp = requests.put(url, verify=False, headers=self.headers,
+                            json=data)
+        return resp
 
-    def delete(self, url, **data):
-        return None
+    def delete(self, url):
+        resp = requests.delete(url, verify=False, headers=self.headers)
+        return resp
