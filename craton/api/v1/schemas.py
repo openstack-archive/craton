@@ -21,7 +21,6 @@ DefinitionVariablesSource = {
 }
 
 DefinitionsHost = {
-    "discriminator": "name",
     "required": [
         "name",
         "region_id",
@@ -71,7 +70,6 @@ DefinitionsHost = {
 }
 
 DefinitionsHostId = {
-    "discriminator": "name",
     "type": "object",
     "properties": {
         "active": {
@@ -114,7 +112,6 @@ DefinitionsHostId = {
 }
 
 DefinitionsCell = {
-    "discriminator": "name",
     "required": [
         "name",
         "region_id",
@@ -139,7 +136,6 @@ DefinitionsCell = {
 }
 
 DefinitionsCellId = {
-    "discriminator": "name",
     "type": "object",
     "properties": {
         "note": {
@@ -204,7 +200,6 @@ DefinitionsError = {
 }
 
 DefinitionsRegion = {
-    "discriminator": "name",
     "required": [
         "name",
     ],
@@ -232,7 +227,6 @@ DefinitionsRegion = {
 }
 
 DefinitionsRegionId = {
-    "discriminator": "name",
     "type": "object",
     "properties": {
         "note": {
@@ -261,7 +255,6 @@ DefinitionsRegionId = {
 }
 
 DefinitionUser = {
-    "discriminator": "name",
     "type": "object",
     "properties": {
         "id": {
@@ -289,7 +282,6 @@ DefinitionUser = {
 }
 
 DefinitionProject = {
-    "discriminator": "name",
     "type": "object",
     "properties": {
         "id": {
@@ -302,7 +294,6 @@ DefinitionProject = {
 }
 
 DefinitionNetwork = {
-    "discriminator": "name",
     "required": [
         "name",
         "cidr",
@@ -343,7 +334,6 @@ DefinitionNetwork = {
 }
 
 DefinitionNetworkId = {
-    "discriminator": "name",
     "type": "object",
     "properties": {
         "id": {
@@ -381,7 +371,6 @@ DefinitionNetworkId = {
 }
 
 DefinitionNetworkInterface = {
-    "discriminator": "name",
     "required": [
         "name",
         "device_id",
@@ -438,7 +427,6 @@ DefinitionNetworkInterface = {
 }
 
 DefinitionNetworkInterfaceId = {
-    "discriminator": "name",
     "type": "object",
     "properties": {
         "id": {
@@ -488,7 +476,6 @@ DefinitionNetworkInterfaceId = {
 }
 
 DefinitionNetworkDevice = {
-    "discriminator": "hostname",
     "required": [
         "hostname",
         "region_id",
@@ -541,7 +528,6 @@ DefinitionNetworkDevice = {
 }
 
 DefinitionNetworkDeviceId = {
-    "discriminator": "hostname",
     "type": "object",
     "properties": {
         "id": {
