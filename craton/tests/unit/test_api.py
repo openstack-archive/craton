@@ -725,7 +725,6 @@ class APIV1NetworkInterfacesTest(APIV1Test):
     def test_get_network_interfaces_by_device_id(self, fake_interfaces):
         fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE_LIST1
         resp = self.get('/v1/network_interfaces?name=NetInterface&device_id=1')
-        print(resp.json)
         network_interface_resp = fake_resources.NETWORK_INTERFACE1
         self.assertEqual(resp.json[0]["name"], network_interface_resp.name)
 
