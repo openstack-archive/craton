@@ -44,6 +44,22 @@ class CellsDBTestCase(base.DBTestCase):
         for cell in res:
             self.assertEqual(cell['name'], 'cell1')
 
+    def test_cells_get_all_filter_id(self):
+        for cell in cells:
+            dbapi.cells_create(self.context, cell)
+        setup_res = dbapi.cells_get_all(self.context, {})
+        self.assertGreater(len(setup_res), 2)
+        self.assertEqual(
+            len([cell for cell in setup_res if cell['id'] == 1]), 1
+        )
+
+        filters = {
+            "id": 1,
+        }
+        res = dbapi.cells_get_all(self.context, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]['id'], 1)
+
     def test_cells_get_all_with_filters(self):
         res = dbapi.cells_create(self.context, cell1)
         variables = {"key1": "value1", "key2": "value2"}

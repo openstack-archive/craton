@@ -212,6 +212,40 @@ class HostsDBTestCase(base.DBTestCase):
         host = dbapi.hosts_get_by_id(self.context, host_id)
         self.assertEqual(host.labels, {"jerry", "jones"})
 
+    def test_hosts_get_all_with_filter_cell_id(self):
+        region_id = self.make_region('region_1', foo='R1')
+        cell_id1 = self.make_cell(region_id, 'cell_1', bar='C2')
+        cell_id2 = self.make_cell(region_id, 'cell_2', bar='C2')
+        self.assertNotEqual(cell_id1, cell_id2)
+
+        self.make_host(
+            region_id,
+            'www.example.xyz',
+            IPAddress(u'10.1.2.101'),
+            'server',
+            cell_id=cell_id1,
+        )
+        self.make_host(
+            region_id,
+            'www.example.abc',
+            IPAddress(u'10.1.2.102'),
+            'server',
+            cell_id=cell_id2,
+        )
+
+        all_res = dbapi.hosts_get_all(self.context, {})
+        self.assertEqual(len(all_res), 2)
+        self.assertEqual(
+            len([host for host in all_res if host['cell_id'] == cell_id1]), 1
+        )
+
+        filters = {
+            "cell_id": cell_id1,
+        }
+        res = dbapi.hosts_get_all(self.context, filters)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].name, 'www.example.xyz')
+
     def test_hosts_get_all_with_filters(self):
         region_id = self.make_region('region_1', foo='R1')
         host_id = self.make_host(region_id, 'www.example.xyz',

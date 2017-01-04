@@ -198,7 +198,7 @@ class NetworkInterfaces(base.Resource):
     @base.http_codes
     @base.filtered_context(
         reserved_keys=['id', 'ip_address', 'interface_type',
-                       'device_id', 'vars'])
+                       'device_id'])
     def get(self, context, **filters):
         """Get all network interfaces."""
         interfaces_obj = dbapi.network_interfaces_get_all(context, filters)
