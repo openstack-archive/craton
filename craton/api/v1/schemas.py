@@ -645,17 +645,14 @@ validators = {
         "args": {
             "properties": {
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the region to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get a region",
                 },
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "ID of the region to get",
                 },
@@ -675,27 +672,22 @@ validators = {
         "args": {
             "properties": {
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the hosts to get",
                 },
                 "region_id": {
-                    "default": None,
                     "type": "integer",
                     "description": "ID of the region to get hosts",
                 },
                 "cell_id": {
-                    "default": None,
                     "type": "integer",
                     "description": "ID of the cell to get hosts",
                 },
                 "device_type": {
-                    "default": None,
                     "type": "string",
                     "description": "Type of host to get",
                 },
                 "label": {
-                    "default": None,
                     "type": "string",
                     "description": "label to get host by",
                 },
@@ -707,17 +699,14 @@ validators = {
                     "maximum": 10000,
                 },
                 "ip_address": {
-                    "default": None,
                     "type": "string",
                     "description": "ip_address of the hosts to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get a host",
                 },
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "ID of host to get",
                 },
@@ -743,22 +732,18 @@ validators = {
         "args": {
             "properties": {
                 "region_id": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the region to get cells for",
                 },
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the cell to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get a cell",
                 },
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the cell to get",
                 },
@@ -822,37 +807,30 @@ validators = {
         "args": {
             "properties": {
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the net device to get",
                 },
                 "ip_address": {
-                    "default": None,
                     "type": "string",
                     "description": "IP of the device to get",
                 },
                 "region_id": {
-                    "default": None,
                     "type": "string",
                     "description": "region id of the device to get",
                 },
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the device to get",
                 },
                 "device_type": {
-                    "default": None,
                     "type": "string",
                     "description": "type of the device to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get device",
                 },
                 "cell_id": {
-                    "default": None,
                     "type": "string",
                     "description": "cell id of the device to get",
                 },
@@ -930,22 +908,18 @@ validators = {
         "args": {
             "properties": {
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the net interface to get",
                 },
                 "device_id": {
-                    "default": None,
                     "type": "integer",
                     "description": "device id of the interface to get",
                 },
                 "ip_address": {
-                    "default": None,
                     "type": "string",
                     "description": "IP of the interface to get",
                 },
                 "interface_type": {
-                    "default": None,
                     "type": "string",
                     "description": "Type of the interface  to get",
                 },
@@ -992,32 +966,26 @@ validators = {
         "args": {
             "properties": {
                 "id": {
-                    "default": None,
                     "type": "integer",
                     "description": "id of the network to get",
                 },
                 "network_type": {
-                    "default": None,
                     "type": "string",
                     "description": "type of the network to get",
                 },
                 "name": {
-                    "default": None,
                     "type": "string",
                     "description": "name of the network to get",
                 },
                 "region_id": {
-                    "default": None,
                     "type": "string",
                     "description": "region id of the network to get",
                 },
                 "vars": {
-                    "default": None,
                     "type": "string",
                     "description": "variable filters to get networks",
                 },
                 "cell_id": {
-                    "default": None,
                     "type": "string",
                     "description": "cell idof the network to get",
                 },

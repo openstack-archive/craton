@@ -13,8 +13,7 @@ LOG = log.getLogger(__name__)
 class Cells(base.Resource):
 
     @base.http_codes
-    @base.filtered_context(
-        reserved_keys=['id', 'name', 'region_id', 'vars'])
+    @base.filtered_context()
     def get(self, context, **filters):
         """Get all cells, with optional filtering."""
         cells_obj = dbapi.cells_get_all(context, filters)
