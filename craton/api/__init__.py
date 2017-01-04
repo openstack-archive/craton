@@ -49,7 +49,7 @@ def create_app(global_config, **local_config):
 
 
 def setup_app(config=None):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder=None)
     app.config.update(
         PROPAGATE_EXCEPTIONS=True
     )
