@@ -631,7 +631,7 @@ validators = {
             },
         },
     },
-    ("hosts_variables", "GET"): {
+    ("hosts_id_variables", "GET"): {
         "args": {
             "properties": {
                 "resolved-values": {
@@ -1638,7 +1638,7 @@ filters = {
         },
     },
     ("network_devices_id_variables", "DELETE"): {
-        200: {
+        204: {
             "headers": None,
             "schema": None,
         },
@@ -1731,7 +1731,7 @@ filters = {
         },
     },
     ("networks_id_variables", "DELETE"): {
-        200: {
+        204: {
             "headers": None,
             "schema": None,
         },
