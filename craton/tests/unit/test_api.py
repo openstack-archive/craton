@@ -486,7 +486,7 @@ class APIV1HostsVariablesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'hosts_variables_update')
     def test_hosts_put_data(self, mock_host):
-        mock_host.return_value = fake_resources.REGION1
+        mock_host.return_value = fake_resources.HOST1
         payload = {"a": "b"}
         resp = self.put('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
