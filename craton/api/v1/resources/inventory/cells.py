@@ -46,7 +46,7 @@ class CellById(base.Resource):
     def put(self, id):
         """Update existing cell."""
         context = request.environ.get('context')
-        cell_obj = dbapi.cells_update(context, id, request.json)
+        cell_obj = dbapi.cells_update(context, id, g.json)
         return jsonutils.to_primitive(cell_obj), 200, None
 
     @base.http_codes
