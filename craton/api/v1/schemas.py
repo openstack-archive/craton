@@ -607,7 +607,7 @@ validators = {
         },
     },
     ("hosts_id", "PUT"): {
-        "args": {
+        "json": {
             "properties": {
                 "active": {
                     "type": "boolean",
@@ -711,7 +711,7 @@ validators = {
         },
     },
     ("cells_id", "PUT"): {
-        "args": {
+        "json": {
             "properties": {
                 "note": {
                     "type": "string",
@@ -748,7 +748,7 @@ validators = {
         },
     },
     ("regions_id", "PUT"): {
-        "args": {
+        "json": {
             "properties": {
                 "name": {
                     "type": "string",
@@ -848,7 +848,7 @@ validators = {
         "json": DefinitionVariablesSource
     },
     ("networks_id", "PUT"): {
-        "args": {
+        "json": {
             "properties": {
                 "name": {
                     "type": "string",
@@ -872,7 +872,7 @@ validators = {
         },
     },
     ("network_devices_id", "PUT"): {
-        "args": {
+        "json": {
             "properties": {
                 "ip_address": {
                     "type": "string",
@@ -927,7 +927,7 @@ validators = {
         "json": DefinitionNetworkInterface,
     },
     ("network_interfaces_id", "PUT"): {
-        "args": {
+        "json": {
             "properties": {
                 "name": {
                     "type": "string",
