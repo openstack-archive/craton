@@ -84,7 +84,7 @@ class HostsVariables(base.Resource):
     def put(self, id):
         """Update existing host variables, or create if it does not exist."""
         context = request.environ.get('context')
-        obj = dbapi.hosts_variables_update(context, id, request.json)
+        obj = dbapi.hosts_variables_update(context, id, g.json)
         response = {"variables": jsonutils.to_primitive(obj.variables)}
         return response, 200, None
 

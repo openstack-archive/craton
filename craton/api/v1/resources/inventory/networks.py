@@ -71,7 +71,7 @@ class NetworksVariables(base.Resource):
     def put(self, id):
         """"Update existing variables, or create if it does not exist."""
         context = request.environ.get('context')
-        obj = dbapi.networks_variables_update(context, id, request.json)
+        obj = dbapi.networks_variables_update(context, id, g.json)
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
@@ -149,7 +149,7 @@ class NetworkDevicesVariables(base.Resource):
     def put(self, id):
         """"Update device variables, or create if it does not exist."""
         context = request.environ.get('context')
-        obj = dbapi.network_devices_variables_update(context, id, request.json)
+        obj = dbapi.network_devices_variables_update(context, id, g.json)
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 

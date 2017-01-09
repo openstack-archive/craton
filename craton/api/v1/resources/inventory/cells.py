@@ -74,7 +74,7 @@ class CellsVariables(base.Resource):
         not exist.
         """
         context = request.environ.get('context')
-        obj = dbapi.cells_variables_update(context, id, request.json)
+        obj = dbapi.cells_variables_update(context, id, g.json)
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 

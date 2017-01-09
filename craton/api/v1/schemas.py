@@ -7,6 +7,15 @@ DefinitionVariablesSource = {
                     "type": "string",
                 },
                 {
+                    "type": "null",
+                },
+                {
+                    "type": "number",
+                },
+                {
+                    "type": "boolean",
+                },
+                {
                     "type": "integer",
                 },
                 {
@@ -156,18 +165,6 @@ DefinitionsCellId = {
             "description": "Unique ID of the cell",
         },
         "variables": DefinitionVariablesSource,
-    },
-}
-
-DefinitionsData = {
-    "type": "object",
-    "properties": {
-        "key": {
-            "type": "string",
-        },
-        "value": {
-            "type": "object",
-        },
     },
 }
 
@@ -594,7 +591,7 @@ validators = {
         },
     },
     ("hosts_id_variables", "PUT"): {
-        "json": DefinitionsData,
+        "json": DefinitionVariablesSource,
     },
     ("hosts_labels", "PUT"): {
         "json": DefinitionsLabel,
@@ -663,7 +660,7 @@ validators = {
         "json": DefinitionsRegion,
     },
     ("regions_id_variables", "PUT"): {
-        "json": DefinitionsData,
+        "json": DefinitionVariablesSource,
     },
     ("hosts", "POST"): {
         "json": DefinitionsHost,
@@ -763,7 +760,7 @@ validators = {
         },
     },
     ("cells_id_variables", "PUT"): {
-        "json": DefinitionsData,
+        "json": DefinitionVariablesSource,
     },
     ("projects", "GET"): {
         "args": {
@@ -848,7 +845,7 @@ validators = {
         },
     },
     ("network_devices_id_variables", "PUT"): {
-        "json": DefinitionsData
+        "json": DefinitionVariablesSource
     },
     ("networks_id", "PUT"): {
         "args": {
@@ -993,7 +990,7 @@ validators = {
         },
     },
     ("networks_id_variables", "PUT"): {
-        "json": DefinitionsData
+        "json": DefinitionVariablesSource
     },
     ("networks", "POST"): {
         "json": DefinitionNetwork,
