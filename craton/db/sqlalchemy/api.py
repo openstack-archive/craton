@@ -214,7 +214,7 @@ def _device_variables_delete(context, device_type, device_id, data):
         return ref
 
 
-def cells_get_all(context, filters):
+def cells_get_all(context, filters, pagination_params):
     """Get all cells."""
     query = model_query(context, models.Cell, project_only=True)
 
@@ -227,12 +227,7 @@ def cells_get_all(context, filters):
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
-    try:
-        return query.all()
-    except sa_exc.NoResultFound:
-        raise exceptions.NotFound()
-    except Exception as err:
-        raise exceptions.UnknownException(message=err)
+    return _paginate(query, models.Cell, filters, pagination_params)
 
 
 def cells_get_by_id(context, cell_id):
@@ -310,17 +305,14 @@ def cells_variables_delete(context, cell_id, data):
         return cell_ref
 
 
-def regions_get_all(context, filters):
+def regions_get_all(context, filters, pagination_params):
     """Get all available regions."""
     query = model_query(context, models.Region, project_only=True)
 
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
-    try:
-        return query.all()
-    except sa_exc.NoResultFound:
-        raise exceptions.NotFound()
+    return _paginate(query, models.Region, filters, pagination_params)
 
 
 def regions_get_by_name(context, name):
@@ -412,7 +404,7 @@ def regions_variables_delete(context, region_id, data):
         return region_ref
 
 
-def hosts_get_all(context, filters):
+def hosts_get_all(context, filters, pagination_params):
     """Get all hosts matching filters.
 
     :param filters: filters which contains different keys/values to match.
@@ -441,13 +433,7 @@ def hosts_get_all(context, filters):
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
-    try:
-        result = query.all()
-    except sa_exc.NoResultFound:
-        raise exceptions.NotFound()
-    except Exception as err:
-        raise exceptions.UnknownException(message=err)
-    return result
+    return _paginate(query, models.Host, filters, pagination_params)
 
 
 def hosts_get_by_id(context, host_id):
@@ -527,15 +513,10 @@ def hosts_labels_delete(context, host_id, labels):
 
 
 @require_admin_context
-def projects_get_all(context):
+def projects_get_all(context, filters, pagination_params):
     """Get all the projects."""
     query = model_query(context, models.Project)
-    try:
-        return query.all()
-    except sa_exc.NoResultFound:
-        raise exceptions.NotFound()
-    except Exception as err:
-        raise exceptions.UnknownException(message=err)
+    return _paginate(query, models.Project, filters, pagination_params)
 
 
 @require_admin_context
@@ -588,7 +569,7 @@ def projects_delete(context, project_id):
 
 
 @require_project_admin_context
-def users_get_all(context):
+def users_get_all(context, filters, pagination_params):
     """Get all the users."""
     if is_admin_context(context):
         LOG.info("Getting all users as root user")
@@ -598,7 +579,7 @@ def users_get_all(context):
         query = model_query(context, models.User, project_only=True)
         query = query.filter_by(project_id=context.tenant)
 
-    return query.all()
+    return _paginate(query, models.User, filters, pagination_params)
 
 
 @require_project_admin_context
@@ -651,7 +632,7 @@ def users_delete(context, user_id):
     return
 
 
-def networks_get_all(context, filters):
+def networks_get_all(context, filters, pagination_params):
     """Get all networks."""
     query = model_query(context, models.Network, project_only=True)
 
@@ -668,8 +649,7 @@ def networks_get_all(context, filters):
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
-    result = query.all()
-    return result
+    return _paginate(query, models.Network, filters, pagination_params)
 
 
 def networks_get_by_id(context, network_id):
@@ -763,7 +743,7 @@ def networks_variables_delete(context, network_id, data):
         return ref
 
 
-def network_devices_get_all(context, filters):
+def network_devices_get_all(context, filters, pagination_params):
     """Get all network devices."""
     devices = with_polymorphic(models.Device, [models.NetworkDevice])
     query = model_query(context, devices, project_only=True)
@@ -784,8 +764,7 @@ def network_devices_get_all(context, filters):
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
-    result = query.all()
-    return result
+    return _paginate(query, models.Device, filters, pagination_params)
 
 
 def network_devices_get_by_id(context, network_device_id):
@@ -863,7 +842,7 @@ def network_devices_variables_delete(context, device_id, data):
                                     device_id, data)
 
 
-def network_interfaces_get_all(context, filters):
+def network_interfaces_get_all(context, filters, pagination_params):
     """Get all network interfaces."""
     query = model_query(context, models.NetworkInterface, project_only=True)
 
@@ -876,7 +855,8 @@ def network_interfaces_get_all(context, filters):
     if "interface_type" in filters:
         query = query.filter_by(interface_type=filters["interface_type"])
 
-    return query.all()
+    return _paginate(query, models.NetworkInterface, filters,
+                     pagination_params)
 
 
 def network_interfaces_get_by_id(context, interface_id):
@@ -922,3 +902,17 @@ def network_interfaces_delete(context, interface_id):
                             project_only=True)
         query = query.filter_by(id=interface_id)
         query.delete()
+
+
+def _paginate(query, model, filters, pagination_params):
+    try:
+        return db_utils.paginate_query(
+            query, model,
+            limit=pagination_params['limit'],
+            sort_keys=filters.get('sort_keys', ['created_at']),
+            marker=pagination_params['marker'],
+        ).all()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)

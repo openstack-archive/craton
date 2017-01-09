@@ -13,9 +13,12 @@ class Networks(base.Resource):
     """Controller for Networks resources."""
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get all networks, with optional filtering."""
-        networks_obj = dbapi.networks_get_all(context, request_args)
+        networks_obj = dbapi.networks_get_all(
+            context, request_args, pagination_params,
+        )
         return jsonutils.to_primitive(networks_obj), 200, None
 
     @base.http_codes
@@ -77,9 +80,12 @@ class NetworkDevices(base.Resource):
     """Controller for Network Device resources."""
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get all network devices."""
-        devices_obj = dbapi.network_devices_get_all(context, request_args)
+        devices_obj = dbapi.network_devices_get_all(
+            context, request_args, pagination_params,
+        )
         return jsonutils.to_primitive(devices_obj), 200, None
 
     @base.http_codes
@@ -171,10 +177,11 @@ class NetworkInterfaces(base.Resource):
     """Controller for Netowrk Interfaces."""
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get all network interfaces."""
         interfaces_obj = dbapi.network_interfaces_get_all(
-            context, request_args
+            context, request_args, pagination_params,
         )
         return jsonutils.to_primitive(interfaces_obj), 200, None
 
