@@ -181,7 +181,7 @@ class APIV1CellsTest(APIV1Test):
         resp = self.put('v1/cells/1', data=payload)
         self.assertEqual(resp.json['region_id'], payload['region_id'])
         self.assertEqual(resp.json['project_id'], payload['project_id'])
-        self.assertTrue(resp.json['name'], payload['name'])
+        self.assertEqual(resp.json['name'], payload['name'])
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'cells_create')
@@ -301,7 +301,7 @@ class APIV1RegionsTest(APIV1Test):
         mock_region.return_value = fake_resources.REGION1
         payload = {"name": "region_New1"}
         resp = self.put('v1/regions/1', data=payload)
-        self.assertTrue(resp.json['name'], payload['name'])
+        self.assertEqual(resp.json['name'], payload['name'])
         self.assertEqual(resp.status_code, 200)
 
     @mock.patch.object(dbapi, 'regions_create')
@@ -470,7 +470,7 @@ class APIV1HostsTest(APIV1Test):
         resp = self.put('/v1/hosts/1', data=payload)
         self.assertEqual(resp.json['project_id'], payload['project_id'])
         self.assertEqual(resp.json['region_id'], payload['region_id'])
-        self.assertTrue(resp.json['name'], payload['name'])
+        self.assertEqual(resp.json['name'], payload['name'])
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'hosts_create')
@@ -646,7 +646,7 @@ class APIV1NetworksTest(APIV1Test):
         mock_network.return_value = fake_resources.NETWORK1
         payload = {"name": "Network_New1"}
         resp = self.put('v1/networks/1', data=payload)
-        self.assertTrue(resp.json['name'], payload['name'])
+        self.assertEqual(resp.json['name'], payload['name'])
         self.assertEqual(resp.status_code, 200)
 
     @mock.patch.object(dbapi, 'networks_delete')
@@ -852,7 +852,7 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         resp = self.put('/v1/network_interfaces/1', data=payload)
         self.assertEqual(resp.json['project_id'], payload['project_id'])
         self.assertEqual(resp.json['device_id'], payload['device_id'])
-        self.assertTrue(resp.json['name'], payload['name'])
+        self.assertEqual(resp.json['name'], payload['name'])
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_interfaces_delete')
