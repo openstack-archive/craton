@@ -211,7 +211,9 @@ class FlaskValidatorAdaptor(object):
     def validate(self, value):
         value = self.type_convert(value)
         errors = list(e.message for e in self.validator.iter_errors(value))
-        return merge_default(self.validator.schema, value), errors
+        if errors:
+            abort(422, message='Unprocessable Entity', errors=errors)
+        return merge_default(self.validator.schema, value)
 
 
 def request_validate(view):
@@ -232,9 +234,7 @@ def request_validate(view):
         for location, schema in locations.items():
             value = getattr(request, location, MultiDict())
             validator = FlaskValidatorAdaptor(schema)
-            result, errors = validator.validate(value)
-            if errors:
-                abort(422, message='Unprocessable Entity', errors=errors)
+            result = validator.validate(value)
             setattr(g, location, result)
         return view(*args, **kwargs)
 
