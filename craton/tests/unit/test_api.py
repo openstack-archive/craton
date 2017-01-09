@@ -205,8 +205,18 @@ class APIV1CellsVariablesTest(APIV1Test):
     def test_cells_put_variables(self, mock_cell):
         mock_cell.return_value = fake_resources.CELL1
         payload = {"a": "b"}
+        db_data = payload.copy()
         resp = self.put('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
+        mock_cell.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'cells_variables_update')
+    def test_cells_put_bad_data_type(self, mock_cell):
+        mock_cell.return_value = fake_resources.CELL1
+        payload = ["a", "b"]
+        resp = self.put('v1/cells/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_cell.assert_not_called()
 
     @mock.patch.object(dbapi, 'cells_variables_delete')
     def test_cells_delete_variables(self, mock_cell):
@@ -314,8 +324,18 @@ class APIV1RegionsVariablesTest(APIV1Test):
     def test_regions_put_variables(self, mock_region):
         mock_region.return_value = fake_resources.REGION1
         payload = {"a": "b"}
+        db_data = payload.copy()
         resp = self.put('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
+        mock_region.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'regions_variables_update')
+    def test_regions_put_bad_data_type(self, mock_region):
+        mock_region.return_value = fake_resources.REGION1
+        payload = ["a", "b"]
+        resp = self.put('v1/regions/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_region.assert_not_called()
 
     @mock.patch.object(dbapi, 'regions_variables_delete')
     def test_regions_delete_variables(self, mock_region):
@@ -488,8 +508,18 @@ class APIV1HostsVariablesTest(APIV1Test):
     def test_hosts_put_data(self, mock_host):
         mock_host.return_value = fake_resources.HOST1
         payload = {"a": "b"}
+        db_data = payload.copy()
         resp = self.put('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
+        mock_host.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'hosts_variables_update')
+    def test_hosts_put_bad_data_type(self, mock_host):
+        mock_host.return_value = fake_resources.HOST1
+        payload = ["a", "b"]
+        resp = self.put('v1/hosts/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_host.assert_not_called()
 
     @mock.patch.object(dbapi, 'hosts_variables_delete')
     def test_regions_delete_data(self, mock_host):
@@ -624,29 +654,35 @@ class APIV1NetworksTest(APIV1Test):
         resp = self.delete('v1/networks/1')
         self.assertEqual(204, resp.status_code)
 
+
+class APIV1NetworksVariablesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'networks_get_by_id')
+    def test_networks_get_variables(self, mock_network):
+        mock_network.return_value = fake_resources.NETWORK1
+        resp = self.get('v1/networks/1/variables')
+        expected = {"variables": {"key1": "value1"}}
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json, expected)
+
     @mock.patch.object(dbapi, 'networks_variables_update')
     def test_networks_put_variables(self, mock_network):
         mock_network.return_value = fake_resources.NETWORK1
         payload = {"a": "b"}
+        db_data = payload.copy()
         resp = self.put('v1/networks/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
+        mock_network.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'networks_variables_update')
-    def test_network_put_variable(self, mock_network):
+    def test_networks_put_bad_data_type(self, mock_network):
         mock_network.return_value = fake_resources.NETWORK1
-        payload = {"a": "b"}
+        payload = ["a", "b"]
         resp = self.put('v1/networks/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 200)
-
-    @mock.patch.object(dbapi, 'networks_get_by_id')
-    def test_network_get_variables(self, mock_network):
-        mock_network.return_value = fake_resources.NETWORK2
-        resp = self.get('v1/networks/2/variables')
-        expected = {"variables": {"pkey1": "pvalue1"}}
-        self.assertEqual(resp.json, expected)
+        self.assertEqual(resp.status_code, 422)
+        mock_network.assert_not_called()
 
     @mock.patch.object(dbapi, 'networks_variables_delete')
-    def test_network_variables_delete(self, mock_network):
+    def test_networks_delete_variables(self, mock_network):
         payload = {"key1": "value1"}
         resp = self.delete('v1/networks/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
@@ -716,19 +752,6 @@ class APIV1NetworkDevicesTest(APIV1Test):
         resp = self.delete('v1/network_devices/1')
         self.assertEqual(204, resp.status_code)
 
-    @mock.patch.object(dbapi, 'network_devices_variables_delete')
-    def test_network_devices_variables_delete(self, mock_devices):
-        payload = {"key1": "value1"}
-        resp = self.delete('v1/network_devices/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 204)
-
-    @mock.patch.object(dbapi, 'network_devices_variables_update')
-    def test_network_devices_variables_update(self, mock_devices):
-        mock_devices.return_value = fake_resources.NETWORK_DEVICE1
-        payload = {"a": "b"}
-        resp = self.put('v1/network_devices/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 200)
-
     @mock.patch.object(dbapi, 'network_devices_labels_update')
     def test_network_devices_labels_update(self, mock_devices):
         payload = {"labels": ["a", "b"]}
@@ -736,6 +759,39 @@ class APIV1NetworkDevicesTest(APIV1Test):
         resp = self.put('v1/network_devices/1/labels', data=payload)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(resp.json, payload)
+
+
+class APIV1NetworkDevicesVariablesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'network_devices_get_by_id')
+    def test_network_devices_get_variables(self, mock_network_device):
+        mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
+        resp = self.get('v1/network_devices/1/variables')
+        expected = {"variables": {"key1": "value1", "key2": "value2"}}
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json, expected)
+
+    @mock.patch.object(dbapi, 'network_devices_variables_update')
+    def test_network_devices_put_variables(self, mock_network_device):
+        mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
+        payload = {"a": "b"}
+        db_data = payload.copy()
+        resp = self.put('v1/network_devices/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 200)
+        mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'network_devices_variables_update')
+    def test_network_devices_put_bad_data_type(self, mock_network_device):
+        mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
+        payload = ["a", "b"]
+        resp = self.put('v1/network_devices/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_network_device.assert_not_called()
+
+    @mock.patch.object(dbapi, 'network_devices_variables_delete')
+    def test_network_devices_delete_variables(self, mock_network_device):
+        payload = {"key1": "value1"}
+        resp = self.delete('v1/network_devices/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 204)
 
 
 class APIV1NetworkInterfacesTest(APIV1Test):
