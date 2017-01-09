@@ -11,7 +11,8 @@ LOG = log.getLogger(__name__)
 class Projects(base.Resource):
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get all projects. Requires super admin privileges."""
         project_id = request_args["id"]
         project_name = request_args["name"]
@@ -24,7 +25,9 @@ class Projects(base.Resource):
             project_obj = dbapi.projects_get_by_id(context, project_id)
             return jsonutils.to_primitive([project_obj], 200, None)
 
-        projects_obj = dbapi.projects_get_all(context)
+        projects_obj = dbapi.projects_get_all(
+            context, request_args, pagination_params,
+        )
         return jsonutils.to_primitive(projects_obj), 200, None
 
     @base.http_codes

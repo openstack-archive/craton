@@ -32,9 +32,9 @@ def get_user_info(context, user):
 
 # Cells
 
-def cells_get_all(context, filters):
+def cells_get_all(context, filters, pagination_params):
     """Get all available cells."""
-    return IMPL.cells_get_all(context, filters)
+    return IMPL.cells_get_all(context, filters, pagination_params)
 
 
 def cells_get_by_id(context, cell_id):
@@ -71,9 +71,9 @@ def cells_variables_delete(context, cell_id, data_key):
 # Regions
 
 
-def regions_get_all(context, filters):
+def regions_get_all(context, filters, pagination_params):
     """Get all available regions."""
-    return IMPL.regions_get_all(context, filters)
+    return IMPL.regions_get_all(context, filters, pagination_params)
 
 
 def regions_get_by_name(context, name):
@@ -115,14 +115,17 @@ def regions_variables_delete(context, region_id, data_key):
 # Hosts
 
 
-def hosts_get_by_region_cell(context, region_id, cell_id, filters):
+def hosts_get_by_region_cell(context, region_id, cell_id, filters,
+                             pagination_params):
     """Get all hosts for region/cell."""
-    return IMPL.hosts_get_by_region_cell(context, region_id, cell_id, filters)
+    return IMPL.hosts_get_by_region_cell(
+        context, region_id, cell_id, filters, pagination_params,
+    )
 
 
-def hosts_get_all(context, filters):
+def hosts_get_all(context, filters, pagination_params):
     """Get all hosts."""
-    return IMPL.hosts_get_all(context, filters)
+    return IMPL.hosts_get_all(context, filters, pagination_params)
 
 
 def hosts_get_by_id(context, host_id):
@@ -169,9 +172,9 @@ def hosts_labels_update(context, host_id, labels):
 
 # Projects
 
-def projects_get_all(context):
+def projects_get_all(context, pagination_params):
     """Get all the projects."""
-    return IMPL.projects_get_all(context)
+    return IMPL.projects_get_all(context, pagination_params)
 
 
 def projects_get_by_name(context, project_name):
@@ -196,9 +199,9 @@ def projects_delete(context, project_id):
 
 # Users
 
-def users_get_all(context):
+def users_get_all(context, pagination_params):
     """Get all the users."""
-    return IMPL.users_get_all(context)
+    return IMPL.users_get_all(context, pagination_params)
 
 
 def users_get_by_name(context, user_name):
@@ -223,9 +226,9 @@ def users_delete(context, user_id):
 
 # Networks
 
-def networks_get_all(context, filters):
+def networks_get_all(context, filters, pagination_params):
     """Get all networks for the given region."""
-    return IMPL.networks_get_all(context, filters)
+    return IMPL.networks_get_all(context, filters, pagination_params)
 
 
 def networks_get_by_id(context, network_id):
@@ -258,9 +261,9 @@ def networks_variables_delete(context, network_id, data):
     return IMPL.networks_variables_delete(context, network_id, data)
 
 
-def network_devices_get_all(context, filters):
+def network_devices_get_all(context, filters, pagination_params):
     """Get all network devices."""
-    return IMPL.network_devices_get_all(context, filters)
+    return IMPL.network_devices_get_all(context, filters, pagination_params)
 
 
 def network_devices_get_by_id(context, network_device_id):
@@ -307,9 +310,11 @@ def network_devices_labels_update(context, network_device_id, labels):
                                               labels)
 
 
-def network_interfaces_get_all(context, filters):
+def network_interfaces_get_all(context, filters, pagination_params):
     """Get all network interfaces."""
-    return IMPL.network_interfaces_get_all(context, filters)
+    return IMPL.network_interfaces_get_all(
+        context, filters, pagination_params,
+    )
 
 
 def network_interfaces_get_by_id(context, interface_id):
