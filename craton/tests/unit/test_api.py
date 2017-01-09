@@ -197,13 +197,17 @@ class APIV1CellsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'cells_update')
     def test_update_cell(self, mock_cell):
-        mock_cell.return_value = fake_resources.CELL1
-        payload = {'name': 'cell1-New', 'region_id': 1, 'project_id': 1}
+        record = dict(fake_resources.CELL1.items())
+        payload = {'name': 'cell1-New'}
+        record.update(payload)
+        db_data = payload.copy()
+        mock_cell.return_value = record
+
         resp = self.put('v1/cells/1', data=payload)
-        self.assertEqual(resp.json['region_id'], payload['region_id'])
-        self.assertEqual(resp.json['project_id'], payload['project_id'])
-        self.assertTrue(resp.json['name'], payload['name'])
+
+        self.assertEqual(resp.json['name'], db_data['name'])
         self.assertEqual(200, resp.status_code)
+        mock_cell.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_fails_with_invalid_data(self, mock_cell):
@@ -361,11 +365,17 @@ class APIV1RegionsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'regions_update')
     def test_update_region(self, mock_region):
-        mock_region.return_value = fake_resources.REGION1
+        record = dict(fake_resources.REGION1.items())
         payload = {"name": "region_New1"}
+        db_data = payload.copy()
+        record.update(payload)
+        mock_region.return_value = record
+
         resp = self.put('v1/regions/1', data=payload)
-        self.assertTrue(resp.json['name'], payload['name'])
+
         self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json['name'], 'region_New1')
+        mock_region.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_invalid_data_fails(self, mock_region):
@@ -569,14 +579,17 @@ class APIV1HostsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'hosts_update')
     def test_update_host(self, mock_host):
-        mock_host.return_value = fake_resources.HOST1
-        payload = {'name': 'Host_New', 'project_id': 1, 'region_id': 1,
-                   'ip_address': "192.168.1.1", 'device_type': "server"}
+        record = dict(fake_resources.HOST1.items())
+        payload = {'name': 'Host_New'}
+        db_data = payload.copy()
+        record.update(payload)
+        mock_host.return_value = record
+
         resp = self.put('/v1/hosts/1', data=payload)
-        self.assertEqual(resp.json['project_id'], payload['project_id'])
-        self.assertEqual(resp.json['region_id'], payload['region_id'])
-        self.assertTrue(resp.json['name'], payload['name'])
+
+        self.assertEqual(resp.json['name'], db_data['name'])
         self.assertEqual(200, resp.status_code)
+        mock_host.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_returns_host_obj(self, mock_host):
@@ -824,11 +837,17 @@ class APIV1NetworksTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'networks_update')
     def test_update_network(self, mock_network):
-        mock_network.return_value = fake_resources.NETWORK1
+        record = dict(fake_resources.NETWORK1.items())
         payload = {"name": "Network_New1"}
+        db_data = payload.copy()
+        record.update(payload)
+        mock_network.return_value = record
+
         resp = self.put('v1/networks/1', data=payload)
-        self.assertTrue(resp.json['name'], payload['name'])
+
+        self.assertEqual(resp.json['name'], payload['name'])
         self.assertEqual(resp.status_code, 200)
+        mock_network.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'networks_update')
     def test_update_network_invalid_property(self, mock_network):
@@ -1107,15 +1126,17 @@ class APIV1NetworkInterfacesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'network_interfaces_update')
     def test_network_interfaces_update(self, fake_interfaces):
-        fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE1
-        payload = {'name': 'New', 'device_id': 1, 'project_id': 1,
-                   'interface_type': 'interface_type1',
-                   'ip_address': '10.0.0.1'}
+        record = dict(fake_resources.NETWORK_INTERFACE1.items())
+        payload = {'name': 'New'}
+        db_data = payload.copy()
+        record.update(payload)
+        fake_interfaces.return_value = record
+
         resp = self.put('/v1/network_interfaces/1', data=payload)
-        self.assertEqual(resp.json['project_id'], payload['project_id'])
-        self.assertEqual(resp.json['device_id'], payload['device_id'])
-        self.assertTrue(resp.json['name'], payload['name'])
+
+        self.assertEqual(resp.json['name'], db_data['name'])
         self.assertEqual(200, resp.status_code)
+        fake_interfaces.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'network_interfaces_update')
     def test_network_interfaces_update_invalid_property(self, fake_interfaces):
