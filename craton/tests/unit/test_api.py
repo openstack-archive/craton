@@ -673,7 +673,7 @@ class APIV1HostsVariablesTest(APIV1Test):
         mock_host.assert_not_called()
 
     @mock.patch.object(dbapi, 'hosts_variables_delete')
-    def test_regions_delete_data(self, mock_host):
+    def test_hosts_delete_data(self, mock_host):
         payload = {"key1": "value1"}
         resp = self.delete('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
