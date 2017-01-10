@@ -11,23 +11,39 @@ class TestAPISchema(TestCase):
 
 
 def generate_schema_validation_functions(cls):
-    def gen_test(name, schema):
+    def gen_validator_test(endpoint, method, loc_schema):
+        name = '_'.join(('validator', endpoint, method))
+
+        def test(self):
+            self.assertEqual(len(loc_schema), 1)
+            locations = {
+                'GET': 'args',
+                'PUT': 'json',
+                'POST': 'json',
+            }
+            location, schema = loc_schema.popitem()
+            self.assertIn(method, locations)
+            self.assertEqual(locations[method], location)
+            self.assertIs(
+                jsonschema.Draft4Validator.check_schema(schema), None
+            )
+        setattr(cls, 'test_valid_schema_{}'.format(name), test)
+
+    for (endpoint, method), loc_schema in validators.items():
+        gen_validator_test(endpoint, method, loc_schema)
+
+    def gen_filter_test(name, schema):
         def test(self):
             self.assertIs(
                 jsonschema.Draft4Validator.check_schema(schema), None
             )
         setattr(cls, 'test_valid_schema_{}'.format(name), test)
 
-    for (endpoint, method), s in validators.items():
-        schema = s.get('args') or s.get('json')
-        name = '_'.join(('validator', endpoint, method))
-        gen_test(name, schema)
-
     for (endpoint, method), responses in filters.items():
         for return_code, json in responses.items():
             if json['schema']:
                 name = '_'.join(('filter', endpoint, method, str(return_code)))
-                gen_test(name, json['schema'])
+                gen_filter_test(name, json['schema'])
 
 
 generate_schema_validation_functions(TestAPISchema)

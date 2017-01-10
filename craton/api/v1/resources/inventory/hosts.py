@@ -58,7 +58,7 @@ class HostById(base.Resource):
     def put(self, id):
         """Update existing host data, or create if it does not exist."""
         context = request.environ.get('context')
-        host_obj = dbapi.hosts_update(context, id, request.json)
+        host_obj = dbapi.hosts_update(context, id, g.json)
         return jsonutils.to_primitive(host_obj), 200, None
 
     @base.http_codes
@@ -116,7 +116,7 @@ class HostsLabels(base.Resource):
         not exist.
         """
         context = request.environ.get('context')
-        resp = dbapi.hosts_labels_update(context, id, request.json)
+        resp = dbapi.hosts_labels_update(context, id, g.json)
         response = {"labels": list(resp.labels)}
         return response, 200, None
 
