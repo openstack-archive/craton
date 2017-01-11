@@ -85,5 +85,5 @@ class CellsVariables(base.Resource):
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
         context = request.environ.get('context')
-        dbapi.cells_variables_delete(context, id, request.json)
+        dbapi.cells_variables_delete(context, id, g.json)
         return None, 204, None

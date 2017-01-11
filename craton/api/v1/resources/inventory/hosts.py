@@ -95,7 +95,7 @@ class HostsVariables(base.Resource):
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
         context = request.environ.get('context')
-        dbapi.hosts_variables_delete(context, id, request.json)
+        dbapi.hosts_variables_delete(context, id, g.json)
         return None, 204, None
 
 
@@ -124,5 +124,5 @@ class HostsLabels(base.Resource):
     def delete(self, id):
         """Delete device label entirely."""
         context = request.environ.get('context')
-        dbapi.hosts_labels_delete(context, id, request.json)
+        dbapi.hosts_labels_delete(context, id, g.json)
         return None, 204, None

@@ -79,7 +79,7 @@ class NetworksVariables(base.Resource):
     def delete(self, id):
         """Delete networks variables."""
         context = request.environ.get('context')
-        dbapi.networks_variables_delete(context, id, request.json)
+        dbapi.networks_variables_delete(context, id, g.json)
         return None, 204, None
 
 
@@ -157,7 +157,7 @@ class NetworkDevicesVariables(base.Resource):
     def delete(self, id):
         """Delete network device variables."""
         context = request.environ.get('context')
-        dbapi.network_devices_variables_delete(context, id, request.json)
+        dbapi.network_devices_variables_delete(context, id, g.json)
         return None, 204, None
 
 

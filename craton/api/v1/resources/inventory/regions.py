@@ -99,5 +99,5 @@ class RegionsVariables(base.Resource):
     def delete(self, id):
         """Delete region variables."""
         context = request.environ.get('context')
-        dbapi.regions_variables_delete(context, id, request.json)
+        dbapi.regions_variables_delete(context, id, g.json)
         return None, 204, None

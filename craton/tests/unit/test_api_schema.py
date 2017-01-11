@@ -18,6 +18,7 @@ def generate_schema_validation_functions(cls):
             self.assertEqual(len(loc_schema), 1)
             locations = {
                 'GET': 'args',
+                'DELETE': 'json',
                 'PUT': 'json',
                 'POST': 'json',
             }

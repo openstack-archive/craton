@@ -265,6 +265,13 @@ class APIV1CellsVariablesTest(APIV1Test):
         self.assertEqual(resp.status_code, 204)
         mock_cell.assert_called_once_with(mock.ANY, '1', db_data)
 
+    @mock.patch.object(dbapi, 'cells_variables_delete')
+    def test_cells_delete_bad_data_type(self, mock_cell):
+        payload = ["a", "b"]
+        resp = self.delete('v1/cells/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_cell.assert_not_called()
+
 
 class APIV1RegionsIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_get_by_id')
@@ -424,6 +431,13 @@ class APIV1RegionsVariablesTest(APIV1Test):
         self.assertEqual(resp.status_code, 204)
         mock_region.assert_called_once_with(mock.ANY, '1', db_data)
 
+    @mock.patch.object(dbapi, 'regions_variables_delete')
+    def test_regions_delete_bad_data_type(self, mock_region):
+        payload = ["a", "b"]
+        resp = self.delete('v1/regions/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_region.assert_not_called()
+
 
 class APIV1HostsIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_get_by_id')
@@ -520,6 +534,21 @@ class APIV1HostsLabelsTest(APIV1Test):
         mock_host.return_value = fake_resources.HOST4
         resp = self.put('v1/hosts/1/labels', data=payload)
         self.assertEqual(422, resp.status_code)
+
+    @mock.patch.object(dbapi, 'hosts_labels_delete')
+    def test_hosts_delete_labels(self, mock_host):
+        payload = {"labels": ["label1", "label2"]}
+        db_data = payload.copy()
+        resp = self.delete('v1/hosts/1/labels', data=payload)
+        self.assertEqual(resp.status_code, 204)
+        mock_host.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'hosts_labels_delete')
+    def test_hosts_delete_bad_data_type(self, mock_host):
+        payload = ["label1", "label2"]
+        resp = self.delete('v1/hosts/1/labels', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_host.assert_not_called()
 
 
 class APIV1HostsTest(APIV1Test):
@@ -687,6 +716,13 @@ class APIV1HostsVariablesTest(APIV1Test):
         resp = self.delete('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
         mock_host.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'hosts_variables_delete')
+    def test_hosts_delete_bad_data_type(self, mock_host):
+        payload = ["a", "b"]
+        resp = self.delete('v1/hosts/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_host.assert_not_called()
 
 
 class APIV1ProjectsTest(APIV1Test):
@@ -909,6 +945,13 @@ class APIV1NetworksVariablesTest(APIV1Test):
         self.assertEqual(resp.status_code, 204)
         mock_network.assert_called_once_with(mock.ANY, '1', db_data)
 
+    @mock.patch.object(dbapi, 'networks_variables_delete')
+    def test_networks_delete_bad_data_type(self, mock_network):
+        payload = ["a", "b"]
+        resp = self.delete('v1/networks/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_network.assert_not_called()
+
 
 class APIV1NetworkDevicesIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_get_by_id')
@@ -1081,6 +1124,13 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
         resp = self.delete('v1/network_devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
         mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'network_devices_variables_delete')
+    def test_network_devices_delete_bad_data_type(self, mock_network_device):
+        payload = ["a", "b"]
+        resp = self.delete('v1/network_devices/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_network_device.assert_not_called()
 
 
 class APIV1NetworkInterfacesTest(APIV1Test):

@@ -593,7 +593,13 @@ validators = {
     ("hosts_id_variables", "PUT"): {
         "json": DefinitionVariablesSource,
     },
+    ("hosts_id_variables", "DELETE"): {
+        "json": DefinitionVariablesSource,
+    },
     ("hosts_labels", "PUT"): {
+        "json": DefinitionsLabel,
+    },
+    ("hosts_labels", "DELETE"): {
         "json": DefinitionsLabel,
     },
     ("hosts_id", "GET"): {
@@ -660,6 +666,9 @@ validators = {
         "json": DefinitionsRegion,
     },
     ("regions_id_variables", "PUT"): {
+        "json": DefinitionVariablesSource,
+    },
+    ("regions_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource,
     },
     ("hosts", "POST"): {
@@ -762,6 +771,9 @@ validators = {
     ("cells_id_variables", "PUT"): {
         "json": DefinitionVariablesSource,
     },
+    ("cells_id_variables", "DELETE"): {
+        "json": DefinitionVariablesSource,
+    },
     ("projects", "GET"): {
         "args": {
             "properties": {
@@ -845,6 +857,9 @@ validators = {
         },
     },
     ("network_devices_id_variables", "PUT"): {
+        "json": DefinitionVariablesSource
+    },
+    ("network_devices_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource
     },
     ("networks_id", "PUT"): {
@@ -990,6 +1005,9 @@ validators = {
         },
     },
     ("networks_id_variables", "PUT"): {
+        "json": DefinitionVariablesSource
+    },
+    ("networks_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource
     },
     ("networks", "POST"): {
