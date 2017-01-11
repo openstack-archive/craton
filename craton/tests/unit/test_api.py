@@ -49,9 +49,13 @@ class APIV1Test(TestCase):
     def delete(self, path, data=None):
         if data:
             content = jsonutils.dumps(data)
+            content_type = 'application/json'
         else:
             content = None
-        resp = self.client.delete(path=path, data=content)
+            content_type = None
+        resp = self.client.delete(
+            path=path, content_type=content_type, data=content
+        )
         return resp
 
 
@@ -256,8 +260,10 @@ class APIV1CellsVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_variables_delete')
     def test_cells_delete_variables(self, mock_cell):
         payload = {"key1": "value1"}
+        db_data = payload.copy()
         resp = self.delete('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
+        mock_cell.assert_called_once_with(mock.ANY, '1', db_data)
 
 
 class APIV1RegionsIDTest(APIV1Test):
@@ -413,8 +419,10 @@ class APIV1RegionsVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_variables_delete')
     def test_regions_delete_variables(self, mock_region):
         payload = {"key1": "value1"}
+        db_data = payload.copy()
         resp = self.delete('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
+        mock_region.assert_called_once_with(mock.ANY, '1', db_data)
 
 
 class APIV1HostsIDTest(APIV1Test):
@@ -675,8 +683,10 @@ class APIV1HostsVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_variables_delete')
     def test_hosts_delete_data(self, mock_host):
         payload = {"key1": "value1"}
+        db_data = payload.copy()
         resp = self.delete('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
+        mock_host.assert_called_once_with(mock.ANY, '1', db_data)
 
 
 class APIV1ProjectsTest(APIV1Test):
@@ -894,8 +904,10 @@ class APIV1NetworksVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'networks_variables_delete')
     def test_networks_delete_variables(self, mock_network):
         payload = {"key1": "value1"}
+        db_data = payload.copy()
         resp = self.delete('v1/networks/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
+        mock_network.assert_called_once_with(mock.ANY, '1', db_data)
 
 
 class APIV1NetworkDevicesIDTest(APIV1Test):
@@ -1065,8 +1077,10 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_variables_delete')
     def test_network_devices_delete_variables(self, mock_network_device):
         payload = {"key1": "value1"}
+        db_data = payload.copy()
         resp = self.delete('v1/network_devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
+        mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
 
 
 class APIV1NetworkInterfacesTest(APIV1Test):
