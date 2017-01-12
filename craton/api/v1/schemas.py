@@ -599,8 +599,12 @@ validators = {
     ("hosts_labels", "PUT"): {
         "json": DefinitionsLabel,
     },
+    ("hosts_labels", "GET"): {
+    },
     ("hosts_labels", "DELETE"): {
         "json": DefinitionsLabel,
+    },
+    ("hosts_id", "DELETE"): {
     },
     ("hosts_id", "GET"): {
         "args": {
@@ -668,6 +672,8 @@ validators = {
     ("regions_id_variables", "PUT"): {
         "json": DefinitionVariablesSource,
     },
+    ("regions_id_variables", "GET"): {
+    },
     ("regions_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource,
     },
@@ -719,6 +725,10 @@ validators = {
             },
         },
     },
+    ("cells_id", "DELETE"): {
+    },
+    ("cells_id", "GET"): {
+    },
     ("cells_id", "PUT"): {
         "json": {
             "properties": {
@@ -756,6 +766,10 @@ validators = {
             },
         },
     },
+    ("regions_id", "DELETE"): {
+    },
+    ("regions_id", "GET"): {
+    },
     ("regions_id", "PUT"): {
         "json": {
             "properties": {
@@ -770,6 +784,8 @@ validators = {
     },
     ("cells_id_variables", "PUT"): {
         "json": DefinitionVariablesSource,
+    },
+    ("cells_id_variables", "GET"): {
     },
     ("cells_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource,
@@ -793,6 +809,10 @@ validators = {
     ("projects", "POST"): {
         "json": DefinitionProject,
     },
+    ("projects_id", "DELETE"): {
+    },
+    ("projects_id", "GET"): {
+    },
     ("users", "GET"): {
         "args": {
             "properties": {
@@ -811,6 +831,10 @@ validators = {
     },
     ("users", "POST"): {
         "json": DefinitionUser,
+    },
+    ("users_id", "DELETE"): {
+    },
+    ("users_id", "GET"): {
     },
     ("network_devices", "GET"): {
         "args": {
@@ -846,6 +870,8 @@ validators = {
             },
         },
     },
+    ("network_devices_id", "DELETE"): {
+    },
     ("network_devices_id", "GET"): {
         "args": {
             "properties": {
@@ -859,8 +885,14 @@ validators = {
     ("network_devices_id_variables", "PUT"): {
         "json": DefinitionVariablesSource
     },
+    ("network_devices_id_variables", "GET"): {
+    },
     ("network_devices_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource
+    },
+    ("networks_id", "DELETE"): {
+    },
+    ("networks_id", "GET"): {
     },
     ("networks_id", "PUT"): {
         "json": {
@@ -913,6 +945,10 @@ validators = {
     ("network_devices", "POST"): {
         "json": DefinitionNetworkDevice,
     },
+    ("network_devices_labels", "DELETE"): {
+    },
+    ("network_devices_labels", "GET"): {
+    },
     ("network_devices_labels", "PUT"): {
         "json": DefinitionsLabel,
     },
@@ -940,6 +976,10 @@ validators = {
     },
     ("network_interfaces", "POST"): {
         "json": DefinitionNetworkInterface,
+    },
+    ("network_interfaces_id", "DELETE"): {
+    },
+    ("network_interfaces_id", "GET"): {
     },
     ("network_interfaces_id", "PUT"): {
         "json": {
@@ -1006,6 +1046,8 @@ validators = {
     },
     ("networks_id_variables", "PUT"): {
         "json": DefinitionVariablesSource
+    },
+    ("networks_id_variables", "GET"): {
     },
     ("networks_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource
