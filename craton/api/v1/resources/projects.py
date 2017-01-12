@@ -46,10 +46,6 @@ class ProjectById(base.Resource):
         project_obj = dbapi.projects_get_by_id(context, id)
         return jsonutils.to_primitive(project_obj), 200, None
 
-    def put(self, id):
-        """Update existing project. Requires super admin privileges."""
-        return None, 200, None
-
     @base.http_codes
     def delete(self, id):
         """Delete existing project. Requires super admin privileges."""

@@ -55,10 +55,6 @@ class UserById(base.Resource):
         user_obj = dbapi.users_get_by_id(context, id)
         return jsonutils.to_primitive(user_obj), 200, None
 
-    def put(self, id):
-        """Update existing user. Requires project admin privileges."""
-        return None, 200, None
-
     @base.http_codes
     def delete(self, id):
         """Delete existing user. Requires project admin privileges."""
