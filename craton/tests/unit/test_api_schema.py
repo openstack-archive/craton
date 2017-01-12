@@ -5,16 +5,93 @@ from craton.api.v1.schemas import filters, validators, scopes
 from craton.tests import TestCase
 
 
+VALIDATORS = {
+    "with_schema": [
+        ('ansible_inventory', 'GET'),
+        ('cells', 'GET'),
+        ('cells', 'POST'),
+        ('cells_id', 'PUT'),
+        ('cells_id_variables', 'DELETE'),
+        ('cells_id_variables', 'PUT'),
+        ('hosts', 'GET'),
+        ('hosts', 'POST'),
+        ('hosts_id', 'GET'),
+        ('hosts_id', 'PUT'),
+        ('hosts_id_variables', 'DELETE'),
+        ('hosts_id_variables', 'GET'),
+        ('hosts_id_variables', 'PUT'),
+        ('hosts_labels', 'DELETE'),
+        ('hosts_labels', 'PUT'),
+        ('network_devices', 'GET'),
+        ('network_devices', 'POST'),
+        ('network_devices_id', 'GET'),
+        ('network_devices_id', 'PUT'),
+        ('network_devices_id_variables', 'DELETE'),
+        ('network_devices_id_variables', 'PUT'),
+        ('network_devices_labels', 'PUT'),
+        ('network_interfaces', 'GET'),
+        ('network_interfaces', 'POST'),
+        ('network_interfaces_id', 'PUT'),
+        ('networks', 'GET'),
+        ('networks', 'POST'),
+        ('networks_id', 'PUT'),
+        ('networks_id_variables', 'DELETE'),
+        ('networks_id_variables', 'PUT'),
+        ('projects', 'GET'),
+        ('projects', 'POST'),
+        ('regions', 'GET'),
+        ('regions', 'POST'),
+        ('regions_id', 'PUT'),
+        ('regions_id_variables', 'DELETE'),
+        ('regions_id_variables', 'PUT'),
+        ('users', 'GET'),
+        ('users', 'POST'),
+    ],
+    "without_schema": [
+        ('cells_id', 'DELETE'),
+        ('cells_id', 'GET'),
+        ('cells_id_variables', 'GET'),
+        ('hosts_id', 'DELETE'),
+        ('hosts_labels', 'GET'),
+        ('network_devices_id', 'DELETE'),
+        ('network_devices_id_variables', 'GET'),
+        ('network_devices_labels', 'DELETE'),
+        ('network_devices_labels', 'GET'),
+        ("network_interfaces_id", "DELETE"),
+        ("network_interfaces_id", "GET"),
+        ("networks_id", "DELETE"),
+        ("networks_id", "GET"),
+        ("networks_id_variables", "GET"),
+        ("projects_id", "DELETE"),
+        ("projects_id", "GET"),
+        ("users_id", "DELETE"),
+        ("users_id", "GET"),
+        ("regions_id", "DELETE"),
+        ("regions_id", "GET"),
+        ("regions_id_variables", "GET"),
+    ]
+}
+
+
 class TestAPISchema(TestCase):
     """Confirm that valid schema are defined."""
-    pass
+    def test_all_validators_have_test(self):
+        known = set(VALIDATORS["with_schema"] + VALIDATORS["without_schema"])
+        defined = set(validators.keys())
+        self.assertSetEqual(known, defined)
 
 
 def generate_schema_validation_functions(cls):
-    def gen_validator_test(endpoint, method, loc_schema):
-        name = '_'.join(('validator', endpoint, method))
-
+    def gen_validator_schema_test(endpoint, method):
         def test(self):
+            try:
+                loc_schema = validators[(endpoint, method)]
+            except KeyError:
+                self.fail(
+                    'The validator {} is missing from the schemas '
+                    'validators object.'.format((endpoint, method))
+                )
+
             self.assertEqual(len(loc_schema), 1)
             locations = {
                 'GET': 'args',
@@ -28,10 +105,28 @@ def generate_schema_validation_functions(cls):
             self.assertIs(
                 jsonschema.Draft4Validator.check_schema(schema), None
             )
+
+        name = '_'.join(('validator', endpoint, method))
         setattr(cls, 'test_valid_schema_{}'.format(name), test)
 
-    for (endpoint, method), loc_schema in validators.items():
-        gen_validator_test(endpoint, method, loc_schema)
+    for (endpoint, method) in VALIDATORS["with_schema"]:
+        gen_validator_schema_test(endpoint, method)
+
+    def gen_no_validator_schema_test(endpoint, method):
+        def test(self):
+            try:
+                loc_schema = validators[(endpoint, method)]
+            except KeyError:
+                self.fail(
+                    'The validator {} is missing from the schemas '
+                    'validators object.'.format((endpoint, method))
+                )
+            self.assertEqual({}, loc_schema)
+        name = '_'.join(('validator', endpoint, method))
+        setattr(cls, 'test_no_schema_{}'.format(name), test)
+
+    for (endpoint, method) in VALIDATORS["without_schema"]:
+        gen_no_validator_schema_test(endpoint, method)
 
     def gen_filter_test(name, schema):
         def test(self):
@@ -83,3 +178,33 @@ def generate_endpoint_method_validation_functions(cls):
 
 
 generate_endpoint_method_validation_functions(TestSchemaLocationInRoute)
+
+
+class TestRoutesInValidators(TestCase):
+    def setUp(self):
+        super().setUp()
+
+
+def generate_route_validation_functions(cls):
+    def gen_test(test_type, checker, endpoint, method):
+        def test(self):
+            self.assertIn((endpoint, method), checker)
+        test_name = 'test_route_in_{}_{}_{}'.format(
+            test_type, endpoint, method
+        )
+        setattr(cls, test_name, test)
+
+    app = api.setup_app()
+    for rule in app.url_map.iter_rules():
+        # remove 'v1.' from start of endpoint
+        endpoint = rule.endpoint[3:]
+        for method in rule.methods:
+            if method == 'OPTIONS':
+                continue
+            elif method == 'HEAD' and 'GET' in rule.methods:
+                continue
+            else:
+                gen_test('validators', validators, endpoint, method)
+
+
+generate_route_validation_functions(TestRoutesInValidators)
