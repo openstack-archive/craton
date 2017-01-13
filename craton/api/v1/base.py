@@ -41,8 +41,7 @@ def filtered_context():
         objname = f.__qualname__.split('.')[0].rstrip('s').lower()
 
         @functools.wraps(f)
-        def method_wrapper(self):
-            context = flask.request.environ.get("context")
+        def method_wrapper(self, context):
             query_filters = flask.g.args
             inspect.getmodule(f).LOG.info(
                 "Getting all %s objects that match filters %s" % (

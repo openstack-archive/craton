@@ -1,5 +1,4 @@
 from flask import g
-from flask import request
 from oslo_serialization import jsonutils
 from oslo_log import log
 
@@ -21,9 +20,8 @@ class Hosts(base.Resource):
         return jsonutils.to_primitive(hosts_obj), 200, None
 
     @base.http_codes
-    def post(self):
+    def post(self, context):
         """Create a new host."""
-        context = request.environ.get('context')
         json = util.copy_project_id_into_json(context, g.json)
         host_obj = dbapi.hosts_create(context, json)
         host = jsonutils.to_primitive(host_obj)
@@ -46,25 +44,22 @@ def format_variables(args, obj):
 class HostById(base.Resource):
 
     @base.http_codes
-    def get(self, id):
+    def get(self, context, id):
         """Get host by given id"""
-        context = request.environ.get('context')
         host_obj = dbapi.hosts_get_by_id(context, id)
         host_obj = format_variables(g.args, host_obj)
         host = jsonutils.to_primitive(host_obj)
         host['variables'] = jsonutils.to_primitive(host_obj.vars)
         return host, 200, None
 
-    def put(self, id):
+    def put(self, context, id):
         """Update existing host data, or create if it does not exist."""
-        context = request.environ.get('context')
         host_obj = dbapi.hosts_update(context, id, g.json)
         return jsonutils.to_primitive(host_obj), 200, None
 
     @base.http_codes
-    def delete(self, id):
+    def delete(self, context, id):
         """Delete existing host."""
-        context = request.environ.get('context')
         dbapi.hosts_delete(context, id)
         return None, 204, None
 
@@ -72,29 +67,26 @@ class HostById(base.Resource):
 class HostsVariables(base.Resource):
 
     @base.http_codes
-    def get(self, id):
+    def get(self, context, id):
         """Get variables for given host."""
-        context = request.environ.get('context')
         obj = dbapi.hosts_get_by_id(context, id)
         obj = format_variables(g.args, obj)
         response = {"variables": jsonutils.to_primitive(obj.vars)}
         return response, 200, None
 
     @base.http_codes
-    def put(self, id):
+    def put(self, context, id):
         """Update existing host variables, or create if it does not exist."""
-        context = request.environ.get('context')
         obj = dbapi.hosts_variables_update(context, id, g.json)
         response = {"variables": jsonutils.to_primitive(obj.variables)}
         return response, 200, None
 
     @base.http_codes
-    def delete(self, id):
+    def delete(self, context, id):
         """Delete host  variables."""
         # NOTE(sulo): this is not that great. Find a better way to do this.
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
-        context = request.environ.get('context')
         dbapi.hosts_variables_delete(context, id, g.json)
         return None, 204, None
 
@@ -102,27 +94,24 @@ class HostsVariables(base.Resource):
 class HostsLabels(base.Resource):
 
     @base.http_codes
-    def get(self, id):
+    def get(self, context, id):
         """Get labels for given host device."""
-        context = request.environ.get('context')
         host_obj = dbapi.hosts_get_by_id(context, id)
         response = {"labels": list(host_obj.labels)}
         return response, 200, None
 
     @base.http_codes
-    def put(self, id):
+    def put(self, context, id):
         """
         Update existing device label entirely, or add if it does
         not exist.
         """
-        context = request.environ.get('context')
         resp = dbapi.hosts_labels_update(context, id, g.json)
         response = {"labels": list(resp.labels)}
         return response, 200, None
 
     @base.http_codes
-    def delete(self, id):
+    def delete(self, context, id):
         """Delete device label entirely."""
-        context = request.environ.get('context')
         dbapi.hosts_labels_delete(context, id, g.json)
         return None, 204, None

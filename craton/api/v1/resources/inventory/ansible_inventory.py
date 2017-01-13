@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from flask import g
-from flask import request
 from operator import attrgetter
 from oslo_serialization import jsonutils
 from oslo_log import log
@@ -82,8 +81,7 @@ class AnsibleInventory(base.Resource):
             }
         return inventory
 
-    def get(self):
-        context = request.environ.get("context")
+    def get(self, context):
         region_id = g.args["region_id"]
         cell_id = g.args["cell_id"]
 

@@ -236,7 +236,8 @@ def request_validate(view):
             validator = FlaskValidatorAdaptor(schema)
             result = validator.validate(value)
             setattr(g, location, result)
-        return view(*args, **kwargs)
+        context = request.environ['context']
+        return view(*args, context=context, **kwargs)
 
     return wrapper
 
