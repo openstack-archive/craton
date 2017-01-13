@@ -5,7 +5,7 @@ from datetime import date
 from functools import wraps
 
 from werkzeug.datastructures import MultiDict, Headers
-from flask import request, g, current_app, json
+from flask import request, current_app, json
 from flask_restful import abort
 from flask_restful.utils import unpack
 from jsonschema import Draft4Validator
@@ -231,11 +231,12 @@ def request_validate(view):
         if method == 'HEAD':
             method = 'GET'
         locations = validators.get((endpoint, method), {})
+        data_type = {"json": "request_data", "args": "request_args"}
         for location, schema in locations.items():
             value = getattr(request, location, MultiDict())
             validator = FlaskValidatorAdaptor(schema)
             result = validator.validate(value)
-            setattr(g, location, result)
+            kwargs[data_type[location]] = result
         context = request.environ['context']
         return view(*args, context=context, **kwargs)
 

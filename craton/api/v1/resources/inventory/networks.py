@@ -1,4 +1,3 @@
-from flask import g
 from oslo_serialization import jsonutils
 from oslo_log import log
 
@@ -15,15 +14,15 @@ class Networks(base.Resource):
 
     @base.http_codes
     @base.filtered_context()
-    def get(self, context, **filters):
+    def get(self, context, request_args):
         """Get all networks, with optional filtering."""
-        networks_obj = dbapi.networks_get_all(context, filters)
+        networks_obj = dbapi.networks_get_all(context, request_args)
         return jsonutils.to_primitive(networks_obj), 200, None
 
     @base.http_codes
-    def post(self, context):
+    def post(self, context, request_data):
         """Create a new network."""
-        json = util.copy_project_id_into_json(context, g.json)
+        json = util.copy_project_id_into_json(context, request_data)
         network_obj = dbapi.networks_create(context, json)
         return jsonutils.to_primitive(network_obj), 200, None
 
@@ -39,9 +38,9 @@ class NetworkById(base.Resource):
         device['variables'] = jsonutils.to_primitive(obj.variables)
         return device, 200, None
 
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """Update existing network values."""
-        net_obj = dbapi.networks_update(context, id, g.json)
+        net_obj = dbapi.networks_update(context, id, request_data)
         return jsonutils.to_primitive(net_obj), 200, None
 
     @base.http_codes
@@ -62,16 +61,16 @@ class NetworksVariables(base.Resource):
         return resp, 200, None
 
     @base.http_codes
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """"Update existing variables, or create if it does not exist."""
-        obj = dbapi.networks_variables_update(context, id, g.json)
+        obj = dbapi.networks_variables_update(context, id, request_data)
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
-    def delete(self, context, id):
+    def delete(self, context, id, request_data):
         """Delete networks variables."""
-        dbapi.networks_variables_delete(context, id, g.json)
+        dbapi.networks_variables_delete(context, id, request_data)
         return None, 204, None
 
 
@@ -80,15 +79,15 @@ class NetworkDevices(base.Resource):
 
     @base.http_codes
     @base.filtered_context()
-    def get(self, context, **filters):
+    def get(self, context, request_args):
         """Get all network devices."""
-        devices_obj = dbapi.network_devices_get_all(context, filters)
+        devices_obj = dbapi.network_devices_get_all(context, request_args)
         return jsonutils.to_primitive(devices_obj), 200, None
 
     @base.http_codes
-    def post(self, context):
+    def post(self, context, request_data):
         """Create a new network device."""
-        json = util.copy_project_id_into_json(context, g.json)
+        json = util.copy_project_id_into_json(context, request_data)
         obj = dbapi.network_devices_create(context, json)
         device = jsonutils.to_primitive(obj)
         return device, 200, None
@@ -98,9 +97,9 @@ class NetworkDeviceById(base.Resource):
     """Controller for Network Devices by ID."""
 
     @base.http_codes
-    def get(self, context, id):
+    def get(self, context, id, request_args):
         """Get network device by given id"""
-        resolved_values = g.args["resolved-values"]
+        resolved_values = request_args["resolved-values"]
         obj = dbapi.network_devices_get_by_id(context, id)
         if resolved_values:
             obj.vars = obj.resolved
@@ -110,9 +109,9 @@ class NetworkDeviceById(base.Resource):
         device['variables'] = jsonutils.to_primitive(obj.vars)
         return device, 200, None
 
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """Update existing device values."""
-        net_obj = dbapi.network_devices_update(context, id, g.json)
+        net_obj = dbapi.network_devices_update(context, id, request_data)
         return jsonutils.to_primitive(net_obj), 200, None
 
     @base.http_codes
@@ -133,16 +132,16 @@ class NetworkDevicesVariables(base.Resource):
         return resp, 200, None
 
     @base.http_codes
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """"Update device variables, or create if it does not exist."""
-        obj = dbapi.network_devices_variables_update(context, id, g.json)
+        obj = dbapi.network_devices_variables_update(context, id, request_data)
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
     @base.http_codes
-    def delete(self, context, id):
+    def delete(self, context, id, request_data):
         """Delete network device variables."""
-        dbapi.network_devices_variables_delete(context, id, g.json)
+        dbapi.network_devices_variables_delete(context, id, request_data)
         return None, 204, None
 
 
@@ -157,9 +156,9 @@ class NetworkDeviceLabels(base.Resource):
         return response, 200, None
 
     @base.http_codes
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """Update existing device label. Adds if it does not exist."""
-        resp = dbapi.network_devices_labels_update(context, id, g.json)
+        resp = dbapi.network_devices_labels_update(context, id, request_data)
         response = {"labels": list(resp.labels)}
         return response, 200, None
 
@@ -175,15 +174,17 @@ class NetworkInterfaces(base.Resource):
 
     @base.http_codes
     @base.filtered_context()
-    def get(self, context, **filters):
+    def get(self, context, request_args):
         """Get all network interfaces."""
-        interfaces_obj = dbapi.network_interfaces_get_all(context, filters)
+        interfaces_obj = dbapi.network_interfaces_get_all(
+            context, request_args
+        )
         return jsonutils.to_primitive(interfaces_obj), 200, None
 
     @base.http_codes
-    def post(self, context):
+    def post(self, context, request_data):
         """Create a new network interface."""
-        json = util.copy_project_id_into_json(context, g.json)
+        json = util.copy_project_id_into_json(context, request_data)
         obj = dbapi.network_interfaces_create(context, json)
         interface = jsonutils.to_primitive(obj)
         return interface, 200, None
@@ -199,9 +200,9 @@ class NetworkInterfaceById(base.Resource):
         interface['variables'] = jsonutils.to_primitive(obj.variables)
         return interface, 200, None
 
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """Update existing network interface values."""
-        net_obj = dbapi.network_interfaces_update(context, id, g.json)
+        net_obj = dbapi.network_interfaces_update(context, id, request_data)
         return jsonutils.to_primitive(net_obj), 200, None
 
     @base.http_codes
