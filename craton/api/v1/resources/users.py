@@ -1,4 +1,4 @@
-from flask import request, g
+from flask import g
 from oslo_serialization import jsonutils
 from oslo_log import log
 from oslo_utils import uuidutils
@@ -14,11 +14,10 @@ LOG = log.getLogger(__name__)
 class Users(base.Resource):
 
     @base.http_codes
-    def get(self):
+    def get(self, context):
         """Get all users. Requires project admin privileges."""
         user_id = g.args["id"]
         user_name = g.args["name"]
-        context = request.environ.get('context')
 
         if user_name:
             user_obj = dbapi.users_get_by_name(context, user_name)
@@ -34,9 +33,8 @@ class Users(base.Resource):
         return jsonutils.to_primitive(users_obj), 200, None
 
     @base.http_codes
-    def post(self):
+    def post(self, context):
         """Create a new user. Requires project admin privileges."""
-        context = request.environ.get('context')
         json = util.copy_project_id_into_json(context, g.json)
         project_id = json["project_id"]
         dbapi.projects_get_by_id(context, project_id)
@@ -49,15 +47,13 @@ class Users(base.Resource):
 class UserById(base.Resource):
 
     @base.http_codes
-    def get(self, id):
+    def get(self, context, id):
         """Get a user details by id. Requires project admin privileges."""
-        context = request.environ.get('context')
         user_obj = dbapi.users_get_by_id(context, id)
         return jsonutils.to_primitive(user_obj), 200, None
 
     @base.http_codes
-    def delete(self, id):
+    def delete(self, context, id):
         """Delete existing user. Requires project admin privileges."""
-        context = request.environ.get('context')
         dbapi.users_delete(context, id)
         return None, 204, None

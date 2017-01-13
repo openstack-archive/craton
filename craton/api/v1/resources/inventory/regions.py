@@ -1,4 +1,4 @@
-from flask import request, g
+from flask import g
 from oslo_serialization import jsonutils
 from oslo_log import log
 
@@ -37,9 +37,8 @@ class Regions(base.Resource):
             return jsonutils.to_primitive([region_obj]), 200, None
 
     @base.http_codes
-    def post(self):
+    def post(self, context):
         """Create a new region."""
-        context = request.environ.get('context')
         json = util.copy_project_id_into_json(context, g.json)
         region_obj = dbapi.regions_create(context, json)
         region = jsonutils.to_primitive(region_obj)
@@ -53,23 +52,20 @@ class Regions(base.Resource):
 class RegionsById(base.Resource):
 
     @base.http_codes
-    def get(self, id):
-        context = request.environ.get('context')
+    def get(self, context, id):
         region_obj = dbapi.regions_get_by_id(context, id)
         region = jsonutils.to_primitive(region_obj)
         region['variables'] = jsonutils.to_primitive(region_obj.variables)
         return region, 200, None
 
-    def put(self, id):
+    def put(self, context, id):
         """Update existing region."""
-        context = request.environ.get('context')
         region_obj = dbapi.regions_update(context, id, g.json)
         return jsonutils.to_primitive(region_obj), 200, None
 
     @base.http_codes
-    def delete(self, id):
+    def delete(self, context, id):
         """Delete existing region."""
-        context = request.environ.get('context')
         dbapi.regions_delete(context, id)
         return None, 204, None
 
@@ -77,27 +73,24 @@ class RegionsById(base.Resource):
 class RegionsVariables(base.Resource):
 
     @base.http_codes
-    def get(self, id):
+    def get(self, context, id):
         """Get variables for given region."""
-        context = request.environ.get('context')
         obj = dbapi.regions_get_by_id(context, id)
         response = {"variables": jsonutils.to_primitive(obj.variables)}
         return response, 200, None
 
     @base.http_codes
-    def put(self, id):
+    def put(self, context, id):
         """
         Update existing region variables, or create if it does
         not exist.
         """
-        context = request.environ.get('context')
         obj = dbapi.regions_variables_update(context, id, g.json)
         response = {"variables": jsonutils.to_primitive(obj.variables)}
         return response, 200, None
 
     @base.http_codes
-    def delete(self, id):
+    def delete(self, context, id):
         """Delete region variables."""
-        context = request.environ.get('context')
         dbapi.regions_variables_delete(context, id, g.json)
         return None, 204, None
