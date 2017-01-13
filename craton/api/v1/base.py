@@ -34,13 +34,3 @@ def http_codes(f, *args, **kwargs):
         inspect.getmodule(f).LOG.error(
             'Error during %s: %s' % (f.__qualname__, err))
         return args[0].error_response(500, 'Unknown Error')
-
-
-def filtered_context():
-    def decorator(f):
-        @functools.wraps(f)
-        def method_wrapper(self, context, request_args):
-            return f(self, context, request_args)
-
-        return method_wrapper
-    return decorator
