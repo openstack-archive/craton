@@ -1,4 +1,3 @@
-from flask import g
 from oslo_serialization import jsonutils
 from oslo_log import log
 
@@ -14,15 +13,15 @@ class Hosts(base.Resource):
 
     @base.http_codes
     @base.filtered_context()
-    def get(self, context, **filters):
+    def get(self, context, request_args):
         """Get all hosts for region, with optional filtering."""
-        hosts_obj = dbapi.hosts_get_all(context, filters)
+        hosts_obj = dbapi.hosts_get_all(context, request_args)
         return jsonutils.to_primitive(hosts_obj), 200, None
 
     @base.http_codes
-    def post(self, context):
+    def post(self, context, request_data):
         """Create a new host."""
-        json = util.copy_project_id_into_json(context, g.json)
+        json = util.copy_project_id_into_json(context, request_data)
         host_obj = dbapi.hosts_create(context, json)
         host = jsonutils.to_primitive(host_obj)
         if 'variables' in json:
@@ -44,17 +43,17 @@ def format_variables(args, obj):
 class HostById(base.Resource):
 
     @base.http_codes
-    def get(self, context, id):
+    def get(self, context, id, request_args):
         """Get host by given id"""
         host_obj = dbapi.hosts_get_by_id(context, id)
-        host_obj = format_variables(g.args, host_obj)
+        host_obj = format_variables(request_args, host_obj)
         host = jsonutils.to_primitive(host_obj)
         host['variables'] = jsonutils.to_primitive(host_obj.vars)
         return host, 200, None
 
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """Update existing host data, or create if it does not exist."""
-        host_obj = dbapi.hosts_update(context, id, g.json)
+        host_obj = dbapi.hosts_update(context, id, request_data)
         return jsonutils.to_primitive(host_obj), 200, None
 
     @base.http_codes
@@ -67,27 +66,27 @@ class HostById(base.Resource):
 class HostsVariables(base.Resource):
 
     @base.http_codes
-    def get(self, context, id):
+    def get(self, context, id, request_args):
         """Get variables for given host."""
         obj = dbapi.hosts_get_by_id(context, id)
-        obj = format_variables(g.args, obj)
+        obj = format_variables(request_args, obj)
         response = {"variables": jsonutils.to_primitive(obj.vars)}
         return response, 200, None
 
     @base.http_codes
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """Update existing host variables, or create if it does not exist."""
-        obj = dbapi.hosts_variables_update(context, id, g.json)
+        obj = dbapi.hosts_variables_update(context, id, request_data)
         response = {"variables": jsonutils.to_primitive(obj.variables)}
         return response, 200, None
 
     @base.http_codes
-    def delete(self, context, id):
+    def delete(self, context, id, request_data):
         """Delete host  variables."""
         # NOTE(sulo): this is not that great. Find a better way to do this.
         # We can pass multiple keys suchs as key1=one key2=two etc. but not
         # the best way to do this.
-        dbapi.hosts_variables_delete(context, id, g.json)
+        dbapi.hosts_variables_delete(context, id, request_data)
         return None, 204, None
 
 
@@ -101,17 +100,17 @@ class HostsLabels(base.Resource):
         return response, 200, None
 
     @base.http_codes
-    def put(self, context, id):
+    def put(self, context, id, request_data):
         """
         Update existing device label entirely, or add if it does
         not exist.
         """
-        resp = dbapi.hosts_labels_update(context, id, g.json)
+        resp = dbapi.hosts_labels_update(context, id, request_data)
         response = {"labels": list(resp.labels)}
         return response, 200, None
 
     @base.http_codes
-    def delete(self, context, id):
+    def delete(self, context, id, request_data):
         """Delete device label entirely."""
-        dbapi.hosts_labels_delete(context, id, g.json)
+        dbapi.hosts_labels_delete(context, id, request_data)
         return None, 204, None

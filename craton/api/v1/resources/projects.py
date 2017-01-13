@@ -1,4 +1,3 @@
-from flask import g
 from oslo_serialization import jsonutils
 from oslo_log import log
 
@@ -12,10 +11,10 @@ LOG = log.getLogger(__name__)
 class Projects(base.Resource):
 
     @base.http_codes
-    def get(self, context):
+    def get(self, context, request_args):
         """Get all projects. Requires super admin privileges."""
-        project_id = g.args["id"]
-        project_name = g.args["name"]
+        project_id = request_args["id"]
+        project_name = request_args["name"]
 
         if project_name:
             project_obj = dbapi.projects_get_by_name(context, project_name)
@@ -29,9 +28,9 @@ class Projects(base.Resource):
         return jsonutils.to_primitive(projects_obj), 200, None
 
     @base.http_codes
-    def post(self, context):
+    def post(self, context, request_data):
         """Create a new project. Requires super admin privileges."""
-        project_obj = dbapi.projects_create(context, g.json)
+        project_obj = dbapi.projects_create(context, request_data)
         return jsonutils.to_primitive(project_obj), 200, None
 
 

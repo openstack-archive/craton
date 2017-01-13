@@ -1,4 +1,3 @@
-from flask import g
 from oslo_serialization import jsonutils
 from oslo_log import log
 from oslo_utils import uuidutils
@@ -14,10 +13,10 @@ LOG = log.getLogger(__name__)
 class Users(base.Resource):
 
     @base.http_codes
-    def get(self, context):
+    def get(self, context, request_args):
         """Get all users. Requires project admin privileges."""
-        user_id = g.args["id"]
-        user_name = g.args["name"]
+        user_id = request_args["id"]
+        user_name = request_args["name"]
 
         if user_name:
             user_obj = dbapi.users_get_by_name(context, user_name)
@@ -33,13 +32,13 @@ class Users(base.Resource):
         return jsonutils.to_primitive(users_obj), 200, None
 
     @base.http_codes
-    def post(self, context):
+    def post(self, context, request_data):
         """Create a new user. Requires project admin privileges."""
-        json = util.copy_project_id_into_json(context, g.json)
+        json = util.copy_project_id_into_json(context, request_data)
         project_id = json["project_id"]
         dbapi.projects_get_by_id(context, project_id)
         api_key = uuidutils.generate_uuid()
-        g.json["api_key"] = api_key
+        request_data["api_key"] = api_key
         user_obj = dbapi.users_create(context, json)
         return jsonutils.to_primitive(user_obj), 200, None
 
