@@ -13,7 +13,6 @@ class Networks(base.Resource):
     """Controller for Networks resources."""
 
     @base.http_codes
-    @base.filtered_context()
     def get(self, context, request_args):
         """Get all networks, with optional filtering."""
         networks_obj = dbapi.networks_get_all(context, request_args)
@@ -78,7 +77,6 @@ class NetworkDevices(base.Resource):
     """Controller for Network Device resources."""
 
     @base.http_codes
-    @base.filtered_context()
     def get(self, context, request_args):
         """Get all network devices."""
         devices_obj = dbapi.network_devices_get_all(context, request_args)
@@ -173,7 +171,6 @@ class NetworkInterfaces(base.Resource):
     """Controller for Netowrk Interfaces."""
 
     @base.http_codes
-    @base.filtered_context()
     def get(self, context, request_args):
         """Get all network interfaces."""
         interfaces_obj = dbapi.network_interfaces_get_all(
