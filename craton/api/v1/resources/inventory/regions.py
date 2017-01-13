@@ -12,7 +12,6 @@ LOG = log.getLogger(__name__)
 class Regions(base.Resource):
 
     @base.http_codes
-    @base.filtered_context()
     def get(self, context, request_args):
         """Get region(s) for the project. Get region details if
         for a particular region.
