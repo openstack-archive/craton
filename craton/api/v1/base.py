@@ -38,13 +38,8 @@ def http_codes(f, *args, **kwargs):
 
 def filtered_context():
     def decorator(f):
-        objname = f.__qualname__.split('.')[0].rstrip('s').lower()
-
         @functools.wraps(f)
         def method_wrapper(self, context, request_args):
-            inspect.getmodule(f).LOG.info(
-                "Getting all %s objects that match filters %s" % (
-                    objname, request_args))
             return f(self, context, request_args)
 
         return method_wrapper
