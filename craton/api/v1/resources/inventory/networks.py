@@ -161,9 +161,9 @@ class NetworkDeviceLabels(base.Resource):
         return response, 200, None
 
     @base.http_codes
-    def delete(self, context, id):
+    def delete(self, context, id, request_data):
         """Delete device label(s)."""
-        dbapi.network_devices_labels_delete(context, id)
+        dbapi.network_devices_labels_delete(context, id, request_data)
         return None, 204, None
 
 

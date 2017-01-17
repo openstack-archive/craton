@@ -1090,6 +1090,21 @@ class APIV1NetworkDevicesLabelsTest(APIV1Test):
         self.assertEqual(resp.status_code, 200)
         fake_device.assert_called_once_with(mock.ANY, '1', {})
 
+    @mock.patch.object(dbapi, 'network_devices_labels_delete')
+    def test_network_devices_delete_labels(self, mock_network_device):
+        payload = {"labels": ["label1", "label2"]}
+        db_data = payload.copy()
+        resp = self.delete('v1/network_devices/1/labels', data=payload)
+        self.assertEqual(resp.status_code, 204)
+        mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
+
+    @mock.patch.object(dbapi, 'network_devices_labels_delete')
+    def test_network_devices_delete_bad_data_type(self, mock_network_device):
+        payload = ["label1", "label2"]
+        resp = self.delete('v1/network_devices/1/labels', data=payload)
+        self.assertEqual(resp.status_code, 422)
+        mock_network_device.assert_not_called()
+
 
 class APIV1NetworkDevicesVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_get_by_id')

@@ -946,6 +946,7 @@ validators = {
         "json": DefinitionNetworkDevice,
     },
     ("network_devices_labels", "DELETE"): {
+        "json": DefinitionsLabel,
     },
     ("network_devices_labels", "GET"): {
     },
