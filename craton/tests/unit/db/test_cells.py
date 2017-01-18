@@ -21,6 +21,11 @@ class CellsDBTestCase(base.DBTestCase):
         except Exception:
             self.fail("Cell create raised unexpected exception")
 
+    def test_duplicate_cell_create_raises_409(self):
+        dbapi.cells_create(self.context, cell1)
+        self.assertRaises(exceptions.DuplicateCell, dbapi.cells_create,
+                          self.context, cell1)
+
     def test_cells_get_all(self):
         dbapi.cells_create(self.context, cell1)
         filters = {

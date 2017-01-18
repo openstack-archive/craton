@@ -250,8 +250,11 @@ def cells_create(context, values):
     session = get_session()
     cell = models.Cell()
     with session.begin():
-        cell.update(values)
-        cell.save(session)
+        try:
+            cell.update(values)
+            cell.save(session)
+        except db_exc.DBDuplicateEntry:
+            raise exceptions.DuplicateCell()
     return cell
 
 

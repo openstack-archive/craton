@@ -35,6 +35,11 @@ class DuplicateRegion(Base):
     msg = "A region with the given name already exists."
 
 
+class DuplicateCell(Base):
+    code = 409
+    msg = "A cell with the given name already exists."
+
+
 class DuplicateNetwork(Base):
     code = 409
     msg = "Network with the given name already exists in this region."
