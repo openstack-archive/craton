@@ -43,6 +43,9 @@ RUN python3.5 /root/get-pip.py
 # Install Mariadb
 RUN apt-get install -y mariadb-server mariadb-client
 
+# Change mysql bind address
+RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf
+
 # Install MySQL-python
 RUN apt-get install -y libmysqlclient-dev python-mysqldb
 
