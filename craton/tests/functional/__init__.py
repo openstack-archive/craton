@@ -1,9 +1,11 @@
+import contextlib
 import docker
 import requests
 from retrying import retry
+from sqlalchemy import create_engine
+from sqlalchemy import MetaData
 import testtools
 import threading
-import subprocess
 
 
 FAKE_DATA_GEN_USERNAME = 'demo'
@@ -83,17 +85,6 @@ class DockerSetup(threading.Thread):
             self.client.remove_image('craton-functional-testing-api')
 
 
-def generate_fake_data(container_data):
-    """Run data generation script."""
-    service_ip = container_data['NetworkSettings']['IPAddress']
-    url = 'http://{}:8080/v1'.format(service_ip)
-
-    subprocess.run(["python", "./tools/generate_fake_data.py", "--url",
-                   url, "--user", FAKE_DATA_GEN_USERNAME, "--key",
-                   FAKE_DATA_GEN_TOKEN, "--project",
-                   FAKE_DATA_GEN_PROJECT_ID], check=True)
-
-
 @retry(wait_fixed=1000, stop_max_attempt_number=20)
 def ensure_running_endpoint(container_data):
     service_ip = container_data['NetworkSettings']['IPAddress']
@@ -118,7 +109,6 @@ def setup_container():
     else:
         try:
             ensure_running_endpoint(_container.container_data)
-            generate_fake_data(_container.container_data)
         except Exception:
             msg = 'Error during data generation script run.'
             _container.error = msg
@@ -140,6 +130,32 @@ def tearDownModule():
     teardown_container()
 
 
+def tearDownDB(container_ip):
+    mysqldb = "mysql://craton:craton@{}/craton".format(container_ip)
+    engine = create_engine(mysqldb)
+    meta = MetaData()
+    meta.reflect(engine)
+
+    # we dont delete all tables, only specific data tables
+    tables_to_del = ("network_interfaces",
+                     "network_devices",
+                     "labels",
+                     "hosts",
+                     "networks",
+                     "devices",
+                     "cells",
+                     "regions",
+                     "variables",
+                     "variable_association")
+
+    with contextlib.closing(engine.connect()) as conn:
+        transaction = conn.begin()
+        for table in reversed(meta.sorted_tables):
+            if table.name in tables_to_del:
+                conn.execute(table.delete())
+        transaction.commit()
+
+
 class TestCase(testtools.TestCase):
 
     def setUp(self):
@@ -155,25 +171,29 @@ class TestCase(testtools.TestCase):
             self.session.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
             self.session.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
 
+    def tearDown(self):
+        super(TestCase, self).tearDown()
+        tearDownDB(self.service_ip)
+
     def get(self, url, headers=None, **params):
         resp = self.session.get(
             url, verify=False, headers=headers, params=params,
         )
         return resp
 
-    def post(self, url, headers=None, **data):
+    def post(self, url, headers=None, data=None):
         resp = self.session.post(
             url, verify=False, headers=headers, json=data,
         )
         return resp
 
-    def put(self, url, headers, **data):
+    def put(self, url, headers=None, data=None):
         resp = self.session.put(
             url, verify=False, headers=headers, json=data,
         )
         return resp
 
-    def delete(self, url, headers, **body):
+    def delete(self, url, headers=None, body=None):
         resp = self.session.delete(
             url, verify=False, headers=headers, json=body,
         )
