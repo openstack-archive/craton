@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 import testtools
 import threading
-import subprocess
 
 
 FAKE_DATA_GEN_USERNAME = 'demo'
