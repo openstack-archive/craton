@@ -957,7 +957,7 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_get_by_id')
     def test_get_network_devices_by_id_invalid_property(self, fake_device):
         fake_device.return_value = fake_resources.NETWORK_DEVICE1
-        resp = self.get('/v1/network_devices/1?foo=isaninvalidproperty')
+        resp = self.get('/v1/network-devices/1?foo=isaninvalidproperty')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json['hostname'], 'NetDevices1')
         fake_device.assert_called_once_with(mock.ANY, '1')
@@ -965,7 +965,7 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_get_by_id')
     def test_get_network_devices_by_id(self, fake_device):
         fake_device.return_value = fake_resources.NETWORK_DEVICE1
-        resp = self.get('/v1/network_devices/1')
+        resp = self.get('/v1/network-devices/1')
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json['hostname'], 'NetDevices1')
         fake_device.assert_called_once_with(mock.ANY, '1')
@@ -975,7 +975,7 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
         payload = {"hostname": "NetDev_New1"}
         fake_device.return_value = dict(fake_resources.NETWORK_DEVICE1.items(),
                                         **payload)
-        resp = self.put('v1/network_devices/1', data=payload)
+        resp = self.put('v1/network-devices/1', data=payload)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json['hostname'], "NetDev_New1")
         fake_device.assert_called_once_with(
@@ -986,20 +986,20 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
     def test_put_network_device_invalid_property(self, fake_device):
         fake_device.return_value = fake_resources.NETWORK_DEVICE1
         payload = {"foo": "isinvalid"}
-        resp = self.put('v1/network_devices/1', data=payload)
+        resp = self.put('v1/network-devices/1', data=payload)
         self.assertEqual(resp.status_code, 200)
         fake_device.assert_called_once_with(mock.ANY, '1', {})
 
     @mock.patch.object(dbapi, 'network_devices_get_by_id')
     def test_get_network_devices_get_by_id(self, mock_devices):
         mock_devices.return_value = fake_resources.NETWORK_DEVICE1
-        resp = self.get('/v1/network_devices/1')
+        resp = self.get('/v1/network-devices/1')
         self.assertEqual(resp.json["hostname"],
                          fake_resources.NETWORK_DEVICE1.hostname)
 
     @mock.patch.object(dbapi, 'network_devices_delete')
     def test_delete_network_devices(self, mock_devices):
-        resp = self.delete('v1/network_devices/1')
+        resp = self.delete('v1/network-devices/1')
         self.assertEqual(204, resp.status_code)
 
 
@@ -1009,7 +1009,7 @@ class APIV1NetworkDevicesTest(APIV1Test):
         region_id = '1'
         ip_address = '10.10.0.1'
         filters = {'region_id': region_id, 'ip_address': ip_address}
-        path_query = '/v1/network_devices?region_id={}&ip_address={}'.format(
+        path_query = '/v1/network-devices?region_id={}&ip_address={}'.format(
             region_id, ip_address
         )
         fake_devices.return_value = fake_resources.NETWORK_DEVICE_LIST1
@@ -1024,21 +1024,21 @@ class APIV1NetworkDevicesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_get_all')
     def test_get_network_devices_invalid_property(self, fake_devices):
         fake_devices.return_value = fake_resources.NETWORK_DEVICE_LIST2
-        resp = self.get('/v1/network_devices?foo=isaninvalidproperty')
+        resp = self.get('/v1/network-devices?foo=isaninvalidproperty')
         self.assertEqual(len(resp.json), 2)
         fake_devices.assert_called_once_with(mock.ANY, {})
 
     @mock.patch.object(dbapi, 'network_devices_get_all')
     def test_get_network_devices(self, fake_devices):
         fake_devices.return_value = fake_resources.NETWORK_DEVICE_LIST2
-        resp = self.get('/v1/network_devices')
+        resp = self.get('/v1/network-devices')
         self.assertEqual(len(resp.json), 2)
         fake_devices.assert_called_once_with(mock.ANY, {})
 
     @mock.patch.object(dbapi, 'network_devices_get_all')
     def test_network_devices_get_by_region(self, mock_devices):
         mock_devices.return_value = fake_resources.NETWORK_DEVICE_LIST1
-        resp = self.get('/v1/network_devices?region_id=1')
+        resp = self.get('/v1/network-devices?region_id=1')
         self.assertEqual(len(resp.json), 1)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(
@@ -1051,7 +1051,7 @@ class APIV1NetworkDevicesTest(APIV1Test):
         mock_devices.return_value = None
         data = {'hostname': 'NewNetDevice1', 'region_id': 1,
                 'device_type': 'Sample', 'ip_address': '0.0.0.0'}
-        resp = self.post('/v1/network_devices', data=data)
+        resp = self.post('/v1/network-devices', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_devices_create')
@@ -1059,7 +1059,7 @@ class APIV1NetworkDevicesTest(APIV1Test):
         mock_devices.return_value = None
         # data is missing entry
         data = {'hostname': 'Sample'}
-        resp = self.post('/v1/network_devices', data=data)
+        resp = self.post('/v1/network-devices', data=data)
         self.assertEqual(422, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_devices_create')
@@ -1068,7 +1068,7 @@ class APIV1NetworkDevicesTest(APIV1Test):
         data = {'hostname': 'NewNetDevice1', 'region_id': 1,
                 'device_type': 'Sample', 'ip_address': '0.0.0.0',
                 'foo': 'isinvalid'}
-        resp = self.post('/v1/network_devices', data=data)
+        resp = self.post('/v1/network-devices', data=data)
         self.assertEqual(200, resp.status_code)
         mock_devices.assert_called_once()
 
@@ -1078,7 +1078,7 @@ class APIV1NetworkDevicesLabelsTest(APIV1Test):
     def test_network_devices_labels_update(self, mock_devices):
         payload = {"labels": ["a", "b"]}
         mock_devices.return_value = fake_resources.NETWORK_DEVICE1
-        resp = self.put('v1/network_devices/1/labels', data=payload)
+        resp = self.put('v1/network-devices/1/labels', data=payload)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(resp.json, payload)
 
@@ -1086,7 +1086,7 @@ class APIV1NetworkDevicesLabelsTest(APIV1Test):
     def test_network_devices_labels_update_invalid_property(self, fake_device):
         fake_device.return_value = fake_resources.NETWORK_DEVICE1
         payload = {"foo": "isinvalid"}
-        resp = self.put('v1/network_devices/1/labels', data=payload)
+        resp = self.put('v1/network-devices/1/labels', data=payload)
         self.assertEqual(resp.status_code, 200)
         fake_device.assert_called_once_with(mock.ANY, '1', {})
 
@@ -1094,14 +1094,14 @@ class APIV1NetworkDevicesLabelsTest(APIV1Test):
     def test_network_devices_delete_labels(self, mock_network_device):
         payload = {"labels": ["label1", "label2"]}
         db_data = payload.copy()
-        resp = self.delete('v1/network_devices/1/labels', data=payload)
+        resp = self.delete('v1/network-devices/1/labels', data=payload)
         self.assertEqual(resp.status_code, 204)
         mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'network_devices_labels_delete')
     def test_network_devices_delete_bad_data_type(self, mock_network_device):
         payload = ["label1", "label2"]
-        resp = self.delete('v1/network_devices/1/labels', data=payload)
+        resp = self.delete('v1/network-devices/1/labels', data=payload)
         self.assertEqual(resp.status_code, 422)
         mock_network_device.assert_not_called()
 
@@ -1110,7 +1110,7 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_get_by_id')
     def test_network_devices_get_variables(self, mock_network_device):
         mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
-        resp = self.get('v1/network_devices/1/variables')
+        resp = self.get('v1/network-devices/1/variables')
         expected = {"variables": {"key1": "value1", "key2": "value2"}}
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json, expected)
@@ -1120,7 +1120,7 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
         mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
         payload = {"a": "b"}
         db_data = payload.copy()
-        resp = self.put('v1/network_devices/1/variables', data=payload)
+        resp = self.put('v1/network-devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
         mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
 
@@ -1128,7 +1128,7 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
     def test_network_devices_put_bad_data_type(self, mock_network_device):
         mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
         payload = ["a", "b"]
-        resp = self.put('v1/network_devices/1/variables', data=payload)
+        resp = self.put('v1/network-devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 422)
         mock_network_device.assert_not_called()
 
@@ -1136,14 +1136,14 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
     def test_network_devices_delete_variables(self, mock_network_device):
         payload = {"key1": "value1"}
         db_data = payload.copy()
-        resp = self.delete('v1/network_devices/1/variables', data=payload)
+        resp = self.delete('v1/network-devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
         mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'network_devices_variables_delete')
     def test_network_devices_delete_bad_data_type(self, mock_network_device):
         payload = ["a", "b"]
-        resp = self.delete('v1/network_devices/1/variables', data=payload)
+        resp = self.delete('v1/network-devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 422)
         mock_network_device.assert_not_called()
 
@@ -1155,7 +1155,7 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         ip_address = '10.10.0.1'
         filters = {'device_id': device_id, 'ip_address': ip_address}
         path_query = (
-            '/v1/network_interfaces?device_id={}&ip_address={}'.format(
+            '/v1/network-interfaces?device_id={}&ip_address={}'.format(
                 device_id, ip_address
             )
         )
@@ -1170,7 +1170,7 @@ class APIV1NetworkInterfacesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_interfaces_get_all')
     def test_get_network_interfaces_by_device_id(self, fake_interfaces):
         fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE_LIST1
-        resp = self.get('/v1/network_interfaces?name=NetInterface&device_id=1')
+        resp = self.get('/v1/network-interfaces?name=NetInterface&device_id=1')
         network_interface_resp = fake_resources.NETWORK_INTERFACE1
         self.assertEqual(resp.json[0]["name"], network_interface_resp.name)
 
@@ -1179,7 +1179,7 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         fake_interfaces.return_value = None
         data = {'name': 'NewNetInterface', 'device_id': 1,
                 'ip_address': '0.0.0.0', 'interface_type': 'Sample'}
-        resp = self.post('/v1/network_interfaces', data=data)
+        resp = self.post('/v1/network-interfaces', data=data)
         self.assertEqual(200, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_interfaces_create')
@@ -1187,7 +1187,7 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE1
         # data is missing entry
         data = {'name': 'sample'}
-        resp = self.post('/v1/network_interfaces', data=data)
+        resp = self.post('/v1/network-interfaces', data=data)
         self.assertEqual(422, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_interfaces_create')
@@ -1196,14 +1196,14 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         data = {'name': 'NewNetInterface', 'device_id': 1,
                 'ip_address': '0.0.0.0', 'interface_type': 'Sample',
                 'foo': 'isinvalid'}
-        resp = self.post('/v1/network_interfaces', data=data)
+        resp = self.post('/v1/network-interfaces', data=data)
         self.assertEqual(200, resp.status_code)
         fake_interfaces.assert_called_once()
 
     @mock.patch.object(dbapi, 'network_interfaces_get_all')
     def test_get_network_interfaces(self, fake_interfaces):
         fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE_LIST2
-        resp = self.get('/v1/network_interfaces')
+        resp = self.get('/v1/network-interfaces')
         self.assertEqual(200, resp.status_code)
         self.assertEqual(len(resp.json), 2)
         fake_interfaces.assert_called_once_with(mock.ANY, {})
@@ -1211,7 +1211,7 @@ class APIV1NetworkInterfacesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_interfaces_get_all')
     def test_get_network_interfaces_invalid_property(self, fake_interfaces):
         fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE_LIST2
-        resp = self.get('/v1/network_interfaces?foo=invalid')
+        resp = self.get('/v1/network-interfaces?foo=invalid')
         self.assertEqual(200, resp.status_code)
         self.assertEqual(len(resp.json), 2)
         fake_interfaces.assert_called_once_with(mock.ANY, {})
@@ -1221,7 +1221,7 @@ class APIV1NetworkInterfacesIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_interfaces_get_by_id')
     def test_get_network_interfaces_by_id(self, fake_interfaces):
         fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE1
-        resp = self.get('/v1/network_interfaces/1')
+        resp = self.get('/v1/network-interfaces/1')
         self.assertEqual(resp.json["name"],
                          fake_resources.NETWORK_INTERFACE1.name)
 
@@ -1233,7 +1233,7 @@ class APIV1NetworkInterfacesIDTest(APIV1Test):
         record.update(payload)
         fake_interfaces.return_value = record
 
-        resp = self.put('/v1/network_interfaces/1', data=payload)
+        resp = self.put('/v1/network-interfaces/1', data=payload)
 
         self.assertEqual(resp.json['name'], db_data['name'])
         self.assertEqual(200, resp.status_code)
@@ -1243,7 +1243,7 @@ class APIV1NetworkInterfacesIDTest(APIV1Test):
     def test_network_interfaces_update_invalid_property(self, fake_interfaces):
         fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE1
         payload = {'foo': 'invalid'}
-        resp = self.put('/v1/network_interfaces/1', data=payload)
+        resp = self.put('/v1/network-interfaces/1', data=payload)
 
         self.assertEqual(200, resp.status_code)
         self.assertNotIn('foo', resp.json)
@@ -1251,5 +1251,5 @@ class APIV1NetworkInterfacesIDTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'network_interfaces_delete')
     def test_network_interfaces_delete(self, fake_interfaces):
-        resp = self.delete('/v1/network_interfaces/1')
+        resp = self.delete('/v1/network-interfaces/1')
         self.assertEqual(204, resp.status_code)

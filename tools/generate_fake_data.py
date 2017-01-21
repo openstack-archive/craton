@@ -141,7 +141,7 @@ class Inventory(object):
         return resp.json()
 
     def create_netdevice(self, name, device_type):
-        network_devices_url = self.url + "/network_devices"
+        network_devices_url = self.url + "/network-devices"
         payload = {"hostname": name,
                    "model_name": "model-x",
                    "os_version": "version-1",
@@ -159,7 +159,7 @@ class Inventory(object):
         return resp.json()
 
     def create_net_interface(self, device, int_num, network=None):
-        netinterfaces_url = self.url + "/network_interfaces"
+        netinterfaces_url = self.url + "/network-interfaces"
         name = "eth%s" % int_num
         payload = {"name": name,
                    "interface_type": "ethernet",
