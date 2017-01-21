@@ -28,7 +28,7 @@ import requests
 import sys
 
 
-CRATON_INVENTORY_URL = "http://<host>:<port>/v1/ansible_inventory?region=%s"
+CRATON_INVENTORY_URL = "http://<host>:<port>/v1/ansible-inventory?region=%s"
 
 
 def parse_args():
