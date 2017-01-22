@@ -168,7 +168,8 @@ class Inventory(object):
                    "duplex": "full",
                    "speed": 1000,
                    "link": "up",
-                   "device_id": device.get("id")}
+                   "device_id": device.get("id"),
+                   "ip_address": "10.10.0.1"}
         if network:
             payload["network_id"] = network.get("id")
 

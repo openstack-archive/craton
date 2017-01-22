@@ -1173,14 +1173,21 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         resp = self.get('/v1/network_interfaces?name=NetInterface&device_id=1')
         network_interface_resp = fake_resources.NETWORK_INTERFACE1
         self.assertEqual(resp.json[0]["name"], network_interface_resp.name)
+        self.assertEqual(
+            resp.json[0]['ip_address'], network_interface_resp.ip_address
+        )
 
     @mock.patch.object(dbapi, 'network_interfaces_create')
     def test_network_interfaces_create_with_valid_data(self, fake_interfaces):
-        fake_interfaces.return_value = None
+        fake_interfaces.return_value = fake_resources.NETWORK_INTERFACE1
+
         data = {'name': 'NewNetInterface', 'device_id': 1,
-                'ip_address': '0.0.0.0', 'interface_type': 'Sample'}
+                'ip_address': '10.10.0.1', 'interface_type': 'interface_type1'}
         resp = self.post('/v1/network_interfaces', data=data)
         self.assertEqual(200, resp.status_code)
+        self.assertEqual(
+            resp.json['ip_address'], data['ip_address']
+        )
 
     @mock.patch.object(dbapi, 'network_interfaces_create')
     def test_network_interfaces_create_invalid_data(self, fake_interfaces):
@@ -1224,6 +1231,10 @@ class APIV1NetworkInterfacesIDTest(APIV1Test):
         resp = self.get('/v1/network_interfaces/1')
         self.assertEqual(resp.json["name"],
                          fake_resources.NETWORK_INTERFACE1.name)
+        self.assertEqual(
+            resp.json['ip_address'],
+            fake_resources.NETWORK_INTERFACE1.ip_address
+        )
 
     @mock.patch.object(dbapi, 'network_interfaces_update')
     def test_network_interfaces_update(self, fake_interfaces):
@@ -1237,6 +1248,10 @@ class APIV1NetworkInterfacesIDTest(APIV1Test):
 
         self.assertEqual(resp.json['name'], db_data['name'])
         self.assertEqual(200, resp.status_code)
+        self.assertEqual(
+            resp.json['ip_address'],
+            fake_resources.NETWORK_INTERFACE1.ip_address
+        )
         fake_interfaces.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'network_interfaces_update')
