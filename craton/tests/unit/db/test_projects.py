@@ -4,6 +4,7 @@ from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
+default_pagination = {'limit': 30, 'marker': None}
 
 project1 = {'name': 'project1'}
 project2 = {'name': 'project2'}
@@ -29,7 +30,7 @@ class ProjectsDBTestCase(base.DBTestCase):
         dbapi.projects_create(self.context, project1)
         dbapi.projects_create(self.context, project2)
 
-        res = dbapi.projects_get_all(self.context)
+        res = dbapi.projects_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(res), 2)
 
     def test_project_get_no_admin_project_raises(self):
@@ -41,7 +42,8 @@ class ProjectsDBTestCase(base.DBTestCase):
         self.context.is_admin_project = False
         self.assertRaises(exceptions.AdminRequired,
                           dbapi.projects_get_all,
-                          self.context)
+                          self.context,
+                          {}, default_pagination)
 
     def test_project_get_by_id(self):
         self.context.is_admin_project = True

@@ -4,6 +4,7 @@ from craton.db import api as dbapi
 from craton.tests.unit.db import base
 from craton import exceptions
 
+default_pagination = {'limit': 30, 'marker': None}
 
 project_id1 = uuid.uuid4().hex
 region1 = {'project_id': project_id1, 'name': 'region1'}
@@ -22,10 +23,10 @@ class RegionsDBTestCase(base.DBTestCase):
         self.assertRaises(exceptions.DuplicateRegion, dbapi.regions_create,
                           self.context, region1)
 
-    def test_reions_get_all(self):
+    def test_regions_get_all(self):
         dbapi.regions_create(self.context, region1)
         filters = {}
-        res = dbapi.regions_get_all(self.context, filters)
+        res = dbapi.regions_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'region1')
 
@@ -35,7 +36,9 @@ class RegionsDBTestCase(base.DBTestCase):
         dbapi.regions_variables_update(self.context, res.id, variables)
         filters = {}
         filters["vars"] = "key1:value1"
-        regions = dbapi.regions_get_all(self.context, filters)
+        regions = dbapi.regions_get_all(
+            self.context, filters, default_pagination,
+        )
         self.assertEqual(len(regions), 1)
         self.assertEqual(regions[0].name, region1['name'])
 
@@ -45,7 +48,9 @@ class RegionsDBTestCase(base.DBTestCase):
         dbapi.regions_variables_update(self.context, res.id, variables)
         filters = {}
         filters["vars"] = "key1:value12"
-        regions = dbapi.regions_get_all(self.context, filters)
+        regions = dbapi.regions_get_all(
+            self.context, filters, default_pagination,
+        )
         self.assertEqual(len(regions), 0)
 
     def test_region_get_by_name(self):
