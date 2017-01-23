@@ -204,6 +204,7 @@ def generate_route_validation_functions(cls):
                 continue
             else:
                 gen_test('validators', validators, endpoint, method)
+                gen_test('filters', filters, endpoint, method)
 
 
 generate_route_validation_functions(TestRoutesInValidators)

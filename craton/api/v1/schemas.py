@@ -1059,6 +1059,76 @@ validators = {
 }
 
 filters = {
+    ("ansible_inventory", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "patternProperties": {
+                    "^.+": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                            },
+                            {
+                                "type": "null",
+                            },
+                            {
+                                "type": "number",
+                            },
+                            {
+                                "type": "boolean",
+                            },
+                            {
+                                "type": "integer",
+                            },
+                            {
+                                "type": "array",
+                            },
+                            {
+                                "type": "object",
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("hosts_id_variables", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("hosts_id_variables", "PUT"): {
         200: {
             "headers": None,
@@ -1132,6 +1202,24 @@ filters = {
         },
     },
     ("hosts_id", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("hosts_labels", "DELETE"): {
         204: {
             "headers": None,
             "schema": None,
@@ -1274,6 +1362,29 @@ filters = {
             "schema": None,
         },
     },
+    ("cells_id_variables", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("cells_id_variables", "PUT"): {
         200: {
             "headers": None,
@@ -1365,6 +1476,29 @@ filters = {
             "schema": {
                 "items": DefinitionsRegion,
                 "type": "array",
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("regions_id_variables", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
             },
         },
         400: {
@@ -1548,6 +1682,42 @@ filters = {
             "schema": None,
         },
     },
+    ("projects_id", "GET"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionProject,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("projects_id", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("users_id", "GET"): {
         200: {
             "headers": None,
@@ -1605,10 +1775,64 @@ filters = {
             "schema": None,
         },
     },
+    ("network_devices", "POST"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionNetworkDeviceId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("network_devices_id", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("network_devices_id", "GET"): {
         200: {
             "headers": None,
             "schema": DefinitionNetworkDeviceId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("network_devices_labels", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
         },
         400: {
             "headers": None,
@@ -1663,6 +1887,29 @@ filters = {
         200: {
             "headers": None,
             "schema": DefinitionNetworkDeviceId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("network_devices_id_variables", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
         },
         400: {
             "headers": None,
@@ -1734,6 +1981,42 @@ filters = {
             "schema": None,
         },
     },
+    ("networks", "POST"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionNetwork,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("networks_id", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("networks_id", "GET"): {
         200: {
             "headers": None,
@@ -1756,6 +2039,29 @@ filters = {
         200: {
             "headers": None,
             "schema": DefinitionNetworkId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("networks_id_variables", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
         },
         400: {
             "headers": None,
@@ -1813,6 +2119,42 @@ filters = {
                 "items": DefinitionNetworkInterface,
                 "type": "array",
             },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("network_interfaces", "POST"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionNetworkInterface,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("network_interfaces_id", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
         },
         400: {
             "headers": None,
