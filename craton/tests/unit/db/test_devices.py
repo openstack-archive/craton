@@ -5,6 +5,8 @@ from netaddr import IPAddress
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
+default_pagination = {'limit': 30, 'marker': None}
+
 
 class HostsDBTestCase(base.DBTestCase):
 
@@ -233,7 +235,7 @@ class HostsDBTestCase(base.DBTestCase):
             cell_id=cell_id2,
         )
 
-        all_res = dbapi.hosts_get_all(self.context, {})
+        all_res = dbapi.hosts_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(all_res), 2)
         self.assertEqual(
             len([host for host in all_res if host['cell_id'] == cell_id1]), 1
@@ -242,7 +244,7 @@ class HostsDBTestCase(base.DBTestCase):
         filters = {
             "cell_id": cell_id1,
         }
-        res = dbapi.hosts_get_all(self.context, filters)
+        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0].name, 'www.example.xyz')
 
@@ -257,7 +259,7 @@ class HostsDBTestCase(base.DBTestCase):
             "region_id": region_id,
             "vars": "key2:value2",
         }
-        res = dbapi.hosts_get_all(self.context, filters)
+        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0].name, 'www.example.xyz')
 
@@ -272,5 +274,5 @@ class HostsDBTestCase(base.DBTestCase):
             "region_id": "region_1",
             "vars": "key1:value5",
         }
-        res = dbapi.hosts_get_all(self.context, filters)
+        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 0)
