@@ -16,15 +16,15 @@ class Projects(base.Resource):
         project_id = request_args["id"]
         project_name = request_args["name"]
 
-        if project_name:
-            project_obj = dbapi.projects_get_by_name(context, project_name)
-            return jsonutils.to_primitive([project_obj]), 200, None
-
         if project_id:
             project_obj = dbapi.projects_get_by_id(context, project_id)
             return jsonutils.to_primitive([project_obj], 200, None)
 
-        projects_obj = dbapi.projects_get_all(context)
+        if project_name:
+            projects_obj = dbapi.projects_get_by_name(context, project_name)
+        else:
+            projects_obj = dbapi.projects_get_all(context, request_args)
+
         return jsonutils.to_primitive(projects_obj), 200, None
 
     @base.http_codes
