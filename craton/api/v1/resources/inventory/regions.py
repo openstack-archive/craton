@@ -12,7 +12,8 @@ LOG = log.getLogger(__name__)
 class Regions(base.Resource):
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get region(s) for the project. Get region details if
         for a particular region.
         """
@@ -21,7 +22,9 @@ class Regions(base.Resource):
 
         if not region_id and not region_name:
             # Get all regions for this tenant
-            regions_obj = dbapi.regions_get_all(context, request_args)
+            regions_obj = dbapi.regions_get_all(
+                context, request_args, pagination_params,
+            )
             return jsonutils.to_primitive(regions_obj), 200, None
 
         if region_name:
