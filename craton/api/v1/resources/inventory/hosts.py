@@ -12,9 +12,12 @@ LOG = log.getLogger(__name__)
 class Hosts(base.Resource):
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get all hosts for region, with optional filtering."""
-        hosts_obj = dbapi.hosts_get_all(context, request_args)
+        hosts_obj = dbapi.hosts_get_all(
+            context, request_args, pagination_params,
+        )
         return jsonutils.to_primitive(hosts_obj), 200, None
 
     @base.http_codes
