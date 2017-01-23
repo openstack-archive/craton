@@ -13,7 +13,8 @@ LOG = log.getLogger(__name__)
 class Users(base.Resource):
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get all users. Requires project admin privileges."""
         user_id = request_args["id"]
         user_name = request_args["name"]
@@ -28,7 +29,9 @@ class Users(base.Resource):
             user_obj.data = user_obj.variables
             return jsonutils.to_primitive([user_obj]), 200, None
 
-        users_obj = dbapi.users_get_all(context, request_args)
+        users_obj = dbapi.users_get_all(
+            context, request_args, pagination_params,
+        )
         return jsonutils.to_primitive(users_obj), 200, None
 
     @base.http_codes

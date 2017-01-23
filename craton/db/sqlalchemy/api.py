@@ -941,8 +941,6 @@ def _marker_from(context, session, model, params, project_only):
 
 def _paginate(context, query, model, session, filters, pagination_params,
               project_only=False):
-    if pagination_params is None:
-        pagination_params = {'limit': 30, 'marker': None}
     try:
         return db_utils.paginate_query(
             query, model,
