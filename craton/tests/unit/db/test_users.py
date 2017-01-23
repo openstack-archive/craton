@@ -4,6 +4,7 @@ from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
+default_pagination = {'limit': 30, 'marker': None}
 
 project_id1 = uuid.uuid4().hex
 project_id2 = uuid.uuid4().hex
@@ -39,7 +40,7 @@ class UsersDBTestCase(base.DBTestCase):
         self.context.tenant = user1['project_id']
         dbapi.users_create(self.context, user1)
         dbapi.users_create(self.context, user2)
-        res = dbapi.users_get_all(self.context)
+        res = dbapi.users_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(res), 2)
 
     def test_user_get_all_no_project_context(self):
@@ -47,7 +48,7 @@ class UsersDBTestCase(base.DBTestCase):
         # is not for the same project no user info is given back.
         self.make_user(user1)
         self.context.tenant = uuid.uuid4().hex
-        res = dbapi.users_get_all(self.context)
+        res = dbapi.users_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(res), 0)
 
     def test_user_get_no_admin_context_raises(self):
@@ -55,7 +56,8 @@ class UsersDBTestCase(base.DBTestCase):
         self.context.is_admin = False
         self.assertRaises(exceptions.AdminRequired,
                           dbapi.users_get_all,
-                          self.context)
+                          self.context,
+                          {}, default_pagination)
 
     def test_user_get_by_name(self):
         dbapi.users_create(self.context, user1)

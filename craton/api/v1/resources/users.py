@@ -28,7 +28,7 @@ class Users(base.Resource):
             user_obj.data = user_obj.variables
             return jsonutils.to_primitive([user_obj]), 200, None
 
-        users_obj = dbapi.users_get_all(context)
+        users_obj = dbapi.users_get_all(context, request_args)
         return jsonutils.to_primitive(users_obj), 200, None
 
     @base.http_codes

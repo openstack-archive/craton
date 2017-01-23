@@ -24,7 +24,7 @@ class Projects(base.Resource):
             project_obj = dbapi.projects_get_by_id(context, project_id)
             return jsonutils.to_primitive([project_obj], 200, None)
 
-        projects_obj = dbapi.projects_get_all(context)
+        projects_obj = dbapi.projects_get_all(context, request_args)
         return jsonutils.to_primitive(projects_obj), 200, None
 
     @base.http_codes
