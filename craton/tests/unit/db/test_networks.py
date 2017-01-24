@@ -335,6 +335,12 @@ class NetworkInterfacesDBTestCase(base.DBTestCase):
         filters = {}
         res = dbapi.network_interfaces_get_all(self.context, filters)
         self.assertEqual(len(res), 2)
+        self.assertEqual(
+            str(res[0]['ip_address']), network_interface1['ip_address']
+        )
+        self.assertEqual(
+            str(res[1]['ip_address']), network_interface2['ip_address']
+        )
 
     def test_interface_get_all_filter_device_id(self):
         dbapi.network_interfaces_create(self.context, network_interface1)
@@ -351,6 +357,7 @@ class NetworkInterfacesDBTestCase(base.DBTestCase):
                                                     network_interface1)
         res = dbapi.network_interfaces_get_by_id(self.context, interface.id)
         self.assertEqual(res.name, 'eth1')
+        self.assertEqual(str(res.ip_address), network_interface1['ip_address'])
 
     def test_network_interfaces_update(self):
         interface = dbapi.network_interfaces_create(self.context,
@@ -361,6 +368,7 @@ class NetworkInterfacesDBTestCase(base.DBTestCase):
         res = dbapi.network_interfaces_update(self.context, interface.id,
                                               {'name': 'eth2'})
         self.assertEqual(res.name, new_name)
+        self.assertEqual(str(res.ip_address), network_interface1['ip_address'])
 
     def test_network_interfaces_delete(self):
         interface = dbapi.network_interfaces_create(self.context,

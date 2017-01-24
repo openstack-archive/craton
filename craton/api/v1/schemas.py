@@ -372,6 +372,7 @@ DefinitionNetworkInterface = {
         "name",
         "device_id",
         "interface_type",
+        "ip_address",
     ],
     "type": "object",
     "properties": {
@@ -417,6 +418,9 @@ DefinitionNetworkInterface = {
             "type": "string",
         },
         "security": {
+            "type": "string",
+        },
+        "ip_address": {
             "type": "string",
         },
         "variables": DefinitionVariablesSource,
@@ -466,6 +470,9 @@ DefinitionNetworkInterfaceId = {
             "type": "string",
         },
         "security": {
+            "type": "string",
+        },
+        "ip_address": {
             "type": "string",
         },
         "variables": DefinitionVariablesSource,

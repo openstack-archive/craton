@@ -401,6 +401,7 @@ class NetworkInterface(Base):
     link = Column(String(255), nullable=True)
     cdp = Column(String(255), nullable=True)
     security = Column(String(255), nullable=True)
+    ip_address = Column(IPAddressType, nullable=False)
     project_id = Column(UUIDType(binary=False), ForeignKey('projects.id'),
                         index=True, nullable=False)
     device_id = Column(Integer, ForeignKey('devices.id'))

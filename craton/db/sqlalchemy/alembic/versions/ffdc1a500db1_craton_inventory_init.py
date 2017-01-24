@@ -255,6 +255,9 @@ def upgrade():
         sa.Column('network_id', sa.Integer, nullable=True),
         sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False),
                   nullable=False),
+        sa.Column('ip_address',
+                  sqlalchemy_utils.types.IPAddressType(length=64),
+                  nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint(
             'device_id', 'name', name='uq_netinter0deviceid0name'),
