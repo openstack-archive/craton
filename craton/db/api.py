@@ -115,14 +115,6 @@ def regions_variables_delete(context, region_id, data_key):
 # Hosts
 
 
-def hosts_get_by_region_cell(context, region_id, cell_id, filters,
-                             pagination_params):
-    """Get all hosts for region/cell."""
-    return IMPL.hosts_get_by_region_cell(
-        context, region_id, cell_id, filters, pagination_params,
-    )
-
-
 def hosts_get_all(context, filters, pagination_params):
     """Get all hosts."""
     return IMPL.hosts_get_all(context, filters, pagination_params)
