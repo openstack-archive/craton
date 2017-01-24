@@ -12,31 +12,12 @@ from jsonschema import Draft4Validator
 from oslo_log import log
 
 from craton.api.v1.schemas import filters
-from craton.api.v1.schemas import scopes
 from craton.api.v1.schemas import validators
 from craton import db as dbapi
 from craton import exceptions
 
 
 LOG = log.getLogger(__name__)
-
-
-class Security(object):
-
-    def __init__(self):
-        super(Security, self).__init__()
-        self._loader = lambda: []
-
-    @property
-    def scopes(self):
-        return self._loader()
-
-    def scopes_loader(self, func):
-        self._loader = func
-        return func
-
-
-security = Security()
 
 
 def merge_default(schema, value):
@@ -221,11 +202,6 @@ def request_validate(view):
     @wraps(view)
     def wrapper(*args, **kwargs):
         endpoint = request.endpoint.partition('.')[-1]
-        # scope
-        if (endpoint, request.method) in scopes and not set(
-                scopes[(endpoint,
-                        request.method)]).issubset(set(security.scopes)):
-            abort(403)
         # data
         method = request.method
         if method == 'HEAD':

@@ -1,7 +1,7 @@
 import jsonschema
 
 from craton import api
-from craton.api.v1.schemas import filters, validators, scopes
+from craton.api.v1.schemas import filters, validators
 from craton.tests import TestCase
 
 
@@ -171,10 +171,6 @@ def generate_endpoint_method_validation_functions(cls):
     for (_endpoint, method) in filters:
         endpoint = "v1.{}".format(_endpoint)
         gen_test('filters', endpoint, method)
-
-    for (_endpoint, method) in scopes:
-        endpoint = "v1.{}".format(_endpoint)
-        gen_test('scopes', endpoint, method)
 
 
 generate_endpoint_method_validation_functions(TestSchemaLocationInRoute)
