@@ -245,22 +245,30 @@ def response_filter(view):
         method = request.method
         if method == 'HEAD':
             method = 'GET'
-        filter = filters.get((endpoint, method), None)
-        if not filter:
-            return resp
+        try:
+            resp_filter = filters[(endpoint, method)]
+        except KeyError:
+            LOG.error(
+                '"(%(endpoint)s, %(method)s)" is not defined in the response '
+                'filters.',
+                {"endpoint": endpoint, "method": method}
+            )
+            abort(500)
 
         headers = None
         status = None
         if isinstance(resp, tuple):
             resp, status, headers = unpack(resp)
 
-        if len(filter) == 1:
-            status = filter.keys()[0]
-
-        schemas = filter.get(status)
-        if not schemas:
-            # return resp, status, headers
-            abort(500, message='`%d` is not a defined status code.' % status)
+        try:
+            schemas = resp_filter[status]
+        except KeyError:
+            LOG.error(
+                'The status code %(status)d is not defined in the response '
+                'filter "(%(endpoint)s, %(method)s)".',
+                {"status": status, "endpoint": endpoint, "method": method}
+            )
+            abort(500)
 
         resp, errors = normalize(schemas['schema'], resp)
         if schemas['headers']:
