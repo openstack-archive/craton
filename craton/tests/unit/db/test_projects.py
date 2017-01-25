@@ -75,3 +75,13 @@ class ProjectsDBTestCase(base.DBTestCase):
         res = dbapi.projects_variables_delete(self.context, res.id,
                                               {"key1": "key1"})
         self.assertEqual(res.variables, {"key2": "value2"})
+
+    def test_project_update(self):
+        self.context.is_admin_project = True
+        project = dbapi.projects_create(self.context, project1)
+        res = dbapi.projects_get_by_id(self.context, project['id'])
+        self.assertEqual(res.name, 'project1')
+        new_name = 'project1-updated'
+        res = dbapi.projects_update(self.context, res.id,
+                                    {'name': 'project1-updated'})
+        self.assertEqual(res.name, new_name)
