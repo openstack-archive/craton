@@ -820,6 +820,9 @@ validators = {
     },
     ("projects_id", "GET"): {
     },
+    ("projects_id", "PUT"): {
+        "json": DefinitionProject,
+    },
     ("users", "GET"): {
         "args": {
             "properties": {
@@ -842,6 +845,9 @@ validators = {
     ("users_id", "DELETE"): {
     },
     ("users_id", "GET"): {
+    },
+    ("users_id", "PUT"): {
+        "json": DefinitionUser,
     },
     ("network_devices", "GET"): {
         "args": {
@@ -1707,6 +1713,24 @@ filters = {
             "schema": None,
         },
     },
+    ("projects_id", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionProject,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("projects_id", "DELETE"): {
         204: {
             "headers": None,
@@ -1726,6 +1750,24 @@ filters = {
         },
     },
     ("users_id", "GET"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionUser,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("users_id", "PUT"): {
         200: {
             "headers": None,
             "schema": DefinitionUser,

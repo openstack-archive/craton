@@ -735,6 +735,13 @@ class APIV1ProjectsTest(APIV1Test):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json['id'], 1)
 
+    @mock.patch.object(dbapi, 'projects_update')
+    def test_update_project(self, mock_project):
+        payload = {'name': 'project1-updated'}
+        resp = self.put('/v1/projects/1', data=payload)
+        self.assertEqual(200, resp.status_code)
+        mock_project.assert_called_once_with(mock.ANY, '1', payload)
+
     @mock.patch.object(dbapi, 'projects_get_all')
     def test_project_get_all(self, mock_projects):
         proj1 = fake_resources.PROJECT1
@@ -791,6 +798,13 @@ class APIV1UsersTest(APIV1Test):
         db_json = {'username': 'user1', 'is_admin': False, 'api_key': mock.ANY,
                    'project_id': None}
         mock_user.assert_called_once_with(mock.ANY, db_json)
+
+    @mock.patch.object(dbapi, 'users_update')
+    def test_users_update(self, mock_user):
+        data = {'username': 'New name'}
+        resp = self.put('v1/users/1', data=data)
+        self.assertEqual(200, resp.status_code)
+        mock_user.assert_called_once_with(mock.ANY, '1', data)
 
     @mock.patch.object(dbapi, 'users_get_all')
     def test_users_get_all(self, mock_user):

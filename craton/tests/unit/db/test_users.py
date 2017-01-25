@@ -65,6 +65,15 @@ class UsersDBTestCase(base.DBTestCase):
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['username'], user1['username'])
 
+    def test_users_update(self):
+        dbapi.users_create(self.context, user1)
+        res = dbapi.users_get_by_id(self.context, 1)
+        self.assertEqual(res.username, 'user1')
+        new_name = "Updated_User1"
+        res = dbapi.users_update(self.context, res.id,
+                                 {'username': 'Updated_User1'})
+        self.assertEqual(res.username, new_name)
+
     def test_user_get_by_id(self):
         user = self.make_user(user1)
         res = dbapi.users_get_by_id(self.context, user["id"])
