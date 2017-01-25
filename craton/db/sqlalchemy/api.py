@@ -583,6 +583,19 @@ def projects_create(context, values):
 
 
 @require_admin_context
+def projects_update(context, project_id, values):
+    """Update an existing projects."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Project, session=session,
+                            project_only=True)
+        project_ref = query.with_for_update().one()
+        project_ref.update(values)
+        project_ref.save(session)
+        return project_ref
+
+
+@require_admin_context
 def projects_delete(context, project_id):
     """Delete an existing project given by its id."""
     session = get_session()
@@ -648,6 +661,19 @@ def users_create(context, values):
         user.update(values)
         user.save(session)
     return user
+
+
+@require_project_admin_context
+def users_update(context, user_id, values):
+    """Update existing user with given values."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.User, session=session,
+                            project_only=True)
+        user_ref = query.with_for_update().one()
+        user_ref.update(values)
+        user_ref.save(session)
+        return user_ref
 
 
 @require_project_admin_context

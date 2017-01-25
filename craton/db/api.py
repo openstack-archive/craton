@@ -174,6 +174,11 @@ def projects_create(context, values):
     return IMPL.projects_create(context, values)
 
 
+def projects_update(context, project_id, values):
+    """Update an existing project with new values."""
+    return IMPL.projects_update(context, project_id, values)
+
+
 def projects_delete(context, project_id):
     """Delete an existing project given by its id."""
     return IMPL.projects_delete(context, project_id)
@@ -200,6 +205,11 @@ def users_get_by_id(context, user_id):
 def users_create(context, values):
     """Create a new user with given values."""
     return IMPL.users_create(context, values)
+
+
+def users_update(context, user_id, values):
+    """Update existing user."""
+    return IMPL.users_update(context, user_id, values)
 
 
 def users_delete(context, user_id):

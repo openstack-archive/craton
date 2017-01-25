@@ -760,6 +760,28 @@ DefinitionsPaginationLinks = {
     },
 }
 
+DefinitionsProjectId = {
+    "required": [
+        "name",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
+        "id": {
+            "type": "integer",
+        },
+        "name": {
+            "type": "string",
+        },
+    },
+}
+
 
 def paginated_resource(list_name, schema):
     return {
@@ -773,6 +795,44 @@ def paginated_resource(list_name, schema):
             "links": DefinitionsPaginationLinks,
         },
     }
+
+DefinitionsUserId = {
+    "required": [
+        "is_admin",
+        "roles",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
+        "id": {
+            "type": "integer",
+        },
+        "api_key": {
+            "type": "string",
+        },
+        "username": {
+            "type": "string",
+        },
+        "is_admin": {
+            "type": "boolean",
+        },
+        "project_id": {
+            "type": "string",
+        },
+        "roles": {
+            "type": "array",
+            "items": {
+                "type": "string",
+            },
+        },
+    },
+}
 
 validators = {
     ("ansible_inventory", "GET"): {
@@ -1078,6 +1138,9 @@ validators = {
     ("projects_id", "GET"): {
         "args": DefinitionNoParams,
     },
+    ("projects_id", "PUT"): {
+        "json": DefinitionsProjectId,
+    },
     ("users", "GET"): {
         "args": {
             "additionalProperties": False,
@@ -1123,6 +1186,9 @@ validators = {
     },
     ("users_id", "GET"): {
         "args": DefinitionNoParams,
+    },
+    ("users_id", "PUT"): {
+        "json": DefinitionsUserId,
     },
     ("network_devices", "GET"): {
         "args": {
@@ -1890,6 +1956,24 @@ filters = {
             "schema": None,
         },
     },
+    ("projects_id", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionsProjectId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
     ("projects_id", "DELETE"): {
         204: {
             "headers": None,
@@ -1912,6 +1996,24 @@ filters = {
         200: {
             "headers": None,
             "schema": DefinitionUser,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("users_id", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionsUserId,
         },
         400: {
             "headers": None,
