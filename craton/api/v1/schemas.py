@@ -56,6 +56,9 @@ DefinitionsHost = {
         "cell_id": {
             "type": "integer",
         },
+        "project_id": {
+            "type": "string",
+        },
         "parent_id": {
             "type": "integer",
             "description": "Parent Id of this host",
@@ -136,6 +139,9 @@ DefinitionsCell = {
         "region_id": {
             "type": "integer",
         },
+        "project_id": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
             "description": "Unique ID of the cell",
@@ -214,6 +220,9 @@ DefinitionsRegion = {
             "items": DefinitionsCell,
             "type": "array",
             "description": "List of cells in this region",
+        },
+        "project_id": {
+            "type": "string",
         },
         "id": {
             "type": "integer",
@@ -307,6 +316,9 @@ DefinitionNetwork = {
         },
         "cell_id": {
             "type": "integer",
+        },
+        "project_id": {
+            "type": "string",
         },
         "name": {
             "type": "string",
@@ -499,6 +511,9 @@ DefinitionNetworkDevice = {
         },
         "parent_id": {
             "type": "integer",
+        },
+        "project_id": {
+            "type": "string",
         },
         "ip_address": {
             "type": "string",

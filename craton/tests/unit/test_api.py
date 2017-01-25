@@ -379,7 +379,7 @@ class APIV1RegionsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_create_region_returns_region_obj(self, mock_region):
-        return_value = {'name': 'region1',
+        return_value = {'name': 'region1', 'project_id': 'abcd',
                         'variables': {"key1": "value1", "key2": "value2"}}
         fake_region = fake_resources.REGION1
         fake_region.variables = {"key1": "value1", "key2": "value2"}
