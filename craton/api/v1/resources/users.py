@@ -55,6 +55,12 @@ class UserById(base.Resource):
         return jsonutils.to_primitive(user_obj), 200, None
 
     @base.http_codes
+    def put(self, context, id, request_data):
+        """Update existing users."""
+        user_obj = dbapi.users_update(context, id, request_data)
+        return jsonutils.to_primitive(user_obj), 200, None
+
+    @base.http_codes
     def delete(self, context, id):
         """Delete existing user. Requires project admin privileges."""
         dbapi.users_delete(context, id)

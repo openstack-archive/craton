@@ -723,6 +723,20 @@ class APIV1ProjectsTest(APIV1Test):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json['id'], 1)
 
+    @mock.patch.object(dbapi, 'projects_update')
+    def test_update_project(self, mock_project):
+        record = dict(fake_resources.PROJECT1.items())
+        payload = {'name': 'project1-updated'}
+        db_data = payload.copy()
+        record.update(payload)
+        mock_project.return_value = record
+
+        resp = self.put('/v1/projects/1', data=payload)
+
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(resp.json['name'], 'project1-updated')
+        mock_project.assert_called_once_with(mock.ANY, '1', db_data)
+
     @mock.patch.object(dbapi, 'projects_get_all')
     def test_project_get_all(self, mock_projects):
         proj1 = fake_resources.PROJECT1
@@ -773,6 +787,20 @@ class APIV1UsersTest(APIV1Test):
         self.assertEqual(400, resp.status_code)
         mock_project.assert_not_called()
         mock_user.assert_not_called()
+
+    @mock.patch.object(dbapi, 'users_update')
+    def test_users_update(self, mock_user):
+        record = dict(fake_resources.USER1.items())
+        payload = {'is_admin': False}
+        record.update(payload)
+        db_data = payload.copy()
+        mock_user.update_value = record
+
+        resp = self.put('v1/users/1', data=payload)
+
+        self.assertEqual(resp.json['is_admin'], db_data['is_admin'])
+        self.assertEqual(resp.status_code, 200)
+        mock_user.assert_called_once_with(mock.ANY, '1', db_data)
 
     @mock.patch.object(dbapi, 'users_get_all')
     def test_users_get_all(self, mock_user):
