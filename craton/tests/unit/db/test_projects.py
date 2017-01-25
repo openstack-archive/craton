@@ -48,3 +48,13 @@ class ProjectsDBTestCase(base.DBTestCase):
         project = dbapi.projects_create(self.context, project1)
         res = dbapi.projects_get_by_id(self.context, project['id'])
         self.assertEqual(str(res['id']), project['id'])
+
+    def test_project_update(self):
+        self.context.is_admin_project = True
+        project = dbapi.projects_create(self.context, project1)
+        res = dbapi.projects_get_by_id(self.context, project['id'])
+        self.assertEqual(res.name, 'project1')
+        new_name = 'project1-updated'
+        res = dbapi.projects_update(self.context, res.id,
+                                    {'name': 'project1-updated'})
+        self.assertEqual(res.name, new_name)
