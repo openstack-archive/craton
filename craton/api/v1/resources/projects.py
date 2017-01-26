@@ -19,17 +19,20 @@ class Projects(base.Resource):
 
         if project_id:
             project_obj = dbapi.projects_get_by_id(context, project_id)
-            return jsonutils.to_primitive([project_obj], 200, None)
+            projects_obj = [project_obj]
+            link_params = {}
 
         if project_name:
-            projects_obj = dbapi.projects_get_by_name(
+            projects_obj, link_params = dbapi.projects_get_by_name(
                 context, project_name, request_args, pagination_params,
             )
         else:
-            projects_obj = dbapi.projects_get_all(
+            projects_obj, link_params = dbapi.projects_get_all(
                 context, request_args, pagination_params,
             )
-        return jsonutils.to_primitive(projects_obj), 200, None
+        links = base.links_from(link_params)
+        response_body = {'projects': projects_obj, 'links': links}
+        return jsonutils.to_primitive(response_body), 200, None
 
     @base.http_codes
     def post(self, context, request_data):
