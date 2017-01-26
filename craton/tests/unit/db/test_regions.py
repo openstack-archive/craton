@@ -26,7 +26,8 @@ class RegionsDBTestCase(base.DBTestCase):
     def test_regions_get_all(self):
         dbapi.regions_create(self.context, region1)
         filters = {}
-        res = dbapi.regions_get_all(self.context, filters, default_pagination)
+        res, _ = dbapi.regions_get_all(self.context, filters,
+                                       default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'region1')
 
@@ -36,7 +37,7 @@ class RegionsDBTestCase(base.DBTestCase):
         dbapi.regions_variables_update(self.context, res.id, variables)
         filters = {}
         filters["vars"] = "key1:value1"
-        regions = dbapi.regions_get_all(
+        regions, _ = dbapi.regions_get_all(
             self.context, filters, default_pagination,
         )
         self.assertEqual(len(regions), 1)
@@ -48,7 +49,7 @@ class RegionsDBTestCase(base.DBTestCase):
         dbapi.regions_variables_update(self.context, res.id, variables)
         filters = {}
         filters["vars"] = "key1:value12"
-        regions = dbapi.regions_get_all(
+        regions, _ = dbapi.regions_get_all(
             self.context, filters, default_pagination,
         )
         self.assertEqual(len(regions), 0)

@@ -48,7 +48,7 @@ class UsersDBTestCase(base.DBTestCase):
         # is not for the same project no user info is given back.
         self.make_user(user1)
         self.context.tenant = uuid.uuid4().hex
-        res = dbapi.users_get_all(self.context, {}, default_pagination)
+        res, _ = dbapi.users_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(res), 0)
 
     def test_user_get_no_admin_context_raises(self):
@@ -63,8 +63,8 @@ class UsersDBTestCase(base.DBTestCase):
         dbapi.users_create(self.context, user1)
         dbapi.users_create(self.context, user2)
         self.context.tenant = user1['project_id']
-        res = dbapi.users_get_by_name(self.context, user1['username'], {},
-                                      default_pagination)
+        res, _ = dbapi.users_get_by_name(self.context, user1['username'], {},
+                                         default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['username'], user1['username'])
 

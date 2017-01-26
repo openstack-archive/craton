@@ -16,10 +16,12 @@ class Cells(base.Resource):
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all cells, with optional filtering."""
-        cells_obj = dbapi.cells_get_all(
+        cells_obj, link_params = dbapi.cells_get_all(
             context, request_args, pagination_params,
         )
-        return jsonutils.to_primitive(cells_obj), 200, None
+        links = base.links_from(link_params)
+        response_body = {'cells': cells_obj, 'links': links}
+        return jsonutils.to_primitive(response_body), 200, None
 
     @base.http_codes
     def post(self, context, request_data):
