@@ -246,7 +246,7 @@ class HostsDBTestCase(base.DBTestCase):
             cell_id=cell_id2,
         )
 
-        all_res = dbapi.hosts_get_all(self.context, {}, default_pagination)
+        all_res, _ = dbapi.hosts_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(all_res), 2)
         self.assertEqual(
             len([host for host in all_res if host['cell_id'] == cell_id1]), 1
@@ -255,7 +255,8 @@ class HostsDBTestCase(base.DBTestCase):
         filters = {
             "cell_id": cell_id1,
         }
-        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
+        res, _ = dbapi.hosts_get_all(self.context, filters,
+                                     default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0].name, 'www.example.xyz')
 
@@ -270,7 +271,8 @@ class HostsDBTestCase(base.DBTestCase):
             "region_id": region_id,
             "vars": "key2:value2",
         }
-        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
+        res, _ = dbapi.hosts_get_all(self.context, filters,
+                                     default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0].name, 'www.example.xyz')
 
@@ -289,12 +291,12 @@ class HostsDBTestCase(base.DBTestCase):
         dbapi.hosts_variables_update(self.context, host2, variables)
         filters = {"vars": "key1:example2"}
 
-        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
+        res, _ = dbapi.hosts_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual('www.example2.xyz', res[0].name)
 
         filters = {"vars": "key2:Tom"}
-        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
+        res, _ = dbapi.hosts_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 2)
 
     def test_hosts_get_all_with_filters_noexist(self):
@@ -308,5 +310,6 @@ class HostsDBTestCase(base.DBTestCase):
             "region_id": "region_1",
             "vars": "key1:value5",
         }
-        res = dbapi.hosts_get_all(self.context, filters, default_pagination)
+        res, _ = dbapi.hosts_get_all(self.context, filters,
+                                     default_pagination)
         self.assertEqual(len(res), 0)

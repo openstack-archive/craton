@@ -1,5 +1,6 @@
 import functools
 import inspect
+import urllib.parse as urllib
 
 import decorator
 
@@ -70,3 +71,32 @@ def limit_from(filters, minimum=10, default=30, maximum=100):
     # isn't too small, then it must be too big. In that case, let's just
     # return the maximum.
     return maximum
+
+
+def links_from(link_params):
+    """Generate the list of hypermedia link relations from their parameters.
+
+    This uses the request thread-local to determine the endpoint and generate
+    URLs from that.
+
+    :param dict link_params:
+        A dictionary mapping the relation name to the query parameters.
+    :returns:
+        List of dictionaries to represent hypermedia link relations.
+    :rtype:
+        list
+    """
+    links = []
+    relations = ["first", "prev", "self", "next"]
+    base_url = flask.request.base_url
+
+    for relation in relations:
+        query_params = link_params.get(relation)
+        if not query_params:
+            continue
+        link_rel = {
+            "rel": relation,
+            "href": base_url + "?" + urllib.urlencode(query_params),
+        }
+        links.append(link_rel)
+    return links
