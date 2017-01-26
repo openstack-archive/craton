@@ -53,12 +53,16 @@ def get_backend():
 
 def is_admin_context(context):
     """Check if this request had admin project context."""
-    return (context.is_admin and context.is_admin_project)
+    if (context.is_admin and context.is_admin_project):
+        return True
+    return False
 
 
 def is_project_admin_context(context):
     """Check if this request has admin context with in the project."""
-    return context.is_admin
+    if context.is_admin:
+        return True
+    return False
 
 
 def require_admin_context(f):
@@ -76,7 +80,10 @@ def require_project_admin_context(f):
         context = args[0]
         if is_project_admin_context(context):
             return f(*args, **kwargs)
-        raise exceptions.AdminRequired()
+        elif is_project_admin_context(args[0]):
+            return f(*args, **kwargs)
+        else:
+            raise exceptions.AdminRequired()
     return wrapper
 
 
@@ -479,13 +486,12 @@ def projects_get_all(context, filters, pagination_params):
 
 
 @require_admin_context
-def projects_get_by_name(context, project_name, filters, pagination_params):
+def projects_get_by_name(context, project_name):
     """Get all projects that match the given name."""
     query = model_query(context, models.Project)
     query = query.filter(models.Project.name.like(project_name))
     try:
-        return _paginate(context, query, models.Project, session, filters,
-                         pagination_params)
+        return query.all()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
     except Exception as err:
@@ -548,8 +554,12 @@ def users_get_all(context, filters, pagination_params):
 @require_project_admin_context
 def users_get_by_name(context, user_name, filters, pagination_params):
     """Get all users that match the given username."""
-    query = model_query(context, models.User,
-                        project_only=is_admin_context(context))
+    session = get_session()
+    if is_admin_context(context):
+        query = model_query(context, models.User, session=session)
+    else:
+        query = model_query(context, models.User, project_only=True,
+                            session=session)
 
     query = query.filter_by(username=user_name)
     return _paginate(context, query, models.User, session, filters,
@@ -819,36 +829,116 @@ def network_interfaces_delete(context, interface_id):
         query.delete()
 
 
-def _marker_from(context, session, model, params, project_only):
-    if params['marker'] is None:
+def _marker_from(context, session, model, marker, project_only):
+    if marker is None:
         return None
 
-    try:
-        query = model_query(context, model, session=session,
-                            project_only=project_only)
-        return query.filter_by(id=params['marker']).one()
-    except sa_exc.NoResultFound:
-        raise exceptions.BadRequest(
-            message='Marker "{}" does not exist'.format(params['marker'])
+    query = model_query(context, model, session=session,
+                        project_only=project_only)
+    return query.filter_by(id=marker).one()
+
+
+def _get_previous(query, model, current_marker, page_size, filters):
+    # NOTE(sigmavirus24): To get the previous items based on the existing
+    # filters, we need only reverse the direction that the user requested.
+    original_sort_dir = filters['sort_dir']
+    sort_dir = 'desc'
+    if original_sort_dir == 'desc':
+        sort_dir = 'asc'
+
+    results = db_utils.paginate_query(
+        query, model,
+        limit=page_size,
+        sort_keys=filters['sort_keys'],
+        sort_dir=sort_dir,
+        marker=current_marker,
+    ).all()
+
+    if not results:
+        return None
+
+    return results[-1].id
+
+
+def _link_params_for(query, model, filters, pagination_params,
+                     current_marker, current_results):
+    links = {}
+    # We can discern our base parameters for our links
+    base_parameters = {}
+    for (key, value) in filters.items():
+        # This takes care of things like sort_keys which may have multiple
+        # values
+        if isinstance(value, list):
+            value = ','.join(value)
+        base_parameters[key] = value
+    base_parameters['limit'] = pagination_params['limit']
+    generate_links = ('first', 'self')
+
+    if current_results:
+        next_marker = current_results[-1]
+        # If there are results to return, there may be a next link to follow
+        generate_links += ('next',)
+
+    # We start our links dictionary with some basics
+    for relation in generate_links:
+        params = base_parameters.copy()
+        if relation == 'self':
+            if pagination_params['marker'] is not None:
+                params['marker'] = pagination_params['marker']
+        elif relation == 'next':
+            params['marker'] = next_marker.id
+        links[relation] = params
+
+    params = base_parameters.copy()
+    previous_marker = None
+    if current_marker is not None:
+        previous_marker = _get_previous(
+            query, model, current_marker, pagination_params['limit'], filters,
         )
+    if previous_marker is not None:
+        params['marker'] = previous_marker
+    links['prev'] = params
+    return links
 
 
 def _paginate(context, query, model, session, filters, pagination_params,
               project_only=False):
+    # NOTE(sigmavirus24) Retrieve the instance of the model represented by the
+    # marker.
     try:
-        return db_utils.paginate_query(
+        marker = _marker_from(context, session, model,
+                              pagination_params['marker'],
+                              project_only)
+    except sa_exc.NoResultFound:
+        raise exceptions.BadRequest(
+            message='Marker "{}" does not exist'.format(
+                pagination_params['marker']
+            )
+        )
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+
+    filters.setdefault('sort_keys', ['created_at', 'id'])
+    filters.setdefault('sort_dir', 'asc')
+    # Retrieve the results based on the marker and the limit
+    try:
+        results = db_utils.paginate_query(
             query, model,
             limit=pagination_params['limit'],
-            sort_keys=filters.get('sort_keys', ['created_at']),
-            marker=_marker_from(context, session, model, pagination_params,
-                                project_only),
+            sort_keys=filters['sort_keys'],
+            sort_dir=filters['sort_dir'],
+            marker=marker,
         ).all()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
-    except exceptions.Base:
-        # NOTE(sigmavirus24): Here we need to allow for _marker_from's
-        # exception to bubble up without being rewrapped as an
-        # UnknownException
-        raise
     except Exception as err:
         raise exceptions.UnknownException(message=err)
+
+    try:
+        links = _link_params_for(
+            query, model, filters, pagination_params, marker, results,
+        )
+    except Exception as err:
+        raise exceptions.UnknownException(message=err)
+
+    return results, links

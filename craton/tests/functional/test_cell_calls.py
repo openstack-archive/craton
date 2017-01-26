@@ -59,16 +59,17 @@ class APIV1CellTest(TestCase):
         # Create a cell first
         self.create_cell('cell-1')
         url = self.url + '/v1/cells?region_id={}'.format(self.region['id'])
-        cells = self.get(url)
-        self.assertEqual(1, len(cells.json()))
-        self.assertEqual(['cell-1'], [i['name'] for i in cells.json()])
+        resp = self.get(url)
+        cells = resp.json()['cells']
+        self.assertEqual(1, len(cells))
+        self.assertEqual(['cell-1'], [i['name'] for i in cells])
 
     def test_cell_get_all_with_name_filter(self):
         self.create_cell('cell1')
         self.create_cell('cell2')
         url = self.url + '/v1/cells?name=cell2'
         cell = self.get(url)
-        self.assertEqual(1, len(cell.json()))
+        self.assertEqual(1, len(cell.json()['cells']))
 
     def test_get_cell_details(self):
         cellvars = {"who": "that"}
@@ -89,11 +90,13 @@ class APIV1CellTest(TestCase):
         cell1 = self.create_cell('cell-1')
         self.create_cell('cell-2')
         url = self.url + '/v1/cells'
-        cells = self.get(url)
-        self.assertEqual(2, len(cells.json()))
+        resp = self.get(url)
+        cells = resp.json()['cells']
+        self.assertEqual(2, len(cells))
 
         delurl = self.url + '/v1/cells/{}'.format(cell1['id'])
         self.delete(delurl)
 
-        cells = self.get(url)
-        self.assertEqual(1, len(cells.json()))
+        resp = self.get(url)
+        cells = resp.json()['cells']
+        self.assertEqual(1, len(cells))
