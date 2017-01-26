@@ -23,17 +23,20 @@ class Users(base.Resource):
         if user_id:
             user_obj = dbapi.users_get_by_id(context, user_id)
             user_obj.data = user_obj.variables
-            return jsonutils.to_primitive([user_obj]), 200, None
+            users_obj = [user_obj]
+            link_params = {}
 
         if user_name:
-            users_obj = dbapi.users_get_by_name(
+            users_obj, link_params = dbapi.users_get_by_name(
                 context, user_name, request_args, pagination_params,
             )
         else:
-            users_obj = dbapi.users_get_all(
+            users_obj, link_params = dbapi.users_get_all(
                 context, request_args, pagination_params,
             )
-        return jsonutils.to_primitive(users_obj), 200, None
+        links = base.links_from(link_params)
+        response_body = {'users': users_obj, 'links': links}
+        return jsonutils.to_primitive(response_body), 200, None
 
     @base.http_codes
     def post(self, context, request_data):
