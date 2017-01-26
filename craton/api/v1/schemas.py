@@ -709,6 +709,37 @@ DefinitionNoParams = {
     "additionalProperties": False,
 }
 
+DefinitionsPaginationLinks = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "rel": {
+                "type": "string",
+                "enum": ["first", "prev", "self", "next"],
+                "description": ("Relation of the associated URL to the current"
+                                " page"),
+            },
+            "href": {
+                "type": "string",
+            },
+        },
+    },
+}
+
+
+def paginated_resource(list_name, schema):
+    return {
+        "type": "object",
+        "properties": {
+            list_name: {
+                "type": "array",
+                "items": schema,
+            },
+            "links": DefinitionsPaginationLinks,
+        },
+    }
+
 validators = {
     ("ansible_inventory", "GET"): {
         "args": {
@@ -1545,10 +1576,7 @@ filters = {
     ("hosts", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionsHost,
-                "type": "array",
-            },
+            "schema": paginated_resource("hosts", DefinitionsHost),
         },
         400: {
             "headers": None,
@@ -1700,10 +1728,7 @@ filters = {
     ("cells", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionsCell,
-                "type": "array",
-            },
+            "schema": paginated_resource("cells", DefinitionsCell),
         },
         400: {
             "headers": None,
@@ -1735,10 +1760,7 @@ filters = {
     ("regions", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionsRegion,
-                "type": "array",
-            },
+            "schema": paginated_resource("regions", DefinitionsRegion),
         },
         400: {
             "headers": None,
@@ -1876,10 +1898,7 @@ filters = {
     ("projects", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionProject,
-                "type": "array",
-            },
+            "schema": paginated_resource("projects", DefinitionProject),
         },
         400: {
             "headers": None,
@@ -1915,10 +1934,7 @@ filters = {
     ("users", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionUser,
-                "type": "array",
-            },
+            "schema": paginated_resource("users", DefinitionUser),
         },
         400: {
             "headers": None,
@@ -2026,10 +2042,8 @@ filters = {
     ("network_devices", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionNetworkDeviceId,
-                "type": "array",
-            },
+            "schema": paginated_resource("network_devices",
+                                         DefinitionNetworkDeviceId),
         },
         400: {
             "headers": None,
@@ -2239,10 +2253,7 @@ filters = {
     ("networks", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionNetwork,
-                "type": "array",
-            },
+            "schema": paginated_resource("networks", DefinitionNetwork),
         },
         400: {
             "headers": None,
@@ -2398,10 +2409,8 @@ filters = {
     ("network_interfaces", "GET"): {
         200: {
             "headers": None,
-            "schema": {
-                "items": DefinitionNetworkInterface,
-                "type": "array",
-            },
+            "schema": paginated_resource("network_interfaces",
+                                         DefinitionNetworkInterface),
         },
         400: {
             "headers": None,
