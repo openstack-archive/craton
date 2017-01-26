@@ -20,22 +20,25 @@ class Regions(base.Resource):
         region_id = request_args.get("id")
         region_name = request_args.get("name")
 
-        if not region_id and not region_name:
+        if not (region_id or region_name):
             # Get all regions for this tenant
-            regions_obj = dbapi.regions_get_all(
+            regions_obj, link_paramss = dbapi.regions_get_all(
                 context, request_args, pagination_params,
             )
-            return jsonutils.to_primitive(regions_obj), 200, None
+        else:
+            if region_name:
+                region_obj = dbapi.regions_get_by_name(context, region_name)
+                region_obj.data = region_obj.variables
 
-        if region_name:
-            region_obj = dbapi.regions_get_by_name(context, region_name)
-            region_obj.data = region_obj.variables
-            return jsonutils.to_primitive([region_obj]), 200, None
+            if region_id:
+                region_obj = dbapi.regions_get_by_id(context, region_id)
+                region_obj.data = region_obj.variables
 
-        if region_id:
-            region_obj = dbapi.regions_get_by_id(context, region_id)
-            region_obj.data = region_obj.variables
-            return jsonutils.to_primitive([region_obj]), 200, None
+            regions_obj = [region_obj]
+            link_params = {}
+        links = base.links_from(link_params)
+        response_body = {'regions': regions_obj, 'links': links}
+        return jsonutils.to_primitive(response_body), 200, None
 
     @base.http_codes
     def post(self, context, request_data):
