@@ -12,9 +12,12 @@ LOG = log.getLogger(__name__)
 class Cells(base.Resource):
 
     @base.http_codes
-    def get(self, context, request_args):
+    @base.pagination_context
+    def get(self, context, request_args, pagination_params):
         """Get all cells, with optional filtering."""
-        cells_obj = dbapi.cells_get_all(context, request_args)
+        cells_obj = dbapi.cells_get_all(
+            context, request_args, pagination_params,
+        )
         return jsonutils.to_primitive(cells_obj), 200, None
 
     @base.http_codes
