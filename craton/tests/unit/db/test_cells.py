@@ -11,6 +11,7 @@ cell1_region2 = {'region_id': 2, 'project_id': project_id1, 'name': 'cell1'}
 cell2 = {'region_id': 1, 'project_id': project_id1, 'name': 'cell2'}
 
 cells = (cell1, cell1_region2, cell2)
+default_pagination = {'limit': 30, 'marker': None}
 
 
 class CellsDBTestCase(base.DBTestCase):
@@ -31,20 +32,20 @@ class CellsDBTestCase(base.DBTestCase):
         filters = {
             "region_id": cell1["region_id"],
         }
-        res = dbapi.cells_get_all(self.context, filters)
+        res = dbapi.cells_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'cell1')
 
     def test_cells_get_all_filter_name(self):
         for cell in cells:
             dbapi.cells_create(self.context, cell)
-        setup_res = dbapi.cells_get_all(self.context, {})
+        setup_res = dbapi.cells_get_all(self.context, {}, default_pagination)
         self.assertGreater(len(setup_res), 2)
 
         filters = {
             "name": cell1["name"],
         }
-        res = dbapi.cells_get_all(self.context, filters)
+        res = dbapi.cells_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 2)
         for cell in res:
             self.assertEqual(cell['name'], 'cell1')
@@ -52,7 +53,7 @@ class CellsDBTestCase(base.DBTestCase):
     def test_cells_get_all_filter_id(self):
         for cell in cells:
             dbapi.cells_create(self.context, cell)
-        setup_res = dbapi.cells_get_all(self.context, {})
+        setup_res = dbapi.cells_get_all(self.context, {}, default_pagination)
         self.assertGreater(len(setup_res), 2)
         self.assertEqual(
             len([cell for cell in setup_res if cell['id'] == 1]), 1
@@ -61,7 +62,7 @@ class CellsDBTestCase(base.DBTestCase):
         filters = {
             "id": 1,
         }
-        res = dbapi.cells_get_all(self.context, filters)
+        res = dbapi.cells_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['id'], 1)
 
@@ -73,7 +74,7 @@ class CellsDBTestCase(base.DBTestCase):
             "vars": "key2:value2",
             "region_id": cell1["region_id"],
         }
-        res = dbapi.cells_get_all(self.context, filters)
+        res = dbapi.cells_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'cell1')
 
@@ -83,7 +84,7 @@ class CellsDBTestCase(base.DBTestCase):
         dbapi.cells_variables_update(self.context, res.id, variables)
         filters = {}
         filters["vars"] = "key2:value5"
-        res = dbapi.cells_get_all(self.context, filters)
+        res = dbapi.cells_get_all(self.context, filters, default_pagination)
         self.assertEqual(len(res), 0)
 
     def test_cell_delete(self):

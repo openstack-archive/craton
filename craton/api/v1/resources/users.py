@@ -18,17 +18,16 @@ class Users(base.Resource):
         user_id = request_args["id"]
         user_name = request_args["name"]
 
-        if user_name:
-            user_obj = dbapi.users_get_by_name(context, user_name)
-            user_obj.data = user_obj.variables
-            return jsonutils.to_primitive([user_obj]), 200, None
-
         if user_id:
             user_obj = dbapi.users_get_by_id(context, user_id)
             user_obj.data = user_obj.variables
             return jsonutils.to_primitive([user_obj]), 200, None
 
-        users_obj = dbapi.users_get_all(context)
+        if user_name:
+            users_obj = dbapi.users_get_by_name(context, user_name,
+                                                request_args)
+        else:
+            users_obj = dbapi.users_get_all(context, request_args)
         return jsonutils.to_primitive(users_obj), 200, None
 
     @base.http_codes
