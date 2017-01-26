@@ -73,8 +73,8 @@ class NetworksDBTestCase(base.DBTestCase):
         dbapi.networks_create(self.context, network1)
         dbapi.networks_create(self.context, network2)
         filters = {}
-        res = dbapi.networks_get_all(self.context, filters,
-                                     default_pagination)
+        res, _ = dbapi.networks_get_all(self.context, filters,
+                                        default_pagination)
         self.assertEqual(len(res), 2)
 
     def test_networks_get_all_filter_region(self):
@@ -83,8 +83,8 @@ class NetworksDBTestCase(base.DBTestCase):
         filters = {
             'region_id': network1['region_id'],
         }
-        res = dbapi.networks_get_all(self.context, filters,
-                                     default_pagination)
+        res, _ = dbapi.networks_get_all(self.context, filters,
+                                        default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'test network')
 
@@ -96,8 +96,8 @@ class NetworksDBTestCase(base.DBTestCase):
     def test_networks_get_by_name_filter_no_exit(self):
         dbapi.networks_create(self.context, network1)
         filters = {"name": "foo", "region_id": network1['region_id']}
-        res = dbapi.networks_get_all(self.context, filters,
-                                     default_pagination)
+        res, _ = dbapi.networks_get_all(self.context, filters,
+                                        default_pagination)
         self.assertEqual(res, [])
 
     def test_network_update(self):
@@ -137,8 +137,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         dbapi.network_devices_create(self.context, device1)
         dbapi.network_devices_create(self.context, device2)
         filters = {}
-        res = dbapi.network_devices_get_all(self.context, filters,
-                                            default_pagination)
+        res, _ = dbapi.network_devices_get_all(self.context, filters,
+                                               default_pagination)
         self.assertEqual(len(res), 2)
 
     def test_network_device_get_all_filter_region(self):
@@ -147,8 +147,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         filters = {
             'region_id': device1['region_id'],
         }
-        res = dbapi.network_devices_get_all(self.context, filters,
-                                            default_pagination)
+        res, _ = dbapi.network_devices_get_all(self.context, filters,
+                                               default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['hostname'], 'switch1')
 
@@ -157,8 +157,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         dbapi.network_devices_create(self.context, device2)
 
         name = device1['hostname']
-        setup_res = dbapi.network_devices_get_all(self.context, {},
-                                                  default_pagination)
+        setup_res, _ = dbapi.network_devices_get_all(self.context, {},
+                                                     default_pagination)
 
         self.assertEqual(len(setup_res), 2)
         matches = [dev for dev in setup_res if dev['hostname'] == name]
@@ -167,8 +167,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         filters = {
             'name': name,
         }
-        res = dbapi.network_devices_get_all(self.context, filters,
-                                            default_pagination)
+        res, _ = dbapi.network_devices_get_all(self.context, filters,
+                                               default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['hostname'], name)
 
@@ -197,8 +197,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
             self.context, dict(cell_id=cell2.id, **device2)
         )
 
-        setup_res = dbapi.network_devices_get_all(self.context, {},
-                                                  default_pagination)
+        setup_res, _ = dbapi.network_devices_get_all(self.context, {},
+                                                     default_pagination)
 
         self.assertEqual(len(setup_res), 2)
         matches = [dev for dev in setup_res if dev['cell_id'] == cell1.id]
@@ -207,8 +207,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         filters = {
             'cell_id': cell1.id,
         }
-        res = dbapi.network_devices_get_all(self.context, filters,
-                                            default_pagination)
+        res, _ = dbapi.network_devices_get_all(self.context, filters,
+                                               default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['cell_id'], cell1.id)
 
@@ -217,8 +217,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         dbapi.network_devices_create(self.context, device3)
 
         dev_type = device1['device_type']
-        setup_res = dbapi.network_devices_get_all(self.context, {},
-                                                  default_pagination)
+        setup_res, _ = dbapi.network_devices_get_all(self.context, {},
+                                                     default_pagination)
 
         self.assertEqual(len(setup_res), 2)
         matches = [dev for dev in setup_res if dev['device_type'] == dev_type]
@@ -227,8 +227,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         filters = {
             'device_type': dev_type,
         }
-        res = dbapi.network_devices_get_all(self.context, filters,
-                                            default_pagination)
+        res, _ = dbapi.network_devices_get_all(self.context, filters,
+                                               default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['device_type'], dev_type)
 
@@ -236,8 +236,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         dbapi.network_devices_create(self.context, device1)
         dbapi.network_devices_create(self.context, device2)
 
-        setup_res = dbapi.network_devices_get_all(self.context, {},
-                                                  default_pagination)
+        setup_res, _ = dbapi.network_devices_get_all(self.context, {},
+                                                     default_pagination)
 
         self.assertEqual(len(setup_res), 2)
 
@@ -247,8 +247,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         filters = {
             'id': dev_id
         }
-        res = dbapi.network_devices_get_all(self.context, filters,
-                                            default_pagination)
+        res, _ = dbapi.network_devices_get_all(self.context, filters,
+                                               default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['id'], dev_id)
 
@@ -257,8 +257,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         dbapi.network_devices_create(self.context, device3)
 
         ip = device1['ip_address']
-        setup_res = dbapi.network_devices_get_all(self.context, {},
-                                                  default_pagination)
+        setup_res, _ = dbapi.network_devices_get_all(self.context, {},
+                                                     default_pagination)
 
         self.assertEqual(len(setup_res), 2)
         matches = [dev for dev in setup_res if str(dev['ip_address']) == ip]
@@ -267,8 +267,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         filters = {
             'ip_address': ip,
         }
-        res = dbapi.network_devices_get_all(self.context, filters,
-                                            default_pagination)
+        res, _ = dbapi.network_devices_get_all(self.context, filters,
+                                               default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(str(res[0]['ip_address']), ip)
 
@@ -280,8 +280,8 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
     def test_network_devices_get_by_filter_no_exit(self):
         dbapi.network_devices_create(self.context, device1)
         filters = {"hostname": "foo"}
-        res = dbapi.networks_get_all(self.context, filters,
-                                     default_pagination)
+        res, _ = dbapi.networks_get_all(self.context, filters,
+                                        default_pagination)
         self.assertEqual(res, [])
 
     def test_network_devices_delete(self):
@@ -332,8 +332,8 @@ class NetworkInterfacesDBTestCase(base.DBTestCase):
         dbapi.network_interfaces_create(self.context, network_interface1)
         dbapi.network_interfaces_create(self.context, network_interface2)
         filters = {}
-        res = dbapi.network_interfaces_get_all(self.context, filters,
-                                               default_pagination)
+        res, _ = dbapi.network_interfaces_get_all(self.context, filters,
+                                                  default_pagination)
         self.assertEqual(len(res), 2)
         self.assertEqual(
             str(res[0]['ip_address']), network_interface1['ip_address']
@@ -348,8 +348,8 @@ class NetworkInterfacesDBTestCase(base.DBTestCase):
         filters = {
             "device_id": 1,
         }
-        res = dbapi.network_interfaces_get_all(self.context, filters,
-                                               default_pagination)
+        res, _ = dbapi.network_interfaces_get_all(self.context, filters,
+                                                  default_pagination)
         self.assertEqual(len(res), 1)
         self.assertEqual(res[0]['name'], 'eth1')
 

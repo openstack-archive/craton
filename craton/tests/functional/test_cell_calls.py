@@ -69,16 +69,16 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
         self.create_cell('cell-1')
         url = self.url + '/v1/cells?region_id={}'.format(self.region['id'])
         resp = self.get(url)
-        cells = resp.json()
+        cells = resp.json()['cells']
         self.assertEqual(1, len(cells))
-        self.assertEqual({'cell-1'}, {i['name'] for i in cells})
+        self.assertEqual(['cell-1'], [i['name'] for i in cells])
 
     def test_cell_get_all_with_name_filter(self):
         self.create_cell('cell1')
         self.create_cell('cell2')
         url = self.url + '/v1/cells?name=cell2'
         resp = self.get(url)
-        cells = resp.json()
+        cells = resp.json()['cells']
         self.assertEqual(1, len(cells))
         self.assertEqual({'cell2'}, {cell['name'] for cell in cells})
 
@@ -106,7 +106,7 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
         url = self.url + '/v1/cells'
         resp = self.get(url)
         self.assertEqual(200, resp.status_code)
-        cells = resp.json()
+        cells = resp.json()['cells']
         self.assertEqual(2, len(cells))
         self.assertEqual({'cell-1', 'cell-2'},
                          {cell['name'] for cell in cells})
@@ -117,7 +117,7 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
 
         resp = self.get(url)
         self.assertEqual(200, resp.status_code)
-        cells = resp.json()
+        cells = resp.json()['cells']
         self.assertEqual(1, len(cells))
         self.assertEqual({'cell-2'},
                          {cell['name'] for cell in cells})

@@ -182,6 +182,15 @@ class TestCase(testtools.TestCase):
     def tearDown(self):
         super(TestCase, self).tearDown()
 
+    def assertSuccessOk(self, response):
+        self.assertEqual(requests.codes.OK, response.status_code)
+
+    def assertSuccessCreated(self, response):
+        self.assertEqual(requests.codes.CREATED, response.status_code)
+
+    def assertNoContent(self, response):
+        self.assertEqual(requests.codes.NO_CONTENT, response.status_code)
+
     def get(self, url, headers=None, **params):
         resp = self.session.get(
             url, verify=False, headers=headers, params=params,
