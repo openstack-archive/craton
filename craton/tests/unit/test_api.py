@@ -1,3 +1,4 @@
+import copy
 import mock
 import uuid
 
@@ -246,16 +247,21 @@ class APIV1CellsVariablesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'cells_variables_update')
     def test_cells_put_variables(self, mock_cell):
-        mock_cell.return_value = fake_resources.CELL1
+        db_return_value = copy.deepcopy(fake_resources.CELL1)
+        db_return_value.variables["a"] = "b"
+        mock_cell.return_value = db_return_value
         payload = {"a": "b"}
         db_data = payload.copy()
         resp = self.put('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
         mock_cell.assert_called_once_with(mock.ANY, '1', db_data)
+        expected = {
+            "variables": {"key1": "value1", "key2": "value2", "a": "b"},
+        }
+        self.assertDictEqual(expected, resp.json)
 
     @mock.patch.object(dbapi, 'cells_variables_update')
     def test_cells_put_bad_data_type(self, mock_cell):
-        mock_cell.return_value = fake_resources.CELL1
         payload = ["a", "b"]
         resp = self.put('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 422)
@@ -414,16 +420,21 @@ class APIV1RegionsVariablesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'regions_variables_update')
     def test_regions_put_variables(self, mock_region):
-        mock_region.return_value = fake_resources.REGION1
+        db_return_value = copy.deepcopy(fake_resources.REGION1)
+        db_return_value.variables["a"] = "b"
+        mock_region.return_value = db_return_value
         payload = {"a": "b"}
         db_data = payload.copy()
         resp = self.put('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
         mock_region.assert_called_once_with(mock.ANY, '1', db_data)
+        expected = {
+            "variables": {"key1": "value1", "key2": "value2", "a": "b"},
+        }
+        self.assertDictEqual(expected, resp.json)
 
     @mock.patch.object(dbapi, 'regions_variables_update')
     def test_regions_put_bad_data_type(self, mock_region):
-        mock_region.return_value = fake_resources.REGION1
         payload = ["a", "b"]
         resp = self.put('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 422)
@@ -706,16 +717,21 @@ class APIV1HostsVariablesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'hosts_variables_update')
     def test_hosts_put_data(self, mock_host):
-        mock_host.return_value = fake_resources.HOST1
+        db_return_value = copy.deepcopy(fake_resources.HOST1)
+        db_return_value.variables["a"] = "b"
+        mock_host.return_value = db_return_value
         payload = {"a": "b"}
         db_data = payload.copy()
         resp = self.put('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
         mock_host.assert_called_once_with(mock.ANY, '1', db_data)
+        expected = {
+            "variables": {"key1": "value1", "key2": "value2", "a": "b"},
+        }
+        self.assertDictEqual(expected, resp.json)
 
     @mock.patch.object(dbapi, 'hosts_variables_update')
     def test_hosts_put_bad_data_type(self, mock_host):
-        mock_host.return_value = fake_resources.HOST1
         payload = ["a", "b"]
         resp = self.put('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 422)
@@ -938,16 +954,21 @@ class APIV1NetworksVariablesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'networks_variables_update')
     def test_networks_put_variables(self, mock_network):
-        mock_network.return_value = fake_resources.NETWORK1
+        db_return_value = copy.deepcopy(fake_resources.NETWORK1)
+        db_return_value.variables["a"] = "b"
+        mock_network.return_value = db_return_value
         payload = {"a": "b"}
         db_data = payload.copy()
         resp = self.put('v1/networks/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
         mock_network.assert_called_once_with(mock.ANY, '1', db_data)
+        expected = {
+            "variables": {"key1": "value1", "a": "b"},
+        }
+        self.assertDictEqual(expected, resp.json)
 
     @mock.patch.object(dbapi, 'networks_variables_update')
     def test_networks_put_bad_data_type(self, mock_network):
-        mock_network.return_value = fake_resources.NETWORK1
         payload = ["a", "b"]
         resp = self.put('v1/networks/1/variables', data=payload)
         self.assertEqual(resp.status_code, 422)
@@ -1139,16 +1160,21 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'network_devices_variables_update')
     def test_network_devices_put_variables(self, mock_network_device):
-        mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
+        db_return_value = copy.deepcopy(fake_resources.NETWORK_DEVICE1)
+        db_return_value.variables["a"] = "b"
+        mock_network_device.return_value = db_return_value
         payload = {"a": "b"}
         db_data = payload.copy()
         resp = self.put('v1/network-devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
         mock_network_device.assert_called_once_with(mock.ANY, '1', db_data)
+        expected = {
+            "variables": {"key1": "value1", "key2": "value2", "a": "b"},
+        }
+        self.assertDictEqual(expected, resp.json)
 
     @mock.patch.object(dbapi, 'network_devices_variables_update')
     def test_network_devices_put_bad_data_type(self, mock_network_device):
-        mock_network_device.return_value = fake_resources.NETWORK_DEVICE1
         payload = ["a", "b"]
         resp = self.put('v1/network-devices/1/variables', data=payload)
         self.assertEqual(resp.status_code, 422)

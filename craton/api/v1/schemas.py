@@ -1235,7 +1235,12 @@ filters = {
     ("hosts_id_variables", "PUT"): {
         200: {
             "headers": None,
-            "schema": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
         },
         400: {
             "headers": None,
@@ -1491,7 +1496,12 @@ filters = {
     ("cells_id_variables", "PUT"): {
         200: {
             "headers": None,
-            "schema": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
         },
         400: {
             "headers": None,
@@ -1620,7 +1630,12 @@ filters = {
     ("regions_id_variables", "PUT"): {
         200: {
             "headers": None,
-            "schema": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
         },
         400: {
             "headers": None,
@@ -2030,7 +2045,12 @@ filters = {
     ("network_devices_id_variables", "PUT"): {
         200: {
             "headers": None,
-            "schema": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
         },
         400: {
             "headers": None,
@@ -2182,7 +2202,12 @@ filters = {
     ("networks_id_variables", "PUT"): {
         200: {
             "headers": None,
-            "schema": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
         },
         400: {
             "headers": None,
