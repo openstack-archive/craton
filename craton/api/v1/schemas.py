@@ -38,6 +38,12 @@ DefinitionsHost = {
     ],
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "active": {
             "type": "boolean",
         },
@@ -84,6 +90,12 @@ DefinitionsHost = {
 DefinitionsHostId = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "active": {
             "type": "boolean",
         },
@@ -130,6 +142,12 @@ DefinitionsCell = {
     ],
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "note": {
             "type": "string",
         },
@@ -153,6 +171,12 @@ DefinitionsCell = {
 DefinitionsCellId = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "note": {
             "type": "string",
         },
@@ -208,6 +232,12 @@ DefinitionsRegion = {
     ],
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "note": {
             "type": "string",
             "description": "Region Note",
@@ -235,6 +265,12 @@ DefinitionsRegion = {
 DefinitionsRegionId = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "note": {
             "type": "string",
             "description": "Region Note",
@@ -263,6 +299,12 @@ DefinitionsRegionId = {
 DefinitionUser = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
@@ -290,6 +332,12 @@ DefinitionUser = {
 DefinitionProject = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
@@ -308,6 +356,12 @@ DefinitionNetwork = {
     ],
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
@@ -345,6 +399,12 @@ DefinitionNetwork = {
 DefinitionNetworkId = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
@@ -388,6 +448,12 @@ DefinitionNetworkInterface = {
     ],
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
@@ -442,6 +508,12 @@ DefinitionNetworkInterface = {
 DefinitionNetworkInterfaceId = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
@@ -500,6 +572,12 @@ DefinitionNetworkDevice = {
     ],
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
@@ -549,6 +627,12 @@ DefinitionNetworkDevice = {
 DefinitionNetworkDeviceId = {
     "type": "object",
     "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
         "id": {
             "type": "integer",
         },
