@@ -210,19 +210,24 @@ def upgrade():
         unique=False)
     op.create_table(
         'hosts',
-        sa.Column('id', sa.Integer, nullable=False),
-        sa.ForeignKeyConstraint(['id'], ['devices.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.Column(
+            'id', sa.Integer,
+            sa.ForeignKey(
+                'devices.id', name='fk_hosts_devices', ondelete='cascade'),
+            primary_key=True)
     )
     op.create_table(
         'network_devices',
-        sa.Column('id', sa.Integer, nullable=False),
+        sa.Column(
+            'id', sa.Integer,
+            sa.ForeignKey(
+                'devices.id',
+                name='fk_network_devices_devices', ondelete='cascade'),
+            primary_key=True),
         sa.Column('model_name', sa.String(length=255), nullable=True),
         sa.Column('os_version', sa.String(length=255), nullable=True),
         sa.Column('vlans', sqlalchemy_utils.types.json.JSONType,
-                  nullable=True),
-        sa.ForeignKeyConstraint(['id'], ['devices.id']),
-        sa.PrimaryKeyConstraint('id')
+                  nullable=True)
     )
     op.create_table(
         'labels',
@@ -251,7 +256,11 @@ def upgrade():
         sa.Column('link', sa.String(length=255), nullable=True),
         sa.Column('cdp', sa.String(length=255), nullable=True),
         sa.Column('security', sa.String(length=255), nullable=True),
-        sa.Column('device_id', sa.Integer, nullable=False),
+        sa.Column('device_id', sa.Integer,
+            sa.ForeignKey(
+                'devices.id',
+                name='fk_network_interfaces_devices', ondelete='cascade'),
+            nullable=False),
         sa.Column('network_id', sa.Integer, nullable=True),
         sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False),
                   nullable=False),
@@ -262,7 +271,6 @@ def upgrade():
         sa.UniqueConstraint(
             'device_id', 'name', name='uq_netinter0deviceid0name'),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
-        sa.ForeignKeyConstraint(['device_id'], ['devices.id'], ),
         sa.ForeignKeyConstraint(['network_id'], ['networks.id'], ),
         sa.ForeignKeyConstraint(
             ['variable_association_id'], ['variable_association.id'],
