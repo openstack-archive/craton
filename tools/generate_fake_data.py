@@ -66,7 +66,7 @@ class Inventory(object):
         print("Creating region entry for %s with data %s" % (payload, data))
         resp = requests.post(region_url, headers=self.headers,
                              data=json.dumps(payload), verify=False)
-        if resp.status_code != 200:
+        if resp.status_code != 201:
             raise Exception(resp.text)
 
         self.region = resp.json()
@@ -85,7 +85,7 @@ class Inventory(object):
         print("Creating cell entry %s with data %s" % (payload, data))
         resp = requests.post(region_url, headers=self.headers,
                              data=json.dumps(payload), verify=False)
-        if resp.status_code != 200:
+        if resp.status_code != 201:
             raise Exception(resp.text)
 
         self.cell = resp.json()
@@ -109,7 +109,7 @@ class Inventory(object):
         device_obj = requests.post(region_url, headers=self.headers,
                                    data=json.dumps(payload), verify=False)
 
-        if device_obj.status_code != 200:
+        if device_obj.status_code != 201:
             raise Exception(device_obj.text)
 
         if data:
@@ -135,7 +135,7 @@ class Inventory(object):
         print("Creating new network: %s" % payload)
         resp = requests.post(networks_url, headers=self.headers,
                              data=json.dumps(payload), verify=False)
-        if resp.status_code != 200:
+        if resp.status_code != 201:
             raise Exception(resp.text)
 
         return resp.json()
@@ -153,7 +153,7 @@ class Inventory(object):
 
         resp = requests.post(network_devices_url, headers=self.headers,
                              data=json.dumps(payload), verify=False)
-        if resp.status_code != 200:
+        if resp.status_code != 201:
             raise Exception(resp.text)
 
         return resp.json()
@@ -177,7 +177,7 @@ class Inventory(object):
               % (name, device.get("id"), network.get("id")))
         resp = requests.post(netinterfaces_url, headers=self.headers,
                              data=json.dumps(payload), verify=False)
-        if resp.status_code != 200:
+        if resp.status_code != 201:
             raise Exception(resp.text)
 
         return resp.json()
