@@ -996,7 +996,7 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
         fake_device.return_value = fake_resources.NETWORK_DEVICE1
         resp = self.get('/v1/network-devices/1?foo=isaninvalidproperty')
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json['hostname'], 'NetDevices1')
+        self.assertEqual(resp.json['name'], 'NetDevices1')
         fake_device.assert_called_once_with(mock.ANY, '1')
 
     @mock.patch.object(dbapi, 'network_devices_get_by_id')
@@ -1004,19 +1004,19 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
         fake_device.return_value = fake_resources.NETWORK_DEVICE1
         resp = self.get('/v1/network-devices/1')
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json['hostname'], 'NetDevices1')
+        self.assertEqual(resp.json['name'], 'NetDevices1')
         fake_device.assert_called_once_with(mock.ANY, '1')
 
     @mock.patch.object(dbapi, 'network_devices_update')
     def test_put_network_device(self, fake_device):
-        payload = {"hostname": "NetDev_New1"}
+        payload = {"name": "NetDev_New1"}
         fake_device.return_value = dict(fake_resources.NETWORK_DEVICE1.items(),
                                         **payload)
         resp = self.put('v1/network-devices/1', data=payload)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json['hostname'], "NetDev_New1")
+        self.assertEqual(resp.json['name'], "NetDev_New1")
         fake_device.assert_called_once_with(
-            mock.ANY, '1', {"hostname": "NetDev_New1"}
+            mock.ANY, '1', {"name": "NetDev_New1"}
         )
 
     @mock.patch.object(dbapi, 'network_devices_update')
@@ -1031,8 +1031,8 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
     def test_get_network_devices_get_by_id(self, mock_devices):
         mock_devices.return_value = fake_resources.NETWORK_DEVICE1
         resp = self.get('/v1/network-devices/1')
-        self.assertEqual(resp.json["hostname"],
-                         fake_resources.NETWORK_DEVICE1.hostname)
+        self.assertEqual(resp.json["name"],
+                         fake_resources.NETWORK_DEVICE1.name)
 
     @mock.patch.object(dbapi, 'network_devices_delete')
     def test_delete_network_devices(self, mock_devices):
@@ -1085,14 +1085,14 @@ class APIV1NetworkDevicesTest(APIV1Test):
         self.assertEqual(len(resp.json), 1)
         self.assertEqual(200, resp.status_code)
         self.assertEqual(
-            resp.json[0]["hostname"],
-            fake_resources.NETWORK_DEVICE_LIST1[0].hostname
+            resp.json[0]["name"],
+            fake_resources.NETWORK_DEVICE_LIST1[0].name
         )
 
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_network_devices_with_valid_data(self, mock_devices):
         mock_devices.return_value = None
-        data = {'hostname': 'NewNetDevice1', 'region_id': 1,
+        data = {'name': 'NewNetDevice1', 'region_id': 1,
                 'device_type': 'Sample', 'ip_address': '0.0.0.0'}
         resp = self.post('/v1/network-devices', data=data)
         self.assertEqual(200, resp.status_code)
@@ -1101,14 +1101,14 @@ class APIV1NetworkDevicesTest(APIV1Test):
     def test_create_netdevices_with_invalid_data(self, mock_devices):
         mock_devices.return_value = None
         # data is missing entry
-        data = {'hostname': 'Sample'}
+        data = {'name': 'Sample'}
         resp = self.post('/v1/network-devices', data=data)
         self.assertEqual(422, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_netdevices_with_invalid_property(self, mock_devices):
         mock_devices.return_value = None
-        data = {'hostname': 'NewNetDevice1', 'region_id': 1,
+        data = {'name': 'NewNetDevice1', 'region_id': 1,
                 'device_type': 'Sample', 'ip_address': '0.0.0.0',
                 'foo': 'isinvalid'}
         resp = self.post('/v1/network-devices', data=data)
