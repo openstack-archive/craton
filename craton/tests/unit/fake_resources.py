@@ -136,9 +136,9 @@ NETWORKS_LIST2 = [NETWORK1, NETWORK2, NETWORK3]
 
 
 class NetworkDevice():
-    def __init__(self, hostname, project_id, region_id,
+    def __init__(self, name, project_id, region_id,
                  device_type, ip_address, variables, labels=None):
-        self.hostname = hostname
+        self.name = name
         self.project_id = project_id
         self.region_id = region_id
         self.device_type = device_type

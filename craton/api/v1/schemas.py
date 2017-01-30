@@ -565,7 +565,7 @@ DefinitionNetworkInterfaceId = {
 
 DefinitionNetworkDevice = {
     "required": [
-        "hostname",
+        "name",
         "region_id",
         "device_type",
         "ip_address",
@@ -599,7 +599,10 @@ DefinitionNetworkDevice = {
         "device_type": {
             "type": "string",
         },
-        "hostname": {
+        "active": {
+            "type": "boolean",
+        },
+        "name": {
             "type": "string",
         },
         "access_secret_id": {
@@ -648,13 +651,16 @@ DefinitionNetworkDeviceId = {
         "parent_id": {
             "type": "integer",
         },
+        "active": {
+            "type": "boolean",
+        },
         "ip_address": {
             "type": "string",
         },
         "device_type": {
             "type": "string",
         },
-        "hostname": {
+        "name": {
             "type": "string",
         },
         "access_secret_id": {
@@ -1092,7 +1098,7 @@ validators = {
                 "device_type": {
                     "type": "string",
                 },
-                "hostname": {
+                "name": {
                     "type": "string",
                 },
                 "model_name": {
