@@ -142,7 +142,7 @@ class Inventory(object):
 
     def create_netdevice(self, name, device_type):
         network_devices_url = self.url + "/network-devices"
-        payload = {"hostname": name,
+        payload = {"name": name,
                    "model_name": "model-x",
                    "os_version": "version-1",
                    "device_type": device_type,
