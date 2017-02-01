@@ -40,6 +40,11 @@ class DuplicateCell(Base):
     msg = "A cell with the given name already exists."
 
 
+class DuplicateDevice(Base):
+    code = 409
+    msg = "A device with the given name already exists."
+
+
 class DuplicateNetwork(Base):
     code = 409
     msg = "Network with the given name already exists in this region."

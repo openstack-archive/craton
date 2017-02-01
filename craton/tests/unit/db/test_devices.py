@@ -2,6 +2,7 @@ import uuid
 
 from netaddr import IPAddress
 
+from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
@@ -102,6 +103,16 @@ class HostsDBTestCase(base.DBTestCase):
         self.assertEqual(blame['foo'].variable.value, 'H1')
         self.assertEqual(blame['bar'].source.name, 'cell_1')
         self.assertEqual(blame['bar'].variable.value, 'C2')
+
+    def test_hosts_create_duplicate_raises(self):
+        region_id = self.make_region('region_1')
+        self.make_host(region_id, 'www1.example.com',
+                       IPAddress(u'10.1.2.101'), 'server')
+        new_host = {'name': 'www1.example.com', 'region_id': region_id,
+                    'ip_address': IPAddress(u'10.1.2.101'),
+                    'device_type': 'server', 'project_id': self.project_id}
+        self.assertRaises(exceptions.DuplicateDevice, dbapi.hosts_create,
+                          self.context, new_host)
 
     def test_hosts_create_without_cell(self):
         region_id, _, host_id = self.make_very_small_cloud()
