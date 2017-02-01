@@ -8,16 +8,21 @@ objects for test.
 
 
 class Project(object):
-    def __init__(self, id, name):
+    def __init__(self, id, name, variables):
         self.id = id
         self.name = name
+        self.variables = variables
 
     def items(self):
         return iter(self.__dict__.items())
 
-
-PROJECT1 = Project("4534dcb4-dacd-474f-8afc-8bd5ab2d26e8", "project1")
-PROJECT2 = Project("77c527cb-837d-4fcb-bafb-af37ba3d13a4", "project2")
+# NOTE(thomasem): To be consistent with other tests, using string
+# representation of Project.id. This needs to change once we correct
+# bug https://bugs.launchpad.net/craton/+bug/1661670.
+PROJECT1 = Project("4534dcb4-dacd-474f-8afc-8bd5ab2d26e8", "project1",
+                   {"key1": "value1", "key2": "value2"})
+PROJECT2 = Project("77c527cb-837d-4fcb-bafb-af37ba3d13a4", "project2",
+                   {"key1": "value1", "key2": "value2"})
 
 
 class User(object):
