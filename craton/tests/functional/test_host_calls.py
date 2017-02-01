@@ -69,6 +69,22 @@ class APIV1HostTest(TestCase):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(1, len(resp.json()))
 
+    def test_host_get_by_vars_filter(self):
+        vars1 = {"a": "b", "host": "one"}
+        host1 = self.create_host('host1', 'server', '192.168.1.1', **vars1)
+        vars2 = {"a": "b"}
+        host2 = self.create_host('host2', 'server', '192.168.1.2', **vars2)
+
+        url = self.url + '/v1/hosts?vars=a:b'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(2, len(resp.json()))
+
+        url = self.url + '/v1/hosts?vars=host:one'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(1, len(resp.json()))
+
     def test_host_by_missing_filter(self):
         self.create_host('host1', 'server', '192.168.1.1')
         url = self.url + '/v1/hosts?ip_address=192.168.1.2'
