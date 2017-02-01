@@ -464,8 +464,11 @@ def hosts_create(context, values):
     session = get_session()
     host = models.Host()
     with session.begin():
-        host.update(values)
-        host.save(session)
+        try:
+            host.update(values)
+            host.save(session)
+        except db_exc.DBDuplicateEntry:
+            raise exceptions.DuplicateDevice()
     return host
 
 
