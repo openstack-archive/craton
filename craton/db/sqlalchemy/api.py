@@ -100,12 +100,14 @@ def model_query(context, model, *args, **kwargs):
 
 
 def add_var_filters_to_query(query, filters):
-    # vars filters are of form ?vars=a:b,c:d
+    # vars filters are of form ?vars=a:b
+    query = query.join(models.VariableAssociation)
+    query = query.join(models.Variable)
     var_filters = filters['vars'].split(',')
     for filters in var_filters:
         k, v = filters.split(':', 1)
-        query = query.filter(models.Variable.key == k)
-        query = query.filter(models.Variable.value == v)
+        query = query.filter_by(key=k)
+        query = query.filter_by(value=v)
 
     return query
 
