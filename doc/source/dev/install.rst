@@ -26,25 +26,24 @@ Installing Environment from packages: Ubuntu
 
 * Install the prerequisite packages::
 
-    # sudo apt-get install python-dev
-    # sudo apt-get install python-pip
-    # sudo apt-get install python-setuptools
-    # sudo pip install --upgrade pip
-    # sudo pip install --upgrade setuptools
+    # sudo apt-get install python3.5 python3.5-dev
+    # sudo apt-get install python3-pip python3-setuptools
+    # sudo pip3 install --upgrade pip
+    # sudo pip3 install --upgrade setuptools
 
 * Goto craton directory and install the following::
 
-    # sudo pip install -r requirements.txt
-    # sudo python setup.py install
+    # sudo pip3 install -r requirements.txt
+    # sudo python3 setup.py install
 
 * Install mariadb and make sure mysql is running::
 
     # sudo apt-get install mariadb-server
     # sudo service mysql start
 
-* Ensure you have python-mysqldb installed::
+* Ensure you have python3-mysqldb installed::
 
-    # sudo apt-get install python-mysqldb
+    # sudo apt-get install python3-mysqldb
 
 --------------------------------------------------------
 Installing Environment from packages: Fedora/CentOS etc.
@@ -64,25 +63,25 @@ Installing Environment from packages: Fedora/CentOS etc.
 
 * Install the prerequisite packages::
 
-    # sudo yum install python-devel
-    # sudo yum install python-pip
-    # sudo yum install python-setuptools
-    # sudo pip install --upgrade pip
-    # sudo pip install --upgrade setuptools
+    # sudo yum install python3-devel
+    # sudo yum install python3-pip
+    # sudo yum install python3-setuptools
+    # sudo pip3 install --upgrade pip
+    # sudo pip3 install --upgrade setuptools
 
 * Goto craton directory and install the following::
 
-    # sudo pip install -r requirements.txt
-    # sudo python setup.py install
+    # sudo pip3 install -r requirements.txt
+    # sudo python3 setup.py install
 
 * Install mariadb and make sure mysql is running::
 
     # sudo yum install mariadb-server
     # sudo service mysql start
 
-* Ensure you have python-mysqldb installed::
+* Ensure you have python3-mysql installed::
 
-    # sudo yum install MySQL-python
+    # sudo yum install python3-mysql
 
 --------------
 Database Setup
@@ -247,4 +246,3 @@ Running Tests
 * To run functional tests, execute the following command::
 
     # tox -e functional
-
