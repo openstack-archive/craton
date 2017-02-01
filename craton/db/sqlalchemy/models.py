@@ -227,7 +227,7 @@ class VariableMixin(object):
         return blamed
 
 
-class Project(Base):
+class Project(Base, VariableMixin):
     """Supports multitenancy for all other schema elements."""
     __tablename__ = 'projects'
     id = Column(UUIDType(binary=False), primary_key=True)
