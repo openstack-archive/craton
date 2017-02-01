@@ -360,6 +360,7 @@ DefinitionProject = {
         "name": {
             "type": "string",
         },
+        "variables": DefinitionVariablesSource,
     },
 }
 
@@ -960,6 +961,10 @@ validators = {
                 "marker": {
                     "type": "integer",
                     "description": "Last project ID of the previous page",
+                },
+                "vars": {
+                    "type": "string",
+                    "description": "variable filters to get a project",
                 },
             },
         },
