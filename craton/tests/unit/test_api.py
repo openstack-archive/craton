@@ -747,6 +747,87 @@ class APIV1ProjectsTest(APIV1Test):
         resp = self.get('v1/projects')
         self.assertEqual(resp.status_code, 401)
 
+    @mock.patch.object(dbapi, 'projects_get_by_id')
+    def test_project_get_by_id(self, mock_project):
+        proj1 = fake_resources.PROJECT1
+        mock_project.return_value = proj1
+
+        resp = self.get('v1/projects/{}'.format(proj1.id))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json['id'], proj1.id)
+
+    @mock.patch.object(dbapi, 'projects_get_by_name')
+    def test_project_get_by_name(self, mock_projects):
+        proj1 = fake_resources.PROJECT1
+        return_value = [proj1]
+        mock_projects.return_value = return_value
+
+        resp = self.get('v1/projects?name=project1')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(len(resp.json), 1)
+        self.assertEqual(resp.json[0]['id'], proj1.id)
+
+
+class APIV1ProjectsVariablesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'projects_get_by_id')
+    def test_projects_get_variables(self, mock_project):
+        mock_project.return_value = fake_resources.PROJECT1
+        resp = self.get(
+            'v1/projects/{}/variables'.format(fake_resources.PROJECT1.id)
+        )
+        expected = {"variables": {"key1": "value1", "key2": "value2"}}
+        self.assertEqual(resp.json, expected)
+
+    @mock.patch.object(dbapi, 'projects_variables_update')
+    def test_projects_put_variables(self, mock_project):
+        proj1 = fake_resources.PROJECT1
+        db_return_value = copy.deepcopy(proj1)
+        db_return_value.variables["a"] = "b"
+        mock_project.return_value = db_return_value
+        payload = {"a": "b"}
+        db_data = payload.copy()
+        resp = self.put(
+            'v1/projects/{}/variables'.format(proj1.id),
+            data=payload
+        )
+        self.assertEqual(resp.status_code, 200)
+        mock_project.assert_called_once_with(mock.ANY, proj1.id, db_data)
+        expected = {
+            "variables": {"key1": "value1", "key2": "value2", "a": "b"},
+        }
+        self.assertDictEqual(expected, resp.json)
+
+    @mock.patch.object(dbapi, 'projects_variables_update')
+    def test_projects_put_bad_data_type(self, mock_project):
+        payload = ["a", "b"]
+        resp = self.put(
+            'v1/projects/{}/variables'.format(fake_resources.PROJECT1.id),
+            data=payload
+        )
+        self.assertEqual(400, resp.status_code)
+        mock_project.assert_not_called()
+
+    @mock.patch.object(dbapi, 'projects_variables_delete')
+    def test_cells_delete_variables(self, mock_project):
+        proj1 = fake_resources.PROJECT1
+        payload = {"key1": "value1"}
+        db_data = payload.copy()
+        resp = self.delete(
+            'v1/projects/{}/variables'.format(proj1.id), data=payload
+        )
+        self.assertEqual(resp.status_code, 204)
+        mock_project.assert_called_once_with(mock.ANY, proj1.id, db_data)
+
+    @mock.patch.object(dbapi, 'cells_variables_delete')
+    def test_projects_delete_bad_data_type(self, mock_project):
+        payload = ["a", "b"]
+        resp = self.delete(
+            'v1/projects/{}/variables'.format(fake_resources.PROJECT1.id),
+            data=payload
+        )
+        self.assertEqual(400, resp.status_code)
+        mock_project.assert_not_called()
+
 
 class APIV1UsersTest(APIV1Test):
     @mock.patch.object(dbapi, 'users_create')
