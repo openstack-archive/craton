@@ -23,11 +23,18 @@ USERNAME="demo"
 TOKEN="demo"
 PROJECT="b9f10eca66ac4c279c139d01e65f96b4"
 
-###################################
-# Create initial project and user #
-###################################
-mysql -u root craton -e "INSERT into projects (created_at, updated_at, name, id) values (NOW(), NOW(), '$USERNAME', '$PROJECT')"
+BOOTSTRAP_USERNAME="bootstrap"
+BOOTSTRAP_TOKEN="bootstrap"
+
+PROJECT_DISCRIMINATOR='project'
+
+####################################
+# Create initial project and users #
+####################################
+PROJECT_VA_ID=$(mysql -u root craton -e "INSERT into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), '$PROJECT_DISCRIMINATOR'); SELECT LAST_INSERT_ID();" | grep -Eo '[0-9]+')
+mysql -u root craton -e "INSERT into projects (created_at, updated_at, name, variable_association_id, id) values (NOW(), NOW(), '$USERNAME', $PROJECT_VA_ID, '$PROJECT')"
 mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_admin) values (NOW(), NOW(), '$PROJECT', '$USERNAME', '$TOKEN', False)"
+mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$BOOTSTRAP_USERNAME', '$BOOTSTRAP_TOKEN', True, True)"
 
 #########################
 # Start the API service #
