@@ -1,6 +1,7 @@
 """SQLAlchemy backend implementation."""
 
 import sys
+import uuid
 
 from oslo_config import cfg
 from oslo_db import exception as db_exc
@@ -8,7 +9,6 @@ from oslo_db import options as db_options
 from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
-from oslo_utils import uuidutils
 
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
@@ -140,6 +140,7 @@ def _get_resource_model(resource):
         ),
         "networks": models.Network,
         "regions": models.Region,
+        "projects": models.Project,
     }
     return resource_models[resource]
 
@@ -476,29 +477,31 @@ def hosts_labels_delete(context, host_id, labels):
     return _device_labels_delete(context, 'hosts', host_id, labels)
 
 
-@require_admin_context
 def projects_get_all(context, filters, pagination_params):
     """Get all the projects."""
     session = get_session()
     query = model_query(context, models.Project, session=session)
+    if "vars" in filters:
+        query = add_var_filters_to_query(query, filters)
     return _paginate(context, query, models.Project, session, filters,
                      pagination_params)
 
 
-@require_admin_context
-def projects_get_by_name(context, project_name):
+def projects_get_by_name(context, project_name, filters, pagination_params):
     """Get all projects that match the given name."""
     query = model_query(context, models.Project)
     query = query.filter(models.Project.name.like(project_name))
+    if "vars" in filters:
+        query = add_var_filters_to_query(query, filters)
     try:
-        return query.all()
+        return _paginate(context, query, models.Project, session, filters,
+                         pagination_params)
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
     except Exception as err:
         raise exceptions.UnknownException(message=err)
 
 
-@require_admin_context
 def projects_get_by_id(context, project_id):
     """Get project by its id."""
     query = model_query(context, models.Project)
@@ -517,7 +520,7 @@ def projects_create(context, values):
     session = get_session()
     project = models.Project()
     if not values.get('id'):
-        values['id'] = uuidutils.generate_uuid()
+        values['id'] = uuid.uuid4()
     with session.begin():
         project.update(values)
         project.save(session)

@@ -12,6 +12,13 @@ FAKE_DATA_GEN_USERNAME = 'demo'
 FAKE_DATA_GEN_TOKEN = 'demo'
 FAKE_DATA_GEN_PROJECT_ID = 'b9f10eca66ac4c279c139d01e65f96b4'
 
+FAKE_DATA_GEN_BOOTSTRAP_USERNAME = 'bootstrap'
+FAKE_DATA_GEN_BOOTSTRAP_TOKEN = 'bootstrap'
+
+HEADER_TOKEN = 'X-Auth-Token'
+HEADER_USERNAME = 'X-Auth-User'
+HEADER_PROJECT = 'X-Auth-Project'
+
 
 class DockerSetup(threading.Thread):
 
@@ -148,17 +155,27 @@ def setup_database(container_ip):
     # isolate all test from any external scripts.
     projects = meta.tables['projects']
     users = meta.tables['users']
+    variable_assn = meta.tables['variable_association']
 
     with contextlib.closing(engine.connect()) as conn:
         transaction = conn.begin()
+        result = conn.execute(variable_assn.insert(),
+                              discriminator='project')
         conn.execute(projects.insert(),
                      name=FAKE_DATA_GEN_USERNAME,
-                     id=FAKE_DATA_GEN_PROJECT_ID)
+                     id=FAKE_DATA_GEN_PROJECT_ID,
+                     variable_association_id=result.inserted_primary_key[0])
         conn.execute(users.insert(),
                      project_id=FAKE_DATA_GEN_PROJECT_ID,
                      username=FAKE_DATA_GEN_USERNAME,
                      api_key=FAKE_DATA_GEN_TOKEN,
                      is_admin=True)
+        conn.execute(users.insert(),
+                     project_id=FAKE_DATA_GEN_PROJECT_ID,
+                     username=FAKE_DATA_GEN_BOOTSTRAP_USERNAME,
+                     api_key=FAKE_DATA_GEN_BOOTSTRAP_TOKEN,
+                     is_admin=True,
+                     is_root=True)
         transaction.commit()
 
 
@@ -173,9 +190,9 @@ class TestCase(testtools.TestCase):
             data = _container.container_data
             self.service_ip = data['NetworkSettings']['IPAddress']
             self.url = 'http://{}:8080'.format(self.service_ip)
-            self.session.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
-            self.session.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
-            self.session.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
+            self.session.headers[HEADER_PROJECT] = FAKE_DATA_GEN_PROJECT_ID
+            self.session.headers[HEADER_USERNAME] = FAKE_DATA_GEN_USERNAME
+            self.session.headers[HEADER_TOKEN] = FAKE_DATA_GEN_TOKEN
 
         setup_database(self.service_ip)
 
