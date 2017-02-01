@@ -26,4 +26,5 @@ class TestCase(testtools.TestCase):
         self.context = make_context(auth_token='fake-token',
                                     user='fake-user',
                                     tenant='fake-tenant',
-                                    is_admin=True)
+                                    is_admin=True,
+                                    is_admin_project=True)

@@ -42,7 +42,13 @@ class Projects(base.Resource):
         )
         headers = {'Location': location}
 
-        return jsonutils.to_primitive(project_obj), 201, headers
+        project = jsonutils.to_primitive(project_obj)
+        if 'variables' in request_data:
+            project["variables"] = \
+                jsonutils.to_primitive(project_obj.variables)
+        else:
+            project["variables"] = {}
+        return project, 201, headers
 
 
 class ProjectById(base.Resource):
@@ -51,10 +57,41 @@ class ProjectById(base.Resource):
     def get(self, context, id):
         """Get a project details by id. Requires super admin privileges."""
         project_obj = dbapi.projects_get_by_id(context, id)
-        return jsonutils.to_primitive(project_obj), 200, None
+        project = jsonutils.to_primitive(project_obj, convert_instances=True)
+        project['variables'] = jsonutils.to_primitive(project_obj.variables)
+        return project, 200, None
 
     @base.http_codes
     def delete(self, context, id):
         """Delete existing project. Requires super admin privileges."""
         dbapi.projects_delete(context, id)
+        return None, 204, None
+
+
+class ProjectsVariables(base.Resource):
+
+    @base.http_codes
+    def get(self, context, id):
+        """Get variables for given project. Requires super admin privileges."""
+        obj = dbapi.projects_get_by_id(context, id)
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def put(self, context, id, request_data):
+        """
+        Update existing project variables, or create if it does
+        not exist. Requires super admin privileges.
+        """
+        obj = dbapi.projects_variables_update(context, id, request_data)
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def delete(self, context, id, request_data):
+        """Delete project variables. Requires super admin privileges."""
+        dbapi.projects_variables_delete(context, id, request_data)
+        # NOTE(sulo): this is not that great. Find a better way to do this.
+        # We can pass multiple keys suchs as key1=one key2=two etc. but not
+        # the best way to do this.
         return None, 204, None
