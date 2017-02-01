@@ -11,7 +11,7 @@ from craton.api.v1.resources.inventory import networks
 
 VARS_RESOLVE = ", ".join(map(repr, ("hosts", )))
 VARS_NOT_RESOLVE = ", ".join(
-    map(repr, ("network-devices", "cells", "regions", "networks"))
+    map(repr, ("network-devices", "cells", "regions", "networks", "projects"))
 )
 
 routes = [
