@@ -1,3 +1,5 @@
+import copy
+
 from oslo_utils import uuidutils
 
 from craton import exceptions
@@ -14,19 +16,19 @@ class ProjectsDBTestCase(base.DBTestCase):
 
     def test_create_project(self):
         # Set root, as only admin project can create other projects
-        self.context.is_admin_project = True
         project = dbapi.projects_create(self.context, project1)
         self.assertTrue(uuidutils.is_uuid_like(project['id']))
         self.assertEqual(project['name'], project1['name'])
 
     def test_create_project_no_root_fails(self):
+        context = copy.deepcopy(self.context)
+        context.is_admin_project = False
         self.assertRaises(exceptions.AdminRequired,
                           dbapi.projects_create,
-                          self.context,
+                          context,
                           project1)
 
     def test_project_get_all(self):
-        self.context.is_admin_project = True
         dbapi.projects_create(self.context, project1)
         dbapi.projects_create(self.context, project2)
 
@@ -34,19 +36,42 @@ class ProjectsDBTestCase(base.DBTestCase):
         self.assertEqual(len(res), 2)
 
     def test_project_get_no_admin_project_raises(self):
-        self.context.is_admin_project = True
         dbapi.projects_create(self.context, project1)
         dbapi.projects_create(self.context, project2)
 
         # Now set admin_project = false to become normal project user
-        self.context.is_admin_project = False
+        context = copy.deepcopy(self.context)
+        context.is_admin_project = False
         self.assertRaises(exceptions.AdminRequired,
                           dbapi.projects_get_all,
-                          self.context,
+                          context,
                           {}, default_pagination)
 
     def test_project_get_by_id(self):
-        self.context.is_admin_project = True
         project = dbapi.projects_create(self.context, project1)
         res = dbapi.projects_get_by_id(self.context, project['id'])
         self.assertEqual(str(res['id']), project['id'])
+
+    def test_project_variables_update_does_update_variables(self):
+        create_res = dbapi.projects_create(self.context, project1)
+        res = dbapi.projects_get_by_id(self.context, create_res.id)
+        self.assertEqual(res.variables, {})
+        variables = {"key1": "value1", "key2": "value2"}
+        res = dbapi.projects_variables_update(self.context, res.id, variables)
+        self.assertEqual(res.variables, variables)
+        new_variables = {"key1": "tom", "key2": "cat"}
+        res = dbapi.projects_variables_update(self.context, res.id,
+                                              new_variables)
+        self.assertEqual(res.variables, new_variables)
+
+    def test_project_variables_delete(self):
+        create_res = dbapi.projects_create(self.context, project1)
+        res = dbapi.projects_get_by_id(self.context, create_res.id)
+        self.assertEqual(res.variables, {})
+        variables = {"key1": "value1", "key2": "value2"}
+        res = dbapi.projects_variables_update(self.context, res.id, variables)
+        self.assertEqual(res.variables, variables)
+        # NOTE(sulo): we delete variables by their key
+        res = dbapi.projects_variables_delete(self.context, res.id,
+                                              {"key1": "key1"})
+        self.assertEqual(res.variables, {"key2": "value2"})
