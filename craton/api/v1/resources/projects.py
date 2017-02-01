@@ -51,3 +51,32 @@ class ProjectById(base.Resource):
         """Delete existing project. Requires super admin privileges."""
         dbapi.projects_delete(context, id)
         return None, 204, None
+
+
+class ProjectsVariables(base.Resource):
+
+    @base.http_codes
+    def get(self, context, id):
+        """Get variables for given project."""
+        obj = dbapi.projects_get_by_id(context, id)
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def put(self, context, id, request_data):
+        """
+        Update existing project variables, or create if it does
+        not exist.
+        """
+        obj = dbapi.projects_variables_update(context, id, request_data)
+        resp = {"variables": jsonutils.to_primitive(obj.variables)}
+        return resp, 200, None
+
+    @base.http_codes
+    def delete(self, context, id, request_data):
+        """Delete project variables."""
+        dbapi.projects_variables_delete(context, id, request_data)
+        # NOTE(sulo): this is not that great. Find a better way to do this.
+        # We can pass multiple keys suchs as key1=one key2=two etc. but not
+        # the best way to do this.
+        return None, 204, None

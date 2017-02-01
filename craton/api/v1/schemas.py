@@ -344,6 +344,7 @@ DefinitionProject = {
         "name": {
             "type": "string",
         },
+        "variables": DefinitionVariablesSource,
     },
 }
 
