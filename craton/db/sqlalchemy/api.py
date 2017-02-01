@@ -523,6 +523,8 @@ def projects_get_all(context, filters, pagination_params):
     """Get all the projects."""
     session = get_session()
     query = model_query(context, models.Project, session=session)
+    if "vars" in filters:
+        query = add_var_filters_to_query(query, filters)
     return _paginate(context, query, models.Project, session, filters,
                      pagination_params)
 
@@ -532,6 +534,8 @@ def projects_get_by_name(context, project_name, filters, pagination_params):
     """Get all projects that match the given name."""
     query = model_query(context, models.Project)
     query = query.filter(models.Project.name.like(project_name))
+    if "vars" in filters:
+        query = add_var_filters_to_query(query, filters)
     try:
         return _paginate(context, query, models.Project, session, filters,
                          pagination_params)
@@ -575,6 +579,40 @@ def projects_delete(context, project_id):
         query = model_query(context, models.Project, session=session)
         query = query.filter_by(id=project_id)
         query.delete()
+
+
+@require_admin_context
+def projects_variables_update(context, project_id, data):
+    """Update existing projects variables or create when
+    its not present.
+    """
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Project, session=session,
+                            project_only=True)
+        query = query.filter_by(id=project_id)
+        project_ref = query.with_for_update().one()
+        for key in data:
+            project_ref.variables[key] = data[key]
+        return project_ref
+
+
+@require_admin_context
+def projects_variables_delete(context, project_id, data):
+    """Delete the existing key from cells variables."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Project, session=session,
+                            project_only=True)
+        query = query.filter_by(id=project_id)
+        project_ref = query.with_for_update().one()
+        for key in data:
+            try:
+                del project_ref.variables[data[key]]
+            except KeyError:
+                # This key does not exist so just ignore
+                pass
+        return project_ref
 
 
 @require_project_admin_context
