@@ -227,7 +227,7 @@ class VariableMixin(object):
         return blamed
 
 
-class Project(Base):
+class Project(Base, VariableMixin):
     """Supports multitenancy for all other schema elements."""
     __tablename__ = 'projects'
     id = Column(UUIDType(binary=False), primary_key=True)
@@ -359,12 +359,12 @@ class Device(Base, VariableMixin):
 
     @property
     def resolution_order(self):
-        # TODO(jimbaker) add self.project to resolution_order
         return list(itertools.chain(
             [self],
             self.ancestors,
             [self.cell] if self.cell else [],
-            [self.region]))
+            [self.region],
+            [self.project]))
 
     __mapper_args__ = {
         'polymorphic_on': type,
