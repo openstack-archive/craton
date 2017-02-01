@@ -47,6 +47,7 @@ class APIV1HostTest(APIV1ResourceWithVariablesTestCase):
         self.assertEqual('host1', host['name'])
 
     def test_create_host_supports_vars_ops(self):
+        print("TEM self.resource: {}".format(self.resource))
         host = self.create_host('host1', 'server', '192.168.1.1')
         self.assert_vars_get_expected(host['id'], {})
         self.assert_vars_can_be_set(host['id'])
