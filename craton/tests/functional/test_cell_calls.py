@@ -45,7 +45,7 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
         self.assertEqual('cell-a', cell['name'])
         self.assertEqual(variables, cell['variables'])
 
-    def test_create_region_supports_vars_ops(self):
+    def test_create_cell_supports_vars_ops(self):
         cell = self.create_cell('new-cell', {'a': 'b'})
         self.assert_vars_get_expected(cell['id'], {'a': 'b'})
         self.assert_vars_can_be_set(cell['id'])
