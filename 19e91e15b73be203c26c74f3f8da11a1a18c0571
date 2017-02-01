@@ -1,0 +1,11 @@
+Code-Review+1: Thomas Maddox <thomas.maddox@rackspace.com>
+Code-Review+1: Jim Baker <jim.baker@python.org>
+Code-Review+2: Ian Cordasco <sigmavirus24@gmail.com>
+Code-Review+1: Syed Ahsan Shamim Zaidi <ahsanmohsin04@yahoo.com>
+Workflow+1: Jim Baker <jim.baker@python.org>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 01 Feb 2017 20:47:09 +0000
+Reviewed-on: https://review.openstack.org/408784
+Project: openstack/craton
+Branch: refs/heads/master
