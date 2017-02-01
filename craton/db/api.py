@@ -190,6 +190,18 @@ def projects_delete(context, project_id):
     return IMPL.projects_delete(context, project_id)
 
 
+def projects_variables_update(context, project_id, data):
+    """Update existing projects variables or create when
+    it's not present.
+    """
+    return IMPL.projects_variables_update(context, project_id, data)
+
+
+def projects_variables_delete(context, project_id, data):
+    """Delete the existing key from projects variables."""
+    return IMPL.projects_variables_delete(context, project_id, data)
+
+
 # Users
 
 def users_get_all(context, filters, pagination_params):

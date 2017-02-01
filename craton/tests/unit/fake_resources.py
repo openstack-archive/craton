@@ -1,4 +1,5 @@
 import copy
+import uuid
 
 
 """
@@ -8,15 +9,19 @@ objects for test.
 
 
 class Project(object):
-    def __init__(self, name):
+    def __init__(self, id, name, variables):
+        self.id = id
         self.name = name
+        self.variables = variables
 
     def items(self):
         return iter(self.__dict__.items())
 
 
-PROJECT1 = Project("project1")
-PROJECT2 = Project("project2")
+PROJECT1 = Project(str(uuid.uuid4()), "project1", {"key1": "value1",
+                                                   "key2": "value2"})
+PROJECT2 = Project(str(uuid.uuid4()), "project2", {"key1": "value1",
+                                                   "key2": "value2"})
 
 
 class User(object):
