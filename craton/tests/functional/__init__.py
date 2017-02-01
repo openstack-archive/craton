@@ -12,6 +12,9 @@ FAKE_DATA_GEN_USERNAME = 'demo'
 FAKE_DATA_GEN_TOKEN = 'demo'
 FAKE_DATA_GEN_PROJECT_ID = 'b9f10eca66ac4c279c139d01e65f96b4'
 
+FAKE_DATA_GEN_BOOTSTRAP_USERNAME = 'bootstrap'
+FAKE_DATA_GEN_BOOTSTRAP_TOKEN = 'bootstrap'
+
 
 class DockerSetup(threading.Thread):
 
@@ -159,12 +162,18 @@ def setup_database(container_ip):
                      username=FAKE_DATA_GEN_USERNAME,
                      api_key=FAKE_DATA_GEN_TOKEN,
                      is_admin=True)
+        conn.execute(users.insert(),
+                     project_id=FAKE_DATA_GEN_PROJECT_ID,
+                     username=FAKE_DATA_GEN_BOOTSTRAP_USERNAME,
+                     api_key=FAKE_DATA_GEN_BOOTSTRAP_TOKEN,
+                     is_admin=True,
+                     is_root=True)
         transaction.commit()
 
 
 class TestCase(testtools.TestCase):
 
-    def setUp(self):
+    def setUp(self, use_root=False):
         """Base setup provides container data back individual tests."""
         super(TestCase, self).setUp()
         self.container_setup_error = _container.error
@@ -173,16 +182,32 @@ class TestCase(testtools.TestCase):
             data = _container.container_data
             self.service_ip = data['NetworkSettings']['IPAddress']
             self.url = 'http://{}:8080/'.format(self.service_ip)
+            # NOTE(thomasem): Currently project ID is required even when you're
+            # interacting with the Projects resource.
+            # LP Bug: https://bugs.launchpad.net/craton/+bug/1661390
             self.session.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
-            self.session.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
-            self.session.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
+            self.session.headers.update(self._test_credentials(root=use_root))
 
         setup_database(self.service_ip)
 
     def tearDown(self):
         super(TestCase, self).tearDown()
 
-    def get(self, url, headers=None, **params):
+    @staticmethod
+    def _test_credentials(root=False):
+        USER = 'X-Auth-User'
+        TOKEN = 'X-Auth-Token'
+        if root:
+            return {
+                USER: FAKE_DATA_GEN_BOOTSTRAP_USERNAME,
+                TOKEN: FAKE_DATA_GEN_BOOTSTRAP_TOKEN
+            }
+        return {
+            USER: FAKE_DATA_GEN_USERNAME,
+            TOKEN: FAKE_DATA_GEN_TOKEN
+        }
+
+    def get(self, url, headers=None, root=False, **params):
         resp = self.session.get(
             url, verify=False, headers=headers, params=params,
         )
