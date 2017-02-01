@@ -193,7 +193,7 @@ class FlaskValidatorAdaptor(object):
         value = self.type_convert(value)
         errors = list(e.message for e in self.validator.iter_errors(value))
         if errors:
-            abort(422, message='Unprocessable Entity', errors=errors)
+            abort(400, message='Bad Request', errors=errors)
         return merge_default(self.validator.schema, value)
 
 
