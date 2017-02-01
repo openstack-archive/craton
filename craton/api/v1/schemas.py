@@ -344,6 +344,7 @@ DefinitionProject = {
         "name": {
             "type": "string",
         },
+        "variables": DefinitionVariablesSource,
     },
 }
 
@@ -952,6 +953,10 @@ validators = {
                     "type": "integer",
                     "description": "Last project ID of the previous page",
                 },
+                "vars": {
+                    "type": "string",
+                    "description": "variable filters to get a project",
+                },
             },
         },
     },
@@ -961,6 +966,14 @@ validators = {
     ("projects_id", "DELETE"): {
     },
     ("projects_id", "GET"): {
+    },
+    ("projects_id_variables", "PUT"): {
+        "json": DefinitionVariablesSource,
+    },
+    ("projects_id_variables", "GET"): {
+    },
+    ("projects_id_variables", "DELETE"): {
+        "json": DefinitionVariablesSource,
     },
     ("users", "GET"): {
         "args": {
@@ -1795,6 +1808,70 @@ filters = {
         },
     },
     ("regions_id", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("projects_id_variables", "GET"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("projects_id_variables", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "variables": DefinitionVariablesSource,
+                },
+            },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("projects_id_variables", "DELETE"): {
         204: {
             "headers": None,
             "schema": None,
