@@ -36,7 +36,7 @@ class APIV1CellTest(TestCase):
         url = self.url + '/v1/cells'
         payload = {'region_id': self.region['id']}
         cell = self.post(url, data=payload)
-        self.assertEqual(422, cell.status_code)
+        self.assertEqual(400, cell.status_code)
 
     def test_cell_create_with_duplicate_name_fails(self):
         self.create_cell('test-cell')

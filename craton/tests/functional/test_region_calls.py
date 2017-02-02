@@ -42,7 +42,7 @@ class APIV1RegionTest(TestCase):
         values = {"note": "This is region one."}
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         err_msg = ["'name' is a required property"]
         self.assertEqual(resp.json()['errors'], err_msg)
 

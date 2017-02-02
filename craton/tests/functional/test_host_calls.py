@@ -38,21 +38,21 @@ class APIV1HostTest(TestCase):
         payload = {'device_type': 'server', 'ip_address': '192.168.1.1',
                    'region_id': self.region['id']}
         host = self.post(url, data=payload)
-        self.assertEqual(422, host.status_code)
+        self.assertEqual(400, host.status_code)
 
     def test_create_with_missing_ip_fails(self):
         url = self.url + '/v1/hosts'
         payload = {'name': 'test', 'device_type': 'server',
                    'region_id': self.region['id']}
         host = self.post(url, data=payload)
-        self.assertEqual(422, host.status_code)
+        self.assertEqual(400, host.status_code)
 
     def test_create_with_missing_type_fails(self):
         url = self.url + '/v1/hosts'
         payload = {'name': 'who', 'ip_address': '192.168.1.1',
                    'region_id': self.region['id']}
         host = self.post(url, data=payload)
-        self.assertEqual(422, host.status_code)
+        self.assertEqual(400, host.status_code)
 
     def test_host_get_all_for_region(self):
         self.create_host('host1', 'server', '192.168.1.1')

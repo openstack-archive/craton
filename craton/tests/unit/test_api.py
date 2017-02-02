@@ -224,7 +224,7 @@ class APIV1CellsTest(APIV1Test):
         # data is missing required cell name
         data = {'region_id': 1}
         resp = self.post('v1/cells', data=data)
-        self.assertEqual(422, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_with_invalid_property(self, mock_cell):
@@ -264,7 +264,7 @@ class APIV1CellsVariablesTest(APIV1Test):
     def test_cells_put_bad_data_type(self, mock_cell):
         payload = ["a", "b"]
         resp = self.put('v1/cells/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_cell.assert_not_called()
 
     @mock.patch.object(dbapi, 'cells_variables_delete')
@@ -279,7 +279,7 @@ class APIV1CellsVariablesTest(APIV1Test):
     def test_cells_delete_bad_data_type(self, mock_cell):
         payload = ["a", "b"]
         resp = self.delete('v1/cells/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_cell.assert_not_called()
 
 
@@ -407,7 +407,7 @@ class APIV1RegionsTest(APIV1Test):
         mock_region.return_value = None
         data = {}
         resp = self.post('v1/regions', data=data)
-        self.assertEqual(422, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
 
 class APIV1RegionsVariablesTest(APIV1Test):
@@ -437,7 +437,7 @@ class APIV1RegionsVariablesTest(APIV1Test):
     def test_regions_put_bad_data_type(self, mock_region):
         payload = ["a", "b"]
         resp = self.put('v1/regions/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_region.assert_not_called()
 
     @mock.patch.object(dbapi, 'regions_variables_delete')
@@ -452,7 +452,7 @@ class APIV1RegionsVariablesTest(APIV1Test):
     def test_regions_delete_bad_data_type(self, mock_region):
         payload = ["a", "b"]
         resp = self.delete('v1/regions/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_region.assert_not_called()
 
 
@@ -550,7 +550,7 @@ class APIV1HostsLabelsTest(APIV1Test):
         payload = {"labels": {"a": "b"}}
         mock_host.return_value = fake_resources.HOST4
         resp = self.put('v1/hosts/1/labels', data=payload)
-        self.assertEqual(422, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
     @mock.patch.object(dbapi, 'hosts_labels_delete')
     def test_hosts_delete_labels(self, mock_host):
@@ -564,7 +564,7 @@ class APIV1HostsLabelsTest(APIV1Test):
     def test_hosts_delete_bad_data_type(self, mock_host):
         payload = ["label1", "label2"]
         resp = self.delete('v1/hosts/1/labels', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_host.assert_not_called()
 
 
@@ -734,7 +734,7 @@ class APIV1HostsVariablesTest(APIV1Test):
     def test_hosts_put_bad_data_type(self, mock_host):
         payload = ["a", "b"]
         resp = self.put('v1/hosts/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_host.assert_not_called()
 
     @mock.patch.object(dbapi, 'hosts_variables_delete')
@@ -749,7 +749,7 @@ class APIV1HostsVariablesTest(APIV1Test):
     def test_hosts_delete_bad_data_type(self, mock_host):
         payload = ["a", "b"]
         resp = self.delete('v1/hosts/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_host.assert_not_called()
 
 
@@ -889,7 +889,7 @@ class APIV1NetworksTest(APIV1Test):
         # data is missing entries
         data = {'region_id': 1}
         resp = self.post('v1/networks', data=data)
-        self.assertEqual(422, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
     @mock.patch.object(dbapi, 'networks_create')
     def test_create_networks_with_invalid_property(self, mock_network):
@@ -971,7 +971,7 @@ class APIV1NetworksVariablesTest(APIV1Test):
     def test_networks_put_bad_data_type(self, mock_network):
         payload = ["a", "b"]
         resp = self.put('v1/networks/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_network.assert_not_called()
 
     @mock.patch.object(dbapi, 'networks_variables_delete')
@@ -986,7 +986,7 @@ class APIV1NetworksVariablesTest(APIV1Test):
     def test_networks_delete_bad_data_type(self, mock_network):
         payload = ["a", "b"]
         resp = self.delete('v1/networks/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_network.assert_not_called()
 
 
@@ -1103,7 +1103,7 @@ class APIV1NetworkDevicesTest(APIV1Test):
         # data is missing entry
         data = {'name': 'Sample'}
         resp = self.post('/v1/network-devices', data=data)
-        self.assertEqual(422, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_netdevices_with_invalid_property(self, mock_devices):
@@ -1145,7 +1145,7 @@ class APIV1NetworkDevicesLabelsTest(APIV1Test):
     def test_network_devices_delete_bad_data_type(self, mock_network_device):
         payload = ["label1", "label2"]
         resp = self.delete('v1/network-devices/1/labels', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_network_device.assert_not_called()
 
 
@@ -1177,7 +1177,7 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
     def test_network_devices_put_bad_data_type(self, mock_network_device):
         payload = ["a", "b"]
         resp = self.put('v1/network-devices/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_network_device.assert_not_called()
 
     @mock.patch.object(dbapi, 'network_devices_variables_delete')
@@ -1192,7 +1192,7 @@ class APIV1NetworkDevicesVariablesTest(APIV1Test):
     def test_network_devices_delete_bad_data_type(self, mock_network_device):
         payload = ["a", "b"]
         resp = self.delete('v1/network-devices/1/variables', data=payload)
-        self.assertEqual(resp.status_code, 422)
+        self.assertEqual(resp.status_code, 400)
         mock_network_device.assert_not_called()
 
 
@@ -1245,7 +1245,7 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         # data is missing entry
         data = {'name': 'sample'}
         resp = self.post('/v1/network-interfaces', data=data)
-        self.assertEqual(422, resp.status_code)
+        self.assertEqual(400, resp.status_code)
 
     @mock.patch.object(dbapi, 'network_interfaces_create')
     def test_network_interfaces_create_invalid_property(self, fake_interfaces):
