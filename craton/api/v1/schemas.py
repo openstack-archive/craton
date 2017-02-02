@@ -1,5 +1,6 @@
 DefinitionVariablesSource = {
     "type": "object",
+    "additionalProperties": False,
     "patternProperties": {
         "^.+": {
             "anyOf": [
@@ -37,6 +38,7 @@ DefinitionsHost = {
         "device_type",
     ],
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -89,6 +91,7 @@ DefinitionsHost = {
 
 DefinitionsHostId = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -141,6 +144,7 @@ DefinitionsCell = {
         "region_id",
     ],
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -170,6 +174,7 @@ DefinitionsCell = {
 
 DefinitionsCellId = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -200,6 +205,7 @@ DefinitionsCellId = {
 
 DefinitionsLabel = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "labels": {
             "type": "array",
@@ -212,6 +218,7 @@ DefinitionsLabel = {
 
 DefinitionsError = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "fields": {
             "type": "string",
@@ -231,6 +238,7 @@ DefinitionsRegion = {
         "name",
     ],
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -264,6 +272,7 @@ DefinitionsRegion = {
 
 DefinitionsRegionId = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -298,6 +307,7 @@ DefinitionsRegionId = {
 
 DefinitionUser = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -331,6 +341,7 @@ DefinitionUser = {
 
 DefinitionProject = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -355,6 +366,7 @@ DefinitionNetwork = {
         "netmask",
     ],
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -398,6 +410,7 @@ DefinitionNetwork = {
 
 DefinitionNetworkId = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -447,6 +460,7 @@ DefinitionNetworkInterface = {
         "ip_address",
     ],
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -507,6 +521,7 @@ DefinitionNetworkInterface = {
 
 DefinitionNetworkInterfaceId = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -571,6 +586,7 @@ DefinitionNetworkDevice = {
         "ip_address",
     ],
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -629,6 +645,7 @@ DefinitionNetworkDevice = {
 
 DefinitionNetworkDeviceId = {
     "type": "object",
+    "additionalProperties": False,
     "properties": {
         "created_at": {
             "type": "string",
@@ -685,9 +702,17 @@ DefinitionNetworkDeviceId = {
     },
 }
 
+DefinitionNoParams = {
+    "type": "object",
+    "properties": {},
+    "maxProperties": 0,
+    "additionalProperties": False,
+}
+
 validators = {
     ("ansible_inventory", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "region_id": {
                     "default": None,
@@ -712,6 +737,7 @@ validators = {
         "json": DefinitionsLabel,
     },
     ("hosts_labels", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("hosts_labels", "DELETE"): {
         "json": DefinitionsLabel,
@@ -720,6 +746,7 @@ validators = {
     },
     ("hosts_id", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "resolved-values": {
                     "default": True,
@@ -730,6 +757,7 @@ validators = {
     },
     ("hosts_id", "PUT"): {
         "json": {
+            "additionalProperties": False,
             "properties": {
                 "active": {
                     "type": "boolean",
@@ -752,6 +780,7 @@ validators = {
     },
     ("hosts_id_variables", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "resolved-values": {
                     "default": True,
@@ -762,6 +791,7 @@ validators = {
     },
     ("regions", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "name": {
                     "type": "string",
@@ -796,6 +826,7 @@ validators = {
         "json": DefinitionVariablesSource,
     },
     ("regions_id_variables", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("regions_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource,
@@ -805,6 +836,7 @@ validators = {
     },
     ("hosts", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "name": {
                     "type": "string",
@@ -855,9 +887,11 @@ validators = {
     ("cells_id", "DELETE"): {
     },
     ("cells_id", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("cells_id", "PUT"): {
         "json": {
+            "additionalProperties": False,
             "properties": {
                 "note": {
                     "type": "string",
@@ -873,6 +907,7 @@ validators = {
     },
     ("cells", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "region_id": {
                     "type": "string",
@@ -907,9 +942,11 @@ validators = {
     ("regions_id", "DELETE"): {
     },
     ("regions_id", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("regions_id", "PUT"): {
         "json": {
+            "additionalProperties": False,
             "properties": {
                 "name": {
                     "type": "string",
@@ -924,12 +961,14 @@ validators = {
         "json": DefinitionVariablesSource,
     },
     ("cells_id_variables", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("cells_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource,
     },
     ("projects", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "id": {
                     "default": None,
@@ -961,9 +1000,11 @@ validators = {
     ("projects_id", "DELETE"): {
     },
     ("projects_id", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("users", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "id": {
                     "default": None,
@@ -995,9 +1036,11 @@ validators = {
     ("users_id", "DELETE"): {
     },
     ("users_id", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("network_devices", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "id": {
                     "type": "integer",
@@ -1045,6 +1088,7 @@ validators = {
     },
     ("network_devices_id", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "resolved-values": {
                     "default": True,
@@ -1057,6 +1101,7 @@ validators = {
         "json": DefinitionVariablesSource
     },
     ("network_devices_id_variables", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("network_devices_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource
@@ -1064,9 +1109,11 @@ validators = {
     ("networks_id", "DELETE"): {
     },
     ("networks_id", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("networks_id", "PUT"): {
         "json": {
+            "additionalProperties": False,
             "properties": {
                 "name": {
                     "type": "string",
@@ -1091,6 +1138,7 @@ validators = {
     },
     ("network_devices_id", "PUT"): {
         "json": {
+            "additionalProperties": False,
             "properties": {
                 "ip_address": {
                     "type": "string",
@@ -1120,12 +1168,14 @@ validators = {
         "json": DefinitionsLabel,
     },
     ("network_devices_labels", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("network_devices_labels", "PUT"): {
         "json": DefinitionsLabel,
     },
     ("network_interfaces", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "id": {
                     "type": "integer",
@@ -1163,9 +1213,11 @@ validators = {
     ("network_interfaces_id", "DELETE"): {
     },
     ("network_interfaces_id", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("network_interfaces_id", "PUT"): {
         "json": {
+            "additionalProperties": False,
             "properties": {
                 "name": {
                     "type": "string",
@@ -1199,6 +1251,7 @@ validators = {
     },
     ("networks", "GET"): {
         "args": {
+            "additionalProperties": False,
             "properties": {
                 "id": {
                     "type": "integer",
@@ -1242,6 +1295,7 @@ validators = {
         "json": DefinitionVariablesSource
     },
     ("networks_id_variables", "GET"): {
+        "args": DefinitionNoParams,
     },
     ("networks_id_variables", "DELETE"): {
         "json": DefinitionVariablesSource
@@ -1257,6 +1311,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "patternProperties": {
                     "^.+": {
                         "anyOf": [
@@ -1304,6 +1359,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -1327,6 +1383,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -1565,6 +1622,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -1588,6 +1646,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -1699,6 +1758,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -1722,6 +1782,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -2114,6 +2175,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -2137,6 +2199,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -2271,6 +2334,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },
@@ -2294,6 +2358,7 @@ filters = {
             "headers": None,
             "schema": {
                 "type": "object",
+                "additionalProperties": False,
                 "properties": {
                     "variables": DefinitionVariablesSource,
                 },

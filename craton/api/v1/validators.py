@@ -212,8 +212,12 @@ def request_validate(view):
             value = getattr(request, location, MultiDict())
             validator = FlaskValidatorAdaptor(schema)
             result = validator.validate(value)
-            kwargs[data_type[location]] = result
             LOG.info("Validated request %s: %s" % (location, result))
+            if schema.get("maxProperties") == 0:
+                continue
+            else:
+                kwargs[data_type[location]] = result
+
         context = request.environ['context']
         return view(*args, context=context, **kwargs)
 
