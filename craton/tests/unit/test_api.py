@@ -206,17 +206,37 @@ class APIV1CellsTest(APIV1Test):
         mock_cell.return_value = fake_resources.CELL1
         data = {'name': 'cell1', 'region_id': 1}
         resp = self.post('v1/cells', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/cells/1"
+        )
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_returns_cell_obj(self, mock_cell):
-        return_value = {'name': 'cell1', 'region_id': 1, 'id': 1,
-                        'variables': {}}
-        mock_cell.return_value = return_value
-        data = {'name': 'cell1', 'region_id': 1}
+        mock_cell.return_value = fake_resources.CELL1
+        data = {
+            'name': "cell1",
+            'region_id': 1,
+            'variables': {'key1': 'value1', 'key2': 'value2'},
+        }
         resp = self.post('v1/cells', data=data)
-        self.assertEqual(200, resp.status_code)
-        self.assertEqual(return_value, resp.json)
+
+        expected_result = {
+            'id': 1,
+            'name': 'cell1',
+            'region_id': 1,
+            'project_id': 1,
+            'variables': {'key1': 'value1', 'key2': 'value2'},
+        }
+        self.assertEqual(201, resp.status_code)
+        self.assertEqual(expected_result, resp.json)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/cells/1"
+        )
 
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_fails_with_invalid_data(self, mock_cell):
@@ -231,7 +251,12 @@ class APIV1CellsTest(APIV1Test):
         mock_cell.return_value = fake_resources.CELL1
         data = {'name': 'cell1', 'region_id': 1, 'foo': 'invalidproperty'}
         resp = self.post('v1/cells', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/cells/1"
+        )
         mock_cell.assert_called_once_with(
             mock.ANY, {'name': 'cell1', 'region_id': 1, 'project_id': None}
         )
@@ -376,14 +401,14 @@ class APIV1RegionsTest(APIV1Test):
         mock_region.return_value = fake_resources.REGION1
         data = {'name': 'region1'}
         resp = self.post('v1/regions', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_invalid_property_name(self, mock_region):
         mock_region.return_value = fake_resources.REGION1
         data = {'name': 'region1', 'foo': 'invalidpropertyname'}
         resp = self.post('v1/regions', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
         mock_region.assert_called_once_with(
             mock.ANY,
             {'project_id': None, 'name': 'region1'}
@@ -391,7 +416,9 @@ class APIV1RegionsTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'regions_create')
     def test_create_region_returns_region_obj(self, mock_region):
-        return_value = {'name': 'region1', 'project_id': 'abcd',
+        return_value = {'name': 'region1',
+                        'project_id': 'abcd',
+                        'id': 1,
                         'variables': {"key1": "value1", "key2": "value2"}}
         fake_region = fake_resources.REGION1
         fake_region.variables = {"key1": "value1", "key2": "value2"}
@@ -399,7 +426,7 @@ class APIV1RegionsTest(APIV1Test):
         data = {'name': 'region1',
                 'variables': {"key1": "value1", "key2": "value2"}}
         resp = self.post('v1/regions', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
         self.assertEqual(return_value, resp.json)
 
     @mock.patch.object(dbapi, 'regions_create')
@@ -645,40 +672,76 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_with_valid_data(self, mock_host):
         mock_host.return_value = fake_resources.HOST1
-        data = {'name': 'www.host1.com', 'region_id': 1,
-                'ip_address': '10.0.0.1', 'device_type': 'server',
+        data = {'name': 'www.craton.com', 'region_id': 1,
+                'ip_address': '192.168.1.1', 'device_type': 'server',
                 'active': True}
         resp = self.post('/v1/hosts', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/hosts/1"
+        )
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_returns_host_obj(self, mock_host):
-        return_value = {'name': 'www.host1.com', 'region_id': 1,
-                        'ip_address': '10.0.0.1', 'id': 1, 'variables': {},
-                        'device_type': 'server', 'active': True}
-        mock_host.return_value = return_value
-        data = {'name': 'www.host1.com', 'region_id': 1,
-                'ip_address': '10.0.0.1', 'device_type': 'server'}
+        mock_host.return_value = fake_resources.HOST1
+        data = {
+            'name': 'www.craton.com',
+            'region_id': 1,
+            'ip_address': '192.168.1.1',
+            'device_type': 'server',
+            'labels': [],
+            'variables': {"key1": "value1", "key2": "value2"},
+        }
         resp = self.post('v1/hosts', data=data)
-        self.assertEqual(200, resp.status_code)
-        self.assertEqual(return_value, resp.json)
+        self.assertEqual(201, resp.status_code)
+        expected_response = {
+            'id': 1,
+            'name': 'www.craton.com',
+            'region_id': 1,
+            'project_id': 1,
+            'ip_address': '192.168.1.1',
+            'device_type': 'server',
+            'labels': [],
+            'variables': {"key1": "value1", "key2": "value2"},
+        }
+        self.assertEqual(expected_response, resp.json)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/hosts/1"
+        )
 
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_invalid_property_name(self, mock_host):
-        return_value = {'name': 'www.host1.com', 'region_id': 1,
-                        'ip_address': '10.0.0.1', 'id': 1, 'variables': {},
-                        'device_type': 'server', 'active': True}
-        mock_host.return_value = return_value
-        data = {'name': 'www.host1.com', 'region_id': 1, 'foo': 'invalidprop',
-                'ip_address': '10.0.0.1', 'device_type': 'server'}
+        mock_host.return_value = fake_resources.HOST1
+        data = {'name': 'www.craton.com', 'region_id': 1, 'foo': 'invalidprop',
+                'ip_address': '192.168.1.1', 'device_type': 'server'}
         db_json = data.copy()
         db_json['project_id'] = None
         del db_json['foo']
 
         resp = self.post('v1/hosts', data=data)
 
-        self.assertEqual(200, resp.status_code)
-        self.assertEqual(return_value, resp.json)
+        expected_result = {
+            'device_type': 'server',
+            'id': 1,
+            'ip_address': '192.168.1.1',
+            'labels': [],
+            'name': 'www.craton.com',
+            'region_id': 1,
+            'project_id': 1,
+            'variables': {},
+        }
+
+        self.assertEqual(201, resp.status_code)
+        self.assertEqual(expected_result, resp.json)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/hosts/1"
+        )
         mock_host.assert_called_once_with(mock.ANY, db_json)
 
 
@@ -756,12 +819,19 @@ class APIV1HostsVariablesTest(APIV1Test):
 class APIV1ProjectsTest(APIV1Test):
     @mock.patch.object(dbapi, 'projects_create')
     def test_create_project(self, mock_project):
-        return_value = {'name': 'project1', 'id': 1}
-        mock_project.return_value = return_value
+        mock_project.return_value = fake_resources.PROJECT1
         data = {'name': 'project1'}
         resp = self.post('v1/projects', data=data)
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json['id'], 1)
+        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(
+            resp.json['id'],
+            "4534dcb4-dacd-474f-8afc-8bd5ab2d26e8"
+        )
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/projects/4534dcb4-dacd-474f-8afc-8bd5ab2d26e8"
+        )
 
     @mock.patch.object(dbapi, 'projects_get_all')
     def test_project_get_all(self, mock_projects):
@@ -778,7 +848,7 @@ class APIV1ProjectsTest(APIV1Test):
     def test_project_post_invalid_property(self, mock_projects):
         data = {'foo': 'isinvalidproperty'}
         resp = self.post('v1/projects', data=data)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 201)
         mock_projects.assert_called_once_with(mock.ANY, {})
 
     @mock.patch.object(dbapi, 'projects_get_all')
@@ -793,29 +863,35 @@ class APIV1UsersTest(APIV1Test):
     @mock.patch.object(dbapi, 'projects_get_by_id')
     def test_create_users(self, mock_project, mock_user):
         mock_project.return_value = {'id': project_id1, 'name': 'project1'}
-        return_value = {'username': 'user1', 'is_admin': False, 'id': 1,
-                        'api_key': 'xxxx'}
-        mock_user.return_value = return_value
+        mock_user.return_value = fake_resources.USER1
         data = {'username': 'user1', 'is_admin': False}
         resp = self.post('v1/users', data=data)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.json['id'], 1)
+        self.assertIn("Location", resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/users/1"
+        )
 
     @mock.patch.object(dbapi, 'users_create')
     @mock.patch.object(dbapi, 'projects_get_by_id')
     def test_create_users_invalid_property(self, mock_project, mock_user):
         mock_project.return_value = {'id': project_id1, 'name': 'project1'}
-        return_value = {'username': 'user1', 'is_admin': False, 'id': 1,
-                        'api_key': 'xxxx'}
-        mock_user.return_value = return_value
+        mock_user.return_value = fake_resources.USER1
         data = {
             'username': 'user1',
             'is_admin': False,
-            'foo': 'isinvalidproperty'
+            'foo': 'isinvalidproperty',
         }
         resp = self.post('v1/users', data=data)
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.json['id'], 1)
+        self.assertIn("Location", resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/users/1"
+        )
         db_json = {'username': 'user1', 'is_admin': False, 'api_key': mock.ANY,
                    'project_id': None}
         mock_user.assert_called_once_with(mock.ANY, db_json)
@@ -876,12 +952,22 @@ class APIV1NetworksTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'networks_create')
     def test_create_networks_with_valid_data(self, mock_network):
-        mock_network.return_value = None
-        data = {'name': 'some network', 'region_id': 1,
-                'cidr': '10.10.1.0/24', 'gateway': '192.168.1.1',
-                'netmask': '255.255.255.0'}
+        mock_network.return_value = fake_resources.NETWORK1
+        data = {
+            'name': 'PrivateNetwork',
+            'cidr': '192.168.1.0/24',
+            'gateway': '192.168.1.1',
+            'netmask': '255.255.255.0',
+            'variables': {'key1': 'value1'},
+            'region_id': 1,
+        }
         resp = self.post('/v1/networks', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/networks/1"
+        )
 
     @mock.patch.object(dbapi, 'networks_create')
     def test_create_networks_with_invalid_data(self, mock_network):
@@ -893,13 +979,35 @@ class APIV1NetworksTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'networks_create')
     def test_create_networks_with_invalid_property(self, mock_network):
-        mock_network.return_value = None
-        data = {'name': 'some network', 'region_id': 1,
-                'cidr': '10.10.1.0/24', 'gateway': '192.168.1.1',
-                'netmask': '255.255.255.0', 'foo': 'isinvalid'}
+        mock_network.return_value = fake_resources.NETWORK1
+        data = {
+            'cidr': '192.168.1.0/24',
+            'gateway': '192.168.1.1',
+            'name': 'PrivateNetwork',
+            'netmask': '255.255.255.0',
+            'region_id': 1,
+            'variables': {'key1': 'value1'},
+            'foo': 'isinvalid',
+        }
         resp = self.post('/v1/networks', data=data)
-        self.assertEqual(200, resp.status_code)
+        expected_response = {
+            'cidr': '192.168.1.0/24',
+            'gateway': '192.168.1.1',
+            'id': 1,
+            'name': 'PrivateNetwork',
+            'netmask': '255.255.255.0',
+            'region_id': 1,
+            'project_id': 1,
+            'variables': {'key1': 'value1'},
+        }
+        self.assertEqual(201, resp.status_code)
+        self.assertEqual(expected_response, resp.json)
         mock_network.assert_called_once()
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/networks/1"
+        )
 
 
 class APIV1NetworksIDTest(APIV1Test):
@@ -1091,11 +1199,16 @@ class APIV1NetworkDevicesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_network_devices_with_valid_data(self, mock_devices):
-        mock_devices.return_value = None
+        mock_devices.return_value = fake_resources.NETWORK_DEVICE1
         data = {'name': 'NewNetDevice1', 'region_id': 1,
                 'device_type': 'Sample', 'ip_address': '0.0.0.0'}
         resp = self.post('/v1/network-devices', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/network-devices/1"
+        )
 
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_netdevices_with_invalid_data(self, mock_devices):
@@ -1107,12 +1220,17 @@ class APIV1NetworkDevicesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_netdevices_with_invalid_property(self, mock_devices):
-        mock_devices.return_value = None
-        data = {'name': 'NewNetDevice1', 'region_id': 1,
-                'device_type': 'Sample', 'ip_address': '0.0.0.0',
+        mock_devices.return_value = fake_resources.NETWORK_DEVICE1
+        data = {'name': 'NetDevice1', 'region_id': 1,
+                'device_type': 'Server', 'ip_address': '10.10.0.1',
                 'foo': 'isinvalid'}
         resp = self.post('/v1/network-devices', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/network-devices/1"
+        )
         mock_devices.assert_called_once()
 
 
@@ -1234,9 +1352,14 @@ class APIV1NetworkInterfacesTest(APIV1Test):
         data = {'name': 'NewNetInterface', 'device_id': 1,
                 'ip_address': '10.10.0.1', 'interface_type': 'interface_type1'}
         resp = self.post('/v1/network-interfaces', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
         self.assertEqual(
             resp.json['ip_address'], data['ip_address']
+        )
+        self.assertIn("Location", resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/network-interfaces/1"
         )
 
     @mock.patch.object(dbapi, 'network_interfaces_create')
@@ -1249,12 +1372,17 @@ class APIV1NetworkInterfacesTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'network_interfaces_create')
     def test_network_interfaces_create_invalid_property(self, fake_interfaces):
-        fake_interfaces.return_value = None
-        data = {'name': 'NewNetInterface', 'device_id': 1,
-                'ip_address': '0.0.0.0', 'interface_type': 'Sample',
+        fake_interfaces.return_value = fake_resources.NETWORK1
+        data = {'name': 'PrivateNetwork', 'device_id': 1,
+                'ip_address': '192.168.1.0', 'interface_type': 'Sample',
                 'foo': 'isinvalid'}
         resp = self.post('/v1/network-interfaces', data=data)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/network-interfaces/1"
+        )
         fake_interfaces.assert_called_once()
 
     @mock.patch.object(dbapi, 'network_interfaces_get_all')

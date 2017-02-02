@@ -4,6 +4,7 @@ from oslo_log import log
 from craton.api.v1 import base
 from craton import db as dbapi
 from craton import util
+from craton.api import v1
 
 
 LOG = log.getLogger(__name__)
@@ -47,7 +48,13 @@ class Regions(base.Resource):
             region["variables"] = jsonutils.to_primitive(region_obj.variables)
         else:
             region["variables"] = {}
-        return region, 200, None
+
+        location = v1.api.url_for(
+            RegionsById, id=region_obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return region, 201, headers
 
 
 class RegionsById(base.Resource):

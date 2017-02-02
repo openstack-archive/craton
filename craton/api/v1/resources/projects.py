@@ -3,6 +3,7 @@ from oslo_log import log
 
 from craton.api.v1 import base
 from craton import db as dbapi
+from craton.api import v1
 
 
 LOG = log.getLogger(__name__)
@@ -35,7 +36,13 @@ class Projects(base.Resource):
     def post(self, context, request_data):
         """Create a new project. Requires super admin privileges."""
         project_obj = dbapi.projects_create(context, request_data)
-        return jsonutils.to_primitive(project_obj), 200, None
+
+        location = v1.api.url_for(
+            ProjectById, id=project_obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return jsonutils.to_primitive(project_obj), 201, headers
 
 
 class ProjectById(base.Resource):

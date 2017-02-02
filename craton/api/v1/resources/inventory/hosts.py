@@ -4,6 +4,7 @@ from oslo_log import log
 from craton.api.v1 import base
 from craton import db as dbapi
 from craton import util
+from craton.api import v1
 
 
 LOG = log.getLogger(__name__)
@@ -30,7 +31,13 @@ class Hosts(base.Resource):
             host["variables"] = jsonutils.to_primitive(host_obj.variables)
         else:
             host["variables"] = {}
-        return host, 200, None
+
+        location = v1.api.url_for(
+            HostById, id=host_obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return host, 201, headers
 
 
 def format_variables(args, obj):

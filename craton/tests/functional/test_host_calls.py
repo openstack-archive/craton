@@ -14,7 +14,12 @@ class APIV1HostTest(TestCase):
         url = self.url + '/v1/regions'
         payload = {'name': 'region-1'}
         region = self.post(url, data=payload)
-        self.assertEqual(200, region.status_code)
+        self.assertEqual(201, region.status_code)
+        self.assertIn('Location', region.headers)
+        self.assertEqual(
+            region.headers['Location'],
+            "{}/{}".format(url, region.json()['id'])
+        )
         return region.json()
 
     def create_host(self, name, hosttype, ip_address, **variables):
@@ -26,7 +31,12 @@ class APIV1HostTest(TestCase):
             payload['variables'] = variables
 
         host = self.post(url, data=payload)
-        self.assertEqual(200, host.status_code)
+        self.assertEqual(201, host.status_code)
+        self.assertIn('Location', host.headers)
+        self.assertEqual(
+            host.headers['Location'],
+            "{}/{}".format(url, host.json()['id'])
+        )
         return host.json()
 
     def test_create_host(self):
