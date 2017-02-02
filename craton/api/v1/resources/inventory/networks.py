@@ -1,6 +1,7 @@
 from oslo_serialization import jsonutils
 from oslo_log import log
 
+from craton.api import v1
 from craton.api.v1 import base
 from craton import db as dbapi
 from craton import util
@@ -26,7 +27,13 @@ class Networks(base.Resource):
         """Create a new network."""
         json = util.copy_project_id_into_json(context, request_data)
         network_obj = dbapi.networks_create(context, json)
-        return jsonutils.to_primitive(network_obj), 200, None
+
+        location = v1.api.url_for(
+            NetworkById, id=network_obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return jsonutils.to_primitive(network_obj), 201, headers
 
 
 class NetworkById(base.Resource):
@@ -94,7 +101,13 @@ class NetworkDevices(base.Resource):
         json = util.copy_project_id_into_json(context, request_data)
         obj = dbapi.network_devices_create(context, json)
         device = jsonutils.to_primitive(obj)
-        return device, 200, None
+
+        location = v1.api.url_for(
+            NetworkDeviceById, id=obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return device, 201, headers
 
 
 class NetworkDeviceById(base.Resource):
@@ -191,7 +204,13 @@ class NetworkInterfaces(base.Resource):
         json = util.copy_project_id_into_json(context, request_data)
         obj = dbapi.network_interfaces_create(context, json)
         interface = jsonutils.to_primitive(obj)
-        return interface, 200, None
+
+        location = v1.api.url_for(
+            NetworkInterfaceById, id=obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return interface, 201, headers
 
 
 class NetworkInterfaceById(base.Resource):

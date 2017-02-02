@@ -12,7 +12,7 @@ Create Cell
 
 Create a new Cell
 
-Normal response codes: OK(200)
+Normal response codes: OK(201)
 
 Error response codes: invalid request(400), validation exception(405)
 

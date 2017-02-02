@@ -1,6 +1,7 @@
 from oslo_serialization import jsonutils
 from oslo_log import log
 
+from craton.api import v1
 from craton.api.v1 import base
 from craton import db as dbapi
 from craton import util
@@ -30,7 +31,13 @@ class Cells(base.Resource):
             cell["variables"] = jsonutils.to_primitive(cell_obj.variables)
         else:
             cell["variables"] = {}
-        return cell, 200, None
+
+        location = v1.api.url_for(
+            CellById, id=cell_obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return cell, 201, headers
 
 
 class CellById(base.Resource):

@@ -14,7 +14,12 @@ class APIV1CellTest(TestCase):
         url = self.url + '/v1/regions'
         payload = {'name': 'region-1'}
         region = self.post(url, data=payload)
-        self.assertEqual(200, region.status_code)
+        self.assertEqual(201, region.status_code)
+        self.assertIn('Location', region.headers)
+        self.assertEqual(
+            region.headers['Location'],
+            "{}/{}".format(url, region.json()['id'])
+        )
         return region.json()
 
     def create_cell(self, name, variables=None):
@@ -23,7 +28,12 @@ class APIV1CellTest(TestCase):
         if variables:
             payload['variables'] = variables
         cell = self.post(url, data=payload)
-        self.assertEqual(200, cell.status_code)
+        self.assertEqual(201, cell.status_code)
+        self.assertIn('Location', cell.headers)
+        self.assertEqual(
+            cell.headers['Location'],
+            "{}/{}".format(url, cell.json()['id'])
+        )
         return cell.json()
 
     def test_cell_create_with_variables(self):
