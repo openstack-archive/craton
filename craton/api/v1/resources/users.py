@@ -2,6 +2,7 @@ from oslo_serialization import jsonutils
 from oslo_log import log
 from oslo_utils import uuidutils
 
+from craton.api import v1
 from craton.api.v1 import base
 from craton import db as dbapi
 from craton import util
@@ -43,7 +44,13 @@ class Users(base.Resource):
         api_key = uuidutils.generate_uuid()
         request_data["api_key"] = api_key
         user_obj = dbapi.users_create(context, json)
-        return jsonutils.to_primitive(user_obj), 200, None
+
+        location = v1.api.url_for(
+            UserById, id=user_obj.id, _external=True
+        )
+        headers = {'Location': location}
+
+        return jsonutils.to_primitive(user_obj), 201, headers
 
 
 class UserById(base.Resource):

@@ -1529,7 +1529,7 @@ filters = {
         },
     },
     ("hosts", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionsHost,
         },
@@ -1684,7 +1684,7 @@ filters = {
         },
     },
     ("cells", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionsCell,
         },
@@ -1719,7 +1719,7 @@ filters = {
         },
     },
     ("regions", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionsRegion,
         },
@@ -1895,7 +1895,7 @@ filters = {
         },
     },
     ("projects", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionProject,
         },
@@ -1934,7 +1934,7 @@ filters = {
         },
     },
     ("users", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionUser,
         },
@@ -2045,7 +2045,7 @@ filters = {
         },
     },
     ("network_devices", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionNetworkDeviceId,
         },
@@ -2258,7 +2258,7 @@ filters = {
         },
     },
     ("networks", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionNetwork,
         },
@@ -2417,7 +2417,7 @@ filters = {
         },
     },
     ("network_interfaces", "POST"): {
-        200: {
+        201: {
             "headers": None,
             "schema": DefinitionNetworkInterface,
         },

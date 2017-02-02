@@ -17,7 +17,12 @@ class APIV1RegionTest(TestCase):
         if variables:
             values['variables'] = variables
         resp = self.post(url, data=values)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "{}/{}".format(url, resp.json()['id'])
+        )
         return resp.json()
 
     def test_create_region_full_data(self):
@@ -27,7 +32,12 @@ class APIV1RegionTest(TestCase):
                   "variables": {"a": "b"}}
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "{}/{}".format(url, resp.json()['id'])
+        )
         self.assertEqual(values['name'], resp.json()['name'])
 
     def test_create_region_without_variables(self):
@@ -35,7 +45,12 @@ class APIV1RegionTest(TestCase):
                   "note": "This is region-two"}
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
-        self.assertEqual(200, resp.status_code)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "{}/{}".format(url, resp.json()['id'])
+        )
         self.assertEqual("region-two", resp.json()['name'])
 
     def test_create_region_with_no_name_fails(self):

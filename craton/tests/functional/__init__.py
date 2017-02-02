@@ -172,7 +172,7 @@ class TestCase(testtools.TestCase):
         if not self.container_setup_error:
             data = _container.container_data
             self.service_ip = data['NetworkSettings']['IPAddress']
-            self.url = 'http://{}:8080/'.format(self.service_ip)
+            self.url = 'http://{}:8080'.format(self.service_ip)
             self.session.headers['X-Auth-Project'] = FAKE_DATA_GEN_PROJECT_ID
             self.session.headers['X-Auth-Token'] = FAKE_DATA_GEN_TOKEN
             self.session.headers['X-Auth-User'] = FAKE_DATA_GEN_USERNAME
