@@ -9,6 +9,6 @@ Contents:
    devices
    hosts
    networks
-   net-devices
-   net-interfaces
+   network-devices
+   network-interfaces
    regions
