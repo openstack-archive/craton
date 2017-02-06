@@ -74,7 +74,7 @@ def require_project_admin_context(f):
     """Decorator that ensures admin or project_admin request context."""
     def wrapper(*args, **kwargs):
         context = args[0]
-        if is_admin_context(context) or is_project_admin_context(context):
+        if is_project_admin_context(context):
             return f(*args, **kwargs)
         raise exceptions.AdminRequired()
     return wrapper
