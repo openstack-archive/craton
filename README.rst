@@ -22,5 +22,8 @@ For more information, please refer to the following project resources:
 For information on how to contribute to Craton, please see the
 contents of the `CONTRIBUTING.rst file <CONTRIBUTING.rst>`_.
 
+For information on how to setup a Developer's Environment, please
+see the contents of `INSTALL.RST file <https://github.com/openstack/craton/blob/master/doc/source/dev/install.rst>`_.
+
 For more information on Craton distribution license, please see
 the contents of the `LICENSE file <LICENSE>`_.
