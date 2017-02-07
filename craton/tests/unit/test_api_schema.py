@@ -10,8 +10,10 @@ VALIDATORS = {
         ('ansible_inventory', 'GET'),
         ('cells', 'GET'),
         ('cells', 'POST'),
+        ('cells_id', 'GET'),
         ('cells_id', 'PUT'),
         ('cells_id_variables', 'DELETE'),
+        ('cells_id_variables', 'GET'),
         ('cells_id_variables', 'PUT'),
         ('hosts', 'GET'),
         ('hosts', 'POST'),
@@ -21,54 +23,52 @@ VALIDATORS = {
         ('hosts_id_variables', 'GET'),
         ('hosts_id_variables', 'PUT'),
         ('hosts_labels', 'DELETE'),
+        ('hosts_labels', 'GET'),
         ('hosts_labels', 'PUT'),
         ('network_devices', 'GET'),
         ('network_devices', 'POST'),
         ('network_devices_id', 'GET'),
         ('network_devices_id', 'PUT'),
         ('network_devices_id_variables', 'DELETE'),
+        ('network_devices_id_variables', 'GET'),
         ('network_devices_id_variables', 'PUT'),
+        ('network_devices_labels', 'GET'),
         ('network_devices_labels', 'PUT'),
         ('network_devices_labels', 'DELETE'),
         ('network_interfaces', 'GET'),
         ('network_interfaces', 'POST'),
+        ("network_interfaces_id", "GET"),
         ('network_interfaces_id', 'PUT'),
         ('networks', 'GET'),
         ('networks', 'POST'),
+        ("networks_id", "GET"),
         ('networks_id', 'PUT'),
         ('networks_id_variables', 'DELETE'),
+        ("networks_id_variables", "GET"),
         ('networks_id_variables', 'PUT'),
         ('projects', 'GET'),
         ('projects', 'POST'),
+        ("projects_id", "GET"),
         ('regions', 'GET'),
         ('regions', 'POST'),
+        ("regions_id", "GET"),
         ('regions_id', 'PUT'),
         ('regions_id_variables', 'DELETE'),
+        ("regions_id_variables", "GET"),
         ('regions_id_variables', 'PUT'),
         ('users', 'GET'),
         ('users', 'POST'),
+        ("users_id", "GET"),
     ],
     "without_schema": [
         ('cells_id', 'DELETE'),
-        ('cells_id', 'GET'),
-        ('cells_id_variables', 'GET'),
         ('hosts_id', 'DELETE'),
-        ('hosts_labels', 'GET'),
         ('network_devices_id', 'DELETE'),
-        ('network_devices_id_variables', 'GET'),
-        ('network_devices_labels', 'GET'),
         ("network_interfaces_id", "DELETE"),
-        ("network_interfaces_id", "GET"),
         ("networks_id", "DELETE"),
-        ("networks_id", "GET"),
-        ("networks_id_variables", "GET"),
         ("projects_id", "DELETE"),
-        ("projects_id", "GET"),
         ("users_id", "DELETE"),
-        ("users_id", "GET"),
         ("regions_id", "DELETE"),
-        ("regions_id", "GET"),
-        ("regions_id_variables", "GET"),
     ]
 }
 
@@ -105,6 +105,8 @@ def generate_schema_validation_functions(cls):
             self.assertIs(
                 jsonschema.Draft4Validator.check_schema(schema), None
             )
+            if 'type' not in schema or schema['type'] == 'object':
+                self.assertFalse(schema['additionalProperties'])
 
         name = '_'.join(('validator', endpoint, method))
         setattr(cls, 'test_valid_schema_{}'.format(name), test)
@@ -133,6 +135,8 @@ def generate_schema_validation_functions(cls):
             self.assertIs(
                 jsonschema.Draft4Validator.check_schema(schema), None
             )
+            if 'type' not in schema or schema['type'] == 'object':
+                self.assertFalse(schema['additionalProperties'])
         setattr(cls, 'test_valid_schema_{}'.format(name), test)
 
     for (endpoint, method), responses in filters.items():
