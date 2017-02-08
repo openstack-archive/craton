@@ -238,6 +238,7 @@ class Project(Base, VariableMixin):
     # this suffices to define multitenancy for MVP
 
     # one-to-many relationship with the following objects
+    clouds = relationship('Cloud', back_populates='project')
     regions = relationship('Region', back_populates='project')
     cells = relationship('Cell', back_populates='project')
     devices = relationship('Device', back_populates='project')
@@ -266,11 +267,11 @@ class User(Base, VariableMixin):
     project = relationship('Project', back_populates='users')
 
 
-class Region(Base, VariableMixin):
-    __tablename__ = 'regions'
+class Cloud(Base, VariableMixin):
+    __tablename__ = 'clouds'
     __table_args__ = (
         UniqueConstraint("project_id", "name",
-                         name="uq_region0projectid0name"),
+                         name="uq_cloud0projectid0name"),
     )
     id = Column(Integer, primary_key=True)
     project_id = Column(
@@ -280,7 +281,31 @@ class Region(Base, VariableMixin):
     note = Column(Text)
     _repr_columns = [id, name]
 
+    project = relationship('Project', back_populates='clouds')
+    regions = relationship('Region', back_populates='cloud')
+    cells = relationship('Cell', back_populates='cloud')
+    devices = relationship('Device', back_populates='cloud')
+    networks = relationship('Network', back_populates='cloud')
+
+
+class Region(Base, VariableMixin):
+    __tablename__ = 'regions'
+    __table_args__ = (
+        UniqueConstraint("cloud_id", "name",
+                         name="uq_region0cloudid0name"),
+    )
+    id = Column(Integer, primary_key=True)
+    project_id = Column(
+        UUIDType(binary=False), ForeignKey('projects.id'), index=True,
+        nullable=False)
+    cloud_id = Column(
+        Integer, ForeignKey('clouds.id'), index=True, nullable=False)
+    name = Column(String(255))
+    note = Column(Text)
+    _repr_columns = [id, name]
+
     project = relationship('Project', back_populates='regions')
+    cloud = relationship('Cloud', back_populates='regions')
     cells = relationship('Cell', back_populates='region')
     devices = relationship('Device', back_populates='region')
     networks = relationship('Network', back_populates='region')
@@ -295,6 +320,8 @@ class Cell(Base, VariableMixin):
     id = Column(Integer, primary_key=True)
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
+    cloud_id = Column(
+        Integer, ForeignKey('clouds.id'), index=True, nullable=False)
     project_id = Column(
         UUIDType(binary=False), ForeignKey('projects.id'), index=True,
         nullable=False)
@@ -302,9 +329,10 @@ class Cell(Base, VariableMixin):
     note = Column(Text)
     _repr_columns = [id, name]
 
+    project = relationship('Project', back_populates='cells')
+    cloud = relationship('Cloud', back_populates='cells')
     region = relationship('Region', back_populates='cells')
     devices = relationship('Device', back_populates='cell')
-    project = relationship('Project', back_populates='cells')
     networks = relationship('Network', back_populates='cell')
 
 
@@ -319,6 +347,8 @@ class Device(Base, VariableMixin):
     id = Column(Integer, primary_key=True)
     type = Column(String(50))  # discriminant for joined table inheritance
     name = Column(String(255), nullable=False)
+    cloud_id = Column(
+        Integer, ForeignKey('clouds.id'), index=True, nullable=False)
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
     cell_id = Column(
@@ -337,6 +367,7 @@ class Device(Base, VariableMixin):
     _repr_columns = [id, name]
 
     project = relationship('Project', back_populates='devices')
+    cloud = relationship('Cloud', back_populates='devices')
     region = relationship('Region', back_populates='devices')
     cell = relationship('Cell', back_populates='devices')
     related_labels = relationship(
@@ -364,6 +395,7 @@ class Device(Base, VariableMixin):
             self.ancestors,
             [self.cell] if self.cell else [],
             [self.region],
+            [self.cloud],
             [self.project]))
 
     __mapper_args__ = {
@@ -426,6 +458,8 @@ class Network(Base, VariableMixin):
     netmask = Column(String(255), nullable=True)
     ip_block_type = Column(String(255), nullable=True)
     nss = Column(String(255), nullable=True)
+    cloud_id = Column(
+        Integer, ForeignKey('clouds.id'), index=True, nullable=False)
     region_id = Column(
         Integer, ForeignKey('regions.id'), index=True, nullable=False)
     cell_id = Column(
@@ -434,10 +468,11 @@ class Network(Base, VariableMixin):
         UUIDType(binary=False), ForeignKey('projects.id'), index=True,
         nullable=False)
 
-    devices = relationship('NetworkInterface', back_populates='network')
+    project = relationship('Project', back_populates='networks')
+    cloud = relationship('Cloud', back_populates='networks')
     region = relationship('Region', back_populates='networks')
     cell = relationship('Cell', back_populates='networks')
-    project = relationship('Project', back_populates='networks')
+    devices = relationship('NetworkInterface', back_populates='network')
 
 
 class NetworkDevice(Device):
