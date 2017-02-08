@@ -8,40 +8,46 @@ from craton.tests.unit.db import base
 default_pagination = {'limit': 30, 'marker': None}
 
 project_id1 = uuid.uuid4().hex
+cloud_id1 = uuid.uuid4().hex
 network1 = {"name": "test network",
             "cidr": "192.168.1.0/24",
             "gateway": "192.168.1.1",
             "netmask": "255.255.255.0",
             "region_id": 1,
-            "project_id": project_id1}
+            "project_id": project_id1,
+            "cloud_id": cloud_id1}
 
 network2 = {"name": "test network2",
             "cidr": "192.168.1.0/24",
             "gateway": "192.168.1.1",
             "netmask": "255.255.255.0",
             "region_id": 2,
-            "project_id": project_id1}
+            "project_id": project_id1,
+            "cloud_id": cloud_id1}
 
 device1 = {"hostname": "switch1",
            "model_name": "Model-X",
            "region_id": 1,
            "project_id": project_id1,
            "device_type": "switch",
-           "ip_address": "192.168.1.1"}
+           "ip_address": "192.168.1.1",
+           "cloud_id": cloud_id1}
 
 device2 = {"hostname": "switch2",
            "model_name": "Model-X",
            "region_id": 2,
            "project_id": project_id1,
            "device_type": "switch",
-           "ip_address": "192.168.1.1"}
+           "ip_address": "192.168.1.1",
+           "cloud_id": cloud_id1}
 
 device3 = {"hostname": "foo1",
            "model_name": "Model-Bar",
            "region_id": 1,
            "project_id": project_id1,
            "device_type": "foo",
-           "ip_address": "192.168.1.2"}
+           "ip_address": "192.168.1.2",
+           "cloud_id": cloud_id1}
 
 network_interface1 = {"device_id": 1,
                       "project_id": project_id1,
@@ -179,6 +185,7 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
             {
                 'name': 'cell1',
                 'project_id': project_id1,
+                'cloud_id': cloud_id1,
                 'region_id': region_id,
             }
         )
@@ -187,6 +194,7 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
             {
                 'name': 'cell2',
                 'project_id': project_id1,
+                'cloud_id': cloud_id1,
                 'region_id': region_id,
             }
         )
