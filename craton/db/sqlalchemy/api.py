@@ -425,6 +425,76 @@ def regions_delete(context, region_id):
     return
 
 
+def clouds_get_all(context, filters, pagination_params):
+    """Get all available clouds."""
+    session = get_session()
+    query = model_query(context, models.Cloud, project_only=True,
+                        session=session)
+
+    if "vars" in filters:
+        query = add_var_filters_to_query(query, filters)
+
+    return _paginate(context, query, models.Cloud, session, filters,
+                     pagination_params)
+
+
+def clouds_get_by_name(context, name):
+    """Get cell detail for the cloud with given name."""
+    query = model_query(context, models.Cloud, project_only=True)
+    query = query.filter_by(name=name)
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+
+def clouds_get_by_id(context, cloud_id):
+    """Get cell detail for the cloud with given id."""
+    query = model_query(context, models.Cloud, project_only=True)
+    query = query.filter_by(id=cloud_id)
+    try:
+        return query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+
+
+def clouds_create(context, values):
+    """Create a new cloud."""
+    session = get_session()
+    cloud = models.Cloud()
+    with session.begin():
+        try:
+            cloud.update(values)
+            cloud.save(session)
+        except db_exc.DBDuplicateEntry:
+            raise exceptions.DuplicateCloud()
+    return cloud
+
+
+def clouds_update(context, cloud_id, values):
+    """Update an existing cloud."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Cloud, session=session,
+                            project_only=True)
+        query = query.filter_by(id=cloud_id)
+        cloud_ref = query.with_for_update().one()
+        cloud_ref.update(values)
+        cloud_ref.save(session)
+        return cloud_ref
+
+
+def clouds_delete(context, cloud_id):
+    """Delete an existing cloud."""
+    session = get_session()
+    with session.begin():
+        query = model_query(context, models.Cloud, session=session,
+                            project_only=True)
+        query = query.filter_by(id=cloud_id)
+        query.delete()
+    return
+
+
 def hosts_get_all(context, filters, pagination_params):
     """Get all hosts matching filters.
 
