@@ -20,28 +20,40 @@ class BaseDevicesDBTestCase(base.DBTestCase):
              "variables": variables})
         return str(project.id)
 
-    def make_region(self, project_id, name, **variables):
+    def make_cloud(self, project_id, name, **variables):
+        cloud = dbapi.clouds_create(
+            self.context,
+            {'name': name,
+             'project_id': project_id,
+             'variables': variables})
+        return cloud.id
+
+    def make_region(self, project_id, cloud_id, name, **variables):
         region = dbapi.regions_create(
             self.context,
             {'name': name,
              'project_id': project_id,
+             'cloud_id': cloud_id,
              'variables': variables})
         return region.id
 
-    def make_cell(self, project_id, region_id, name, **variables):
+    def make_cell(self, project_id, cloud_id, region_id, name, **variables):
         cell = dbapi.cells_create(
             self.context,
             {'name': name,
              'project_id': project_id,
+             'cloud_id': cloud_id,
              'region_id': region_id,
              'variables': variables})
         return cell.id
 
-    def make_host(self, project_id, region_id, name, ip_address, host_type,
-                  cell_id=None, parent_id=None, labels=None, **variables):
+    def make_host(self, project_id, cloud_id, region_id, name, ip_address,
+                  host_type, cell_id=None, parent_id=None, labels=None,
+                  **variables):
         if cell_id:
             host = {'name': name,
                     'project_id': project_id,
+                    'cloud_id': cloud_id,
                     'region_id': region_id,
                     'cell_id': cell_id,
                     'ip_address': ip_address,
@@ -53,6 +65,7 @@ class BaseDevicesDBTestCase(base.DBTestCase):
         else:
             host = {'name': name,
                     'project_id': project_id,
+                    'cloud_id': cloud_id,
                     'region_id': region_id,
                     'ip_address': ip_address,
                     'parent_id': parent_id,
@@ -65,12 +78,13 @@ class BaseDevicesDBTestCase(base.DBTestCase):
         return host.id
 
     def make_network_device(
-            self, project_id, region_id, name, ip_address, device_type,
-            cell_id=None, parent_id=None, **variables
+            self, project_id, cloud_id, region_id, name, ip_address,
+            device_type, cell_id=None, parent_id=None, **variables
             ):
         network_device_data = {
             'name': name,
             'project_id': project_id,
+            'cloud_id': cloud_id,
             'region_id': region_id,
             'cell_id': cell_id,
             'ip_address': ip_address,
@@ -91,25 +105,26 @@ class DevicesDBTestCase(BaseDevicesDBTestCase):
     def setUp(self):
         super().setUp()
         project_id = self.make_project('project_1')
-        region_id = self.make_region(project_id, 'region_1')
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1')
         net_device1_id = self.make_network_device(
-            project_id, region_id, 'switch1.example.com',
+            project_id, cloud_id, region_id, 'switch1.example.com',
             IPAddress('10.1.2.101'), 'switch'
         )
         net_device2_id = self.make_network_device(
-            project_id, region_id, 'switch2.example.com',
+            project_id, cloud_id, region_id, 'switch2.example.com',
             IPAddress('10.1.2.102'), 'switch', parent_id=net_device1_id
         )
         host1_id = self.make_host(
-            project_id, region_id, 'www1.example.com',
+            project_id, cloud_id, region_id, 'www1.example.com',
             IPAddress(u'10.1.2.103'), 'server', parent_id=net_device2_id
         )
         host2_id = self.make_host(
-            project_id, region_id, 'www2.example.com',
+            project_id, cloud_id, region_id, 'www2.example.com',
             IPAddress(u'10.1.2.104'), 'container', parent_id=host1_id
         )
         host3_id = self.make_host(
-            project_id, region_id, 'www3.example.com',
+            project_id, cloud_id, region_id, 'www3.example.com',
             IPAddress(u'10.1.2.105'), 'server'
         )
 
@@ -147,27 +162,32 @@ class DevicesDBTestCase(BaseDevicesDBTestCase):
 class HostsDBTestCase(BaseDevicesDBTestCase):
 
     def make_very_small_cloud(self, with_cell=False):
-        project_id = self.make_project('project_1', foo='P1', zoo='P2')
+        project_id = self.make_project('project_1', foo='P1', zoo='P2',
+                                       boo='P3')
+        cloud_id = self.make_cloud(project_id, 'cloud_1', zoo='CL1')
         region_id = self.make_region(
             project_id,
+            cloud_id,
             'region_1',
             foo='R1', bar='R2', bax='R3')
         if with_cell:
-            cell_id = self.make_cell(project_id, region_id, 'cell_1', bar='C2')
+            cell_id = self.make_cell(project_id, cloud_id, region_id, 'cell_1',
+                                     bar='C2')
         else:
             cell_id = None
-        host_id = self.make_host(project_id, region_id, 'www1.example.com',
+        host_id = self.make_host(project_id, cloud_id, region_id,
+                                 'www1.example.com',
                                  IPAddress(u'10.1.2.101'), 'server',
                                  cell_id=cell_id, foo='H1', baz='H3')
-        return project_id, region_id, cell_id, host_id
+        return project_id, cloud_id, region_id, cell_id, host_id
 
     def test_hosts_create(self):
         # Need to do this query despite creation above because other
         # elements (cell, region) were in separate committed sessions
         # when the host was created. Verify these linked elements load
         # correctly
-        project_id, region_id, cell_id, host_id = self.make_very_small_cloud(
-            with_cell=True)
+        project_id, cloud_id, region_id, cell_id, host_id = \
+            self.make_very_small_cloud(with_cell=True)
         host = dbapi.hosts_get_by_id(self.context, host_id)
         self.assertEqual(host.region.id, region_id)
         self.assertEqual(host.region.name, 'region_1')
@@ -177,41 +197,50 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         # Verify resolved variables/blames override properly
         self.assertEqual(
             [obj.id for obj in host.resolution_order],
-            [host_id, cell_id, region_id, uuid.UUID(project_id)])
+            [host_id, cell_id, region_id, cloud_id, uuid.UUID(project_id)])
 
         self.assertEqual(
             [variables for variables in host.resolution_order_variables],
             [{'foo': 'H1', 'baz': 'H3'},
              {'bar': 'C2'},
              {'foo': 'R1', 'bar': 'R2', 'bax': 'R3'},
-             {'foo': 'P1', 'zoo': 'P2'}])
+             {'zoo': 'CL1'},
+             {'foo': 'P1', 'zoo': 'P2', 'boo': 'P3'}])
 
         self.assertEqual(
             host.resolved,
-            {'foo': 'H1', 'bar': 'C2', 'baz': 'H3', 'bax': 'R3', 'zoo': 'P2'})
+            {'foo': 'H1', 'bar': 'C2', 'baz': 'H3', 'bax': 'R3', 'zoo': 'CL1',
+             'boo': 'P3'})
 
-        blame = host.blame(['foo', 'bar', 'zoo'])
+        blame = host.blame(['foo', 'bar', 'zoo', 'boo'])
         self.assertEqual(blame['foo'].source.name, 'www1.example.com')
         self.assertEqual(blame['foo'].variable.value, 'H1')
         self.assertEqual(blame['bar'].source.name, 'cell_1')
         self.assertEqual(blame['bar'].variable.value, 'C2')
-        self.assertEqual(blame['zoo'].source.name, 'project_1')
-        self.assertEqual(blame['zoo'].variable.value, 'P2')
+        self.assertEqual(blame['zoo'].source.name, 'cloud_1')
+        self.assertEqual(blame['zoo'].variable.value, 'CL1')
+        self.assertEqual(blame['boo'].source.name, 'project_1')
+        self.assertEqual(blame['boo'].variable.value, 'P3')
 
     def test_hosts_create_duplicate_raises(self):
-        region_id = self.make_region(self.mock_project_id, 'region_1')
-        self.make_host(self.mock_project_id, region_id, 'www1.example.com',
+        cloud_id = self.make_cloud(self.mock_project_id, 'cloud_1')
+        region_id = self.make_region(self.mock_project_id, cloud_id,
+                                     'region_1')
+        self.make_host(self.mock_project_id, cloud_id, region_id,
+                       'www1.example.com',
                        IPAddress(u'10.1.2.101'), 'server')
         new_host = {'name': 'www1.example.com', 'region_id': region_id,
                     'ip_address': IPAddress(u'10.1.2.101'),
                     'device_type': 'server',
-                    'project_id': self.mock_project_id}
+                    'cloud_id': cloud_id, 'project_id': self.mock_project_id}
         self.assertRaises(exceptions.DuplicateDevice, dbapi.hosts_create,
                           self.context, new_host)
 
     def test_hosts_create_without_cell(self):
-        project_id, region_id, _, host_id = self.make_very_small_cloud()
+        project_id, cloud_id, region_id, _, host_id = \
+            self.make_very_small_cloud()
         host = dbapi.hosts_get_by_id(self.context, host_id)
+        self.assertEqual(host.cloud_id, cloud_id)
         self.assertEqual(host.region.id, region_id)
         self.assertEqual(host.region.name, 'region_1')
         self.assertIsNone(host.cell)
@@ -219,29 +248,36 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         # Verify resolved variables/blames override properly
         self.assertEqual(
             [obj.id for obj in host.resolution_order],
-            [host_id, region_id, uuid.UUID(project_id)])
+            [host_id, region_id, cloud_id, uuid.UUID(project_id)])
 
         self.assertEqual(
             [variables for variables in host.resolution_order_variables],
             [{'foo': 'H1', 'baz': 'H3'},
              {'foo': 'R1', 'bar': 'R2', 'bax': 'R3'},
-             {'foo': 'P1', 'zoo': 'P2'}])
+             {'zoo': 'CL1'},
+             {'foo': 'P1', 'zoo': 'P2', 'boo': 'P3'}])
 
         self.assertEqual(
             host.resolved,
-            {'foo': 'H1', 'bar': 'R2', 'baz': 'H3', 'bax': 'R3', 'zoo': 'P2'})
+            {'foo': 'H1', 'bar': 'R2', 'baz': 'H3', 'bax': 'R3', 'zoo': 'CL1',
+             'boo': 'P3'})
 
-        blame = host.blame(['foo', 'bar', 'zoo'])
+        blame = host.blame(['foo', 'bar', 'zoo', 'boo'])
         self.assertEqual(blame['foo'].source.name, 'www1.example.com')
         self.assertEqual(blame['foo'].variable.value, 'H1')
         self.assertEqual(blame['bar'].source.name, 'region_1')
         self.assertEqual(blame['bar'].variable.value, 'R2')
-        self.assertEqual(blame['zoo'].source.name, 'project_1')
-        self.assertEqual(blame['zoo'].variable.value, 'P2')
+        self.assertEqual(blame['zoo'].source.name, 'cloud_1')
+        self.assertEqual(blame['zoo'].variable.value, 'CL1')
+        self.assertEqual(blame['boo'].source.name, 'project_1')
+        self.assertEqual(blame['boo'].variable.value, 'P3')
 
     def test_hosts_update(self):
-        region_id = self.make_region(self.mock_project_id, 'region_1')
-        host_id = self.make_host(self.mock_project_id, region_id, 'example',
+        cloud_id = self.make_cloud(self.mock_project_id, 'cloud_1')
+        region_id = self.make_region(self.mock_project_id, cloud_id,
+                                     'region_1')
+        host_id = self.make_host(self.mock_project_id, cloud_id, region_id,
+                                 'example',
                                  IPAddress(u'10.1.2.101'), 'server',
                                  bar='bar2')
         name = "Host_New"
@@ -251,17 +287,24 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
     def test_hosts_variable_resolved_with_parent(self):
         project_id = self.make_project(
             'project_1',
-            foo='P1', zoo='P2')
+            foo='P1', zoo='P2', boo='P3')
+        cloud_id = self.make_cloud(
+            project_id,
+            'cloud_1',
+            zoo='CL1', zab='CL2')
         region_id = self.make_region(
             project_id,
+            cloud_id,
             'region_1',
             foo='R1', bar='R2', bax='R3')
-        cell_id = self.make_cell(project_id, region_id, 'cell_1',
+        cell_id = self.make_cell(project_id, cloud_id, region_id, 'cell_1',
                                  bar='C2')
-        host1_id = self.make_host(project_id, region_id, 'www1.example.com',
+        host1_id = self.make_host(project_id, cloud_id, region_id,
+                                  'www1.example.com',
                                   IPAddress(u'10.1.2.101'), 'server',
                                   cell_id=cell_id, foo='H1', baz='H3')
-        host2_id = self.make_host(project_id, region_id, 'www1.example2.com',
+        host2_id = self.make_host(project_id, cloud_id, region_id,
+                                  'www1.example2.com',
                                   IPAddress(u'10.1.2.102'), 'server',
                                   cell_id=cell_id, parent_id=host1_id)
         host2 = dbapi.hosts_get_by_id(self.context, host2_id)
@@ -269,7 +312,8 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         # Verify resolved variables/blames override properly
         self.assertEqual(
             [obj.id for obj in host2.resolution_order],
-            [host2_id, host1_id, cell_id, region_id, uuid.UUID(project_id)])
+            [host2_id, host1_id, cell_id, region_id, cloud_id,
+             uuid.UUID(project_id)])
 
         self.assertEqual(
             [variables for variables in host2.resolution_order_variables],
@@ -277,24 +321,33 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
              {'baz': 'H3', 'foo': 'H1'},
              {'bar': 'C2'},
              {'bar': 'R2', 'foo': 'R1', 'bax': 'R3'},
-             {'foo': 'P1', 'zoo': 'P2'}])
+             {'zoo': 'CL1', 'zab': 'CL2'},
+             {'foo': 'P1', 'zoo': 'P2', 'boo': 'P3'}])
 
         self.assertEqual(
             host2.resolved,
-            {'foo': 'H1', 'bar': 'C2', 'baz': 'H3', 'bax': 'R3', 'zoo': 'P2'})
+            {'foo': 'H1', 'bar': 'C2', 'baz': 'H3', 'bax': 'R3', 'zoo': 'CL1',
+             'boo': 'P3', 'zab': 'CL2'})
 
-        blame = host2.blame(['foo', 'bar', 'zoo'])
+        blame = host2.blame(['foo', 'bar', 'zoo', 'boo', 'zab'])
         self.assertEqual(blame['foo'].source.name, 'www1.example.com')
         self.assertEqual(blame['foo'].variable.value, 'H1')
         self.assertEqual(blame['bar'].source.name, 'cell_1')
         self.assertEqual(blame['bar'].variable.value, 'C2')
-        self.assertEqual(blame['zoo'].source.name, 'project_1')
-        self.assertEqual(blame['zoo'].variable.value, 'P2')
+        self.assertEqual(blame['zoo'].source.name, 'cloud_1')
+        self.assertEqual(blame['zoo'].variable.value, 'CL1')
+        self.assertEqual(blame['zab'].source.name, 'cloud_1')
+        self.assertEqual(blame['zab'].variable.value, 'CL2')
+        self.assertEqual(blame['boo'].source.name, 'project_1')
+        self.assertEqual(blame['boo'].variable.value, 'P3')
 
     def test_hosts_variables_no_resolved(self):
         project_id = self.make_project('project_1', zoo='P2')
-        region_id = self.make_region(project_id, 'region_1', foo='R1')
-        host_id = self.make_host(project_id, region_id, 'www.example.xyz',
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1',
+                                     foo='R1')
+        host_id = self.make_host(project_id, cloud_id, region_id,
+                                 'www.example.xyz',
                                  IPAddress(u'10.1.2.101'),
                                  'server', bar='bar2')
         host = dbapi.hosts_get_by_id(self.context, host_id)
@@ -303,9 +356,10 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
 
     def test_hosts_resolved_vars_no_cells(self):
         project_id = self.make_project('project_1')
-        region_id = self.make_region(project_id, 'region_1',
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1',
                                      foo='R1')
-        host_id = self.make_host(project_id, region_id,
+        host_id = self.make_host(project_id, cloud_id, region_id,
                                  'www.example.xyz',
                                  IPAddress(u'10.1.2.101'),
                                  'server', bar='bar2')
@@ -314,9 +368,11 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         self.assertEqual(host.resolved, {'bar': 'bar2', 'foo': 'R1'})
 
     def test_host_labels_create(self):
-        region_id = self.make_region(self.mock_project_id, 'region_1',
+        cloud_id = self.make_cloud(self.mock_project_id, 'cloud_1')
+        region_id = self.make_region(self.mock_project_id, cloud_id,
+                                     'region_1',
                                      foo='R1')
-        host_id = self.make_host(self.mock_project_id, region_id,
+        host_id = self.make_host(self.mock_project_id, cloud_id, region_id,
                                  'www.example.xyz',
                                  IPAddress(u'10.1.2.101'),
                                  'server', bar='bar2')
@@ -324,9 +380,11 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         dbapi.hosts_labels_update(self.context, host_id, labels)
 
     def test_host_labels_delete(self):
-        region_id = self.make_region(self.mock_project_id, 'region_1',
+        cloud_id = self.make_cloud(self.mock_project_id, 'cloud_1')
+        region_id = self.make_region(self.mock_project_id, cloud_id,
+                                     'region_1',
                                      foo='R1')
-        host_id = self.make_host(self.mock_project_id, region_id,
+        host_id = self.make_host(self.mock_project_id, cloud_id, region_id,
                                  'www.example.xyz',
                                  IPAddress(u'10.1.2.101'),
                                  'server', bar='bar2')
@@ -340,10 +398,13 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         self.assertEqual(host.labels, {"jerry", "jones"})
 
     def test_hosts_get_all_with_label_filters(self):
-        region_id = self.make_region(self.mock_project_id, 'region_1')
+        cloud_id = self.make_cloud(self.mock_project_id, 'cloud_1')
+        region_id = self.make_region(self.mock_project_id, cloud_id,
+                                     'region_1')
         labels = {"labels": ["compute"]}
         host1 = self.make_host(
             self.mock_project_id,
+            cloud_id,
             region_id,
             'www1.example.com',
             IPAddress(u'10.1.2.101'),
@@ -353,6 +414,7 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
 
         self.make_host(
             self.mock_project_id,
+            cloud_id,
             region_id,
             'www1.example2.com',
             IPAddress(u'10.1.2.102'),
@@ -366,13 +428,18 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
 
     def test_hosts_get_all_with_filter_cell_id(self):
         project_id = self.make_project('project_1', foo='P1', zoo='P2')
-        region_id = self.make_region(project_id, 'region_1', foo='R1')
-        cell_id1 = self.make_cell(project_id, region_id, 'cell_1', bar='C2')
-        cell_id2 = self.make_cell(project_id, region_id, 'cell_2', bar='C2')
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1',
+                                     foo='R1')
+        cell_id1 = self.make_cell(project_id, cloud_id, region_id, 'cell_1',
+                                  bar='C2')
+        cell_id2 = self.make_cell(project_id, cloud_id, region_id, 'cell_2',
+                                  bar='C2')
         self.assertNotEqual(cell_id1, cell_id2)
 
         self.make_host(
             project_id,
+            cloud_id,
             region_id,
             'www.example.xyz',
             IPAddress(u'10.1.2.101'),
@@ -381,6 +448,7 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         )
         self.make_host(
             project_id,
+            cloud_id,
             region_id,
             'www.example.abc',
             IPAddress(u'10.1.2.102'),
@@ -404,8 +472,11 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
 
     def test_hosts_get_all_with_filters(self):
         project_id = self.make_project('project_1', foo='P1', zoo='P2')
-        region_id = self.make_region(project_id, 'region_1', foo='R1')
-        host_id = self.make_host(project_id, region_id, 'www.example.xyz',
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1',
+                                     foo='R1')
+        host_id = self.make_host(project_id, cloud_id, region_id,
+                                 'www.example.xyz',
                                  IPAddress(u'10.1.2.101'),
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}
@@ -423,8 +494,11 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
 
     def test_hosts_get_with_key_value_filters(self):
         project_id = self.make_project('project_1', foo='P1', zoo='P2')
-        region_id = self.make_region(project_id, 'region_1', foo='R1')
-        host1 = self.make_host(project_id, region_id, 'www.example.xyz',
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1',
+                                     foo='R1')
+        host1 = self.make_host(project_id, cloud_id, region_id,
+                               'www.example.xyz',
                                IPAddress(u'10.1.2.101'),
                                'server')
         variables = {"key1": "example1", "key2": "Tom"}
@@ -432,7 +506,8 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
             self.context, "hosts", host1, variables
         )
         # Second host with own variables
-        host2 = self.make_host(project_id, region_id, 'www.example2.xyz',
+        host2 = self.make_host(project_id, cloud_id, region_id,
+                               'www.example2.xyz',
                                IPAddress(u'10.1.2.102'),
                                'server')
         variables = {"key1": "example2", "key2": "Tom"}
@@ -451,8 +526,11 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
 
     def test_hosts_get_all_with_filters_noexist(self):
         project_id = self.make_project('project_1', foo='P1', zoo='P2')
-        region_id = self.make_region(project_id, 'region_1', foo='R1')
-        host_id = self.make_host(project_id, region_id, 'www.example.xyz',
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1',
+                                     foo='R1')
+        host_id = self.make_host(project_id, cloud_id, region_id,
+                                 'www.example.xyz',
                                  IPAddress(u'10.1.2.101'),
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}

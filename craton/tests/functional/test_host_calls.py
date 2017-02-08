@@ -1,17 +1,11 @@
 import urllib.parse
 
-from craton.tests.functional import TestCase
+from craton.tests.functional import DeviceTestBase
 from craton.tests.functional.test_variable_calls import \
     APIV1ResourceWithVariablesTestCase
 
 
-class HostTests(TestCase):
-    def setUp(self):
-        super(HostTests, self).setUp()
-        self.region = self.create_region()
-
-
-class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
+class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
 
     resource = 'hosts'
 
@@ -71,7 +65,8 @@ class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
     def test_create_with_extra_id_property_fails(self):
         url = self.url + '/v1/hosts'
         payload = {'device_type': 'server', 'ip_address': '192.168.1.1',
-                   'region_id': self.region['id'], 'name': 'a', 'id': 1}
+                   'region_id': self.region['id'],
+                   'cloud_id': self.cloud['id'], 'name': 'a', 'id': 1}
         host = self.post(url, data=payload)
         self.assertEqual(400, host.status_code)
         msg = ["Additional properties are not allowed ('id' was unexpected)"]
@@ -80,7 +75,8 @@ class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
     def test_create_with_extra_created_at_property_fails(self):
         url = self.url + '/v1/hosts'
         payload = {'device_type': 'server', 'ip_address': '192.168.1.1',
-                   'region_id': self.region['id'], 'name': 'a',
+                   'region_id': self.region['id'],
+                   'cloud_id': self.cloud['id'], 'name': 'a',
                    'created_at': 'some date'}
         host = self.post(url, data=payload)
         self.assertEqual(400, host.status_code)
@@ -91,7 +87,8 @@ class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
     def test_create_with_extra_updated_at_property_fails(self):
         url = self.url + '/v1/hosts'
         payload = {'device_type': 'server', 'ip_address': '192.168.1.1',
-                   'region_id': self.region['id'], 'name': 'a',
+                   'region_id': self.region['id'],
+                   'cloud_id': self.cloud['id'], 'name': 'a',
                    'updated_at': 'some date'}
         host = self.post(url, data=payload)
         self.assertEqual(400, host.status_code)
@@ -223,7 +220,7 @@ class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
                          resp.json())
 
 
-class TestPagination(HostTests):
+class TestPagination(DeviceTestBase):
 
     def setUp(self):
         super(TestPagination, self).setUp()
@@ -284,6 +281,20 @@ class TestPagination(HostTests):
         self.assertSuccessOk(resp)
         hosts = resp.json()
         self.assertEqual(2, len(hosts['hosts']))
+
+    def test_get_all_for_cloud(self):
+        cloud = self.create_cloud('cloud-2')
+        region = self.create_region(cloud=cloud)
+        self.create_host('host1', 'server', '192.168.1.1', cloud=cloud,
+                         region=region)
+        self.create_host('host2', 'server', '192.168.1.2', cloud=cloud,
+                         region=region)
+        url = self.url + '/v1/hosts?cloud_id={}'.format(cloud['id'])
+        resp = self.get(url)
+        self.assertSuccessOk(resp)
+        hosts = resp.json()['hosts']
+        self.assertEqual(2, len(hosts))
+        self.assertEqual(['host1', 'host2'], [h['name'] for h in hosts])
 
     def test_ascending_sort_by_name(self):
         response = self.get(self.url + '/v1/hosts',

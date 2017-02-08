@@ -1,13 +1,10 @@
 from itertools import count, cycle
 import urllib.parse
 
-from craton.tests.functional import TestCase
+from craton.tests.functional import DeviceTestBase
 
 
-class DeviceTests(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.region = self.create_region()
+class DeviceTests(DeviceTestBase):
 
     def count_devices(self, devices):
         num_devices = (

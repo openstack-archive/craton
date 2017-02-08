@@ -4,6 +4,7 @@ from craton.api.v1.resources import variables
 
 from craton.api.v1.resources.inventory import ansible_inventory
 from craton.api.v1.resources.inventory import cells
+from craton.api.v1.resources.inventory import clouds
 from craton.api.v1.resources.inventory import devices
 from craton.api.v1.resources.inventory import hosts
 from craton.api.v1.resources.inventory import regions
@@ -12,7 +13,8 @@ from craton.api.v1.resources.inventory import networks
 
 VARS_RESOLVE = ", ".join(map(repr, ("hosts", )))
 VARS_NOT_RESOLVE = ", ".join(
-    map(repr, ("network-devices", "cells", "regions", "networks", "projects"))
+    map(repr, ("network-devices", "cells", "regions", "networks", "projects",
+               "clouds"))
 )
 
 routes = [
@@ -37,6 +39,12 @@ routes = [
     dict(resource=regions.RegionsById,
          urls=['/regions/<id>'],
          endpoint='regions_id'),
+    dict(resource=clouds.Clouds,
+         urls=['/clouds'],
+         endpoint='clouds'),
+    dict(resource=clouds.CloudsById,
+         urls=['/clouds/<id>'],
+         endpoint='clouds_id'),
     dict(resource=cells.CellById,
          urls=['/cells/<id>'],
          endpoint='cells_id'),

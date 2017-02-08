@@ -42,6 +42,10 @@ VALIDATORS = {
         ('regions', 'POST'),
         ("regions_id", "GET"),
         ('regions_id', 'PUT'),
+        ('clouds', 'GET'),
+        ('clouds', 'POST'),
+        ("clouds_id", "GET"),
+        ('clouds_id', 'PUT'),
         ('users', 'GET'),
         ('users', 'POST'),
         ("users_id", "GET"),
@@ -61,6 +65,7 @@ VALIDATORS = {
         ("projects_id", "DELETE"),
         ("users_id", "DELETE"),
         ("regions_id", "DELETE"),
+        ("clouds_id", "DELETE"),
     ]
 }
 

@@ -241,33 +241,77 @@ class TestCase(testtools.TestCase):
         )
         return resp
 
-    def create_region(self, name='region-1', variables=None):
+    def create_cloud(self, name, variables=None):
+        url = self.url + '/v1/clouds'
+
+        values = {'name': name}
+        if variables:
+            values['variables'] = variables
+        resp = self.post(url, data=values)
+        self.assertSuccessCreated(resp)
+        self.assertIn('Location', resp.headers)
+        json = resp.json()
+        self.assertEqual(
+            resp.headers['Location'],
+            "{}/{}".format(url, json['id'])
+        )
+        return json
+
+    def delete_clouds(self, clouds):
+        base_url = self.url + '/v1/clouds/{}'
+        for cloud in clouds:
+            url = base_url.format(cloud['id'])
+            resp = self.delete(url)
+            self.assertNoContent(resp)
+
+    def create_region(self, name, cloud, variables=None):
         url = self.url + '/v1/regions'
-        payload = {'name': name}
+
+        values = {'name': name, 'cloud_id': cloud['id']}
+        if variables:
+            values['variables'] = variables
+        resp = self.post(url, data=values)
+        self.assertSuccessCreated(resp)
+        self.assertIn('Location', resp.headers)
+        json = resp.json()
+        self.assertEqual(
+            resp.headers['Location'],
+            "{}/{}".format(url, json['id'])
+        )
+        return json
+
+    def delete_regions(self, regions):
+        base_url = self.url + '/v1/regions/{}'
+        for region in regions:
+            url = base_url.format(region['id'])
+            resp = self.delete(url)
+            self.assertNoContent(resp)
+
+    def create_cell(self, name, cloud, region, variables=None):
+        url = self.url + '/v1/cells'
+        payload = {'name': name, 'region_id': region['id'],
+                   'cloud_id': cloud['id']}
         if variables:
             payload['variables'] = variables
-
-        region = self.post(url, data=payload)
-
-        self.assertEqual(201, region.status_code)
-        self.assertIn('Location', region.headers)
+        cell = self.post(url, data=payload)
+        self.assertEqual(201, cell.status_code)
+        self.assertIn('Location', cell.headers)
         self.assertEqual(
-            region.headers['Location'],
-            "{}/{}".format(url, region.json()['id'])
+            cell.headers['Location'],
+            "{}/{}".format(url, cell.json()['id'])
         )
-        return region.json()
+        return cell.json()
 
-    def create_host(
-            self, name, hosttype, ip_address, region=None, parent_id=None,
-            **variables
-            ):
-        if region is None:
-            region = self.region
-
+    def create_host(self, name, cloud, region, hosttype, ip_address,
+                    parent_id=None, **variables):
         url = self.url + '/v1/hosts'
-        payload = {'name': name, 'device_type': hosttype,
-                   'ip_address': ip_address,
-                   'region_id': region['id']}
+        payload = {
+            'name': name,
+            'device_type': hosttype,
+            'ip_address': ip_address,
+            'region_id': region['id'],
+            'cloud_id': cloud['id']
+        }
         if parent_id:
             payload['parent_id'] = parent_id
         if variables:
@@ -283,11 +327,9 @@ class TestCase(testtools.TestCase):
         return host.json()
 
     def create_network_device(
-            self, name, device_type, ip_address, region=None, parent_id=None,
+            self, name, cloud, region, device_type, ip_address, parent_id=None,
             **variables
             ):
-        if region is None:
-            region = self.region
 
         url = self.url + '/v1/network-devices'
         payload = {
@@ -295,6 +337,7 @@ class TestCase(testtools.TestCase):
             'device_type': device_type,
             'ip_address': ip_address,
             'region_id': region['id'],
+            'cloud_id': cloud['id'],
         }
         if parent_id:
             payload['parent_id'] = parent_id
@@ -309,3 +352,43 @@ class TestCase(testtools.TestCase):
             "{}/{}".format(url, network_device.json()['id'])
         )
         return network_device.json()
+
+
+class DeviceTestBase(TestCase):
+    def setUp(self):
+        super(DeviceTestBase, self).setUp()
+        self.cloud = self.create_cloud()
+        self.region = self.create_region()
+
+    def create_cloud(self, name='cloud-1'):
+        return super(DeviceTestBase, self).create_cloud(name=name)
+
+    def create_region(self, name='region-1', cloud=None):
+        return super(DeviceTestBase, self).create_region(
+            name=name,
+            cloud=cloud if cloud else self.cloud
+        )
+
+    def create_network_device(self, name, device_type, ip_address, region=None,
+                              cloud=None, parent_id=None, **variables):
+        return super(DeviceTestBase, self).create_network_device(
+            name=name,
+            cloud=cloud if cloud else self.cloud,
+            region=region if region else self.region,
+            device_type=device_type,
+            ip_address=ip_address,
+            parent_id=parent_id,
+            **variables
+        )
+
+    def create_host(self, name, hosttype, ip_address, region=None, cloud=None,
+                    parent_id=None, **variables):
+        return super(DeviceTestBase, self).create_host(
+            name=name,
+            cloud=cloud if cloud else self.cloud,
+            region=region if region else self.region,
+            hosttype=hosttype,
+            ip_address=ip_address,
+            parent_id=parent_id,
+            **variables
+        )

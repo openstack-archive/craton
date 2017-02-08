@@ -30,6 +30,11 @@ class Base(Exception):
             '%s: %s' % (self.code, self.message))
 
 
+class DuplicateCloud(Base):
+    code = 409
+    msg = "A cloud with the given name already exists."
+
+
 class DuplicateRegion(Base):
     code = 409
     msg = "A region with the given name already exists."

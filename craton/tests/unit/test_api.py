@@ -316,7 +316,7 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_with_valid_data(self, mock_cell):
         mock_cell.return_value = fake_resources.CELL1
-        data = {'name': 'cell1', 'region_id': 1}
+        data = {'name': 'cell1', 'region_id': 1, 'cloud_id': 1}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(201, resp.status_code)
         self.assertIn('Location', resp.headers)
@@ -331,6 +331,7 @@ class APIV1CellsTest(APIV1Test):
         data = {
             'name': "cell1",
             'region_id': 1,
+            'cloud_id': 1,
             'variables': {'key1': 'value1', 'key2': 'value2'},
         }
         resp = self.post('v1/cells', data=data)
@@ -339,6 +340,7 @@ class APIV1CellsTest(APIV1Test):
             'id': 1,
             'name': 'cell1',
             'region_id': 1,
+            'cloud_id': 1,
             'project_id': 1,
             'variables': {'key1': 'value1', 'key2': 'value2'},
         }
@@ -410,6 +412,187 @@ class APIV1CellsVariablesTest(APIV1Test):
         resp = self.delete('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 400)
         mock_cell.assert_not_called()
+
+
+class APIV1CloudsIDTest(APIV1Test):
+    @mock.patch.object(dbapi, 'clouds_get_by_id')
+    def test_clouds_get_by_id(self, mock_clouds):
+        mock_clouds.return_value = fake_resources.CLOUD1
+        resp = self.get('v1/clouds/1')
+        self.assertEqual(resp.json['name'], fake_resources.CLOUD1.name)
+
+    @mock.patch.object(dbapi, 'clouds_get_by_id')
+    def test_clouds_get_by_bad_id_is_404(self, mock_clouds):
+        mock_clouds.side_effect = exceptions.NotFound()
+        resp = self.get('v1/clouds/1')
+        self.assertEqual(404, resp.status_code)
+
+    @mock.patch.object(dbapi, 'clouds_delete')
+    def test_delete_cloud(self, mock_cloud):
+        resp = self.delete('v1/clouds/1')
+        self.assertEqual(204, resp.status_code)
+
+    @mock.patch.object(dbapi, 'clouds_update')
+    def test_put_clouds_by_id(self, mock_cloud):
+        data = {'note': 'new note', 'name': 'new name'}
+        resp = self.put('v1/clouds/1', data=data)
+        self.assertEqual(200, resp.status_code)
+        mock_cloud.assert_called_once_with(mock.ANY, '1', data)
+
+    @mock.patch.object(dbapi, 'clouds_update')
+    def test_put_clouds_by_id_invalid_property(self, mock_cloud):
+        data = {'foo': 'isinvalid'}
+        resp = self.put('v1/clouds/1', data=data)
+        self.assertEqual(400, resp.status_code)
+        mock_cloud.assert_not_called()
+
+    @mock.patch.object(dbapi, 'clouds_update')
+    def test_update_cloud(self, mock_cloud):
+        record = dict(fake_resources.CLOUD1.items())
+        payload = {"name": "cloud_New1"}
+        db_data = payload.copy()
+        record.update(payload)
+        mock_cloud.return_value = record
+
+        resp = self.put('v1/clouds/1', data=payload)
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json['name'], 'cloud_New1')
+        mock_cloud.assert_called_once_with(mock.ANY, '1', db_data)
+
+
+class APIV1CloudsTest(APIV1Test):
+    @mock.patch.object(dbapi, 'clouds_get_all')
+    def test_clouds_get_all(self, mock_clouds):
+        mock_clouds.return_value = (fake_resources.CLOUDS_LIST, {})
+        resp = self.get('v1/clouds')
+        self.assertEqual(len(resp.json), len(fake_resources.CLOUDS_LIST))
+
+    @mock.patch.object(dbapi, 'clouds_get_all')
+    def test_clouds_get_all_by_invalid_property_name(self, mock_clouds):
+        resp = self.get('v1/clouds?foo=invalidpropertyname')
+        self.assertEqual(400, resp.status_code)
+        mock_clouds.assert_not_called()
+
+    @mock.patch.object(dbapi, 'clouds_get_by_name')
+    def test_clouds_get_by_name_filters(self, mock_clouds):
+        mock_clouds.return_value = fake_resources.CLOUD1
+        resp = self.get('v1/clouds?name=cloud1')
+        clouds = resp.json['clouds']
+        self.assertEqual(clouds[0]["name"], fake_resources.CLOUD1.name)
+
+    @mock.patch.object(dbapi, 'clouds_get_by_id')
+    def test_clouds_get_by_id_filters(self, mock_clouds):
+        mock_clouds.return_value = fake_resources.CLOUD1
+        resp = self.get('v1/clouds?id=1')
+        clouds = resp.json['clouds']
+        self.assertEqual(clouds[0]["name"], fake_resources.CLOUD1.name)
+
+    @mock.patch.object(dbapi, 'clouds_get_all')
+    def test_clouds_get_by_vars_filters(self, mock_clouds):
+        mock_clouds.return_value = ([fake_resources.CLOUD1], {})
+        resp = self.get('v1/clouds?vars=somekey:somevalue')
+        self.assertEqual(len(resp.json['clouds']), 1)
+        self.assertEqual(resp.json['clouds'][0]["name"],
+                         fake_resources.CLOUD1.name)
+
+    @mock.patch.object(dbapi, 'clouds_get_by_name')
+    def test_get_cloud_no_exist_by_name_fails(self, mock_clouds):
+        mock_clouds.side_effect = exceptions.NotFound()
+        resp = self.get('v1/clouds?name=bla')
+        self.assertEqual(404, resp.status_code)
+
+    @mock.patch.object(dbapi, 'clouds_create')
+    def test_post_cloud_with_valid_data(self, mock_cloud):
+        mock_cloud.return_value = fake_resources.CLOUD1
+        data = {'name': 'cloud1'}
+        resp = self.post('v1/clouds', data=data)
+        self.assertEqual(201, resp.status_code)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/clouds/1"
+        )
+
+    @mock.patch.object(dbapi, 'clouds_create')
+    def test_post_cloud_with_invalid_property_name(self, mock_cloud):
+        data = {'name': 'cloud1', 'foo': 'invalidpropertyname'}
+        resp = self.post('v1/clouds', data=data)
+        self.assertEqual(400, resp.status_code)
+        mock_cloud.assert_not_called()
+
+    @mock.patch.object(dbapi, 'clouds_create')
+    def test_create_cloud_returns_cloud_obj(self, mock_cloud):
+        return_value = {'name': 'cloud1',
+                        'project_id': 'abcd',
+                        'id': 1,
+                        'variables': {"key1": "value1", "key2": "value2"}}
+        fake_cloud = fake_resources.CLOUD1
+        fake_cloud.variables = {"key1": "value1", "key2": "value2"}
+        mock_cloud.return_value = fake_cloud
+        data = {'name': 'cloud1',
+                'variables': {"key1": "value1", "key2": "value2"}}
+        resp = self.post('v1/clouds', data=data)
+        self.assertEqual(201, resp.status_code)
+        self.assertEqual(return_value, resp.json)
+        self.assertIn('Location', resp.headers)
+        self.assertEqual(
+            resp.headers['Location'],
+            "http://localhost/v1/clouds/1"
+        )
+
+    @mock.patch.object(dbapi, 'clouds_create')
+    def test_post_cloud_with_invalid_data_fails(self, mock_cloud):
+        mock_cloud.return_value = None
+        data = {}
+        resp = self.post('v1/clouds', data=data)
+        self.assertEqual(400, resp.status_code)
+
+
+class APIV1CloudsVariablesTest(APIV1Test):
+    @mock.patch.object(dbapi, 'resource_get_by_id')
+    def test_cloud_get_variables(self, mock_cloud):
+        mock_cloud.return_value = fake_resources.CLOUD1
+        resp = self.get('v1/clouds/1/variables')
+        expected = {"variables": {"key1": "value1", "key2": "value2"}}
+        self.assertEqual(resp.json, expected)
+
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
+    def test_clouds_put_variables(self, mock_cloud):
+        db_return_value = copy.deepcopy(fake_resources.CLOUD1)
+        db_return_value.variables["a"] = "b"
+        mock_cloud.return_value = db_return_value
+        payload = {"a": "b"}
+        db_data = payload.copy()
+        resp = self.put('v1/clouds/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 200)
+        mock_cloud.assert_called_once_with(mock.ANY, "clouds", '1', db_data)
+        expected = {
+            "variables": {"key1": "value1", "key2": "value2", "a": "b"},
+        }
+        self.assertDictEqual(expected, resp.json)
+
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
+    def test_clouds_put_variables_bad_data_type(self, mock_cloud):
+        payload = ["a", "b"]
+        resp = self.put('v1/clouds/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 400)
+        mock_cloud.assert_not_called()
+
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
+    def test_clouds_delete_variables(self, mock_cloud):
+        payload = ["key1"]
+        db_data = payload.copy()
+        resp = self.delete('v1/clouds/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 204)
+        mock_cloud.assert_called_once_with(mock.ANY, "clouds", '1', db_data)
+
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
+    def test_clouds_delete_variables_bad_data_type(self, mock_cloud):
+        payload = {"a": "b"}
+        resp = self.delete('v1/clouds/1/variables', data=payload)
+        self.assertEqual(resp.status_code, 400)
+        mock_cloud.assert_not_called()
 
 
 class APIV1RegionsIDTest(APIV1Test):
@@ -511,7 +694,7 @@ class APIV1RegionsTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_valid_data(self, mock_region):
         mock_region.return_value = fake_resources.REGION1
-        data = {'name': 'region1'}
+        data = {'name': 'region1', 'cloud_id': 1}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(201, resp.status_code)
         self.assertIn('Location', resp.headers)
@@ -532,11 +715,12 @@ class APIV1RegionsTest(APIV1Test):
         return_value = {'name': 'region1',
                         'project_id': 'abcd',
                         'id': 1,
+                        'cloud_id': 1,
                         'variables': {"key1": "value1", "key2": "value2"}}
         fake_region = fake_resources.REGION1
         fake_region.variables = {"key1": "value1", "key2": "value2"}
         mock_region.return_value = fake_region
-        data = {'name': 'region1',
+        data = {'name': 'region1', 'cloud_id': 1,
                 'variables': {"key1": "value1", "key2": "value2"}}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(201, resp.status_code)
@@ -798,7 +982,7 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_with_valid_data(self, mock_host):
         mock_host.return_value = fake_resources.HOST1
-        data = {'name': 'www.craton.com', 'region_id': 1,
+        data = {'name': 'www.craton.com', 'region_id': 1, 'cloud_id': 1,
                 'ip_address': '192.168.1.1', 'device_type': 'server',
                 'active': True}
         resp = self.post('/v1/hosts', data=data)
@@ -815,6 +999,7 @@ class APIV1HostsTest(APIV1Test):
         data = {
             'name': 'www.craton.com',
             'region_id': 1,
+            'cloud_id': 1,
             'ip_address': '192.168.1.1',
             'device_type': 'server',
             'labels': [],
@@ -826,6 +1011,7 @@ class APIV1HostsTest(APIV1Test):
             'id': 1,
             'name': 'www.craton.com',
             'region_id': 1,
+            'cloud_id': 1,
             'project_id': 1,
             'ip_address': '192.168.1.1',
             'device_type': 'server',
@@ -1145,6 +1331,7 @@ class APIV1NetworksTest(APIV1Test):
             'netmask': '255.255.255.0',
             'variables': {'key1': 'value1'},
             'region_id': 1,
+            'cloud_id': 1,
         }
         resp = self.post('/v1/networks', data=data)
         self.assertEqual(201, resp.status_code)
@@ -1369,7 +1556,7 @@ class APIV1NetworkDevicesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_network_devices_with_valid_data(self, mock_devices):
         mock_devices.return_value = fake_resources.NETWORK_DEVICE1
-        data = {'name': 'NewNetDevice1', 'region_id': 1,
+        data = {'name': 'NewNetDevice1', 'region_id': 1, 'cloud_id': 1,
                 'device_type': 'Sample', 'ip_address': '0.0.0.0'}
         resp = self.post('/v1/network-devices', data=data)
         self.assertEqual(201, resp.status_code)

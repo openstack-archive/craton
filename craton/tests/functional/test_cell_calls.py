@@ -8,24 +8,28 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
 
     def setUp(self):
         super(APIV1CellTest, self).setUp()
+        self.cloud = self.create_cloud()
         self.region = self.create_region()
 
     def tearDown(self):
         super(APIV1CellTest, self).tearDown()
 
-    def create_cell(self, name, variables=None):
-        url = self.url + '/v1/cells'
-        payload = {'name': name, 'region_id': self.region['id']}
-        if variables:
-            payload['variables'] = variables
-        cell = self.post(url, data=payload)
-        self.assertEqual(201, cell.status_code)
-        self.assertIn('Location', cell.headers)
-        self.assertEqual(
-            cell.headers['Location'],
-            "{}/{}".format(url, cell.json()['id'])
+    def create_cloud(self):
+        return super(APIV1CellTest, self).create_cloud(name='cloud-1')
+
+    def create_region(self):
+        return super(APIV1CellTest, self).create_region(
+            name='region-1',
+            cloud=self.cloud
         )
-        return cell.json()
+
+    def create_cell(self, name, variables=None):
+        return super(APIV1CellTest, self).create_cell(
+            name=name,
+            cloud=self.cloud,
+            region=self.region,
+            variables=variables
+        )
 
     def test_cell_create_with_variables(self):
         variables = {'a': 'b'}
@@ -48,13 +52,15 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
     def test_cell_create_with_duplicate_name_fails(self):
         self.create_cell('test-cell')
         url = self.url + '/v1/cells'
-        payload = {'name': 'test-cell', 'region_id': self.region['id']}
+        payload = {'name': 'test-cell', 'region_id': self.region['id'],
+                   "cloud_id": self.cloud['id']}
         cell = self.post(url, data=payload)
         self.assertEqual(409, cell.status_code)
 
     def test_cell_create_with_extra_id_property_fails(self):
         url = self.url + '/v1/cells'
-        payload = {'region_id': self.region['id'], 'name': 'a', 'id': 3}
+        payload = {'region_id': self.region['id'],
+                   'cloud_id': self.cloud['id'], 'name': 'a', 'id': 3}
         cell = self.post(url, data=payload)
         self.assertEqual(400, cell.status_code)
         msg = ["Additional properties are not allowed ('id' was unexpected)"]
@@ -62,7 +68,8 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
 
     def test_cell_create_with_extra_created_at_property_fails(self):
         url = self.url + '/v1/cells'
-        payload = {'region_id': self.region['id'], 'name': 'a',
+        payload = {'region_id': self.region['id'],
+                   'cloud_id': self.cloud['id'], 'name': 'a',
                    'created_at': "some date"}
         cell = self.post(url, data=payload)
         self.assertEqual(400, cell.status_code)
@@ -72,7 +79,8 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
 
     def test_cell_create_with_extra_updated_at_property_fails(self):
         url = self.url + '/v1/cells'
-        payload = {'region_id': self.region['id'], 'name': 'a',
+        payload = {'region_id': self.region['id'],
+                   'cloud_id': self.cloud['id'], 'name': 'a',
                    'updated_at': "some date"}
         cell = self.post(url, data=payload)
         self.assertEqual(400, cell.status_code)
@@ -88,6 +96,16 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
         cells = resp.json()['cells']
         self.assertEqual(1, len(cells))
         self.assertEqual(['cell-1'], [i['name'] for i in cells])
+
+    def test_cells_get_all_for_cloud(self):
+        # Create a cell first
+        for i in range(2):
+            self.create_cell('cell-{}'.format(str(i)))
+        url = self.url + '/v1/cells?cloud_id={}'.format(self.cloud['id'])
+        resp = self.get(url)
+        cells = resp.json()['cells']
+        self.assertEqual(2, len(cells))
+        self.assertEqual(['cell-0', 'cell-1'], [i['name'] for i in cells])
 
     def test_cell_get_all_with_name_filter(self):
         self.create_cell('cell1')
