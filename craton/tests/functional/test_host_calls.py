@@ -8,11 +8,24 @@ from craton.tests.functional.test_variable_calls import \
 class HostTests(TestCase):
     def setUp(self):
         super(HostTests, self).setUp()
+        self.cloud = self.create_cloud()
         self.region = self.create_region()
+
+    def create_cloud(self):
+        url = self.url + '/v1/clouds'
+        payload = {'name': 'cloud-1'}
+        cloud = self.post(url, data=payload)
+        self.assertEqual(201, cloud.status_code)
+        self.assertIn('Location', cloud.headers)
+        self.assertEqual(
+            cloud.headers['Location'],
+            "{}/{}".format(url, cloud.json()['id'])
+        )
+        return cloud.json()
 
     def create_region(self, region_name='region-1'):
         url = self.url + '/v1/regions'
-        payload = {'name': region_name}
+        payload = {'name': region_name, 'cloud_id': self.cloud['id']}
         region = self.post(url, data=payload)
         self.assertEqual(201, region.status_code)
         self.assertIn('Location', region.headers)
@@ -22,15 +35,19 @@ class HostTests(TestCase):
         )
         return region.json()
 
-    def create_host(self, name, hosttype, ip_address, region=None,
+    def create_host(self, name, hosttype, ip_address, region=None, cloud=None,
                     **variables):
         if region is None:
             region = self.region
 
+        if cloud is None:
+            cloud = self.cloud
+
         url = self.url + '/v1/hosts'
         payload = {'name': name, 'device_type': hosttype,
                    'ip_address': ip_address,
-                   'region_id': region['id']}
+                   'region_id': region['id'],
+                   'cloud_id': cloud['id']}
         if variables:
             payload['variables'] = variables
 

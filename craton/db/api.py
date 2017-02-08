@@ -113,6 +113,38 @@ def regions_delete(context, region_id):
     """Delete an existing region."""
     return IMPL.regions_delete(context, region_id)
 
+# Clouds
+
+
+def clouds_get_all(context, filters, pagination_params):
+    """Get all available clouds."""
+    return IMPL.clouds_get_all(context, filters, pagination_params)
+
+
+def clouds_get_by_name(context, name):
+    """Get clouds with given name."""
+    return IMPL.clouds_get_by_name(context, name)
+
+
+def clouds_get_by_id(context, cloud_id):
+    """Get cloud detail for the cloud with given id."""
+    return IMPL.clouds_get_by_id(context, cloud_id)
+
+
+def clouds_create(context, values):
+    """Create a new cloud."""
+    return IMPL.clouds_create(context, values)
+
+
+def clouds_update(context, cloud_id, values):
+    """Update an existing cloud."""
+    return IMPL.clouds_update(context, cloud_id, values)
+
+
+def clouds_delete(context, cloud_id):
+    """Delete an existing cloud."""
+    return IMPL.clouds_delete(context, cloud_id)
+
 # Hosts
 
 
