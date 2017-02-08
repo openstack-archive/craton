@@ -8,40 +8,28 @@ from craton.tests.functional.test_variable_calls import \
 class HostTests(TestCase):
     def setUp(self):
         super(HostTests, self).setUp()
+        self.cloud = self.create_cloud()
         self.region = self.create_region()
 
-    def create_region(self, region_name='region-1'):
-        url = self.url + '/v1/regions'
-        payload = {'name': region_name}
-        region = self.post(url, data=payload)
-        self.assertEqual(201, region.status_code)
-        self.assertIn('Location', region.headers)
-        self.assertEqual(
-            region.headers['Location'],
-            "{}/{}".format(url, region.json()['id'])
-        )
-        return region.json()
+    def create_cloud(self, name='cloud-1'):
+        return super(HostTests, self).create_cloud(name=name)
 
-    def create_host(self, name, hosttype, ip_address, region=None,
+    def create_region(self, name='region-1', cloud=None):
+        return super(HostTests, self).create_region(
+            name=name,
+            cloud=cloud if cloud else self.cloud
+        )
+
+    def create_host(self, name, hosttype, ip_address, region=None, cloud=None,
                     **variables):
-        if region is None:
-            region = self.region
-
-        url = self.url + '/v1/hosts'
-        payload = {'name': name, 'device_type': hosttype,
-                   'ip_address': ip_address,
-                   'region_id': region['id']}
-        if variables:
-            payload['variables'] = variables
-
-        host = self.post(url, data=payload)
-        self.assertEqual(201, host.status_code)
-        self.assertIn('Location', host.headers)
-        self.assertEqual(
-            host.headers['Location'],
-            "{}/{}".format(url, host.json()['id'])
+        return super(HostTests, self).create_host(
+            name=name,
+            cloud=cloud if cloud else self.cloud,
+            region=region if region else self.region,
+            hosttype=hosttype,
+            ip_address=ip_address,
+            **variables
         )
-        return host.json()
 
 
 class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
@@ -234,6 +222,7 @@ class TestPagination(HostTests):
                              '192.168.1.{}'.format(i + 1))
             for i in range(0, 61)
         ]
+        self.addCleanup(self.delete_hosts, self.hosts)
 
     def test_get_returns_a_default_list_of_thirty_hosts(self):
         response = self.get(self.url + '/v1/hosts')
@@ -286,6 +275,20 @@ class TestPagination(HostTests):
         self.assertSuccessOk(resp)
         hosts = resp.json()
         self.assertEqual(2, len(hosts['hosts']))
+
+    def test_get_all_for_cloud(self):
+        cloud = self.create_cloud('cloud-2')
+        region = self.create_region(cloud=cloud)
+        self.create_host('host1', 'server', '192.168.1.1', cloud=cloud,
+                         region=region)
+        self.create_host('host2', 'server', '192.168.1.2', cloud=cloud,
+                         region=region)
+        url = self.url + '/v1/hosts?cloud_id={}'.format(cloud['id'])
+        resp = self.get(url)
+        self.assertSuccessOk(resp)
+        hosts = resp.json()['hosts']
+        self.assertEqual(2, len(hosts))
+        self.assertEqual(['host1', 'host2'], [h['name'] for h in hosts])
 
     def test_ascending_sort_by_name(self):
         response = self.get(self.url + '/v1/hosts',

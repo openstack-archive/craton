@@ -8,36 +8,28 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
 
     def setUp(self):
         super(APIV1CellTest, self).setUp()
+        self.cloud = self.create_cloud()
         self.region = self.create_region()
 
     def tearDown(self):
         super(APIV1CellTest, self).tearDown()
 
+    def create_cloud(self):
+        return super(APIV1CellTest, self).create_cloud(name='cloud-1')
+
     def create_region(self):
-        url = self.url + '/v1/regions'
-        payload = {'name': 'region-1'}
-        region = self.post(url, data=payload)
-        self.assertEqual(201, region.status_code)
-        self.assertIn('Location', region.headers)
-        self.assertEqual(
-            region.headers['Location'],
-            "{}/{}".format(url, region.json()['id'])
+        return super(APIV1CellTest, self).create_region(
+            name='region-1',
+            cloud=self.cloud
         )
-        return region.json()
 
     def create_cell(self, name, variables=None):
-        url = self.url + '/v1/cells'
-        payload = {'name': name, 'region_id': self.region['id']}
-        if variables:
-            payload['variables'] = variables
-        cell = self.post(url, data=payload)
-        self.assertEqual(201, cell.status_code)
-        self.assertIn('Location', cell.headers)
-        self.assertEqual(
-            cell.headers['Location'],
-            "{}/{}".format(url, cell.json()['id'])
+        return super(APIV1CellTest, self).create_cell(
+            name=name,
+            cloud=self.cloud,
+            region=self.region,
+            variables=variables
         )
-        return cell.json()
 
     def test_cell_create_with_variables(self):
         variables = {'a': 'b'}
@@ -60,7 +52,8 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
     def test_cell_create_with_duplicate_name_fails(self):
         self.create_cell('test-cell')
         url = self.url + '/v1/cells'
-        payload = {'name': 'test-cell', 'region_id': self.region['id']}
+        payload = {'name': 'test-cell', 'region_id': self.region['id'],
+                   "cloud_id": self.cloud['id']}
         cell = self.post(url, data=payload)
         self.assertEqual(409, cell.status_code)
 
@@ -72,6 +65,16 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
         cells = resp.json()['cells']
         self.assertEqual(1, len(cells))
         self.assertEqual(['cell-1'], [i['name'] for i in cells])
+
+    def test_cells_get_all_for_cloud(self):
+        # Create a cell first
+        for i in range(2):
+            self.create_cell('cell-{}'.format(str(i)))
+        url = self.url + '/v1/cells?cloud_id={}'.format(self.cloud['id'])
+        resp = self.get(url)
+        cells = resp.json()['cells']
+        self.assertEqual(2, len(cells))
+        self.assertEqual(['cell-0', 'cell-1'], [i['name'] for i in cells])
 
     def test_cell_get_all_with_name_filter(self):
         self.create_cell('cell1')

@@ -238,3 +238,90 @@ class TestCase(testtools.TestCase):
             url, verify=False, headers=headers, json=body,
         )
         return resp
+
+    def create_cloud(self, name, variables=None):
+        url = self.url + '/v1/clouds'
+
+        values = {'name': name}
+        if variables:
+            values['variables'] = variables
+        resp = self.post(url, data=values)
+        self.assertSuccessCreated(resp)
+        self.assertIn('Location', resp.headers)
+        json = resp.json()
+        self.assertEqual(
+            resp.headers['Location'],
+            "{}/{}".format(url, json['id'])
+        )
+        return json
+
+    def delete_clouds(self, clouds):
+        base_url = self.url + '/v1/clouds/{}'
+        for cloud in clouds:
+            url = base_url.format(cloud['id'])
+            resp = self.delete(url)
+            self.assertNoContent(resp)
+
+    def create_region(self, name, cloud, variables=None):
+        url = self.url + '/v1/regions'
+
+        values = {'name': name, 'cloud_id': cloud['id']}
+        if variables:
+            values['variables'] = variables
+        resp = self.post(url, data=values)
+        self.assertSuccessCreated(resp)
+        self.assertIn('Location', resp.headers)
+        json = resp.json()
+        self.assertEqual(
+            resp.headers['Location'],
+            "{}/{}".format(url, json['id'])
+        )
+        return json
+
+    def delete_regions(self, regions):
+        base_url = self.url + '/v1/regions/{}'
+        for region in regions:
+            url = base_url.format(region['id'])
+            resp = self.delete(url)
+            self.assertNoContent(resp)
+
+    def create_cell(self, name, cloud, region, variables=None):
+        url = self.url + '/v1/cells'
+        payload = {'name': name, 'region_id': region['id'],
+                   'cloud_id': cloud['id']}
+        if variables:
+            payload['variables'] = variables
+        cell = self.post(url, data=payload)
+        self.assertEqual(201, cell.status_code)
+        self.assertIn('Location', cell.headers)
+        self.assertEqual(
+            cell.headers['Location'],
+            "{}/{}".format(url, cell.json()['id'])
+        )
+        return cell.json()
+
+    def create_host(self, name, cloud, region, hosttype, ip_address,
+                    **variables):
+        url = self.url + '/v1/hosts'
+        payload = {'name': name, 'device_type': hosttype,
+                   'ip_address': ip_address,
+                   'region_id': region['id'],
+                   'cloud_id': cloud['id']}
+        if variables:
+            payload['variables'] = variables
+
+        host = self.post(url, data=payload)
+        self.assertEqual(201, host.status_code)
+        self.assertIn('Location', host.headers)
+        self.assertEqual(
+            host.headers['Location'],
+            "{}/{}".format(url, host.json()['id'])
+        )
+        return host.json()
+
+    def delete_hosts(self, hosts):
+        base_url = self.url + '/v1/hosts/{}'
+        for host in hosts:
+            url = base_url.format(host['id'])
+            resp = self.delete(url)
+            self.assertNoContent(resp)
