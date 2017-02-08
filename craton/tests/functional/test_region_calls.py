@@ -4,10 +4,26 @@ from craton.tests.functional import TestCase
 
 
 class RegionTests(TestCase):
+    def setUp(self):
+        super(RegionTests, self).setUp()
+        self.cloud = self.create_cloud()
+
+    def create_cloud(self):
+        url = self.url + '/v1/clouds'
+        payload = {'name': 'cloud-1'}
+        cloud = self.post(url, data=payload)
+        self.assertEqual(201, cloud.status_code)
+        self.assertIn('Location', cloud.headers)
+        self.assertEqual(
+            cloud.headers['Location'],
+            "{}/{}".format(url, cloud.json()['id'])
+        )
+        return cloud.json()
+
     def create_region(self, name, variables=None):
         url = self.url + '/v1/regions'
 
-        values = {'name': name}
+        values = {'name': name, 'cloud_id': self.cloud['id']}
         if variables:
             values['variables'] = variables
         resp = self.post(url, data=values)

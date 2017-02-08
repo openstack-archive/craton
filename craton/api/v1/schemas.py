@@ -59,6 +59,7 @@ DefinitionsHost = {
     "required": [
         "name",
         "region_id",
+        "cloud_id",
         "ip_address",
         "device_type",
     ],
@@ -108,6 +109,9 @@ DefinitionsHost = {
             "description": "User defined labels",
         },
         "region_id": {
+            "type": "integer",
+        },
+        "cloud_id": {
             "type": "integer",
         },
         "variables": DefinitionVariablesSource,
@@ -164,6 +168,9 @@ DefinitionsHostId = {
         "region_id": {
             "type": "integer",
         },
+        "cloud_id": {
+            "type": "integer",
+        },
         "variables": DefinitionVariablesSource,
         "links": DefinitionLinks,
     },
@@ -173,6 +180,7 @@ DefinitionsCell = {
     "required": [
         "name",
         "region_id",
+        "cloud_id",
     ],
     "type": "object",
     "additionalProperties": False,
@@ -190,6 +198,9 @@ DefinitionsCell = {
             "type": "string",
         },
         "region_id": {
+            "type": "integer",
+        },
+        "cloud_id": {
             "type": "integer",
         },
         "project_id": {
@@ -224,6 +235,9 @@ DefinitionsCellId = {
             "type": "string",
         },
         "region_id": {
+            "type": "integer",
+        },
+        "cloud_id": {
             "type": "integer",
         },
         "id": {
@@ -267,6 +281,7 @@ DefinitionsError = {
 DefinitionsRegion = {
     "required": [
         "name",
+        "cloud_id",
     ],
     "type": "object",
     "additionalProperties": False,
@@ -292,6 +307,9 @@ DefinitionsRegion = {
         },
         "project_id": {
             "type": "string",
+        },
+        "cloud_id": {
+            "type": "integer",
         },
         "id": {
             "type": "integer",
@@ -319,6 +337,9 @@ DefinitionsRegionId = {
             "type": "string",
             "description": "Region Name.",
         },
+        "cloud_id": {
+            "type": "integer",
+        },
         "project_id": {
             "type": "string",
             "description": "UUID of the project",
@@ -335,6 +356,85 @@ DefinitionsRegionId = {
         "variables": DefinitionVariablesSource,
     },
 }
+
+DefinitionsCloud = {
+    "required": [
+        "name",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
+        "note": {
+            "type": "string",
+            "description": "Cloud Note",
+        },
+        "name": {
+            "type": "string",
+            "description": "Cloud Name",
+        },
+        "cells": {
+            "items": DefinitionsRegion,
+            "type": "array",
+            "description": "List of regions in this cloud",
+        },
+        "project_id": {
+            "type": "string",
+        },
+        "cloud_id": {
+            "type": "integer",
+        },
+        "id": {
+            "type": "integer",
+            "description": "Unique ID for the cloud",
+        },
+        "variables": DefinitionVariablesSource,
+    },
+}
+
+DefinitionsCloudId = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "created_at": {
+            "type": "string",
+        },
+        "updated_at": {
+            "type": "string",
+        },
+        "note": {
+            "type": "string",
+            "description": "Cloud Note",
+        },
+        "name": {
+            "type": "string",
+            "description": "Cloud Name.",
+        },
+        "cloud_id": {
+            "type": "integer",
+        },
+        "project_id": {
+            "type": "string",
+            "description": "UUID of the project",
+        },
+        "regions": {
+            "items": DefinitionsRegion,
+            "type": "array",
+            "description": "List of regions in this cloud",
+        },
+        "id": {
+            "type": "integer",
+            "description": "Unique ID for the cloud",
+        },
+        "variables": DefinitionVariablesSource,
+    },
+}
+
 
 DefinitionUser = {
     "type": "object",
@@ -412,6 +512,9 @@ DefinitionNetwork = {
         "region_id": {
             "type": "integer",
         },
+        "cloud_id": {
+            "type": "integer",
+        },
         "cell_id": {
             "type": "integer",
         },
@@ -457,6 +560,9 @@ DefinitionNetworkId = {
             "type": "string",
         },
         "region_id": {
+            "type": "integer",
+        },
+        "cloud_id": {
             "type": "integer",
         },
         "cell_id": {
@@ -614,6 +720,7 @@ DefinitionNetworkDevice = {
     "required": [
         "name",
         "region_id",
+        "cloud_id",
         "device_type",
         "ip_address",
     ],
@@ -630,6 +737,9 @@ DefinitionNetworkDevice = {
             "type": "integer",
         },
         "region_id": {
+            "type": "integer",
+        },
+        "cloud_id": {
             "type": "integer",
         },
         "cell_id": {
@@ -692,6 +802,9 @@ DefinitionNetworkDeviceId = {
             "type": "string",
         },
         "region_id": {
+            "type": "integer",
+        },
+        "cloud_id": {
             "type": "integer",
         },
         "cell_id": {
@@ -881,6 +994,39 @@ validators = {
     ("regions", "POST"): {
         "json": DefinitionsRegion,
     },
+    ("clouds", "GET"): {
+        "args": {
+            "additionalProperties": False,
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "name of the cloud to get",
+                },
+                "vars": {
+                    "type": "string",
+                    "description": "variable filters to get a cloud",
+                },
+                "id": {
+                    "type": "integer",
+                    "description": "ID of the cloud to get",
+                },
+                "limit": {
+                    "minimum": 10,
+                    "default": 30,
+                    "maximum": 100,
+                    "type": "integer",
+                    "description": "Number of clouds to return in a page",
+                },
+                "marker": {
+                    "type": "integer",
+                    "description": "Last cloud ID of the previous page",
+                },
+            },
+        },
+    },
+    ("clouds", "POST"): {
+        "json": DefinitionsCloud,
+    },
     ("hosts", "POST"): {
         "json": DefinitionsHost,
     },
@@ -995,6 +1141,24 @@ validators = {
         "args": DefinitionNoParams,
     },
     ("regions_id", "PUT"): {
+        "json": {
+            "additionalProperties": False,
+            "properties": {
+                "name": {
+                    "type": "string",
+                },
+                "note": {
+                    "type": "string",
+                },
+            },
+        },
+    },
+    ("clouds_id", "DELETE"): {
+    },
+    ("clouds_id", "GET"): {
+        "args": DefinitionNoParams,
+    },
+    ("clouds_id", "PUT"): {
         "json": {
             "additionalProperties": False,
             "properties": {
@@ -1314,6 +1478,10 @@ validators = {
                 "region_id": {
                     "type": "string",
                     "description": "region id of the network to get",
+                },
+                "cloud_id": {
+                    "type": "string",
+                    "description": "cloud id of the network to get",
                 },
                 "vars": {
                     "type": "string",
@@ -1712,6 +1880,92 @@ filters = {
         },
     },
     ("regions_id", "DELETE"): {
+        204: {
+            "headers": None,
+            "schema": None,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("clouds", "POST"): {
+        201: {
+            "headers": None,
+            "schema": DefinitionsCloud,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("clouds", "GET"): {
+        200: {
+            "headers": None,
+            "schema": paginated_resource("clouds", DefinitionsCloud),
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("clouds_id", "GET"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionsCloudId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("clouds_id", "PUT"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionsCloudId,
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("clouds_id", "DELETE"): {
         204: {
             "headers": None,
             "schema": None,
