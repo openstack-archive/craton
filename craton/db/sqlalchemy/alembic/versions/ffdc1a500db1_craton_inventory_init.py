@@ -61,7 +61,7 @@ def upgrade():
             'fk_projects_variable_association')
     )
     op.create_table(
-        'regions',
+        'clouds',
         sa.Column('created_at', sa.DateTime, nullable=True),
         sa.Column('updated_at', sa.DateTime, nullable=True),
         sa.Column('id', sa.Integer, nullable=False),
@@ -73,14 +73,39 @@ def upgrade():
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint(
             'project_id', 'name',
-            name='uq_region0projectid0name'),
+            name='uq_cloud0projectid0name'),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
+        sa.ForeignKeyConstraint(
+            ['variable_association_id'], ['variable_association.id'],
+            'fk_clouds_variable_association')
+    )
+    op.create_index(op.f('ix_clouds_project_id'),
+                    'clouds', ['project_id'], unique=False)
+    op.create_table(
+        'regions',
+        sa.Column('created_at', sa.DateTime, nullable=True),
+        sa.Column('updated_at', sa.DateTime, nullable=True),
+        sa.Column('id', sa.Integer, nullable=False),
+        sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False),
+                  nullable=False),
+        sa.Column('cloud_id', sa.Integer, nullable=False),
+        sa.Column('variable_association_id', sa.Integer),
+        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('note', sa.Text, nullable=True),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint(
+            'cloud_id', 'name',
+            name='uq_region0cloudid0name'),
+        sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
+        sa.ForeignKeyConstraint(['cloud_id'], ['clouds.id']),
         sa.ForeignKeyConstraint(
             ['variable_association_id'], ['variable_association.id'],
             'fk_regions_variable_association')
     )
     op.create_index(op.f('ix_regions_project_id'),
                     'regions', ['project_id'], unique=False)
+    op.create_index(op.f('ix_regions_cloud_id'),
+                    'regions', ['cloud_id'], unique=False)
     op.create_table(
         'users',
         sa.Column('created_at', sa.DateTime, nullable=True),
@@ -113,6 +138,7 @@ def upgrade():
         sa.Column('id', sa.Integer, nullable=False),
         sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False),
                   nullable=False),
+        sa.Column('cloud_id', sa.Integer, nullable=False),
         sa.Column('region_id', sa.Integer, nullable=False),
         sa.Column('variable_association_id', sa.Integer),
         sa.Column('name', sa.String(length=255), nullable=True),
@@ -121,6 +147,7 @@ def upgrade():
         sa.UniqueConstraint(
             'region_id', 'name', name='uq_cell0regionid0name'),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id'], ),
+        sa.ForeignKeyConstraint(['cloud_id'], ['clouds.id'], ),
         sa.ForeignKeyConstraint(['region_id'], ['regions.id'], ),
         sa.ForeignKeyConstraint(
             ['variable_association_id'], ['variable_association.id'],
@@ -128,6 +155,9 @@ def upgrade():
     )
     op.create_index(
         op.f('ix_cells_project_id'), 'cells', ['project_id'],
+        unique=False)
+    op.create_index(
+        op.f('ix_cells_cloud_id'), 'cells', ['cloud_id'],
         unique=False)
     op.create_index(
         op.f('ix_cells_region_id'), 'cells', ['region_id'],
@@ -139,6 +169,7 @@ def upgrade():
         sa.Column('id', sa.Integer, nullable=False),
         sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False),
                   nullable=False),
+        sa.Column('cloud_id', sa.Integer, nullable=False),
         sa.Column('region_id', sa.Integer, nullable=False),
         sa.Column('cell_id', sa.Integer, nullable=True),
         sa.Column('variable_association_id', sa.Integer),
@@ -152,6 +183,7 @@ def upgrade():
         sa.UniqueConstraint("name", "project_id", "region_id",
                             name="uq_name0projectid0regionid"),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
+        sa.ForeignKeyConstraint(['cloud_id'], ['clouds.id']),
         sa.ForeignKeyConstraint(['region_id'], ['regions.id']),
         sa.ForeignKeyConstraint(['cell_id'], ['cells.id']),
         sa.ForeignKeyConstraint(
@@ -177,6 +209,7 @@ def upgrade():
         sa.Column('name', sa.String(length=255), nullable=False),
         sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False),
                   nullable=False),
+        sa.Column('cloud_id', sa.Integer, nullable=False),
         sa.Column('region_id', sa.Integer, nullable=False),
         sa.Column('cell_id', sa.Integer, nullable=True),
         sa.Column('parent_id', sa.Integer, nullable=True),
@@ -191,6 +224,7 @@ def upgrade():
         sa.UniqueConstraint('region_id', 'name',
                             name='uq_device0regionid0name'),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
+        sa.ForeignKeyConstraint(['cloud_id'], ['clouds.id']),
         sa.ForeignKeyConstraint(['region_id'], ['regions.id']),
         sa.ForeignKeyConstraint(['cell_id'], ['cells.id']),
         sa.ForeignKeyConstraint(['access_secret_id'], ['access_secrets.id']),
@@ -207,6 +241,9 @@ def upgrade():
         unique=False)
     op.create_index(
         op.f('ix_devices_region_id'), 'devices', ['region_id'],
+        unique=False)
+    op.create_index(
+        op.f('ix_devices_cloud_id'), 'devices', ['cloud_id'],
         unique=False)
     op.create_table(
         'hosts',
@@ -284,20 +321,26 @@ def downgrade():
     op.drop_table('network_devices')
     op.drop_table('hosts')
     op.drop_index(op.f('ix_networks_region_id'), table_name='networks')
+    op.drop_index(op.f('ix_networks_cloud_id'), table_name='networks')
     op.drop_index(op.f('ix_networks_project_id'), table_name='networks')
     op.drop_index(op.f('ix_networks_cell_id'), table_name='networks')
     op.drop_table('networks')
     op.drop_index(op.f('ix_devices_region_id'), table_name='devices')
+    op.drop_index(op.f('ix_devices_cloud_id'), table_name='devices')
     op.drop_index(op.f('ix_devices_project_id'), table_name='devices')
     op.drop_index(op.f('ix_devices_cell_id'), table_name='devices')
     op.drop_table('devices')
     op.drop_index(op.f('ix_cells_region_id'), table_name='cells')
+    op.drop_index(op.f('ix_cells_cloud_id'), table_name='cells')
     op.drop_index(op.f('ix_cells_project_id'), table_name='cells')
     op.drop_table('cells')
     op.drop_index(op.f('ix_users_project_id'), table_name='users')
     op.drop_table('users')
     op.drop_index(op.f('ix_regions_project_id'), table_name='regions')
+    op.drop_index(op.f('ix_regions_cloud_id'), table_name='regions')
     op.drop_table('regions')
+    op.drop_index(op.f('ix_clouds_project_id'), table_name='clouds')
+    op.drop_table('clouds')
     op.drop_table('projects')
     op.drop_table('labels')
     op.drop_table('access_secrets')
