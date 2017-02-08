@@ -5,10 +5,14 @@ from craton.db import api as dbapi
 from craton.tests.unit.db import base
 
 project_id1 = uuid.uuid4().hex
+cloud_id1 = uuid.uuid4().hex
 
-cell1 = {'region_id': 1, 'project_id': project_id1, 'name': 'cell1'}
-cell1_region2 = {'region_id': 2, 'project_id': project_id1, 'name': 'cell1'}
-cell2 = {'region_id': 1, 'project_id': project_id1, 'name': 'cell2'}
+cell1 = {'region_id': 1, 'project_id': project_id1, 'name': 'cell1',
+         "cloud_id": cloud_id1}
+cell1_region2 = {'region_id': 2, 'project_id': project_id1, 'name': 'cell1',
+                 "cloud_id": cloud_id1}
+cell2 = {'region_id': 1, 'project_id': project_id1, 'name': 'cell2',
+         "cloud_id": cloud_id1}
 
 cells = (cell1, cell1_region2, cell2)
 default_pagination = {'limit': 30, 'marker': None}

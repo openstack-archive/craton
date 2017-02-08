@@ -4,6 +4,11 @@ import json
 import requests
 import sys
 
+CLOUDS = [{"CLOUD1": {
+           "openstack_release": "juno"}},
+          {"CLOUD2": {
+           "openstack_release": "kilo"}}]
+
 REGIONS = [{'ORD135': {
             "glance_default_store": "swift",
             "neutron_l2_population": True,
@@ -58,6 +63,25 @@ class Inventory(object):
         start_ip_address = ip_address(u'192.168.1.5')
         ips = [str(start_ip_address + i) for i in range(num_ips)]
         return ips
+
+    def create_cloud(self, cloud, data=None):
+        cloud_url = self.url + "/clouds"
+        payload = {"name": cloud}
+
+        print("Creating cloud entry for %s with data %s" % (payload, data))
+        resp = requests.post(cloud_url, headers=self.headers,
+                             data=json.dumps(payload), verify=False)
+        if resp.status_code != 201:
+            raise Exception(resp.text)
+
+        self.cloud = resp.json()
+        if data:
+            reg_id = self.cloud["id"]
+            cloud_data_url = self.url + "/clouds/%s/variables" % reg_id
+            resp = requests.put(cloud_data_url, headers=self.headers,
+                                data=json.dumps(data), verify=False)
+            if resp.status_code != 200:
+                print(resp.text)
 
     def create_region(self, region, data=None):
         region_url = self.url + "/regions"
@@ -206,35 +230,40 @@ if __name__ == "__main__":
 
     Inv = Inventory(args.url, args.project, args.user, args.key)
 
-    for region in REGIONS:
-        # Frist create region
-        region_name = list(region.keys())[0]
-        Inv.create_region(region_name, data=region[region_name])
+    for cloud in CLOUDS:
+        # First create cloud
+        cloud_name = list(cloud.keys()[0])
+        Inv.create_cloud(cloud_name, data=cloud[cloud_name])
 
-        for cell in CELLS:
-            cell_name = list(cell.keys())[0]
-            Inv.create_cell(cell_name, data=cell[cell_name])
-            # Create a example private network for the cell
-            network_name = "private_net_%s" % cell_name
-            network = Inv.create_network(network_name,
-                                         "192.168.1.0",
-                                         "192.168.1.1",
-                                         "255.255.255.0",
-                                         "private")
-            # Create a ToR switch for this cell
-            _name = "switch1.%s.%s.example.com" % (cell_name, region_name)
-            switch = Inv.create_netdevice(_name, "switch")
-            # NOTE(sulo): Create 6 switch ports on the switch with the
-            # above network, the same switch can have other networks
-            # as well.
-            for int_num in range(5):
-                Inv.create_net_interface(switch, int_num, network=network)
-            # Get host in the cell
-            hosts = make_hosts(region_name, cell_name)
-            for host in hosts:
-                host_obj = Inv.create_device(host, 'server')
-                # Create network interface on the host to connect to the
-                # private network, the interfaces allows us to conncet this
-                # host to the switch or other devices, such that we can form
-                # logical or physical groupings such as a cab.
-                Inv.create_net_interface(host_obj, 0, network=network)
+        for region in REGIONS:
+            # Frist create region
+            region_name = list(region.keys())[0]
+            Inv.create_region(region_name, data=region[region_name])
+
+            for cell in CELLS:
+                cell_name = list(cell.keys())[0]
+                Inv.create_cell(cell_name, data=cell[cell_name])
+                # Create a example private network for the cell
+                network_name = "private_net_%s" % cell_name
+                network = Inv.create_network(network_name,
+                                             "192.168.1.0",
+                                             "192.168.1.1",
+                                             "255.255.255.0",
+                                             "private")
+                # Create a ToR switch for this cell
+                _name = "switch1.%s.%s.example.com" % (cell_name, region_name)
+                switch = Inv.create_netdevice(_name, "switch")
+                # NOTE(sulo): Create 6 switch ports on the switch with the
+                # above network, the same switch can have other networks
+                # as well.
+                for int_num in range(5):
+                    Inv.create_net_interface(switch, int_num, network=network)
+                # Get host in the cell
+                hosts = make_hosts(region_name, cell_name)
+                for host in hosts:
+                    host_obj = Inv.create_device(host, 'server')
+                    # Create network interface on the host to connect to the
+                    # private network, the interfaces allows us to conncet this
+                    # host to the switch or other devices, such that we can
+                    # form logical or physical groupings such as a cab.
+                    Inv.create_net_interface(host_obj, 0, network=network)

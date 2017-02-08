@@ -23,8 +23,8 @@ class VariablesDBTestCase:
         )
         return project.id
 
-    def create_region(self, name, project_id, variables=None):
-        region = dbapi.regions_create(
+    def create_cloud(self, name, project_id, variables=None):
+        cloud = dbapi.clouds_create(
             self.context,
             {
                 'name': name,
@@ -32,14 +32,28 @@ class VariablesDBTestCase:
                 'variables': variables or {},
             },
         )
+        return cloud.id
+
+    def create_region(self, name, project_id, cloud_id, variables=None):
+        region = dbapi.regions_create(
+            self.context,
+            {
+                'name': name,
+                'project_id': project_id,
+                'cloud_id': cloud_id,
+                'variables': variables or {},
+            },
+        )
         return region.id
 
-    def create_cell(self, name, project_id, region_id, variables=None):
+    def create_cell(self, name, project_id, cloud_id, region_id,
+                    variables=None):
         cell = dbapi.cells_create(
             self.context,
             {
                 'name': name,
                 'project_id': project_id,
+                'cloud_id': cloud_id,
                 'region_id': region_id,
                 'variables': variables or {}
             },
@@ -47,12 +61,13 @@ class VariablesDBTestCase:
         return cell.id
 
     def create_host(
-            self, name, project_id, region_id, ip_address, host_type,
+            self, name, project_id, cloud_id, region_id, ip_address, host_type,
             cell_id=None, parent_id=None, labels=None, variables=None,
             ):
         host = {
             'name': name,
             'project_id': project_id,
+            'cloud_id': cloud_id,
             'region_id': region_id,
             'cell_id': cell_id,
             'ip_address': ip_address,
@@ -69,12 +84,13 @@ class VariablesDBTestCase:
         return host.id
 
     def create_network(
-            self, name, project_id, region_id, cidr, gateway, netmask,
-            cell_id=None, variables=None,
+            self, name, project_id, cloud_id, region_id, cidr, gateway,
+            netmask, cell_id=None, variables=None,
             ):
         network = {
             'name': name,
             'project_id': project_id,
+            'cloud_id': cloud_id,
             'region_id': region_id,
             'cell_id': cell_id,
             'cidr': cidr,
@@ -89,12 +105,14 @@ class VariablesDBTestCase:
         return network.id
 
     def create_network_device(
-            self, name, project_id, region_id, ip_address, network_device_type,
-            cell_id=None, parent_id=None, labels=None, variables=None,
+            self, name, project_id, cloud_id, region_id, ip_address,
+            network_device_type, cell_id=None, parent_id=None, labels=None,
+            variables=None,
             ):
         network_device = {
             'name': name,
             'project_id': project_id,
+            'cloud_id': cloud_id,
             'region_id': region_id,
             'cell_id': cell_id,
             'ip_address': ip_address,
@@ -114,12 +132,22 @@ class VariablesDBTestCase:
 
     def setup_host(self, variables):
         project_id = self.create_project(name='project1')
-        region_id = self.create_region(name='region1', project_id=project_id)
-        cell_id = self.create_cell(name="cell1", project_id=project_id,
-                                   region_id=region_id)
+        cloud_id = self.create_cloud(name='cloud1', project_id=project_id)
+        region_id = self.create_region(
+            name='region1',
+            project_id=project_id,
+            cloud_id=cloud_id,
+        )
+        cell_id = self.create_cell(
+            name="cell1",
+            project_id=project_id,
+            cloud_id=cloud_id,
+            region_id=region_id,
+        )
         host_id = self.create_host(
             name="host1",
             project_id=project_id,
+            cloud_id=cloud_id,
             region_id=region_id,
             ip_address="192.168.2.1",
             host_type="server",
@@ -133,12 +161,22 @@ class VariablesDBTestCase:
 
     def setup_network_device(self, variables):
         project_id = self.create_project(name='project1')
-        region_id = self.create_region(name='region1', project_id=project_id)
-        cell_id = self.create_cell(name="cell1", project_id=project_id,
-                                   region_id=region_id)
+        cloud_id = self.create_cloud(name='cloud1', project_id=project_id)
+        region_id = self.create_region(
+            name='region1',
+            project_id=project_id,
+            cloud_id=cloud_id,
+        )
+        cell_id = self.create_cell(
+            name="cell1",
+            project_id=project_id,
+            cloud_id=cloud_id,
+            region_id=region_id
+        )
         network_device_id = self.create_network_device(
             name="network_device1",
             project_id=project_id,
+            cloud_id=cloud_id,
             region_id=region_id,
             ip_address="192.168.2.1",
             network_device_type="switch",
@@ -152,12 +190,22 @@ class VariablesDBTestCase:
 
     def setup_network(self, variables):
         project_id = self.create_project(name='project1')
-        region_id = self.create_region(name='region1', project_id=project_id)
-        cell_id = self.create_cell(name="cell1", project_id=project_id,
-                                   region_id=region_id)
+        cloud_id = self.create_cloud(name='cloud1', project_id=project_id)
+        region_id = self.create_region(
+            name='region1',
+            project_id=project_id,
+            cloud_id=cloud_id,
+        )
+        cell_id = self.create_cell(
+            name="cell1",
+            project_id=project_id,
+            cloud_id=cloud_id,
+            region_id=region_id,
+        )
         network_id = self.create_network(
             name="network1",
             project_id=project_id,
+            cloud_id=cloud_id,
             region_id=region_id,
             cell_id=cell_id,
             cidr="192.168.2.0/24",
@@ -170,10 +218,16 @@ class VariablesDBTestCase:
 
     def setup_cell(self, variables):
         project_id = self.create_project(name='project1')
-        region_id = self.create_region(name='region1', project_id=project_id)
+        cloud_id = self.create_cloud(name='cloud1', project_id=project_id)
+        region_id = self.create_region(
+            name='region1',
+            project_id=project_id,
+            cloud_id=cloud_id,
+        )
         cell_id = self.create_cell(
             name="cell1",
             project_id=project_id,
+            cloud_id=cloud_id,
             region_id=region_id,
             variables=variables,
         )
@@ -182,13 +236,25 @@ class VariablesDBTestCase:
 
     def setup_region(self, variables):
         project_id = self.create_project(name='project1')
+        cloud_id = self.create_cloud(name='cloud1', project_id=project_id)
         region_id = self.create_region(
             name='region1',
             project_id=project_id,
+            cloud_id=cloud_id,
             variables=variables,
         )
 
         return region_id
+
+    def setup_cloud(self, variables):
+        project_id = self.create_project(name='project1')
+        cloud_id = self.create_cloud(
+            name='cloud1',
+            project_id=project_id,
+            variables=variables,
+        )
+
+        return cloud_id
 
     def setup_project(self, variables):
         project_id = self.create_project(name='project1', variables=variables)
@@ -201,6 +267,7 @@ class VariablesDBTestCase:
             "networks": self.setup_network,
             "network-devices": self.setup_network_device,
             "regions": self.setup_region,
+            "clouds": self.setup_cloud,
             "projects": self.setup_project,
         }
 
@@ -400,3 +467,7 @@ class NetworksVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
 
 class ProjectsVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
     resources_type = "projects"
+
+
+class CloudsVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
+    resources_type = "clouds"
