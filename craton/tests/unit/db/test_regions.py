@@ -7,7 +7,8 @@ from craton import exceptions
 default_pagination = {'limit': 30, 'marker': None}
 
 project_id1 = uuid.uuid4().hex
-region1 = {'project_id': project_id1, 'name': 'region1'}
+cloud_id1 = uuid.uuid4().hex
+region1 = {'project_id': project_id1, 'cloud_id': cloud_id1, 'name': 'region1'}
 
 
 class RegionsDBTestCase(base.DBTestCase):
