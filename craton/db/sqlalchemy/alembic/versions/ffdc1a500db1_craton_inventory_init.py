@@ -61,7 +61,7 @@ def upgrade():
             'fk_projects_variable_association')
     )
     op.create_table(
-        'regions',
+        'clouds',
         sa.Column('created_at', sa.DateTime, nullable=True),
         sa.Column('updated_at', sa.DateTime, nullable=True),
         sa.Column('id', sa.Integer, nullable=False),
@@ -73,14 +73,39 @@ def upgrade():
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint(
             'project_id', 'name',
-            name='uq_region0projectid0name'),
+            name='uq_cloud0projectid0name'),
         sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
+        sa.ForeignKeyConstraint(
+            ['variable_association_id'], ['variable_association.id'],
+            'fk_regions_variable_association')
+    )
+    op.create_index(op.f('ix_clouds_project_id'),
+                    'clouds', ['project_id'], unique=False)
+    op.create_table(
+        'regions',
+        sa.Column('created_at', sa.DateTime, nullable=True),
+        sa.Column('updated_at', sa.DateTime, nullable=True),
+        sa.Column('id', sa.Integer, nullable=False),
+        sa.Column('project_id', sqlalchemy_utils.types.UUIDType(binary=False),
+                  nullable=False),
+        sa.Column('cloud_id', sa.Integer, nullable=False),
+        sa.Column('variable_association_id', sa.Integer),
+        sa.Column('name', sa.String(length=255), nullable=True),
+        sa.Column('note', sa.Text, nullable=True),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint(
+            'cloud_id', 'name',
+            name='uq_region0cloudid0name'),
+        sa.ForeignKeyConstraint(['project_id'], ['projects.id']),
+        sa.ForeignKeyConstraint(['cloud_id'], ['clouds.id']),
         sa.ForeignKeyConstraint(
             ['variable_association_id'], ['variable_association.id'],
             'fk_regions_variable_association')
     )
     op.create_index(op.f('ix_regions_project_id'),
                     'regions', ['project_id'], unique=False)
+    op.create_index(op.f('ix_regions_cloud_id'),
+                    'regions', ['cloud_id'], unique=False)
     op.create_table(
         'users',
         sa.Column('created_at', sa.DateTime, nullable=True),
