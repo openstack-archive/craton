@@ -308,7 +308,7 @@ class APIV1CellsTest(APIV1Test):
     @mock.patch.object(dbapi, 'cells_create')
     def test_create_cell_with_valid_data(self, mock_cell):
         mock_cell.return_value = fake_resources.CELL1
-        data = {'name': 'cell1', 'region_id': 1}
+        data = {'name': 'cell1', 'region_id': 1, 'cloud_id': 1}
         resp = self.post('v1/cells', data=data)
         self.assertEqual(201, resp.status_code)
         self.assertIn('Location', resp.headers)
@@ -323,6 +323,7 @@ class APIV1CellsTest(APIV1Test):
         data = {
             'name': "cell1",
             'region_id': 1,
+            'cloud_id': 1,
             'variables': {'key1': 'value1', 'key2': 'value2'},
         }
         resp = self.post('v1/cells', data=data)
@@ -331,6 +332,7 @@ class APIV1CellsTest(APIV1Test):
             'id': 1,
             'name': 'cell1',
             'region_id': 1,
+            'cloud_id': 1,
             'project_id': 1,
             'variables': {'key1': 'value1', 'key2': 'value2'},
         }
@@ -495,7 +497,7 @@ class APIV1RegionsTest(APIV1Test):
     @mock.patch.object(dbapi, 'regions_create')
     def test_post_region_with_valid_data(self, mock_region):
         mock_region.return_value = fake_resources.REGION1
-        data = {'name': 'region1'}
+        data = {'name': 'region1', 'cloud_id': 1}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(201, resp.status_code)
         self.assertIn('Location', resp.headers)
@@ -516,11 +518,12 @@ class APIV1RegionsTest(APIV1Test):
         return_value = {'name': 'region1',
                         'project_id': 'abcd',
                         'id': 1,
+                        'cloud_id': 1,
                         'variables': {"key1": "value1", "key2": "value2"}}
         fake_region = fake_resources.REGION1
         fake_region.variables = {"key1": "value1", "key2": "value2"}
         mock_region.return_value = fake_region
-        data = {'name': 'region1',
+        data = {'name': 'region1', 'cloud_id': 1,
                 'variables': {"key1": "value1", "key2": "value2"}}
         resp = self.post('v1/regions', data=data)
         self.assertEqual(201, resp.status_code)
@@ -774,7 +777,7 @@ class APIV1HostsTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_create')
     def test_create_host_with_valid_data(self, mock_host):
         mock_host.return_value = fake_resources.HOST1
-        data = {'name': 'www.craton.com', 'region_id': 1,
+        data = {'name': 'www.craton.com', 'region_id': 1, 'cloud_id': 1,
                 'ip_address': '192.168.1.1', 'device_type': 'server',
                 'active': True}
         resp = self.post('/v1/hosts', data=data)
@@ -791,6 +794,7 @@ class APIV1HostsTest(APIV1Test):
         data = {
             'name': 'www.craton.com',
             'region_id': 1,
+            'cloud_id': 1,
             'ip_address': '192.168.1.1',
             'device_type': 'server',
             'labels': [],
@@ -802,6 +806,7 @@ class APIV1HostsTest(APIV1Test):
             'id': 1,
             'name': 'www.craton.com',
             'region_id': 1,
+            'cloud_id': 1,
             'project_id': 1,
             'ip_address': '192.168.1.1',
             'device_type': 'server',
@@ -1113,6 +1118,7 @@ class APIV1NetworksTest(APIV1Test):
             'netmask': '255.255.255.0',
             'variables': {'key1': 'value1'},
             'region_id': 1,
+            'cloud_id': 1,
         }
         resp = self.post('/v1/networks', data=data)
         self.assertEqual(201, resp.status_code)
@@ -1337,7 +1343,7 @@ class APIV1NetworkDevicesTest(APIV1Test):
     @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_network_devices_with_valid_data(self, mock_devices):
         mock_devices.return_value = fake_resources.NETWORK_DEVICE1
-        data = {'name': 'NewNetDevice1', 'region_id': 1,
+        data = {'name': 'NewNetDevice1', 'region_id': 1, 'cloud_id': 1,
                 'device_type': 'Sample', 'ip_address': '0.0.0.0'}
         resp = self.post('/v1/network-devices', data=data)
         self.assertEqual(201, resp.status_code)
