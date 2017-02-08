@@ -59,6 +59,26 @@ class Inventory(object):
         ips = [str(start_ip_address + i) for i in range(num_ips)]
         return ips
 
+    def create_cloud(self, cloud_name, date=None):
+        cloud_url = self.url + "/clouds"
+        payload = {"name": cloud}
+
+        print("Creating cloud entry for %s with data %s" % (payload, data))
+        resp = requests.post(cloud_url, headers=self.headers,
+                             data=json.dumps(payload), verify=False)
+        if resp.status_code != 201:
+            raise Exception(resp.text)
+
+        self.cloud = resp.json()
+        if data:
+            reg_id = self.cloud["id"]
+            cloud_data_url = self.url + "/clouds/%s/variables" % reg_id
+            resp = requests.put(cloud_data_url, headers=self.headers,
+                                data=json.dumps(data), verify=False)
+            if resp.status_code != 200:
+                print(resp.text)
+
+
     def create_region(self, region, data=None):
         region_url = self.url + "/regions"
         payload = {"name": region}

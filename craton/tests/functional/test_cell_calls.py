@@ -8,14 +8,27 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
 
     def setUp(self):
         super(APIV1CellTest, self).setUp()
+        self.cloud = self.create_cloud()
         self.region = self.create_region()
 
     def tearDown(self):
         super(APIV1CellTest, self).tearDown()
 
+    def create_cloud(self):
+        url = self.url + '/v1/clouds'
+        payload = {'name': 'cloud-1'}
+        cloud = self.post(url, data=payload)
+        self.assertEqual(201, cloud.status_code)
+        self.assertIn('Location', cloud.headers)
+        self.assertEqual(
+            cloud.headers['Location'],
+            "{}/{}".format(url, cloud.json()['id'])
+        )
+        return cloud.json()
+
     def create_region(self):
         url = self.url + '/v1/regions'
-        payload = {'name': 'region-1'}
+        payload = {'name': 'region-1', 'cloud_id': self.cloud['id']}
         region = self.post(url, data=payload)
         self.assertEqual(201, region.status_code)
         self.assertIn('Location', region.headers)
@@ -27,7 +40,8 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
 
     def create_cell(self, name, variables=None):
         url = self.url + '/v1/cells'
-        payload = {'name': name, 'region_id': self.region['id']}
+        payload = {'name': name, 'region_id': self.region['id'],
+                   'cloud_id': self.cloud['id']}
         if variables:
             payload['variables'] = variables
         cell = self.post(url, data=payload)
