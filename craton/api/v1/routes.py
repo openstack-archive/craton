@@ -11,7 +11,7 @@ from craton.api.v1.resources.inventory import networks
 
 VARS_RESOLVE = ", ".join(map(repr, ("hosts", )))
 VARS_NOT_RESOLVE = ", ".join(
-    map(repr, ("network-devices", "cells", "regions"))
+    map(repr, ("network-devices", "cells", "regions", "networks"))
 )
 
 routes = [
@@ -54,9 +54,6 @@ routes = [
     dict(resource=networks.Networks,
          urls=['/networks'],
          endpoint='networks'),
-    dict(resource=networks.NetworksVariables,
-         urls=['/networks/<id>/variables'],
-         endpoint='networks_id_variables'),
     dict(resource=networks.NetworkById,
          urls=['/networks/<id>'],
          endpoint='networks_id'),

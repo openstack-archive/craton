@@ -53,6 +53,26 @@ class VariablesDBTestCase:
 
         return host.id
 
+    def create_network(
+            self, name, region_id, cidr, gateway, netmask, cell_id=None,
+            variables=None,
+            ):
+        network = {
+            'name': name,
+            'project_id': self.project_id,
+            'region_id': region_id,
+            'cell_id': cell_id,
+            'cidr': cidr,
+            'gateway': gateway,
+            'netmask': netmask,
+            'variables': variables or {},
+        }
+
+        network = dbapi.networks_create(self.context, network)
+        self.assertEqual(variables, network.variables)
+
+        return network.id
+
     def create_network_device(
             self, name, region_id, ip_address, network_device_type,
             cell_id=None, parent_id=None, labels=None, variables=None,
@@ -109,6 +129,21 @@ class VariablesDBTestCase:
 
         return network_device_id
 
+    def setup_network(self, variables):
+        region_id = self.create_region(name='region1')
+        cell_id = self.create_cell(name="cell1", region_id=region_id)
+        network_id = self.create_network(
+            name="network1",
+            region_id=region_id,
+            cell_id=cell_id,
+            cidr="192.168.2.0/24",
+            gateway="192.168.2.1",
+            netmask="255.255.255.0",
+            variables=variables,
+        )
+
+        return network_id
+
     def setup_cell(self, variables):
         region_id = self.create_region(name='region1')
         cell_id = self.create_cell(
@@ -131,6 +166,7 @@ class VariablesDBTestCase:
         setup_fn = {
             "cells": self.setup_cell,
             "hosts": self.setup_host,
+            "networks": self.setup_network,
             "network-devices": self.setup_network_device,
             "regions": self.setup_region,
         }
@@ -324,3 +360,7 @@ class CellsVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
 
 class RegionsVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
     resources_type = "regions"
+
+
+class NetworksVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
+    resources_type = "networks"

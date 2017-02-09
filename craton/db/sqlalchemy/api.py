@@ -131,6 +131,7 @@ def _get_resource_model(resource):
         "network-devices": with_polymorphic(
             models.Device, models.NetworkDevice
         ),
+        "networks": models.Network,
         "regions": models.Region,
     }
     return resource_models[resource]
@@ -663,48 +664,6 @@ def networks_delete(context, network_id):
         query = query.filter_by(id=network_id)
         query.delete()
     return
-
-
-def networks_variables_update(context, network_id, data):
-    """Update/create networks variables variables."""
-    session = get_session()
-    with session.begin():
-        query = model_query(context, models.Network, session=session,
-                            project_only=True)
-        query = query.filter_by(id=network_id)
-
-        try:
-            ref = query.with_for_update().one()
-        except sa_exc.NoResultFound:
-            raise exceptions.NetworkNotFound(id=network_id)
-
-        for key in data:
-            ref.variables[key] = data[key]
-
-        return ref
-
-
-def networks_variables_delete(context, network_id, data):
-    """Delete the existing key from networks variables."""
-    session = get_session()
-    with session.begin():
-        query = model_query(context, models.Network, session=session,
-                            project_only=True)
-        query = query.filter_by(id=network_id)
-
-        try:
-            ref = query.with_for_update().one()
-        except sa_exc.NoResultFound:
-            raise exceptions.NetworkNotFound(id=network_id)
-
-        for key in data:
-            try:
-                del ref.variables[data[key]]
-            except KeyError:
-                # This key does not exist so just ignore
-                pass
-
-        return ref
 
 
 def network_devices_get_all(context, filters, pagination_params):

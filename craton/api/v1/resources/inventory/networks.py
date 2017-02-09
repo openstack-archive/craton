@@ -59,30 +59,6 @@ class NetworkById(base.Resource):
         return None, 204, None
 
 
-class NetworksVariables(base.Resource):
-    """Controller for networks variables endpoints."""
-
-    @base.http_codes
-    def get(self, context, id):
-        """Get variables for the given network."""
-        obj = dbapi.networks_get_by_id(context, id)
-        resp = {"variables": jsonutils.to_primitive(obj.variables)}
-        return resp, 200, None
-
-    @base.http_codes
-    def put(self, context, id, request_data):
-        """"Update existing variables, or create if it does not exist."""
-        obj = dbapi.networks_variables_update(context, id, request_data)
-        resp = {"variables": jsonutils.to_primitive(obj.variables)}
-        return resp, 200, None
-
-    @base.http_codes
-    def delete(self, context, id, request_data):
-        """Delete networks variables."""
-        dbapi.networks_variables_delete(context, id, request_data)
-        return None, 204, None
-
-
 class NetworkDevices(base.Resource):
     """Controller for Network Device resources."""
 

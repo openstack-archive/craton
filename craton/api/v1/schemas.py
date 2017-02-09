@@ -1247,15 +1247,6 @@ validators = {
             },
         },
     },
-    ("networks_id_variables", "PUT"): {
-        "json": DefinitionVariablesSource
-    },
-    ("networks_id_variables", "GET"): {
-        "args": DefinitionNoParams,
-    },
-    ("networks_id_variables", "DELETE"): {
-        "json": DefinitionVariablesSource
-    },
     ("networks", "POST"): {
         "json": DefinitionNetwork,
     },
@@ -2033,72 +2024,6 @@ filters = {
         200: {
             "headers": None,
             "schema": DefinitionNetworkId,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("networks_id_variables", "GET"): {
-        200: {
-            "headers": None,
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "properties": {
-                    "variables": DefinitionVariablesSource,
-                },
-            },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("networks_id_variables", "PUT"): {
-        200: {
-            "headers": None,
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "properties": {
-                    "variables": DefinitionVariablesSource,
-                },
-            },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("networks_id_variables", "DELETE"): {
-        204: {
-            "headers": None,
-            "schema": None,
         },
         400: {
             "headers": None,

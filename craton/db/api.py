@@ -234,16 +234,6 @@ def networks_delete(context, network_id):
     return IMPL.networks_delete(context, network_id)
 
 
-def networks_variables_update(context, network_id, data):
-    """Update/create network variables data."""
-    return IMPL.networks_variables_update(context, network_id, data)
-
-
-def networks_variables_delete(context, network_id, data):
-    """Delete network variables data."""
-    return IMPL.networks_variables_delete(context, network_id, data)
-
-
 def network_devices_get_all(context, filters, pagination_params):
     """Get all network devices."""
     return IMPL.network_devices_get_all(context, filters, pagination_params)
