@@ -8,7 +8,7 @@ from craton import db as dbapi
 class Variables(base.Resource):
 
     @base.http_codes
-    def get(self, context, resources, id, request_args):
+    def get(self, context, resources, id, request_args=None):
         """Get variables for given resource."""
         obj = dbapi.resource_get_by_id(context, resources, id)
         obj = utils.format_variables(request_args, obj)

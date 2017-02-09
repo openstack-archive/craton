@@ -53,6 +53,30 @@ class VariablesDBTestCase:
 
         return host.id
 
+    def create_network_device(
+            self, name, region_id, ip_address, network_device_type,
+            cell_id=None, parent_id=None, labels=None, variables=None,
+            ):
+        network_device = {
+            'name': name,
+            'project_id': self.project_id,
+            'region_id': region_id,
+            'cell_id': cell_id,
+            'ip_address': ip_address,
+            'parent_id': parent_id,
+            'device_type': network_device_type,
+            'active': True,
+            'labels': labels or (),
+            'variables': variables or {},
+        }
+
+        network_device = dbapi.network_devices_create(
+            self.context, network_device
+        )
+        self.assertEqual(variables, network_device.variables)
+
+        return network_device.id
+
     def setup_host(self, variables):
         region_id = self.create_region(name='region1')
         cell_id = self.create_cell(name="cell1", region_id=region_id)
@@ -69,9 +93,26 @@ class VariablesDBTestCase:
 
         return host_id
 
+    def setup_network_device(self, variables):
+        region_id = self.create_region(name='region1')
+        cell_id = self.create_cell(name="cell1", region_id=region_id)
+        network_device_id = self.create_network_device(
+            name="network_device1",
+            region_id=region_id,
+            ip_address="192.168.2.1",
+            network_device_type="switch",
+            cell_id=cell_id,
+            parent_id=None,
+            labels=None,
+            variables=variables,
+        )
+
+        return network_device_id
+
     def setup_resource(self, *args, **kwargs):
         setup_fn = {
             "hosts": self.setup_host,
+            "network-devices": self.setup_network_device,
         }
 
         return setup_fn[self.resources_type](*args, *kwargs)
@@ -251,3 +292,7 @@ class VariablesDBTestCase:
 
 class HostsVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
     resources_type = "hosts"
+
+
+class NetworkDevicesVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
+    resources_type = "network-devices"

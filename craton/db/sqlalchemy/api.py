@@ -127,6 +127,9 @@ def get_user_info(context, username):
 def _get_resource_model(resource):
     resource_models = {
         "hosts": with_polymorphic(models.Device, models.Host),
+        "network-devices": with_polymorphic(
+            models.Device, models.NetworkDevice
+        ),
     }
     return resource_models[resource]
 
@@ -139,8 +142,8 @@ def resource_get_by_id(
 
     query = model_query(context, model, project_only=True, session=session)
 
-    if resources in ("hosts",):
-        query = query.filter_by(type=resources)
+    if resources in ("hosts", "network-devices"):
+        query = query.filter_by(type=resources.replace("-", "_"))
 
     query = query.filter_by(id=resource_id)
 
@@ -222,51 +225,6 @@ def _device_labels_delete(context, device_type, device_id, labels):
             device.labels.discard(label)
         device.save(session)
         return device
-
-
-def _device_variables_update(context, device_type, device_id, data):
-    """Update existing device variables or create when its not present."""
-    session = get_session()
-    with session.begin():
-        _devices = with_polymorphic(models.Device, '*')
-        query = model_query(context, _devices, session=session,
-                            project_only=True)
-        query = query.filter_by(type=device_type)
-        query = query.filter_by(id=device_id)
-        try:
-            ref = query.with_for_update().one()
-        except sa_exc.NoResultFound:
-            raise exceptions.DeviceNotFound(device_type=device_type,
-                                            id=device_id)
-
-        for key in data:
-            ref.variables[key] = data[key]
-
-        return ref
-
-
-def _device_variables_delete(context, device_type, device_id, data):
-    """Delete the existing key (variable) from device data."""
-    session = get_session()
-    with session.begin():
-        _devices = with_polymorphic(models.Device, '*')
-        query = model_query(context, _devices, session=session,
-                            project_only=True)
-        query = query.filter_by(type=device_type)
-        query = query.filter_by(id=device_id)
-
-        try:
-            ref = query.with_for_update().one()
-        except sa_exc.NoResultFound:
-            raise exceptions.DeviceNotFound(device_type=device_type,
-                                            id=device_id)
-        for key in data:
-            try:
-                del ref.variables[data[key]]
-            except KeyError:
-                pass
-
-        return ref
 
 
 def cells_get_all(context, filters, pagination_params):
@@ -898,18 +856,6 @@ def network_devices_labels_delete(context, device_id, labels):
     """Delete labels from the network device labels list if it matches
     the given label in the query, otherwise do nothing."""
     return _device_labels_delete(context, 'network_devices', device_id, labels)
-
-
-def network_devices_variables_update(context, device_id, data):
-    """Update/create network device variables."""
-    return _device_variables_update(context, 'network_devices',
-                                    device_id, data)
-
-
-def network_devices_variables_delete(context, device_id, data):
-    """Delete the existing key from network device variables."""
-    return _device_variables_delete(context, 'network_devices',
-                                    device_id, data)
 
 
 def network_interfaces_get_all(context, filters, pagination_params):

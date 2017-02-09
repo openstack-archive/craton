@@ -293,18 +293,6 @@ def network_devices_delete(context, network_device_id):
     return IMPL.network_devices_delete(context, network_device_id)
 
 
-def network_devices_variables_delete(context, network_device_id, data):
-    """Delete network device variables."""
-    return IMPL.network_devices_variables_delete(context, network_device_id,
-                                                 data)
-
-
-def network_devices_variables_update(context, network_device_id, data):
-    """Update network device variables."""
-    return IMPL.network_devices_variables_update(context, network_device_id,
-                                                 data)
-
-
 def network_devices_labels_delete(context, network_device_id, labels):
     """Delete network device labels."""
     return IMPL.network_devices_labels_delete(context, network_device_id,
