@@ -430,14 +430,14 @@ class APIV1RegionsTest(APIV1Test):
 
 
 class APIV1RegionsVariablesTest(APIV1Test):
-    @mock.patch.object(dbapi, 'regions_get_by_id')
+    @mock.patch.object(dbapi, 'resource_get_by_id')
     def test_region_get_variables(self, mock_region):
         mock_region.return_value = fake_resources.REGION1
         resp = self.get('v1/regions/1/variables')
         expected = {"variables": {"key1": "value1", "key2": "value2"}}
         self.assertEqual(resp.json, expected)
 
-    @mock.patch.object(dbapi, 'regions_variables_update')
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
     def test_regions_put_variables(self, mock_region):
         db_return_value = copy.deepcopy(fake_resources.REGION1)
         db_return_value.variables["a"] = "b"
@@ -446,28 +446,28 @@ class APIV1RegionsVariablesTest(APIV1Test):
         db_data = payload.copy()
         resp = self.put('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
-        mock_region.assert_called_once_with(mock.ANY, '1', db_data)
+        mock_region.assert_called_once_with(mock.ANY, "regions", '1', db_data)
         expected = {
             "variables": {"key1": "value1", "key2": "value2", "a": "b"},
         }
         self.assertDictEqual(expected, resp.json)
 
-    @mock.patch.object(dbapi, 'regions_variables_update')
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
     def test_regions_put_bad_data_type(self, mock_region):
         payload = ["a", "b"]
         resp = self.put('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 400)
         mock_region.assert_not_called()
 
-    @mock.patch.object(dbapi, 'regions_variables_delete')
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
     def test_regions_delete_variables(self, mock_region):
         payload = {"key1": "value1"}
         db_data = payload.copy()
         resp = self.delete('v1/regions/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
-        mock_region.assert_called_once_with(mock.ANY, '1', db_data)
+        mock_region.assert_called_once_with(mock.ANY, "regions", '1', db_data)
 
-    @mock.patch.object(dbapi, 'regions_variables_delete')
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
     def test_regions_delete_bad_data_type(self, mock_region):
         payload = ["a", "b"]
         resp = self.delete('v1/regions/1/variables', data=payload)

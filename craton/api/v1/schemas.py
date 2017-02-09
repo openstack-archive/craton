@@ -805,15 +805,6 @@ validators = {
     ("regions", "POST"): {
         "json": DefinitionsRegion,
     },
-    ("regions_id_variables", "PUT"): {
-        "json": DefinitionVariablesSource,
-    },
-    ("regions_id_variables", "GET"): {
-        "args": DefinitionNoParams,
-    },
-    ("regions_id_variables", "DELETE"): {
-        "json": DefinitionVariablesSource,
-    },
     ("hosts", "POST"): {
         "json": DefinitionsHost,
     },
@@ -1598,72 +1589,6 @@ filters = {
                 "items": DefinitionsRegion,
                 "type": "array",
             },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("regions_id_variables", "GET"): {
-        200: {
-            "headers": None,
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "properties": {
-                    "variables": DefinitionVariablesSource,
-                },
-            },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("regions_id_variables", "PUT"): {
-        200: {
-            "headers": None,
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "properties": {
-                    "variables": DefinitionVariablesSource,
-                },
-            },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("regions_id_variables", "DELETE"): {
-        204: {
-            "headers": None,
-            "schema": None,
         },
         400: {
             "headers": None,

@@ -131,6 +131,7 @@ def _get_resource_model(resource):
         "network-devices": with_polymorphic(
             models.Device, models.NetworkDevice
         ),
+        "regions": models.Region,
     }
     return resource_models[resource]
 
@@ -361,38 +362,6 @@ def regions_delete(context, region_id):
         query = query.filter_by(id=region_id)
         query.delete()
     return
-
-
-def regions_variables_update(context, region_id, data):
-    """
-    Update existing region variables or create when its not present.
-    """
-    session = get_session()
-    with session.begin():
-        query = model_query(context, models.Region, session=session,
-                            project_only=True)
-        query = query.filter_by(id=region_id)
-        region_ref = query.with_for_update().one()
-        for key in data:
-            region_ref.variables[key] = data[key]
-        return region_ref
-
-
-def regions_variables_delete(context, region_id, data):
-    """Delete the existing key from region variables."""
-    session = get_session()
-    with session.begin():
-        query = model_query(context, models.Region, session=session,
-                            project_only=True)
-        query = query.filter_by(id=region_id)
-        region_ref = query.with_for_update().one()
-        for key in data:
-            try:
-                del region_ref.variables[data[key]]
-            except KeyError:
-                # This key does not exist so just ignore
-                pass
-        return region_ref
 
 
 def hosts_get_all(context, filters, pagination_params):

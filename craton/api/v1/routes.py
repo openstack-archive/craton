@@ -10,7 +10,9 @@ from craton.api.v1.resources.inventory import networks
 
 
 VARS_RESOLVE = ", ".join(map(repr, ("hosts", )))
-VARS_NOT_RESOLVE = ", ".join(map(repr, ("network-devices", "cells")))
+VARS_NOT_RESOLVE = ", ".join(
+    map(repr, ("network-devices", "cells", "regions"))
+)
 
 routes = [
     dict(resource=ansible_inventory.AnsibleInventory,
@@ -31,9 +33,6 @@ routes = [
     dict(resource=regions.RegionsById,
          urls=['/regions/<id>'],
          endpoint='regions_id'),
-    dict(resource=regions.RegionsVariables,
-         urls=['/regions/<id>/variables'],
-         endpoint='regions_id_variables'),
     dict(resource=cells.CellById,
          urls=['/cells/<id>'],
          endpoint='cells_id'),

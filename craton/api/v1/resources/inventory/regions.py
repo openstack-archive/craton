@@ -76,29 +76,3 @@ class RegionsById(base.Resource):
         """Delete existing region."""
         dbapi.regions_delete(context, id)
         return None, 204, None
-
-
-class RegionsVariables(base.Resource):
-
-    @base.http_codes
-    def get(self, context, id):
-        """Get variables for given region."""
-        obj = dbapi.regions_get_by_id(context, id)
-        response = {"variables": jsonutils.to_primitive(obj.variables)}
-        return response, 200, None
-
-    @base.http_codes
-    def put(self, context, id, request_data):
-        """
-        Update existing region variables, or create if it does
-        not exist.
-        """
-        obj = dbapi.regions_variables_update(context, id, request_data)
-        response = {"variables": jsonutils.to_primitive(obj.variables)}
-        return response, 200, None
-
-    @base.http_codes
-    def delete(self, context, id, request_data):
-        """Delete region variables."""
-        dbapi.regions_variables_delete(context, id, request_data)
-        return None, 204, None

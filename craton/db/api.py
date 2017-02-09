@@ -113,18 +113,6 @@ def regions_delete(context, region_id):
     """Delete an existing region."""
     return IMPL.regions_delete(context, region_id)
 
-
-def regions_variables_update(context, region_id, data):
-    """
-    Update existing region variables or create when its not present.
-    """
-    return IMPL.regions_variables_update(context, region_id, data)
-
-
-def regions_variables_delete(context, region_id, data_key):
-    """Delete the existing variables from region data."""
-    return IMPL.regions_variables_delete(context, region_id, data_key)
-
 # Hosts
 
 
