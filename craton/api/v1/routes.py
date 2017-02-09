@@ -1,5 +1,6 @@
 from craton.api.v1.resources import users
 from craton.api.v1.resources import projects
+from craton.api.v1.resources import variables
 
 from craton.api.v1.resources.inventory import ansible_inventory
 from craton.api.v1.resources.inventory import cells
@@ -8,13 +9,12 @@ from craton.api.v1.resources.inventory import regions
 from craton.api.v1.resources.inventory import networks
 
 
+VARS_RESOLVE = ", ".join(map(repr, ("hosts", )))
+
 routes = [
     dict(resource=ansible_inventory.AnsibleInventory,
          urls=['/ansible-inventory'],
          endpoint='ansible_inventory'),
-    dict(resource=hosts.HostsVariables,
-         urls=['/hosts/<id>/variables'],
-         endpoint='hosts_id_variables'),
     dict(resource=hosts.HostsLabels,
          urls=['/hosts/<id>/labels'],
          endpoint='hosts_labels'),
@@ -81,4 +81,7 @@ routes = [
     dict(resource=networks.NetworkDeviceLabels,
          urls=['/network-devices/<id>/labels'],
          endpoint='network_devices_labels'),
+    dict(resource=variables.Variables,
+         urls=['/<any({}):resources>/<id>/variables'.format(VARS_RESOLVE)],
+         endpoint='variables_with_resolve'),
 ]

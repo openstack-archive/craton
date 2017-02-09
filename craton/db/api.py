@@ -30,6 +30,31 @@ def get_user_info(context, user):
     return IMPL.get_user_info(context, user)
 
 
+def resource_get_by_id(context, resources, resource_id):
+    """Get resource for the unique resource id."""
+    return IMPL.resource_get_by_id(context, resources, resource_id)
+
+
+def variables_update_by_resource_id(context, resources, resource_id, data):
+    """Update/create existing resource's variables."""
+    return IMPL.variables_update_by_resource_id(
+        context,
+        resources,
+        resource_id,
+        data,
+    )
+
+
+def variables_delete_by_resource_id(context, resources, resource_id, data):
+    """Delete the existing variables, if present, from resource's data."""
+    return IMPL.variables_delete_by_resource_id(
+        context,
+        resources,
+        resource_id,
+        data,
+    )
+
+
 # Cells
 
 def cells_get_all(context, filters, pagination_params):
@@ -138,18 +163,6 @@ def hosts_update(context, host_id, values):
 def hosts_delete(context, host_id):
     """Delete an existing host."""
     return IMPL.hosts_delete(context, host_id)
-
-
-def hosts_variables_update(context, host_id, data):
-    """
-    Update existing host variables or create them when not present.
-    """
-    return IMPL.hosts_variables_update(context, host_id, data)
-
-
-def hosts_variables_delete(context, host_id, data_key):
-    """Delete the existing key (variable) from region data."""
-    return IMPL.hosts_variables_delete(context, host_id, data_key)
 
 
 def hosts_labels_delete(context, host_id, labels):

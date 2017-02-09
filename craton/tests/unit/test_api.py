@@ -707,20 +707,20 @@ class APIV1HostsTest(APIV1Test):
 
 
 class APIV1HostsVariablesTest(APIV1Test):
-    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    @mock.patch.object(dbapi, 'resource_get_by_id')
     def test_host_get_variables(self, mock_host):
         mock_host.return_value = fake_resources.HOST1
         resp = self.get('v1/hosts/1/variables?resolved-values=false')
         expected = {"variables": {"key1": "value1", "key2": "value2"}}
         self.assertEqual(resp.json, expected)
 
-    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    @mock.patch.object(dbapi, 'resource_get_by_id')
     def test_host_get_variables_invalid_property_name(self, mock_host):
         resp = self.get('v1/hosts/1/variables?foo=isnotreal')
         self.assertEqual(400, resp.status_code)
         mock_host.assert_not_called()
 
-    @mock.patch.object(dbapi, 'hosts_get_by_id')
+    @mock.patch.object(dbapi, 'resource_get_by_id')
     def test_host_get_resolved_variables(self, mock_host):
         region_vars = {"r_var": "somevar"}
         host = fake_resources.HOST1
@@ -730,7 +730,7 @@ class APIV1HostsVariablesTest(APIV1Test):
         resp = self.get('v1/hosts/1/variables')
         self.assertEqual(resp.json["variables"], expected)
 
-    @mock.patch.object(dbapi, 'hosts_variables_update')
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
     def test_hosts_put_data(self, mock_host):
         db_return_value = copy.deepcopy(fake_resources.HOST1)
         db_return_value.variables["a"] = "b"
@@ -739,28 +739,28 @@ class APIV1HostsVariablesTest(APIV1Test):
         db_data = payload.copy()
         resp = self.put('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
-        mock_host.assert_called_once_with(mock.ANY, '1', db_data)
+        mock_host.assert_called_once_with(mock.ANY, "hosts", '1', db_data)
         expected = {
             "variables": {"key1": "value1", "key2": "value2", "a": "b"},
         }
         self.assertDictEqual(expected, resp.json)
 
-    @mock.patch.object(dbapi, 'hosts_variables_update')
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
     def test_hosts_put_bad_data_type(self, mock_host):
         payload = ["a", "b"]
         resp = self.put('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 400)
         mock_host.assert_not_called()
 
-    @mock.patch.object(dbapi, 'hosts_variables_delete')
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
     def test_hosts_delete_data(self, mock_host):
         payload = {"key1": "value1"}
         db_data = payload.copy()
         resp = self.delete('v1/hosts/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
-        mock_host.assert_called_once_with(mock.ANY, '1', db_data)
+        mock_host.assert_called_once_with(mock.ANY, "hosts", '1', db_data)
 
-    @mock.patch.object(dbapi, 'hosts_variables_delete')
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
     def test_hosts_delete_bad_data_type(self, mock_host):
         payload = ["a", "b"]
         resp = self.delete('v1/hosts/1/variables', data=payload)

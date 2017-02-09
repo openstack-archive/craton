@@ -265,7 +265,9 @@ class HostsDBTestCase(base.DBTestCase):
                                  IPAddress(u'10.1.2.101'),
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}
-        dbapi.hosts_variables_update(self.context, host_id, variables)
+        dbapi.variables_update_by_resource_id(
+            self.context, "hosts", host_id, variables
+        )
         filters = {
             "region_id": region_id,
             "vars": "key2:value2",
@@ -280,13 +282,17 @@ class HostsDBTestCase(base.DBTestCase):
                                IPAddress(u'10.1.2.101'),
                                'server')
         variables = {"key1": "example1", "key2": "Tom"}
-        dbapi.hosts_variables_update(self.context, host1, variables)
+        dbapi.variables_update_by_resource_id(
+            self.context, "hosts", host1, variables
+        )
         # Second host with own variables
         host2 = self.make_host(region_id, 'www.example2.xyz',
                                IPAddress(u'10.1.2.102'),
                                'server')
         variables = {"key1": "example2", "key2": "Tom"}
-        dbapi.hosts_variables_update(self.context, host2, variables)
+        dbapi.variables_update_by_resource_id(
+            self.context, "hosts", host2, variables
+        )
         filters = {"vars": "key1:example2"}
 
         res = dbapi.hosts_get_all(self.context, filters, default_pagination)
@@ -303,7 +309,9 @@ class HostsDBTestCase(base.DBTestCase):
                                  IPAddress(u'10.1.2.101'),
                                  'server')
         variables = {"key1": "value1", "key2": "value2"}
-        dbapi.hosts_variables_update(self.context, host_id, variables)
+        dbapi.variables_update_by_resource_id(
+            self.context, "hosts", host_id, variables
+        )
         filters = {
             "region_id": "region_1",
             "vars": "key1:value5",

@@ -9,7 +9,11 @@ class TestRouteURLNaming(TestCase):
 def generate_route_naming_functions(cls):
     def gen_test(endpoint, url):
         def test(self):
-            self.assertRegex(url, '^/v1/[a-z-]+(/<id>(/[a-z-]+)?)?$')
+            pattern = (
+                "^/v1/([a-z-]+|<any\('[a-z-]+'(, '[a-z-]+')*\):resources>)"
+                "(/<id>(/[a-z-]+)?)?"
+            )
+            self.assertRegex(url, pattern)
         test_name = 'test_route_naming_{}'.format(endpoint)
         setattr(cls, test_name, test)
 

@@ -124,6 +124,65 @@ def get_user_info(context, username):
         raise exceptions.UnknownException(message=err)
 
 
+def _get_resource_model(resource):
+    resource_models = {
+        "hosts": with_polymorphic(models.Device, models.Host),
+    }
+    return resource_models[resource]
+
+
+def resource_get_by_id(
+        context, resources, resource_id, session=None, for_update=False
+        ):
+    """Get resource for the unique resource id."""
+    model = _get_resource_model(resources)
+
+    query = model_query(context, model, project_only=True, session=session)
+
+    if resources in ("hosts",):
+        query = query.filter_by(type=resources)
+
+    query = query.filter_by(id=resource_id)
+
+    if for_update:
+        query = query.with_for_update()
+
+    try:
+        resource = query.one()
+    except sa_exc.NoResultFound:
+        raise exceptions.NotFound()
+    else:
+        return resource
+
+
+def variables_update_by_resource_id(context, resources, resource_id, data):
+    """Update/create existing resource's variables."""
+    session = get_session()
+    with session.begin():
+        resource = resource_get_by_id(
+            context, resources, resource_id, session, for_update=True
+        )
+
+        resource.variables.update(data)
+        return resource
+
+
+def variables_delete_by_resource_id(context, resources, resource_id, data):
+    """Delete the existing variables, if present, from resource's data."""
+    session = get_session()
+    with session.begin():
+        resource = resource_get_by_id(
+            context, resources, resource_id, session, for_update=True
+        )
+
+        for value in data.values():
+            try:
+                del resource.variables[value]
+            except KeyError:
+                pass
+        return resource
+
+
 def _device_labels_update(context, device_type, device_id, labels):
     """Update labels for the given device. Add the label if it is not present
     in host labels list, otherwise do nothing."""
@@ -499,16 +558,6 @@ def hosts_delete(context, host_id):
         query = query.filter_by(id=host_id)
         query.delete()
     return
-
-
-def hosts_variables_update(context, host_id, data):
-    """Update existing host variables or create when its not present."""
-    return _device_variables_update(context, 'hosts', host_id, data)
-
-
-def hosts_variables_delete(context, host_id, data):
-    """Delete the existing key from region variables."""
-    return _device_variables_delete(context, 'hosts', host_id, data)
 
 
 def hosts_labels_update(context, host_id, labels):
