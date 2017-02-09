@@ -59,32 +59,3 @@ class CellById(base.Resource):
         """Delete existing cell."""
         dbapi.cells_delete(context, id)
         return None, 204, None
-
-
-class CellsVariables(base.Resource):
-
-    @base.http_codes
-    def get(self, context, id):
-        """Get variables for given cell."""
-        obj = dbapi.cells_get_by_id(context, id)
-        resp = {"variables": jsonutils.to_primitive(obj.variables)}
-        return resp, 200, None
-
-    @base.http_codes
-    def put(self, context, id, request_data):
-        """
-        Update existing cell variables, or create if it does
-        not exist.
-        """
-        obj = dbapi.cells_variables_update(context, id, request_data)
-        resp = {"variables": jsonutils.to_primitive(obj.variables)}
-        return resp, 200, None
-
-    @base.http_codes
-    def delete(self, context, id, request_data):
-        """Delete cell variables."""
-        # NOTE(sulo): this is not that great. Find a better way to do this.
-        # We can pass multiple keys suchs as key1=one key2=two etc. but not
-        # the best way to do this.
-        dbapi.cells_variables_delete(context, id, request_data)
-        return None, 204, None

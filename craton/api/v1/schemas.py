@@ -940,15 +940,6 @@ validators = {
             },
         },
     },
-    ("cells_id_variables", "PUT"): {
-        "json": DefinitionVariablesSource,
-    },
-    ("cells_id_variables", "GET"): {
-        "args": DefinitionNoParams,
-    },
-    ("cells_id_variables", "DELETE"): {
-        "json": DefinitionVariablesSource,
-    },
     ("projects", "GET"): {
         "args": {
             "additionalProperties": False,
@@ -1534,72 +1525,6 @@ filters = {
         },
     },
     ("cells_id", "DELETE"): {
-        204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("cells_id_variables", "GET"): {
-        200: {
-            "headers": None,
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "properties": {
-                    "variables": DefinitionVariablesSource,
-                },
-            },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("cells_id_variables", "PUT"): {
-        200: {
-            "headers": None,
-            "schema": {
-                "type": "object",
-                "additionalProperties": False,
-                "properties": {
-                    "variables": DefinitionVariablesSource,
-                },
-            },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
-    },
-    ("cells_id_variables", "DELETE"): {
         204: {
             "headers": None,
             "schema": None,

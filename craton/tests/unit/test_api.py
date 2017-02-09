@@ -252,14 +252,14 @@ class APIV1CellsTest(APIV1Test):
 
 
 class APIV1CellsVariablesTest(APIV1Test):
-    @mock.patch.object(dbapi, 'cells_get_by_id')
+    @mock.patch.object(dbapi, 'resource_get_by_id')
     def test_cells_get_variables(self, mock_cell):
         mock_cell.return_value = fake_resources.CELL1
         resp = self.get('v1/cells/1/variables')
         expected = {"variables": {"key1": "value1", "key2": "value2"}}
         self.assertEqual(resp.json, expected)
 
-    @mock.patch.object(dbapi, 'cells_variables_update')
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
     def test_cells_put_variables(self, mock_cell):
         db_return_value = copy.deepcopy(fake_resources.CELL1)
         db_return_value.variables["a"] = "b"
@@ -268,28 +268,28 @@ class APIV1CellsVariablesTest(APIV1Test):
         db_data = payload.copy()
         resp = self.put('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 200)
-        mock_cell.assert_called_once_with(mock.ANY, '1', db_data)
+        mock_cell.assert_called_once_with(mock.ANY, "cells", '1', db_data)
         expected = {
             "variables": {"key1": "value1", "key2": "value2", "a": "b"},
         }
         self.assertDictEqual(expected, resp.json)
 
-    @mock.patch.object(dbapi, 'cells_variables_update')
+    @mock.patch.object(dbapi, 'variables_update_by_resource_id')
     def test_cells_put_bad_data_type(self, mock_cell):
         payload = ["a", "b"]
         resp = self.put('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 400)
         mock_cell.assert_not_called()
 
-    @mock.patch.object(dbapi, 'cells_variables_delete')
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
     def test_cells_delete_variables(self, mock_cell):
         payload = {"key1": "value1"}
         db_data = payload.copy()
         resp = self.delete('v1/cells/1/variables', data=payload)
         self.assertEqual(resp.status_code, 204)
-        mock_cell.assert_called_once_with(mock.ANY, '1', db_data)
+        mock_cell.assert_called_once_with(mock.ANY, "cells", '1', db_data)
 
-    @mock.patch.object(dbapi, 'cells_variables_delete')
+    @mock.patch.object(dbapi, 'variables_delete_by_resource_id')
     def test_cells_delete_bad_data_type(self, mock_cell):
         payload = ["a", "b"]
         resp = self.delete('v1/cells/1/variables', data=payload)

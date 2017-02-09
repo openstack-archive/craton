@@ -126,6 +126,7 @@ def get_user_info(context, username):
 
 def _get_resource_model(resource):
     resource_models = {
+        "cells": models.Cell,
         "hosts": with_polymorphic(models.Device, models.Host),
         "network-devices": with_polymorphic(
             models.Device, models.NetworkDevice
@@ -290,38 +291,6 @@ def cells_delete(context, cell_id):
                             project_only=True)
         query = query.filter_by(id=cell_id)
         query.delete()
-
-
-def cells_variables_update(context, cell_id, data):
-    """Update existing cells variables or create when
-    its not present.
-    """
-    session = get_session()
-    with session.begin():
-        query = model_query(context, models.Cell, session=session,
-                            project_only=True)
-        query = query.filter_by(id=cell_id)
-        cell_ref = query.with_for_update().one()
-        for key in data:
-            cell_ref.variables[key] = data[key]
-        return cell_ref
-
-
-def cells_variables_delete(context, cell_id, data):
-    """Delete the existing key from cells variables."""
-    session = get_session()
-    with session.begin():
-        query = model_query(context, models.Cell, session=session,
-                            project_only=True)
-        query = query.filter_by(id=cell_id)
-        cell_ref = query.with_for_update().one()
-        for key in data:
-            try:
-                del cell_ref.variables[data[key]]
-            except KeyError:
-                # This key does not exist so just ignore
-                pass
-        return cell_ref
 
 
 def regions_get_all(context, filters, pagination_params):

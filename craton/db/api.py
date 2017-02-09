@@ -81,18 +81,6 @@ def cells_delete(context, cell_id):
     """Delete an existing cell."""
     return IMPL.cells_delete(context, cell_id)
 
-
-def cells_variables_update(context, cell_id, data):
-    """Update existing cells variables or create when
-    its not present.
-    """
-    return IMPL.cells_variables_update(context, cell_id, data)
-
-
-def cells_variables_delete(context, cell_id, data_key):
-    """Delete the existing variable from cells data."""
-    return IMPL.cells_variables_delete(context, cell_id, data_key)
-
 # Regions
 
 

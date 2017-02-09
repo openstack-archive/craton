@@ -109,8 +109,19 @@ class VariablesDBTestCase:
 
         return network_device_id
 
+    def setup_cell(self, variables):
+        region_id = self.create_region(name='region1')
+        cell_id = self.create_cell(
+            name="cell1",
+            region_id=region_id,
+            variables=variables,
+        )
+
+        return cell_id
+
     def setup_resource(self, *args, **kwargs):
         setup_fn = {
+            "cells": self.setup_cell,
             "hosts": self.setup_host,
             "network-devices": self.setup_network_device,
         }
@@ -296,3 +307,7 @@ class HostsVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
 
 class NetworkDevicesVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
     resources_type = "network-devices"
+
+
+class CellsVariablesDBTestCase(VariablesDBTestCase, base.DBTestCase):
+    resources_type = "cells"
