@@ -451,8 +451,8 @@ def hosts_get_all(context, filters, pagination_params):
     if "device_type" in filters:
         query = query.filter_by(device_type=filters["device_type"])
     if "label" in filters:
-        query = query.join(models.Device.related_labels).filter(
-            models.Label.label == filters["label"])
+        query = query.filter(models.Device.related_labels.any(
+            models.Label.label == filters["label"]))
     if "vars" in filters:
         query = add_var_filters_to_query(query, filters)
 
