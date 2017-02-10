@@ -118,6 +118,101 @@ class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(0, len(resp.json()['hosts']))
 
+    def test_host_create_labels(self):
+        res = self.create_host('host1', 'server', '192.168.1.1')
+        url = self.url + '/v1/hosts/{}/labels'.format(res['id'])
+
+        data = {"labels": ["compute"]}
+        resp = self.put(url, data=data)
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.get(url)
+        self.assertEqual(data, resp.json())
+
+    def test_host_by_label_filter_match_one(self):
+        labels_route_mask = '/v1/hosts/{}/labels'
+        host1 = self.create_host('host1', 'server', '192.168.1.1')
+        host2 = self.create_host('host2', 'server', '192.168.1.2')
+        host3 = self.create_host('host3', 'server', '192.168.1.3')
+
+        # set labels on hosts
+        data = {"labels": ["compute"]}
+        for host in (host1, host2, host3):
+            url = self.url + labels_route_mask.format(host['id'])
+            resp = self.put(url, data=data)
+            self.assertEqual(200, resp.status_code)
+
+        # set one of them with extra labels
+        data = {"labels": ["compute", "scheduler"]}
+        url = self.url + labels_route_mask.format(host3['id'])
+        resp = self.put(url, data=data)
+        self.assertEqual(200, resp.status_code)
+
+        # get hosts by its label
+        url = self.url + '/v1/hosts?label=scheduler'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        hosts = resp.json()['hosts']
+        self.assertEqual(1, len(hosts))
+        self.assertEqual(host3['id'], hosts[0]['id'])
+
+    def test_host_by_label_filters_match_all(self):
+        labels_route_mask = '/v1/hosts/{}/labels'
+        host1 = self.create_host('host1', 'server', '192.168.1.1')
+        host2 = self.create_host('host2', 'server', '192.168.1.2')
+        host3 = self.create_host('host3', 'server', '192.168.1.3')
+
+        # set labels on hosts
+        data = {"labels": ["compute"]}
+        for host in (host1, host2, host3):
+            url = self.url + labels_route_mask.format(host['id'])
+            resp = self.put(url, data=data)
+            self.assertEqual(200, resp.status_code)
+
+        # set one of them with extra labels
+        data = {"labels": ["compute", "scheduler"]}
+        url = self.url + labels_route_mask.format(host2['id'])
+        resp = self.put(url, data=data)
+        self.assertEqual(200, resp.status_code)
+
+        # get hosts by its label
+        url = self.url + '/v1/hosts?label=scheduler&label=compute'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        hosts = resp.json()['hosts']
+        self.assertEqual(1, len(hosts))
+        self.assertEqual(host2['id'], hosts[0]['id'])
+
+    def test_host_by_label_filters_match_one_common(self):
+        labels_route_mask = '/v1/hosts/{}/labels'
+        test_hosts = [
+            self.create_host('host1', 'server', '192.168.1.1'),
+            self.create_host('host2', 'server', '192.168.1.2'),
+            self.create_host('host3', 'server', '192.168.1.3'),
+        ]
+
+        # set labels on hosts
+        data = {"labels": ["compute"]}
+        for host in test_hosts:
+            url = self.url + labels_route_mask.format(host['id'])
+            resp = self.put(url, data=data)
+            self.assertEqual(200, resp.status_code)
+
+        # set one of them with extra labels
+        data = {"labels": ["compute", "scheduler"]}
+        url = self.url + labels_route_mask.format(test_hosts[1]['id'])
+        resp = self.put(url, data=data)
+        self.assertEqual(200, resp.status_code)
+
+        # get hosts by its label
+        url = self.url + '/v1/hosts?label=compute'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        hosts = resp.json()['hosts']
+        self.assertEqual(3, len(hosts))
+        self.assertEqual(sorted([host['id'] for host in test_hosts]),
+                         sorted([host['id'] for host in hosts]))
+
     def test_host_delete(self):
         host = self.create_host('host1', 'server', '192.168.1.1')
         url = self.url + '/v1/hosts/{}'.format(host['id'])
