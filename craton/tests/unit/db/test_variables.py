@@ -276,10 +276,10 @@ class VariablesDBTestCase:
             "key3": "value3",
         }
 
-        delete_variables = {
-            "_": "key2",
-            "foo": "key3",
-        }
+        delete_variables = [
+            "key2",
+            "key3",
+        ]
 
         result_variables = {"key1": "value1"}
 
@@ -320,9 +320,9 @@ class VariablesDBTestCase:
             "key3": "value3",
         }
 
-        delete_variables = {
-            "_": "key4",
-        }
+        delete_variables = [
+            "key4",
+        ]
 
         result_variables = deepcopy(existing_variables)
 

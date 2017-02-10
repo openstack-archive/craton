@@ -30,6 +30,11 @@ DefinitionVariablesSource = {
     },
 }
 
+DefinitionDeleteVariables = {
+    "type": "array",
+    "items": {"type": "string"},
+}
+
 DefinitionsHost = {
     "required": [
         "name",
@@ -1251,7 +1256,7 @@ validators = {
         "json": DefinitionNetwork,
     },
     ("variables_with_resolve", "DELETE"): {
-        "json": DefinitionVariablesSource,
+        "json": DefinitionDeleteVariables,
     },
     ("variables_with_resolve", "GET"): {
         "args": {
@@ -1268,7 +1273,7 @@ validators = {
         "json": DefinitionVariablesSource,
     },
     ("variables_without_resolve", "DELETE"): {
-        "json": DefinitionVariablesSource,
+        "json": DefinitionDeleteVariables,
     },
     ("variables_without_resolve", "GET"): {
         "args": DefinitionNoParams,
