@@ -102,6 +102,40 @@ class APIV1HostTest(TestCase):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(0, len(resp.json()))
 
+    def test_host_create_labels(self):
+        res = self.create_host('host1', 'server', '192.168.1.1')
+        url = self.url + '/v1/hosts/{}/labels'.format(res['id'])
+
+        data = {"labels": ["compute"]}
+        resp = self.put(url, data=data)
+        self.assertEqual(200, resp.status_code)
+
+        resp = self.get(url)
+        self.assertEqual(data, resp.json())
+
+    def test_host_by_label_filter(self):
+        host1 = self.create_host('host1', 'server', '192.168.1.1')
+        host2 = self.create_host('host2', 'server', '192.168.1.2')
+        host3 = self.create_host('host3', 'server', '192.168.1.3')
+
+        # set labels on hosts
+        data = {"labels": ["compute"]}
+        for host in (host1, host2, host3):
+            url = self.url + '/v1/hosts/{}/labels'.format(host['id'])
+            resp = self.put(url, data=data)
+            self.assertEqual(200, resp.status_code)
+
+        # set one of them with extra labels
+        data = {"labels": ["compute", "scheduler"]}
+        resp = self.put(url, data=data)
+        self.assertEqual(200, resp.status_code)
+
+        # get hosts by its label
+        url = self.url + '/v1/hosts?label=compute'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(3, len(resp.json()))
+
     def test_host_delete(self):
         host = self.create_host('host1', 'server', '192.168.1.1')
         url = self.url + '/v1/hosts/{}'.format(host['id'])
