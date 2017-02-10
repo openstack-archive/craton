@@ -257,6 +257,31 @@ class HostsDBTestCase(base.DBTestCase):
         host = dbapi.hosts_get_by_id(self.context, host_id)
         self.assertEqual(host.labels, {"jerry", "jones"})
 
+    def test_hosts_get_all_with_label_filters(self):
+        region_id = self.make_region(self.mock_project_id, 'region_1')
+        labels = {"labels": ["compute"]}
+        host1 = self.make_host(
+            self.mock_project_id,
+            region_id,
+            'www1.example.com',
+            IPAddress(u'10.1.2.101'),
+            'server',
+        )
+        dbapi.hosts_labels_update(self.context, host1, labels)
+
+        self.make_host(
+            self.mock_project_id,
+            region_id,
+            'www1.example2.com',
+            IPAddress(u'10.1.2.102'),
+            'server',
+        )
+        res = dbapi.hosts_get_all(self.context, {"label": "compute"},
+                                  default_pagination)
+
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].name, 'www1.example.com')
+
     def test_hosts_get_all_with_filter_cell_id(self):
         project_id = self.make_project('project_1', foo='P1', zoo='P2')
         region_id = self.make_region(project_id, 'region_1', foo='R1')
