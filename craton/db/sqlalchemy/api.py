@@ -181,9 +181,9 @@ def variables_delete_by_resource_id(context, resources, resource_id, data):
             context, resources, resource_id, session, for_update=True
         )
 
-        for value in data.values():
+        for key in data:
             try:
-                del resource.variables[value]
+                del resource.variables[key]
             except KeyError:
                 pass
         return resource
