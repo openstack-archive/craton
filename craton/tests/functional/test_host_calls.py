@@ -1,7 +1,10 @@
-from craton.tests.functional import TestCase
+from craton.tests.functional.test_variable_calls import \
+    APIV1ResourceWithVariablesTestCase
 
 
-class APIV1HostTest(TestCase):
+class APIV1HostTest(APIV1ResourceWithVariablesTestCase):
+
+    resource = 'hosts'
 
     def setUp(self):
         super(APIV1HostTest, self).setUp()
@@ -42,6 +45,9 @@ class APIV1HostTest(TestCase):
     def test_create_host(self):
         host = self.create_host('host1', 'server', '192.168.1.1')
         self.assertEqual('host1', host['name'])
+        self.assert_vars_get_expected(host['id'], {})
+        self.assert_vars_can_be_set(host['id'])
+        self.assert_vars_can_be_deleted(host['id'])
 
     def test_create_with_missing_name_fails(self):
         url = self.url + '/v1/hosts'
@@ -77,7 +83,9 @@ class APIV1HostTest(TestCase):
         url = self.url + '/v1/hosts?ip_address=192.168.1.1'
         resp = self.get(url)
         self.assertEqual(200, resp.status_code)
-        self.assertEqual(1, len(resp.json()))
+        hosts = resp.json()
+        self.assertEqual(1, len(hosts))
+        self.assertEqual('192.168.1.1', hosts[0]['ip_address'])
 
     def test_host_get_by_vars_filter(self):
         vars1 = {"a": "b", "host": "one"}
@@ -88,12 +96,18 @@ class APIV1HostTest(TestCase):
         url = self.url + '/v1/hosts?vars=a:b'
         resp = self.get(url)
         self.assertEqual(200, resp.status_code)
-        self.assertEqual(2, len(resp.json()))
+        hosts = resp.json()
+        self.assertEqual(2, len(hosts))
+        self.assertEqual({'192.168.1.1', '192.168.1.2'},
+                         {host['ip_address'] for host in hosts})
 
         url = self.url + '/v1/hosts?vars=host:one'
         resp = self.get(url)
         self.assertEqual(200, resp.status_code)
-        self.assertEqual(1, len(resp.json()))
+        hosts = resp.json()
+        self.assertEqual(1, len(hosts))
+        self.assertEqual('192.168.1.1', hosts[0]['ip_address'])
+        self.assert_vars_get_expected(hosts[0]['id'], vars1)
 
     def test_host_by_missing_filter(self):
         self.create_host('host1', 'server', '192.168.1.1')
