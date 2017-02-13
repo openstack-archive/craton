@@ -125,6 +125,10 @@ DefinitionsHostId = {
         "project_id": {
             "type": "string",
         },
+        "parent_id": {
+            "type": "integer",
+            "description": "Parent Id of this host",
+        },
         "labels": {
             "type": "array",
             "items": {
