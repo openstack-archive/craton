@@ -3,6 +3,7 @@ from oslo_log import log
 
 from craton.api import v1
 from craton.api.v1 import base
+from craton.api.v1.resources import utils
 from craton import db as dbapi
 from craton import util
 
@@ -92,12 +93,8 @@ class NetworkDeviceById(base.Resource):
     @base.http_codes
     def get(self, context, id, request_args):
         """Get network device by given id"""
-        resolved_values = request_args["resolved-values"]
         obj = dbapi.network_devices_get_by_id(context, id)
-        if resolved_values:
-            obj.vars = obj.resolved
-        else:
-            obj.vars = obj.variables
+        obj = utils.format_variables(request_args, obj)
         device = jsonutils.to_primitive(obj)
         device['variables'] = jsonutils.to_primitive(obj.vars)
         return device, 200, None
