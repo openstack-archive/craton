@@ -1,7 +1,10 @@
-from craton.tests.functional import TestCase
+from craton.tests.functional.test_variable_calls import \
+    APIV1ResourceWithVariablesTestCase
 
 
-class APIV1CellTest(TestCase):
+class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
+
+    resource = 'cells'
 
     def setUp(self):
         super(APIV1CellTest, self).setUp()
@@ -37,10 +40,16 @@ class APIV1CellTest(TestCase):
         return cell.json()
 
     def test_cell_create_with_variables(self):
-        variables = {"a": "b"}
+        variables = {'a': 'b'}
         cell = self.create_cell('cell-a', variables=variables)
         self.assertEqual('cell-a', cell['name'])
         self.assertEqual(variables, cell['variables'])
+
+    def test_create_region_supports_vars_ops(self):
+        cell = self.create_cell('new-cell', {'a': 'b'})
+        self.assert_vars_get_expected(cell['id'], {'a': 'b'})
+        self.assert_vars_can_be_set(cell['id'])
+        self.assert_vars_can_be_deleted(cell['id'])
 
     def test_cell_create_with_no_name_fails(self):
         url = self.url + '/v1/cells'
@@ -59,41 +68,56 @@ class APIV1CellTest(TestCase):
         # Create a cell first
         self.create_cell('cell-1')
         url = self.url + '/v1/cells?region_id={}'.format(self.region['id'])
-        cells = self.get(url)
-        self.assertEqual(1, len(cells.json()))
-        self.assertEqual(['cell-1'], [i['name'] for i in cells.json()])
+        resp = self.get(url)
+        cells = resp.json()
+        self.assertEqual(1, len(cells))
+        self.assertEqual({'cell-1'}, {i['name'] for i in cells})
 
     def test_cell_get_all_with_name_filter(self):
         self.create_cell('cell1')
         self.create_cell('cell2')
         url = self.url + '/v1/cells?name=cell2'
-        cell = self.get(url)
-        self.assertEqual(1, len(cell.json()))
+        resp = self.get(url)
+        cells = resp.json()
+        self.assertEqual(1, len(cells))
+        self.assertEqual({'cell2'}, {cell['name'] for cell in cells})
 
     def test_get_cell_details(self):
         cellvars = {"who": "that"}
         cell = self.create_cell('cell1', variables=cellvars)
         url = self.url + '/v1/cells/{}'.format(cell['id'])
-        cell_with_detail = self.get(url)
-        self.assertEqual('cell1', cell_with_detail.json()['name'])
-        self.assertEqual(cellvars, cell_with_detail.json()['variables'])
+        resp = self.get(url)
+        cell_with_detail = resp.json()
+        self.assertEqual('cell1', cell_with_detail['name'])
+        self.assertEqual(cellvars, cell_with_detail['variables'])
 
     def test_cell_update(self):
         cell = self.create_cell('cell-1')
         url = self.url + '/v1/cells/{}'.format(cell['id'])
         data = {'note': 'Updated cell note.'}
-        cell = self.put(url, data=data)
-        self.assertEqual(data['note'], cell.json()['note'])
+        resp = self.put(url, data=data)
+        self.assertEqual(200, resp.status_code)
+        cell = resp.json()
+        self.assertEqual(data['note'], cell['note'])
 
     def test_cell_delete(self):
         cell1 = self.create_cell('cell-1')
         self.create_cell('cell-2')
         url = self.url + '/v1/cells'
-        cells = self.get(url)
-        self.assertEqual(2, len(cells.json()))
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        cells = resp.json()
+        self.assertEqual(2, len(cells))
+        self.assertEqual({'cell-1', 'cell-2'},
+                         {cell['name'] for cell in cells})
 
         delurl = self.url + '/v1/cells/{}'.format(cell1['id'])
-        self.delete(delurl)
+        resp = self.delete(delurl)
+        self.assertEqual(204, resp.status_code)
 
-        cells = self.get(url)
-        self.assertEqual(1, len(cells.json()))
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        cells = resp.json()
+        self.assertEqual(1, len(cells))
+        self.assertEqual({'cell-2'},
+                         {cell['name'] for cell in cells})
