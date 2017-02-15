@@ -810,6 +810,17 @@ validators = {
                     "type": "string",
                     "description": "Type of host",
                 },
+                "parent_id": {
+                    "anyOf": [
+                        {
+                            "type": "integer",
+                        },
+                        {
+                            "type": "null",
+                        },
+                    ],
+                    "description": "Parent Id of this host",
+                },
             },
         },
     },
@@ -1154,6 +1165,16 @@ validators = {
                 },
                 "vlans": {
                     "type": "string",
+                },
+                "parent_id": {
+                    "anyOf": [
+                        {
+                            "type": "integer",
+                        },
+                        {
+                            "type": "null",
+                        },
+                    ],
                 },
             },
         },

@@ -530,7 +530,7 @@ class APIV1HostsIDTest(APIV1Test):
     @mock.patch.object(dbapi, 'hosts_update')
     def test_update_host(self, mock_host):
         record = dict(fake_resources.HOST1.items())
-        payload = {'name': 'Host_New'}
+        payload = {'name': 'Host_New', 'parent_id': 2}
         db_data = payload.copy()
         record.update(payload)
         mock_host.return_value = record
@@ -538,6 +538,7 @@ class APIV1HostsIDTest(APIV1Test):
         resp = self.put('/v1/hosts/1', data=payload)
 
         self.assertEqual(resp.json['name'], db_data['name'])
+        self.assertEqual(resp.json['parent_id'], db_data['parent_id'])
         self.assertEqual(200, resp.status_code)
         mock_host.assert_called_once_with(mock.ANY, '1', db_data)
 
@@ -1044,14 +1045,15 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
 
     @mock.patch.object(dbapi, 'network_devices_update')
     def test_put_network_device(self, fake_device):
-        payload = {"name": "NetDev_New1"}
+        payload = {"name": "NetDev_New1", "parent_id": 2}
         fake_device.return_value = dict(fake_resources.NETWORK_DEVICE1.items(),
                                         **payload)
         resp = self.put('v1/network-devices/1', data=payload)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json['name'], "NetDev_New1")
+        self.assertEqual(resp.json['parent_id'], 2)
         fake_device.assert_called_once_with(
-            mock.ANY, '1', {"name": "NetDev_New1"}
+            mock.ANY, '1', {"name": "NetDev_New1", "parent_id": 2}
         )
 
     @mock.patch.object(dbapi, 'network_devices_update')
