@@ -45,6 +45,9 @@ def pagination_context(function):
             'limit': limit_from(request_args),
             'marker': request_args.pop('marker', None),
         }
+        sort_keys = request_args.get('sort_keys')
+        if sort_keys is not None:
+            request_args['sort_keys'] = sort_keys.split(' ')
         return function(self, context, request_args=request_args,
                         pagination_params=pagination_parameters)
     return wrapper
