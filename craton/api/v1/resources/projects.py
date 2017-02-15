@@ -45,7 +45,13 @@ class Projects(base.Resource):
         )
         headers = {'Location': location}
 
-        return jsonutils.to_primitive(project_obj), 201, headers
+        project = jsonutils.to_primitive(project_obj)
+        if 'variables' in request_data:
+            project["variables"] = \
+                jsonutils.to_primitive(project_obj.variables)
+        else:
+            project["variables"] = {}
+        return project, 201, headers
 
 
 class ProjectById(base.Resource):
@@ -54,7 +60,9 @@ class ProjectById(base.Resource):
     def get(self, context, id):
         """Get a project details by id. Requires super admin privileges."""
         project_obj = dbapi.projects_get_by_id(context, id)
-        return jsonutils.to_primitive(project_obj), 200, None
+        project = jsonutils.to_primitive(project_obj)
+        project['variables'] = jsonutils.to_primitive(project_obj.variables)
+        return project, 200, None
 
     @base.http_codes
     def delete(self, context, id):

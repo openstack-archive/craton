@@ -1,8 +1,15 @@
 from oslo_serialization import jsonutils
+from oslo_log import log
+
 
 from craton.api.v1 import base
 from craton.api.v1.resources import utils
 from craton import db as dbapi
+
+
+# NOTE(thomasem): LOG must exist for craton.api.v1.base module to introspect
+# and execute this modules LOG.
+LOG = log.getLogger(__name__)
 
 
 class Variables(base.Resource):
