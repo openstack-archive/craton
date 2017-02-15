@@ -931,6 +931,17 @@ validators = {
                     "type": "integer",
                     "description": "Last host ID of the previous page",
                 },
+                "sort_dir": {
+                    "type": "string",
+                    "enum": ["asc", "desc"],
+                    "description": "Direction to sort the hosts based on keys "
+                                   "specified to sort on.",
+                },
+                "sort_keys": {
+                    "type": "string",
+                    "description": "Keys used to sort the hosts by.",
+                },
+
             },
         },
     },
@@ -986,6 +997,16 @@ validators = {
                     "type": "integer",
                     "description": "Last cell ID of the previous page",
                 },
+                "sort_dir": {
+                    "type": "string",
+                    "enum": ["asc", "desc"],
+                    "description": "Direction to sort the cells based on keys "
+                                   "specified to sort on.",
+                },
+                "sort_keys": {
+                    "type": "string",
+                    "description": "Keys used to sort the cells by.",
+                },
             },
         },
     },
@@ -1036,6 +1057,16 @@ validators = {
                     "type": "string",
                     "description": "variable filters to get a project",
                 },
+                "sort_dir": {
+                    "type": "string",
+                    "enum": ["asc", "desc"],
+                    "description": "Direction to sort the projects based on "
+                                   "keys specified to sort on.",
+                },
+                "sort_keys": {
+                    "type": "string",
+                    "description": "Keys used to sort the projects by.",
+                },
             },
         },
     },
@@ -1071,6 +1102,16 @@ validators = {
                 "marker": {
                     "type": "integer",
                     "description": "Last user ID of the previous page",
+                },
+                "sort_dir": {
+                    "type": "string",
+                    "enum": ["asc", "desc"],
+                    "description": "Direction to sort the users based on keys "
+                                   "specified to sort on.",
+                },
+                "sort_keys": {
+                    "type": "string",
+                    "description": "Keys used to sort the users by.",
                 },
             },
         },
@@ -1125,6 +1166,16 @@ validators = {
                 "marker": {
                     "type": "integer",
                     "description": "Last device ID of the previous page",
+                },
+                "sort_dir": {
+                    "type": "string",
+                    "enum": ["asc", "desc"],
+                    "description": "Direction to sort the devices based on "
+                                   "keys specified to sort on.",
+                },
+                "sort_keys": {
+                    "type": "string",
+                    "description": "Keys used to sort the devices by.",
                 },
             },
         },
@@ -1250,6 +1301,16 @@ validators = {
                     "type": "integer",
                     "description": "Last interface ID of the previous page",
                 },
+                "sort_dir": {
+                    "type": "string",
+                    "enum": ["asc", "desc"],
+                    "description": "Direction to sort the interfaces based on "
+                                   "keys specified to sort on.",
+                },
+                "sort_keys": {
+                    "type": "string",
+                    "description": "Keys used to sort the hosts by.",
+                },
             },
         },
     },
@@ -1333,6 +1394,16 @@ validators = {
                 "marker": {
                     "type": "integer",
                     "description": "Last network ID of the previous page",
+                },
+                "sort_dir": {
+                    "type": "string",
+                    "enum": ["asc", "desc"],
+                    "description": "Direction to sort the networks based on "
+                                   "keys specified to sort on.",
+                },
+                "sort_keys": {
+                    "type": "string",
+                    "description": "Keys used to sort the hosts by.",
                 },
             },
         },
