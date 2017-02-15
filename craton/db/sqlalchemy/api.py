@@ -486,12 +486,13 @@ def projects_get_all(context, filters, pagination_params):
 
 
 @require_admin_context
-def projects_get_by_name(context, project_name):
+def projects_get_by_name(context, project_name, filters, pagination_params):
     """Get all projects that match the given name."""
     query = model_query(context, models.Project)
     query = query.filter(models.Project.name.like(project_name))
     try:
-        return query.all()
+        return _paginate(context, query, models.Project, session, filters,
+                         pagination_params)
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
     except Exception as err:
