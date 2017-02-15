@@ -134,6 +134,7 @@ def get_user_info(context, username):
 def _get_resource_model(resource):
     resource_models = {
         "cells": models.Cell,
+        "devices": with_polymorphic(models.Device, "*"),
         "hosts": with_polymorphic(models.Device, models.Host),
         "network-devices": with_polymorphic(
             models.Device, models.NetworkDevice

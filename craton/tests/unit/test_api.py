@@ -527,8 +527,10 @@ class APIV1HostsIDTest(APIV1Test):
         resp = self.get('v1/hosts/1?resolved-values=false')
         self.assertEqual(resp.json["variables"], expected)
 
+    @mock.patch.object(api.v1.resources.utils, 'get_device_type')
     @mock.patch.object(dbapi, 'hosts_update')
-    def test_update_host(self, mock_host):
+    def test_update_host(self, mock_host, mock_get_device_type):
+        mock_get_device_type.return_value = "network_devices"
         record = dict(fake_resources.HOST1.items())
         payload = {'name': 'Host_New', 'parent_id': 2}
         db_data = payload.copy()
@@ -541,6 +543,12 @@ class APIV1HostsIDTest(APIV1Test):
         self.assertEqual(resp.json['parent_id'], db_data['parent_id'])
         self.assertEqual(200, resp.status_code)
         mock_host.assert_called_once_with(mock.ANY, '1', db_data)
+        mock_get_device_type.assert_called_once()
+        up_link = {
+            "rel": "up",
+            "href": "http://localhost/v1/network-devices/2"
+        }
+        self.assertIn(up_link, resp.json["links"])
 
 
 class APIV1HostsLabelsTest(APIV1Test):
@@ -696,6 +704,9 @@ class APIV1HostsTest(APIV1Test):
             'device_type': 'server',
             'labels': [],
             'variables': {"key1": "value1", "key2": "value2"},
+            'cell_id': None,
+            'parent_id': None,
+            'links': [{'href': 'http://localhost/v1/regions/1', 'rel': 'up'}],
         }
         self.assertEqual(expected_response, resp.json)
         self.assertIn('Location', resp.headers)

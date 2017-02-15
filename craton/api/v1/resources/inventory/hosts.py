@@ -21,8 +21,14 @@ class Hosts(base.Resource):
             context, request_args, pagination_params,
         )
         links = base.links_from(link_params)
-        response_body = {'hosts': hosts_obj, 'links': links}
-        return jsonutils.to_primitive(response_body), 200, None
+        response_body = jsonutils.to_primitive(
+            {'hosts': hosts_obj, 'links': links}
+        )
+
+        for host in response_body["hosts"]:
+            utils.add_up_link(context, host)
+
+        return response_body, 200, None
 
     @base.http_codes
     def post(self, context, request_data):
@@ -34,6 +40,8 @@ class Hosts(base.Resource):
             host["variables"] = jsonutils.to_primitive(host_obj.variables)
         else:
             host["variables"] = {}
+
+        utils.add_up_link(context, host)
 
         location = v1.api.url_for(
             HostById, id=host_obj.id, _external=True
@@ -52,12 +60,20 @@ class HostById(base.Resource):
         host_obj = utils.format_variables(request_args, host_obj)
         host = jsonutils.to_primitive(host_obj)
         host['variables'] = jsonutils.to_primitive(host_obj.vars)
+
+        utils.add_up_link(context, host)
+
         return host, 200, None
 
     def put(self, context, id, request_data):
         """Update existing host data, or create if it does not exist."""
         host_obj = dbapi.hosts_update(context, id, request_data)
-        return jsonutils.to_primitive(host_obj), 200, None
+
+        host = jsonutils.to_primitive(host_obj)
+
+        utils.add_up_link(context, host)
+
+        return host, 200, None
 
     @base.http_codes
     def delete(self, context, id):

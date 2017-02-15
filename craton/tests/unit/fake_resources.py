@@ -86,7 +86,8 @@ REGIONS_LIST = [REGION1, REGION2]
 
 class Host(object):
     def __init__(self, id, name, project_id, region_id, ip_address,
-                 device_type, variables, labels=None):
+                 device_type, variables, labels=None, cell_id=None,
+                 parent_id=None):
         self.id = id
         self.name = name
         self.project_id = project_id
@@ -96,6 +97,8 @@ class Host(object):
         self.resolved = copy.copy(variables)
         self.device_type = device_type
         self.labels = labels
+        self.cell_id = cell_id
+        self.parent_id = parent_id
 
     def items(self):
         return iter(self.__dict__.items())

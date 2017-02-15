@@ -35,6 +35,26 @@ DefinitionDeleteVariables = {
     "items": {"type": "string"},
 }
 
+DefinitionLinks = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "additionalProperties": False,
+        "required": [
+            "href",
+            "rel",
+        ],
+        "properties": {
+            "href": {
+                "type": "string",
+            },
+            "rel": {
+                "type": "string",
+            }
+        }
+    }
+}
+
 DefinitionsHost = {
     "required": [
         "name",
@@ -91,6 +111,7 @@ DefinitionsHost = {
             "type": "integer",
         },
         "variables": DefinitionVariablesSource,
+        "links": DefinitionLinks,
     },
 }
 
@@ -144,6 +165,7 @@ DefinitionsHostId = {
             "type": "integer",
         },
         "variables": DefinitionVariablesSource,
+        "links": DefinitionLinks,
     },
 }
 
