@@ -1,5 +1,6 @@
 import functools
 import inspect
+import re
 import urllib.parse as urllib
 
 import decorator
@@ -11,6 +12,9 @@ from craton.api.v1.validators import ensure_project_exists
 from craton.api.v1.validators import request_validate
 from craton.api.v1.validators import response_filter
 from craton import exceptions
+
+
+SORT_KEY_SPLITTER = re.compile('[ ,]')
 
 
 class Resource(restful.Resource):
@@ -45,6 +49,9 @@ def pagination_context(function):
             'limit': limit_from(request_args),
             'marker': request_args.pop('marker', None),
         }
+        sort_keys = request_args.get('sort_keys')
+        if sort_keys is not None:
+            request_args['sort_keys'] = SORT_KEY_SPLITTER.split(sort_keys)
         return function(self, context, request_args=request_args,
                         pagination_params=pagination_parameters)
     return wrapper

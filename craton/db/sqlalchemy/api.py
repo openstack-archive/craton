@@ -989,6 +989,10 @@ def _paginate(context, query, model, session, filters, pagination_params,
         ).all()
     except sa_exc.NoResultFound:
         raise exceptions.NotFound()
+    except db_exc.InvalidSortKey as invalid_key:
+        raise exceptions.BadRequest(
+            message='"{}" is an invalid sort key'.format(invalid_key.key)
+        )
     except Exception as err:
         raise exceptions.UnknownException(message=err)
 
