@@ -141,8 +141,7 @@ class TestPagination(HostTests):
         ]
 
     def test_get_returns_a_default_list_of_thirty_hosts(self):
-        url = self.url + '/v1/hosts'
-        response = self.get(url)
+        response = self.get(self.url + '/v1/hosts')
         self.assertSuccessOk(response)
         hosts = response.json()
         self.assertIn('hosts', hosts)
@@ -151,9 +150,8 @@ class TestPagination(HostTests):
                              [h['id'] for h in hosts['hosts']])
 
     def test_get_returns_correct_next_link(self):
-        url = self.url + '/v1/hosts'
         thirtieth_host = self.hosts[29]
-        response = self.get(url)
+        response = self.get(self.url + '/v1/hosts')
         self.assertSuccessOk(response)
         hosts = response.json()
         self.assertIn('links', hosts)
@@ -193,3 +191,24 @@ class TestPagination(HostTests):
         self.assertSuccessOk(resp)
         hosts = resp.json()
         self.assertEqual(2, len(hosts['hosts']))
+
+    def test_ascending_sort_by_name(self):
+        response = self.get(self.url + '/v1/hosts',
+                            sort_key='name', sort_dir='asc')
+        self.assertSuccessOk(response)
+        hosts = response.json()['hosts']
+        self.assertEqual(30, len(hosts))
+
+    def test_ascending_sort_by_name_and_id(self):
+        response = self.get(self.url + '/v1/hosts',
+                            sort_key='name,id', sort_dir='asc')
+        self.assertSuccessOk(response)
+        hosts = response.json()['hosts']
+        self.assertEqual(30, len(hosts))
+
+    def test_ascending_sort_by_name_and_id_space_separated(self):
+        response = self.get(self.url + '/v1/hosts',
+                            sort_key='name id', sort_dir='asc')
+        self.assertSuccessOk(response)
+        hosts = response.json()['hosts']
+        self.assertEqual(30, len(hosts))
