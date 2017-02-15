@@ -30,8 +30,18 @@ class ProjectsDBTestCase(base.DBTestCase):
         dbapi.projects_create(self.context, project1)
         dbapi.projects_create(self.context, project2)
 
-        res = dbapi.projects_get_all(self.context, {}, default_pagination)
+        res, _ = dbapi.projects_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(res), 2)
+
+    def test_project_get_by_name(self):
+        self.context.is_admin_project = True
+        dbapi.projects_create(self.context, project1)
+        dbapi.projects_create(self.context, project2)
+
+        res, _ = dbapi.projects_get_by_name(self.context, project1['name'], {},
+                                            default_pagination)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].name, project1['name'])
 
     def test_project_get_no_admin_project_raises(self):
         self.context.is_admin_project = True
