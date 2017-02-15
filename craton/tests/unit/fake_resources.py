@@ -145,8 +145,9 @@ NETWORKS_LIST2 = [NETWORK1, NETWORK2, NETWORK3]
 
 
 class NetworkDevice():
-    def __init__(self, id, name, project_id, region_id,
-                 device_type, ip_address, variables, labels=None):
+    def __init__(self, id, name, project_id, region_id, device_type,
+                 ip_address, variables, labels=None, cell_id=None,
+                 parent_id=None):
         self.name = name
         self.id = id
         self.project_id = project_id
@@ -156,6 +157,8 @@ class NetworkDevice():
         self.variables = variables
         self.resolved = copy.copy(variables)
         self.labels = labels
+        self.cell_id = cell_id
+        self.parent_id = parent_id
 
     def items(self):
         return iter(self.__dict__.items())

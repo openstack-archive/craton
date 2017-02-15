@@ -730,6 +730,7 @@ DefinitionNetworkDeviceId = {
             "type": "integer",
         },
         "variables": DefinitionVariablesSource,
+        "links": DefinitionLinks,
     },
 }
 

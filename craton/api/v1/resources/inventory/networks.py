@@ -73,8 +73,14 @@ class NetworkDevices(base.Resource):
             context, request_args, pagination_params,
         )
         links = base.links_from(link_params)
-        response_body = {'network_devices': devices_obj, 'links': links}
-        return jsonutils.to_primitive(response_body), 200, None
+        response_body = jsonutils.to_primitive(
+            {'network_devices': devices_obj, 'links': links}
+        )
+
+        for device in response_body["network_devices"]:
+            utils.add_up_link(context, device)
+
+        return response_body, 200, None
 
     @base.http_codes
     def post(self, context, request_data):
@@ -82,6 +88,8 @@ class NetworkDevices(base.Resource):
         json = util.copy_project_id_into_json(context, request_data)
         obj = dbapi.network_devices_create(context, json)
         device = jsonutils.to_primitive(obj)
+
+        utils.add_up_link(context, device)
 
         location = v1.api.url_for(
             NetworkDeviceById, id=obj.id, _external=True
@@ -101,12 +109,19 @@ class NetworkDeviceById(base.Resource):
         obj = utils.format_variables(request_args, obj)
         device = jsonutils.to_primitive(obj)
         device['variables'] = jsonutils.to_primitive(obj.vars)
+
+        utils.add_up_link(context, device)
+
         return device, 200, None
 
     def put(self, context, id, request_data):
         """Update existing device values."""
         net_obj = dbapi.network_devices_update(context, id, request_data)
-        return jsonutils.to_primitive(net_obj), 200, None
+
+        device = jsonutils.to_primitive(net_obj)
+        utils.add_up_link(context, device)
+
+        return device, 200, None
 
     @base.http_codes
     def delete(self, context, id):

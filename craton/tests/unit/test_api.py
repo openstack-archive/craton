@@ -1054,8 +1054,10 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
         self.assertEqual(resp.json['name'], 'NetDevices1')
         fake_device.assert_called_once_with(mock.ANY, '1')
 
+    @mock.patch.object(api.v1.resources.utils, 'get_device_type')
     @mock.patch.object(dbapi, 'network_devices_update')
-    def test_put_network_device(self, fake_device):
+    def test_put_network_device(self, fake_device, mock_get_device_type):
+        mock_get_device_type.return_value = "network_devices"
         payload = {"name": "NetDev_New1", "parent_id": 2}
         fake_device.return_value = dict(fake_resources.NETWORK_DEVICE1.items(),
                                         **payload)
@@ -1066,6 +1068,12 @@ class APIV1NetworkDevicesIDTest(APIV1Test):
         fake_device.assert_called_once_with(
             mock.ANY, '1', {"name": "NetDev_New1", "parent_id": 2}
         )
+        mock_get_device_type.assert_called_once()
+        up_link = {
+            "rel": "up",
+            "href": "http://localhost/v1/network-devices/2"
+        }
+        self.assertIn(up_link, resp.json["links"])
 
     @mock.patch.object(dbapi, 'network_devices_update')
     def test_put_network_device_invalid_property(self, fake_device):
