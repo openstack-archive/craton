@@ -518,7 +518,6 @@ def projects_get_by_id(context, project_id):
 @require_admin_context
 def projects_create(context, values):
     """Create a new project with given values."""
-    LOG.debug("TEM: uuid = {}".format(type(uuid)))
     session = get_session()
     project = models.Project()
     if not values.get('id'):
