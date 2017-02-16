@@ -33,6 +33,18 @@ class ProjectsDBTestCase(base.DBTestCase):
         res, _ = dbapi.projects_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(res), 2)
 
+    def test_project_get_no_admin_project_raises(self):
+        self.context.is_admin_project = True
+        dbapi.projects_create(self.context, project1)
+        dbapi.projects_create(self.context, project2)
+
+        # Now set admin_project = false to become normal project user
+        self.context.is_admin_project = False
+        self.assertRaises(exceptions.AdminRequired,
+                          dbapi.projects_get_all,
+                          self.context,
+                          {}, default_pagination)
+
     def test_project_get_by_name(self):
         dbapi.projects_create(self.context, project1)
         dbapi.projects_create(self.context, project2)
