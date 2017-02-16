@@ -1,7 +1,6 @@
 from oslo_middleware import base
 from oslo_middleware import request_id
 from oslo_context import context
-from oslo_log import log
 from oslo_utils import uuidutils
 
 import flask
@@ -9,9 +8,6 @@ import json
 
 from craton.db import api as dbapi
 from craton import exceptions
-
-
-LOG = log.getLogger(__name__)
 
 
 class RequestContext(context.RequestContext):

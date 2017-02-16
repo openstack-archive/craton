@@ -1,14 +1,10 @@
 from collections import OrderedDict
 from operator import attrgetter
 from oslo_serialization import jsonutils
-from oslo_log import log
 
 from craton.api.v1 import base
 from craton import db as dbapi
 from craton import exceptions
-
-
-LOG = log.getLogger(__name__)
 
 
 class AnsibleInventory(base.Resource):

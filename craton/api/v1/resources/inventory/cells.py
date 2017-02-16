@@ -1,13 +1,9 @@
 from oslo_serialization import jsonutils
-from oslo_log import log
 
 from craton.api import v1
 from craton.api.v1 import base
 from craton import db as dbapi
 from craton import util
-
-
-LOG = log.getLogger(__name__)
 
 
 class Cells(base.Resource):
