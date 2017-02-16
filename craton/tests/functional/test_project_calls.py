@@ -43,7 +43,8 @@ class TestPaginationOfProjects(ProjectTests):
         ]
 
     def test_lists_first_thirty_projects(self):
-        response = self.get(self.url + '/v1/projects')
+        response = self.get(self.url + '/v1/projects',
+                            headers=self.root_headers)
         self.assertSuccessOk(response)
         json = response.json()
         self.assertIn('projects', json)
