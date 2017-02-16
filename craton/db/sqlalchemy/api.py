@@ -134,7 +134,6 @@ def get_user_info(context, username):
 def _get_resource_model(resource):
     resource_models = {
         "cells": models.Cell,
-        "devices": with_polymorphic(models.Device, "*"),
         "hosts": with_polymorphic(models.Device, models.Host),
         "network-devices": with_polymorphic(
             models.Device, models.NetworkDevice
@@ -518,7 +517,6 @@ def projects_get_by_id(context, project_id):
 @require_admin_context
 def projects_create(context, values):
     """Create a new project with given values."""
-    LOG.debug("TEM: uuid = {}".format(type(uuid)))
     session = get_session()
     project = models.Project()
     if not values.get('id'):

@@ -38,7 +38,6 @@ class Projects(base.Resource):
     @base.http_codes
     def post(self, context, request_data):
         """Create a new project. Requires super admin privileges."""
-        LOG.debug("TEM calling dbapi.projects_create")
         project_obj = dbapi.projects_create(context, request_data)
 
         location = v1.api.url_for(
