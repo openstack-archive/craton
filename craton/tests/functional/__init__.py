@@ -7,6 +7,10 @@ from sqlalchemy import MetaData
 import testtools
 import threading
 
+from oslo_log import log as logging
+
+LOG = logging.getLogger(__name__)
+
 
 FAKE_DATA_GEN_USERNAME = 'demo'
 FAKE_DATA_GEN_TOKEN = 'demo'
@@ -39,10 +43,12 @@ class DockerSetup(threading.Thread):
             if is_ok != 'OK':
                 msg = 'Docker daemon ping failed.'
                 self.error = msg
+                LOG.error(self.error)
                 self.container_is_ready.set()
                 return
         except Exception as err:
             self.error = err
+            LOG.error(self.error)
             self.container_is_ready.set()
             return
 
@@ -52,6 +58,7 @@ class DockerSetup(threading.Thread):
                                          dockerfile='Dockerfile',
                                          pull=True,
                                          forcerm=True)
+        LOG.debug(build_output)
         output_last_line = ""
         for output_last_line in build_output:
             pass
