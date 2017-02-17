@@ -15,13 +15,7 @@ class Projects(base.Resource):
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all projects. Requires super admin privileges."""
-        project_id = request_args["id"]
         project_name = request_args["name"]
-
-        if project_id:
-            project_obj = dbapi.projects_get_by_id(context, project_id)
-            projects_obj = [project_obj]
-            link_params = {}
 
         if project_name:
             projects_obj, link_params = dbapi.projects_get_by_name(
