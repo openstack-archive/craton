@@ -381,7 +381,7 @@ DefinitionProject = {
             "type": "string",
         },
         "id": {
-            "type": "integer",
+            "type": "string",
         },
         "name": {
             "type": "string",
@@ -1034,7 +1034,7 @@ validators = {
             "properties": {
                 "id": {
                     "default": None,
-                    "type": "integer",
+                    "type": "string",
                     "description": "id of the project to get",
                 },
                 "name": {
@@ -1050,7 +1050,7 @@ validators = {
                     "description": "Number of projects to return in a page",
                 },
                 "marker": {
-                    "type": "integer",
+                    "type": "string",
                     "description": "Last project ID of the previous page",
                 },
                 "vars": {
