@@ -1,5 +1,7 @@
 """SQLAlchemy backend implementation."""
 
+import enum
+import functools
 import sys
 import uuid
 
@@ -87,6 +89,52 @@ def require_project_admin_context(f):
     return wrapper
 
 
+class CRUD(enum.Enum):
+    CREATE = 'create'
+    READ = 'read'
+    UPDATE = 'update'
+    DELETE = 'delete'
+
+
+def permissions_for(action):
+    # NOTE(thomasem): Temporary shim applying existing project admin / root
+    # project checks to generic resource methods, since we don't have RBAC
+    # fully baked yet. This needs to be removed once we have solved this via
+    # craton-rbac-support blueprint. This affords us being able to use
+    # generic resource methods support for resources like Projects, where one
+    # must be Project admin to interact.
+    def get_permissions_for(fn):
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            # NOTE(thomasem): Standard order of arguments for generic resources
+            # methods is (context, resources, ...), so args[0] is always
+            # context and args[1] is always resources.
+            context = args[0]
+            resources = args[1]
+            permissions = {
+                CRUD.CREATE: {
+                    'projects': is_project_admin_context(context),
+                },
+                CRUD.READ: {
+                    'projects': is_project_admin_context(context),
+                },
+                CRUD.UPDATE: {
+                    'projects': is_project_admin_context(context),
+                },
+                CRUD.DELETE: {
+                    'projects': is_project_admin_context(context),
+                }
+            }
+            # NOTE(thomasem): Default to True unless otherwise specified in
+            # permissions dict.
+            if permissions[action].get(resources, True):
+                return fn(*args, **kwargs)
+            else:
+                raise exceptions.AdminRequired()
+        return wrapper
+    return get_permissions_for
+
+
 def model_query(context, model, *args, **kwargs):
     """Query helper that accounts for context's `read_deleted` field.
     :param context: context to query under
@@ -146,6 +194,7 @@ def _get_resource_model(resource):
     return resource_models[resource]
 
 
+@permissions_for(CRUD.READ)
 def resource_get_by_id(
         context, resources, resource_id, session=None, for_update=False
         ):
@@ -170,6 +219,7 @@ def resource_get_by_id(
         return resource
 
 
+@permissions_for(CRUD.UPDATE)
 def variables_update_by_resource_id(context, resources, resource_id, data):
     """Update/create existing resource's variables."""
     session = get_session()
@@ -182,6 +232,7 @@ def variables_update_by_resource_id(context, resources, resource_id, data):
         return resource
 
 
+@permissions_for(CRUD.DELETE)
 def variables_delete_by_resource_id(context, resources, resource_id, data):
     """Delete the existing variables, if present, from resource's data."""
     session = get_session()
@@ -478,6 +529,7 @@ def hosts_labels_delete(context, host_id, labels):
     return _device_labels_delete(context, 'hosts', host_id, labels)
 
 
+@require_admin_context
 def projects_get_all(context, filters, pagination_params):
     """Get all the projects."""
     session = get_session()
@@ -488,6 +540,7 @@ def projects_get_all(context, filters, pagination_params):
                      pagination_params)
 
 
+@require_admin_context
 def projects_get_by_name(context, project_name, filters, pagination_params):
     """Get all projects that match the given name."""
     query = model_query(context, models.Project)
@@ -503,6 +556,7 @@ def projects_get_by_name(context, project_name, filters, pagination_params):
         raise exceptions.UnknownException(message=err)
 
 
+@require_project_admin_context
 def projects_get_by_id(context, project_id):
     """Get project by its id."""
     query = model_query(context, models.Project)

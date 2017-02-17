@@ -74,6 +74,109 @@ class APIV1WithContextTest(TestCase):
         return resp
 
 
+class APIV1RBACLiteTest(TestCase):
+
+    @staticmethod
+    def _test_func(context, resources):
+        pass
+
+    def test_permissions_for_project_create_non_admin_raises(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.CREATE)(self._test_func)
+        self.assertRaises(exceptions.AdminRequired,
+                          fn,
+                          context,
+                          resources)
+
+    def test_permissions_for_project_read_non_admin_raises(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.READ)(self._test_func)
+        self.assertRaises(exceptions.AdminRequired,
+                          fn,
+                          context,
+                          resources)
+
+    def test_permissions_for_project_update_non_admin_raises(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.UPDATE)(self._test_func)
+        self.assertRaises(exceptions.AdminRequired,
+                          fn,
+                          context,
+                          resources)
+
+    def test_permissions_for_project_delete_non_admin_raises(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.DELETE)(self._test_func)
+        self.assertRaises(exceptions.AdminRequired,
+                          fn,
+                          context,
+                          resources)
+
+    def test_permissions_for_project_create_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = True
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.CREATE)(self._test_func)
+        fn(context, resources)
+
+    def test_permissions_for_project_read_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = True
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.READ)(self._test_func)
+        fn(context, resources)
+
+    def test_permissions_for_project_update_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = True
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.UPDATE)(self._test_func)
+        fn(context, resources)
+
+    def test_permissions_for_project_delete_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = True
+        resources = 'projects'
+        fn = dbapi.permissions_for(dbapi.CRUD.DELETE)(self._test_func)
+        fn(context, resources)
+
+    def test_permissions_for_nonlisted_resources_create_non_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'iamfakeresources'
+        fn = dbapi.permissions_for(dbapi.CRUD.CREATE)(self._test_func)
+        fn(context, resources)
+
+    def test_permissions_for_nonlisted_resources_read_non_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'iamfakeresources'
+        fn = dbapi.permissions_for(dbapi.CRUD.READ)(self._test_func)
+        fn(context, resources)
+
+    def test_permissions_for_nonlisted_resources_update_non_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'iamfakeresources'
+        fn = dbapi.permissions_for(dbapi.CRUD.UPDATE)(self._test_func)
+        fn(context, resources)
+
+    def test_permissions_for_nonlisted_resources_delete_non_admin_works(self):
+        context = mock.Mock()
+        context.is_admin = False
+        resources = 'iamfakeresources'
+        fn = dbapi.permissions_for(dbapi.CRUD.DELETE)(self._test_func)
+        fn(context, resources)
+
+
 class APIV1MiddlewareTest(APIV1WithContextTest):
     def test_no_auth_token_returns_401(self):
         resp = self.get('v1/cells/1')
