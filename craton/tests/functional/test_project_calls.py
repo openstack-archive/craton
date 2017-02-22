@@ -1,5 +1,7 @@
 import copy
 
+from oslo_utils import uuidutils
+
 from craton.tests import functional
 from craton.tests.functional.test_variable_calls import \
     APIV1ResourceWithVariablesTestCase
@@ -23,15 +25,17 @@ class ProjectTests(functional.TestCase):
         payload = {'name': name}
         if variables:
             payload['variables'] = variables
-        project = self.post(url, headers=self.root_headers, data=payload)
-        self.assertEqual(201, project.status_code)
-        self.assertIn('Location', project.headers)
+        response = self.post(url, headers=self.root_headers, data=payload)
+        self.assertEqual(201, response.status_code)
+        self.assertIn('Location', response.headers)
+        project = response.json()
+        self.assertTrue(uuidutils.is_uuid_like(project['id']))
         self.assertEqual(
-            project.headers['Location'],
-            "{}/{}".format(url, project.json()['id'])
+            response.headers['Location'],
+            "{}/{}".format(url, project['id'])
         )
 
-        return project.json()
+        return project
 
 
 class TestPaginationOfProjects(ProjectTests):
@@ -50,6 +54,16 @@ class TestPaginationOfProjects(ProjectTests):
         self.assertIn('projects', json)
         projects = json['projects']
         self.assertEqual(30, len(projects))
+
+    def test_lists_projects_with_the_same_name(self):
+        self.create_project('project-0')
+
+        response = self.get(self.url + '/v1/projects',
+                            name='project-0',
+                            headers=self.root_headers)
+        self.assertSuccessOk(response)
+        projects = response.json()['projects']
+        self.assertEqual(2, len(projects))
 
 
 class APIV1ProjectTest(ProjectTests, APIV1ResourceWithVariablesTestCase):
