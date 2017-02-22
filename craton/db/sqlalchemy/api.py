@@ -933,9 +933,12 @@ def _link_params_for(query, model, filters, pagination_params,
     generate_links = ('first', 'self')
 
     if current_results:
-        next_marker = current_results[-1]
-        # If there are results to return, there may be a next link to follow
-        generate_links += ('next',)
+        # There will only be the possibility of additional results --
+        # and a next link to follow -- if the result set is of length
+        # limit (which is the maximum of course).
+        if len(current_results) == base_parameters['limit']:
+            next_marker = current_results[-1]
+            generate_links += ('next',)
 
     # We start our links dictionary with some basics
     for relation in generate_links:
@@ -955,7 +958,7 @@ def _link_params_for(query, model, filters, pagination_params,
         )
     if previous_marker is not None:
         params['marker'] = previous_marker
-    links['prev'] = params
+        links['prev'] = params
     return links
 
 
