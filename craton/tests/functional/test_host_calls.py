@@ -307,3 +307,20 @@ class TestPagination(HostTests):
         self.assertSuccessOk(response)
         hosts = response.json()['hosts']
         self.assertEqual(30, len(hosts))
+
+    def test_follows_next_link(self):
+        url = self.url + '/v1/hosts'
+        response = self.get(url)
+        self.assertSuccessOk(response)
+        json = response.json()
+        hosts = json['hosts']
+        while hosts:
+            for link in json['links']:
+                if link['rel'] == 'next':
+                    break
+            else:
+                break
+            response = self.get(link['href'])
+            self.assertSuccessOk(response)
+            json = response.json()
+            hosts = json['hosts']

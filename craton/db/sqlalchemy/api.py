@@ -924,6 +924,12 @@ def _link_params_for(query, model, filters, pagination_params,
     # We can discern our base parameters for our links
     base_parameters = {}
     for (key, value) in filters.items():
+        # NOTE(thomasem): Sometimes the filters that are passed in will include
+        # a None value from the schema. This causes it to not get included
+        # in the link, since a None value indicates you did not include a value
+        # for that parameter in the original call.
+        if value is None:
+            continue
         # This takes care of things like sort_keys which may have multiple
         # values
         if isinstance(value, list):
