@@ -164,3 +164,20 @@ class TestPagination(RegionTests):
         parsed_prev = urllib.parse.urlparse(link_rel['href'])
         self.assertIn('marker={}'.format(first_region['id']),
                       parsed_prev.query)
+
+    def test_follow_all_region_links(self):
+        url = self.url + '/v1/regions'
+        response = self.get(url)
+        self.assertSuccessOk(response)
+        json = response.json()
+        regions = json['regions']
+        while regions:
+            for link in json['links']:
+                if link['rel'] == 'next':
+                    break
+            else:
+                break
+            response = self.get(link['href'])
+            self.assertSuccessOk(response)
+            json = response.json()
+            regions = json['regions']

@@ -761,6 +761,41 @@ DefinitionsPaginationLinks = {
 }
 
 
+def add_pagination_args(resource, args,
+                        minimum_page_size=10,
+                        default_page_size=30,
+                        maximum_page_size=100,
+                        marker_type="integer"):
+    args.update({
+        "limit": {
+            "minimum": minimum_page_size,
+            "default": default_page_size,
+            "maximum": maximum_page_size,
+            "type": "integer",
+            "description": "Number of {}s to return in a page".format(
+                resource,
+            ),
+        },
+        "marker": {
+            "type": marker_type,
+            "description": "Last {} ID of the previous page".format(
+                resource,
+            ),
+        },
+        "sort_dir": {
+            "type": "string",
+            "enum": ["asc", "desc"],
+            "description": ("Direction to sort the {}s based on keys "
+                            "specified to sort on.").format(resource),
+        },
+        "sort_keys": {
+            "type": "string",
+            "description": "Keys used to sort the {}s by.".format(resource),
+        },
+    })
+    return args
+
+
 def paginated_resource(list_name, schema):
     return {
         "type": "object",
@@ -851,7 +886,7 @@ validators = {
     ("regions", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("region", {
                 "name": {
                     "type": "string",
                     "description": "name of the region to get",
@@ -864,18 +899,7 @@ validators = {
                     "type": "integer",
                     "description": "ID of the region to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of regions to return in a page",
-                },
-                "marker": {
-                    "type": "integer",
-                    "description": "Last region ID of the previous page",
-                },
-            },
+            }),
         },
     },
     ("regions", "POST"): {
@@ -887,7 +911,7 @@ validators = {
     ("hosts", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("host", {
                 "name": {
                     "type": "string",
                     "description": "name of the hosts to get",
@@ -920,29 +944,7 @@ validators = {
                     "type": "integer",
                     "description": "ID of host to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of hosts to return in a page",
-                },
-                "marker": {
-                    "type": "integer",
-                    "description": "Last host ID of the previous page",
-                },
-                "sort_dir": {
-                    "type": "string",
-                    "enum": ["asc", "desc"],
-                    "description": "Direction to sort the hosts based on keys "
-                                   "specified to sort on.",
-                },
-                "sort_keys": {
-                    "type": "string",
-                    "description": "Keys used to sort the hosts by.",
-                },
-
-            },
+            }),
         },
     },
     ("cells_id", "DELETE"): {
@@ -969,7 +971,7 @@ validators = {
     ("cells", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("cell", {
                 "region_id": {
                     "type": "string",
                     "description": "name of the region to get cells for",
@@ -986,28 +988,7 @@ validators = {
                     "type": "string",
                     "description": "name of the cell to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of cells to return in a page",
-                },
-                "marker": {
-                    "type": "integer",
-                    "description": "Last cell ID of the previous page",
-                },
-                "sort_dir": {
-                    "type": "string",
-                    "enum": ["asc", "desc"],
-                    "description": "Direction to sort the cells based on keys "
-                                   "specified to sort on.",
-                },
-                "sort_keys": {
-                    "type": "string",
-                    "description": "Keys used to sort the cells by.",
-                },
-            },
+            }),
         },
     },
     ("regions_id", "DELETE"): {
@@ -1031,38 +1012,17 @@ validators = {
     ("projects", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("project", {
                 "name": {
                     "default": None,
                     "type": "string",
                     "description": "name of the project to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of projects to return in a page",
-                },
-                "marker": {
-                    "type": "string",
-                    "description": "Last project ID of the previous page",
-                },
                 "vars": {
                     "type": "string",
                     "description": "variable filters to get a project",
                 },
-                "sort_dir": {
-                    "type": "string",
-                    "enum": ["asc", "desc"],
-                    "description": "Direction to sort the projects based on "
-                                   "keys specified to sort on.",
-                },
-                "sort_keys": {
-                    "type": "string",
-                    "description": "Keys used to sort the projects by.",
-                },
-            },
+            }, marker_type="string"),
         },
     },
     ("projects", "POST"): {
@@ -1076,7 +1036,7 @@ validators = {
     ("users", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("user", {
                 "id": {
                     "default": None,
                     "type": "integer",
@@ -1087,28 +1047,7 @@ validators = {
                     "type": "string",
                     "description": "name of the user to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of users to return in a page",
-                },
-                "marker": {
-                    "type": "integer",
-                    "description": "Last user ID of the previous page",
-                },
-                "sort_dir": {
-                    "type": "string",
-                    "enum": ["asc", "desc"],
-                    "description": "Direction to sort the users based on keys "
-                                   "specified to sort on.",
-                },
-                "sort_keys": {
-                    "type": "string",
-                    "description": "Keys used to sort the users by.",
-                },
-            },
+            }),
         },
     },
     ("users", "POST"): {
@@ -1122,7 +1061,7 @@ validators = {
     ("network_devices", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("network device", {
                 "id": {
                     "type": "integer",
                     "description": "id of the net device to get",
@@ -1151,28 +1090,7 @@ validators = {
                     "type": "string",
                     "description": "cell id of the device to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of devices to return in a page",
-                },
-                "marker": {
-                    "type": "integer",
-                    "description": "Last device ID of the previous page",
-                },
-                "sort_dir": {
-                    "type": "string",
-                    "enum": ["asc", "desc"],
-                    "description": "Direction to sort the devices based on "
-                                   "keys specified to sort on.",
-                },
-                "sort_keys": {
-                    "type": "string",
-                    "description": "Keys used to sort the devices by.",
-                },
-            },
+            }),
         },
     },
     ("network_devices_id", "DELETE"): {
@@ -1268,7 +1186,7 @@ validators = {
     ("network_interfaces", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("network interface", {
                 "id": {
                     "type": "integer",
                     "description": "id of the net interface to get",
@@ -1285,28 +1203,7 @@ validators = {
                     "type": "string",
                     "description": "Type of the interface  to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of interfaces to return in a page",
-                },
-                "marker": {
-                    "type": "integer",
-                    "description": "Last interface ID of the previous page",
-                },
-                "sort_dir": {
-                    "type": "string",
-                    "enum": ["asc", "desc"],
-                    "description": "Direction to sort the interfaces based on "
-                                   "keys specified to sort on.",
-                },
-                "sort_keys": {
-                    "type": "string",
-                    "description": "Keys used to sort the hosts by.",
-                },
-            },
+            }),
         },
     },
     ("network_interfaces", "POST"): {
@@ -1354,7 +1251,7 @@ validators = {
     ("networks", "GET"): {
         "args": {
             "additionalProperties": False,
-            "properties": {
+            "properties": add_pagination_args("network", {
                 "id": {
                     "type": "integer",
                     "description": "id of the network to get",
@@ -1379,28 +1276,7 @@ validators = {
                     "type": "string",
                     "description": "cell idof the network to get",
                 },
-                "limit": {
-                    "minimum": 10,
-                    "default": 30,
-                    "maximum": 100,
-                    "type": "integer",
-                    "description": "Number of networks to return in a page",
-                },
-                "marker": {
-                    "type": "integer",
-                    "description": "Last network ID of the previous page",
-                },
-                "sort_dir": {
-                    "type": "string",
-                    "enum": ["asc", "desc"],
-                    "description": "Direction to sort the networks based on "
-                                   "keys specified to sort on.",
-                },
-                "sort_keys": {
-                    "type": "string",
-                    "description": "Keys used to sort the hosts by.",
-                },
-            },
+            }),
         },
     },
     ("networks", "POST"): {
