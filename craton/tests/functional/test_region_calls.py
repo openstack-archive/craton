@@ -78,6 +78,32 @@ class APIV1RegionTest(RegionTests):
         resp = self.post(url, data=values)
         self.assertEqual(409, resp.status_code)
 
+    def test_create_region_with_extra_id_property_fails(self):
+        values = {"name": "test", "id": 101}
+        url = self.url + '/v1/regions'
+        resp = self.post(url, data=values)
+        self.assertEqual(resp.status_code, 400)
+        msg = ["Additional properties are not allowed ('id' was unexpected)"]
+        self.assertEqual(resp.json()['errors'], msg)
+
+    def test_create_region_with_extra_created_at_property_fails(self):
+        values = {"name": "test", "created_at": "some date"}
+        url = self.url + '/v1/regions'
+        resp = self.post(url, data=values)
+        self.assertEqual(resp.status_code, 400)
+        msg = ["Additional properties are not allowed "
+               "('created_at' was unexpected)"]
+        self.assertEqual(resp.json()['errors'], msg)
+
+    def test_create_region_with_extra_updated_at_property_fails(self):
+        values = {"name": "test", "updated_at": "some date"}
+        url = self.url + '/v1/regions'
+        resp = self.post(url, data=values)
+        self.assertEqual(resp.status_code, 400)
+        msg = ["Additional properties are not allowed "
+               "('updated_at' was unexpected)"]
+        self.assertEqual(resp.json()['errors'], msg)
+
     def test_regions_get_all(self):
         self.create_region("ORD1")
         self.create_region("ORD2")
