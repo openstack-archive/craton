@@ -64,6 +64,14 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
         cell = self.post(url, data=payload)
         self.assertEqual(409, cell.status_code)
 
+    def test_cell_create_with_extra_property_fails(self):
+        url = self.url + '/v1/cells'
+        payload = {'region_id': self.region['id'], 'name': 'a', 'id': 3}
+        cell = self.post(url, data=payload)
+        self.assertEqual(400, cell.status_code)
+        msg = ["Additional properties are not allowed ('id' was unexpected)"]
+        self.assertEqual(cell.json()['errors'], msg)
+
     def test_cells_get_all_for_region(self):
         # Create a cell first
         self.create_cell('cell-1')
