@@ -1,3 +1,5 @@
+import copy
+
 DefinitionVariablesSource = {
     "type": "object",
     "additionalProperties": False,
@@ -55,184 +57,16 @@ DefinitionLinks = {
     }
 }
 
-DefinitionsHost = {
-    "required": [
-        "name",
-        "region_id",
-        "ip_address",
-        "device_type",
-    ],
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "active": {
-            "type": "boolean",
-        },
-        "note": {
-            "type": "string",
-        },
-        "ip_address": {
-            "type": "string",
-        },
-        "name": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "cell_id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "parent_id": {
-            "type": "integer",
-            "description": "Parent Id of this host",
-        },
-        "device_type": {
-            "type": "string",
-            "description": "Type of host",
-        },
-        "labels": {
-            "type": "array",
-            "items": {
-                "type": "string",
-            },
-            "description": "User defined labels",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "variables": DefinitionVariablesSource,
-        "links": DefinitionLinks,
-    },
-}
+# These are properties that should be excluded in any POST call
+# such that a resource can not be created with these in request body.
+blacklisted_create_properties = ["id", "created_at", "updated_at"]
 
-DefinitionsHostId = {
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "active": {
-            "type": "boolean",
-        },
-        "note": {
-            "type": "string",
-        },
-        "ip_address": {
-            "type": "string",
-        },
-        "name": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "cell_id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "parent_id": {
-            "type": "integer",
-            "description": "Parent Id of this host",
-        },
-        "labels": {
-            "type": "array",
-            "items": {
-                "type": "string",
-            },
-            "description": "User defined labels",
-        },
-        "device_type": {
-            "type": "string",
-            "description": "Type of host",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "variables": DefinitionVariablesSource,
-        "links": DefinitionLinks,
-    },
-}
 
-DefinitionsCell = {
-    "required": [
-        "name",
-        "region_id",
-    ],
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "note": {
-            "type": "string",
-        },
-        "name": {
-            "type": "string",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-            "description": "Unique ID of the cell",
-        },
-        "variables": DefinitionVariablesSource,
-    },
-}
-
-DefinitionsCellId = {
-    "type": "object",
-    "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "note": {
-            "type": "string",
-        },
-        "project_id": {
-            "type": "string",
-            "description": "UUID of the project",
-        },
-        "name": {
-            "type": "string",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "id": {
-            "type": "integer",
-            "description": "Unique ID of the cell",
-        },
-        "variables": DefinitionVariablesSource,
-    },
-}
+def _remove_properties(properties, remove_list):
+    props = copy.copy(properties)
+    for prop in remove_list:
+        props.pop(prop)
+    return props
 
 DefinitionsLabel = {
     "type": "object",
@@ -264,130 +98,312 @@ DefinitionsError = {
     },
 }
 
+HostProperties = {
+    "created_at": {
+        "type": "string",
+    },
+    "updated_at": {
+        "type": "string",
+    },
+    "active": {
+        "type": "boolean",
+    },
+    "note": {
+        "type": "string",
+    },
+    "ip_address": {
+        "type": "string",
+    },
+    "name": {
+        "type": "string",
+    },
+    "id": {
+        "type": "integer",
+    },
+    "cell_id": {
+        "type": "integer",
+    },
+    "project_id": {
+        "type": "string",
+    },
+    "parent_id": {
+        "type": "integer",
+        "description": "Parent Id of this host",
+    },
+    "device_type": {
+        "type": "string",
+        "description": "Type of host",
+    },
+    "labels": {
+        "type": "array",
+        "items": {
+            "type": "string",
+        },
+        "description": "User defined labels",
+    },
+    "region_id": {
+        "type": "integer",
+    },
+    "variables": DefinitionVariablesSource,
+    "links": DefinitionLinks,
+}
+
+DefinitionsHost = {
+    "required": [
+        "name",
+        "region_id",
+        "ip_address",
+        "device_type",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": HostProperties,
+}
+
+DefinitionsHostId = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": HostProperties,
+}
+
+DefinitionHostCreate = {
+    "required": [
+        "name",
+        "region_id",
+        "ip_address",
+        "device_type",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(HostProperties,
+                                     blacklisted_create_properties),
+}
+
+CellProperties = {
+    "created_at": {
+        "type": "string",
+    },
+    "updated_at": {
+        "type": "string",
+    },
+    "note": {
+        "type": "string",
+    },
+    "name": {
+        "type": "string",
+    },
+    "region_id": {
+        "type": "integer",
+    },
+    "project_id": {
+        "type": "string",
+    },
+    "id": {
+        "type": "integer",
+        "description": "Unique ID of the cell",
+    },
+    "variables": DefinitionVariablesSource,
+}
+
+DefinitionsCell = {
+    "required": [
+        "name",
+        "region_id",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": CellProperties,
+}
+
+DefinitionsCellId = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": CellProperties,
+}
+
+DefinitionsCellCreate = {
+    "required": [
+        "name",
+        "region_id",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(CellProperties,
+                                     blacklisted_create_properties),
+}
+
+RegionProperties = {
+    "created_at": {
+        "type": "string",
+    },
+    "updated_at": {
+        "type": "string",
+    },
+    "note": {
+        "type": "string",
+        "description": "Region Note",
+    },
+    "name": {
+        "type": "string",
+        "description": "Region Name",
+    },
+    "cells": {
+        "items": DefinitionsCell,
+        "type": "array",
+        "description": "List of cells in this region",
+    },
+    "project_id": {
+        "type": "string",
+    },
+    "id": {
+        "type": "integer",
+        "description": "Unique ID for the region",
+    },
+    "variables": DefinitionVariablesSource,
+}
+
 DefinitionsRegion = {
     "required": [
         "name",
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "note": {
-            "type": "string",
-            "description": "Region Note",
-        },
-        "name": {
-            "type": "string",
-            "description": "Region Name",
-        },
-        "cells": {
-            "items": DefinitionsCell,
-            "type": "array",
-            "description": "List of cells in this region",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-            "description": "Unique ID for the region",
-        },
-        "variables": DefinitionVariablesSource,
-    },
+    "properties": RegionProperties,
 }
 
 DefinitionsRegionId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
+    "properties": RegionProperties,
+}
+
+DefinitionsRegionCreate = {
+    "required": [
+        "name",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(RegionProperties,
+                                     blacklisted_create_properties),
+}
+
+
+UserProperties = {
+    "created_at": {
+        "type": "string",
+    },
+    "updated_at": {
+        "type": "string",
+    },
+    "id": {
+        "type": "integer",
+    },
+    "api_key": {
+        "type": "string",
+    },
+    "username": {
+        "type": "string",
+    },
+    "is_admin": {
+        "type": "boolean",
+    },
+    "project_id": {
+        "type": "string",
+    },
+    "roles": {
+        "type": "array",
+        "items": {
             "type": "string",
         },
-        "updated_at": {
-            "type": "string",
-        },
-        "note": {
-            "type": "string",
-            "description": "Region Note",
-        },
-        "name": {
-            "type": "string",
-            "description": "Region Name.",
-        },
-        "project_id": {
-            "type": "string",
-            "description": "UUID of the project",
-        },
-        "cells": {
-            "items": DefinitionsCell,
-            "type": "array",
-            "description": "List of cells in this region",
-        },
-        "id": {
-            "type": "integer",
-            "description": "Unique ID for the region",
-        },
-        "variables": DefinitionVariablesSource,
     },
 }
 
 DefinitionUser = {
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "api_key": {
-            "type": "string",
-        },
-        "username": {
-            "type": "string",
-        },
-        "is_admin": {
-            "type": "boolean",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "roles": {
-            "type": "array",
-            "items": {
-                "type": "string",
-            },
-        },
+    "properties": UserProperties,
+}
+
+DefinitionUserCreate = {
+    "required": [
+        "username",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(UserProperties,
+                                     blacklisted_create_properties),
+}
+
+ProjectProperties = {
+    "created_at": {
+        "type": "string",
     },
+    "updated_at": {
+        "type": "string",
+    },
+    "id": {
+        "type": "string",
+    },
+    "name": {
+        "type": "string",
+    },
+    "variables": DefinitionVariablesSource,
 }
 
 DefinitionProject = {
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "string",
-        },
-        "name": {
-            "type": "string",
-        },
-        "variables": DefinitionVariablesSource,
+    "properties": ProjectProperties,
+}
+
+DefinitionProjectCreate = {
+    "required": [
+        "name",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(ProjectProperties,
+                                     blacklisted_create_properties),
+}
+
+NetworkProperties = {
+    "created_at": {
+        "type": "string",
     },
+    "updated_at": {
+        "type": "string",
+    },
+    "id": {
+        "type": "integer",
+    },
+    "region_id": {
+        "type": "integer",
+    },
+    "cell_id": {
+        "type": "integer",
+    },
+    "project_id": {
+        "type": "string",
+    },
+    "name": {
+        "type": "string",
+    },
+    "cidr": {
+        "type": "string",
+    },
+    "gateway": {
+        "type": "string",
+    },
+    "netmask": {
+        "type": "string",
+    },
+    "ip_block_type": {
+        "type": "string",
+    },
+    "nss": {
+        "type": "string",
+    },
+    "variables": DefinitionVariablesSource,
 }
 
 DefinitionNetwork = {
@@ -399,89 +415,84 @@ DefinitionNetwork = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "cell_id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "name": {
-            "type": "string",
-        },
-        "cidr": {
-            "type": "string",
-        },
-        "gateway": {
-            "type": "string",
-        },
-        "netmask": {
-            "type": "string",
-        },
-        "ip_block_type": {
-            "type": "string",
-        },
-        "nss": {
-            "type": "string",
-        },
-        "variables": DefinitionVariablesSource,
-    },
+    "properties": NetworkProperties,
 }
 
 DefinitionNetworkId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "cell_id": {
-            "type": "integer",
-        },
-        "name": {
-            "type": "string",
-        },
-        "cidr": {
-            "type": "string",
-        },
-        "gateway": {
-            "type": "string",
-        },
-        "netmask": {
-            "type": "string",
-        },
-        "ip_block_type": {
-            "type": "string",
-        },
-        "nss": {
-            "type": "string",
-        },
-        "variables": DefinitionVariablesSource,
+    "properties": NetworkProperties,
+}
+
+DefinitionNetworkCreate = {
+    "required": [
+        "name",
+        "cidr",
+        "gateway",
+        "netmask",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(NetworkProperties,
+                                     blacklisted_create_properties),
+}
+
+
+NetworkInterfaceProperties = {
+    "created_at": {
+        "type": "string",
     },
+    "updated_at": {
+        "type": "string",
+    },
+    "id": {
+        "type": "integer",
+    },
+    "name": {
+        "type": "string",
+    },
+    "device_id": {
+        "type": "integer",
+        "default": None,
+    },
+    "network_id": {
+        "type": "integer",
+        "default": None,
+    },
+    "interface_type": {
+        "type": "string",
+    },
+    "project_id": {
+        "type": "string",
+    },
+    "vlan_id": {
+        "type": "integer",
+    },
+    "vlan": {
+        "type": "string",
+    },
+    "port": {
+        "type": "integer",
+    },
+    "duplex": {
+        "type": "string",
+    },
+    "speed": {
+        "type": "integer",
+    },
+    "link": {
+        "type": "string",
+    },
+    "cdp": {
+        "type": "string",
+    },
+    "security": {
+        "type": "string",
+    },
+    "ip_address": {
+        "type": "string",
+    },
+    "variables": DefinitionVariablesSource,
 }
 
 DefinitionNetworkInterface = {
@@ -493,121 +504,83 @@ DefinitionNetworkInterface = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "name": {
-            "type": "string",
-        },
-        "device_id": {
-            "type": "integer",
-            "default": None,
-        },
-        "network_id": {
-            "type": "integer",
-            "default": None,
-        },
-        "interface_type": {
-            "type": "string",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "vlan_id": {
-            "type": "integer",
-        },
-        "vlan": {
-            "type": "string",
-        },
-        "port": {
-            "type": "integer",
-        },
-        "duplex": {
-            "type": "string",
-        },
-        "speed": {
-            "type": "integer",
-        },
-        "link": {
-            "type": "string",
-        },
-        "cdp": {
-            "type": "string",
-        },
-        "security": {
-            "type": "string",
-        },
-        "ip_address": {
-            "type": "string",
-        },
-        "variables": DefinitionVariablesSource,
-    },
+    "properties": NetworkInterfaceProperties,
 }
 
 DefinitionNetworkInterfaceId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "name": {
-            "type": "string",
-        },
-        "device_id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "network_id": {
-            "type": "integer",
-        },
-        "interface_type": {
-            "type": "string",
-        },
-        "vlan_id": {
-            "type": "integer",
-        },
-        "vlan": {
-            "type": "string",
-        },
-        "port": {
-            "type": "string",
-        },
-        "duplex": {
-            "type": "string",
-        },
-        "speed": {
-            "type": "integer",
-        },
-        "link": {
-            "type": "string",
-        },
-        "cdp": {
-            "type": "string",
-        },
-        "security": {
-            "type": "string",
-        },
-        "ip_address": {
-            "type": "string",
-        },
-        "variables": DefinitionVariablesSource,
+    "properties": NetworkInterfaceProperties,
+}
+
+
+DefinitionNetworkInterfaceCreate = {
+    "required": [
+        "name",
+        "device_id",
+        "interface_type",
+        "ip_address",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(NetworkInterfaceProperties,
+                                     blacklisted_create_properties),
+}
+
+NetworkDeviceProperties = {
+    "created_at": {
+        "type": "string",
     },
+    "updated_at": {
+        "type": "string",
+    },
+    "id": {
+        "type": "integer",
+    },
+    "region_id": {
+        "type": "integer",
+    },
+    "cell_id": {
+        "type": "integer",
+    },
+    "parent_id": {
+        "type": "integer",
+    },
+    "project_id": {
+        "type": "string",
+    },
+    "ip_address": {
+        "type": "string",
+    },
+    "device_type": {
+        "type": "string",
+    },
+    "active": {
+        "type": "boolean",
+    },
+    "name": {
+        "type": "string",
+    },
+    "access_secret_id": {
+        "type": "integer",
+    },
+    "model_name": {
+        "type": "string",
+    },
+    "os_version": {
+        "type": "string",
+    },
+    "vlans": {
+        "type": "string",
+    },
+    "interface_id": {
+        "type": "integer",
+    },
+    "network_id": {
+        "type": "integer",
+    },
+    "variables": DefinitionVariablesSource,
+    "links": DefinitionLinks,
 }
 
 DefinitionNetworkDevice = {
@@ -619,120 +592,26 @@ DefinitionNetworkDevice = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "cell_id": {
-            "type": "integer",
-        },
-        "parent_id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "ip_address": {
-            "type": "string",
-        },
-        "device_type": {
-            "type": "string",
-        },
-        "active": {
-            "type": "boolean",
-        },
-        "name": {
-            "type": "string",
-        },
-        "access_secret_id": {
-            "type": "integer",
-        },
-        "model_name": {
-            "type": "string",
-        },
-        "os_version": {
-            "type": "string",
-        },
-        "vlans": {
-            "type": "string",
-        },
-        "interface_id": {
-            "type": "integer",
-        },
-        "network_id": {
-            "type": "integer",
-        },
-        "variables": DefinitionVariablesSource,
-    },
+    "properties": NetworkDeviceProperties,
 }
 
 DefinitionNetworkDeviceId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": {
-        "created_at": {
-            "type": "string",
-        },
-        "updated_at": {
-            "type": "string",
-        },
-        "id": {
-            "type": "integer",
-        },
-        "project_id": {
-            "type": "string",
-        },
-        "region_id": {
-            "type": "integer",
-        },
-        "cell_id": {
-            "type": "integer",
-        },
-        "parent_id": {
-            "type": "integer",
-        },
-        "active": {
-            "type": "boolean",
-        },
-        "ip_address": {
-            "type": "string",
-        },
-        "device_type": {
-            "type": "string",
-        },
-        "name": {
-            "type": "string",
-        },
-        "access_secret_id": {
-            "type": "integer",
-        },
-        "model_name": {
-            "type": "string",
-        },
-        "os_version": {
-            "type": "string",
-        },
-        "vlans": {
-            "type": "string",
-        },
-        "interface_id": {
-            "type": "integer",
-        },
-        "network_id": {
-            "type": "integer",
-        },
-        "variables": DefinitionVariablesSource,
-        "links": DefinitionLinks,
-    },
+    "properties": NetworkDeviceProperties,
+}
+
+DefinitionNetworkDeviceCreate = {
+    "required": [
+        "name",
+        "region_id",
+        "device_type",
+        "ip_address",
+    ],
+    "type": "object",
+    "additionalProperties": False,
+    "properties": _remove_properties(NetworkDeviceProperties,
+                                     blacklisted_create_properties),
 }
 
 DefinitionNoParams = {
@@ -903,10 +782,10 @@ validators = {
         },
     },
     ("regions", "POST"): {
-        "json": DefinitionsRegion,
+        "json": DefinitionsRegionCreate,
     },
     ("hosts", "POST"): {
-        "json": DefinitionsHost,
+        "json": DefinitionHostCreate,
     },
     ("hosts", "GET"): {
         "args": {
@@ -966,7 +845,7 @@ validators = {
         },
     },
     ("cells", "POST"): {
-        "json": DefinitionsCell,
+        "json": DefinitionsCellCreate,
     },
     ("cells", "GET"): {
         "args": {
@@ -1026,7 +905,7 @@ validators = {
         },
     },
     ("projects", "POST"): {
-        "json": DefinitionProject,
+        "json": DefinitionProjectCreate,
     },
     ("projects_id", "DELETE"): {
     },
@@ -1051,7 +930,7 @@ validators = {
         },
     },
     ("users", "POST"): {
-        "json": DefinitionUser,
+        "json": DefinitionUserCreate,
     },
     ("users_id", "DELETE"): {
     },
@@ -1172,7 +1051,7 @@ validators = {
         },
     },
     ("network_devices", "POST"): {
-        "json": DefinitionNetworkDevice,
+        "json": DefinitionNetworkDeviceCreate,
     },
     ("network_devices_labels", "DELETE"): {
         "json": DefinitionsLabel,
@@ -1207,7 +1086,7 @@ validators = {
         },
     },
     ("network_interfaces", "POST"): {
-        "json": DefinitionNetworkInterface,
+        "json": DefinitionNetworkInterfaceCreate,
     },
     ("network_interfaces_id", "DELETE"): {
     },
@@ -1280,7 +1159,7 @@ validators = {
         },
     },
     ("networks", "POST"): {
-        "json": DefinitionNetwork,
+        "json": DefinitionNetworkCreate,
     },
     ("variables_with_resolve", "DELETE"): {
         "json": DefinitionDeleteVariables,
