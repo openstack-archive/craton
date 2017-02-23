@@ -4,22 +4,6 @@ from craton.tests.functional import TestCase
 
 
 class RegionTests(TestCase):
-    def create_region(self, name, variables=None):
-        url = self.url + '/v1/regions'
-
-        values = {'name': name}
-        if variables:
-            values['variables'] = variables
-        resp = self.post(url, data=values)
-        self.assertSuccessCreated(resp)
-        self.assertIn('Location', resp.headers)
-        json = resp.json()
-        self.assertEqual(
-            resp.headers['Location'],
-            "{}/{}".format(url, json['id'])
-        )
-        return json
-
     def delete_regions(self, regions):
         base_url = self.url + '/v1/regions/{}'
         for region in regions:

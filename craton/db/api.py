@@ -26,6 +26,11 @@ IMPL = db_api.DBAPI.from_config(cfg.CONF, backend_mapping=BACKEND_MAPPING,
 Blame = namedtuple('Blame', ['source', 'variable'])
 
 
+def devices_get_all(context, filters, pagination_params):
+    """Get all available devices."""
+    return IMPL.devices_get_all(context, filters, pagination_params)
+
+
 def get_user_info(context, user):
     return IMPL.get_user_info(context, user)
 

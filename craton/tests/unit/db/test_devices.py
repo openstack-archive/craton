@@ -9,7 +9,7 @@ from craton.tests.unit.db import base
 default_pagination = {'limit': 30, 'marker': None}
 
 
-class HostsDBTestCase(base.DBTestCase):
+class BaseDevicesDBTestCase(base.DBTestCase):
 
     mock_project_id = uuid.uuid4().hex
 
@@ -63,6 +63,88 @@ class HostsDBTestCase(base.DBTestCase):
 
         host = dbapi.hosts_create(self.context, host)
         return host.id
+
+    def make_network_device(
+            self, project_id, region_id, name, ip_address, device_type,
+            cell_id=None, parent_id=None, **variables
+            ):
+        network_device_data = {
+            'name': name,
+            'project_id': project_id,
+            'region_id': region_id,
+            'cell_id': cell_id,
+            'ip_address': ip_address,
+            'parent_id': parent_id,
+            'device_type': device_type,
+            'active': True,
+            'variables': variables,
+        }
+
+        network_device = dbapi.network_devices_create(
+            self.context, network_device_data
+        )
+        return network_device.id
+
+
+class DevicesDBTestCase(BaseDevicesDBTestCase):
+
+    def setUp(self):
+        super().setUp()
+        project_id = self.make_project('project_1')
+        region_id = self.make_region(project_id, 'region_1')
+        net_device1_id = self.make_network_device(
+            project_id, region_id, 'switch1.example.com',
+            IPAddress('10.1.2.101'), 'switch'
+        )
+        net_device2_id = self.make_network_device(
+            project_id, region_id, 'switch2.example.com',
+            IPAddress('10.1.2.102'), 'switch', parent_id=net_device1_id
+        )
+        host1_id = self.make_host(
+            project_id, region_id, 'www1.example.com',
+            IPAddress(u'10.1.2.103'), 'server', parent_id=net_device2_id
+        )
+        host2_id = self.make_host(
+            project_id, region_id, 'www2.example.com',
+            IPAddress(u'10.1.2.104'), 'container', parent_id=host1_id
+        )
+        host3_id = self.make_host(
+            project_id, region_id, 'www3.example.com',
+            IPAddress(u'10.1.2.105'), 'server'
+        )
+
+        self.parent = net_device1_id
+        self.children = [net_device2_id]
+        self.descendants = [net_device2_id, host1_id, host2_id]
+        self.all = [
+            net_device1_id, net_device2_id, host1_id, host2_id, host3_id
+        ]
+
+    def test_devices_get_all(self):
+        devices, _ = dbapi.devices_get_all(
+            self.context, {}, default_pagination
+        )
+
+        self.assertEqual(self.all, [device.id for device in devices])
+
+    def test_devices_get_all_children(self):
+        devices, _ = dbapi.devices_get_all(
+            self.context, {'parent_id': self.parent}, default_pagination
+        )
+
+        self.assertEqual(self.children, [device.id for device in devices])
+
+    def test_devices_get_all_descendants(self):
+        devices, _ = dbapi.devices_get_all(
+            self.context,
+            {'parent_id': self.parent, 'descendants': True},
+            default_pagination
+        )
+
+        self.assertEqual(self.descendants, [device.id for device in devices])
+
+
+class HostsDBTestCase(BaseDevicesDBTestCase):
 
     def make_very_small_cloud(self, with_cell=False):
         project_id = self.make_project('project_1', foo='P1', zoo='P2')
