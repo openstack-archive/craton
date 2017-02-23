@@ -101,6 +101,37 @@ class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
         host = self.post(url, data=payload)
         self.assertEqual(400, host.status_code)
 
+    def test_create_with_extra_id_property_fails(self):
+        url = self.url + '/v1/hosts'
+        payload = {'device_type': 'server', 'ip_address': '192.168.1.1',
+                   'region_id': self.region['id'], 'name': 'a', 'id': 1}
+        host = self.post(url, data=payload)
+        self.assertEqual(400, host.status_code)
+        msg = ["Additional properties are not allowed ('id' was unexpected)"]
+        self.assertEqual(host.json()['errors'], msg)
+
+    def test_create_with_extra_created_at_property_fails(self):
+        url = self.url + '/v1/hosts'
+        payload = {'device_type': 'server', 'ip_address': '192.168.1.1',
+                   'region_id': self.region['id'], 'name': 'a',
+                   'created_at': 'some date'}
+        host = self.post(url, data=payload)
+        self.assertEqual(400, host.status_code)
+        msg = ["Additional properties are not allowed "
+               "('created_at' was unexpected)"]
+        self.assertEqual(host.json()['errors'], msg)
+
+    def test_create_with_extra_updated_at_property_fails(self):
+        url = self.url + '/v1/hosts'
+        payload = {'device_type': 'server', 'ip_address': '192.168.1.1',
+                   'region_id': self.region['id'], 'name': 'a',
+                   'updated_at': 'some date'}
+        host = self.post(url, data=payload)
+        self.assertEqual(400, host.status_code)
+        msg = ["Additional properties are not allowed "
+               "('updated_at' was unexpected)"]
+        self.assertEqual(host.json()['errors'], msg)
+
     def test_host_get_by_ip_filter(self):
         self.create_host('host1', 'server', '192.168.1.1')
         self.create_host('host2', 'server', '192.168.1.2')
