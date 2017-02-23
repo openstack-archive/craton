@@ -13,18 +13,6 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
     def tearDown(self):
         super(APIV1CellTest, self).tearDown()
 
-    def create_region(self):
-        url = self.url + '/v1/regions'
-        payload = {'name': 'region-1'}
-        region = self.post(url, data=payload)
-        self.assertEqual(201, region.status_code)
-        self.assertIn('Location', region.headers)
-        self.assertEqual(
-            region.headers['Location'],
-            "{}/{}".format(url, region.json()['id'])
-        )
-        return region.json()
-
     def create_cell(self, name, variables=None):
         url = self.url + '/v1/cells'
         payload = {'name': name, 'region_id': self.region['id']}

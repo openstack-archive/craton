@@ -152,8 +152,10 @@ def setup_database(container_ip):
 
     with contextlib.closing(engine.connect()) as conn:
         transaction = conn.begin()
+        conn.execute("SET foreign_key_checks = 0")
         for table in reversed(meta.sorted_tables):
             conn.execute(table.delete())
+        conn.execute("SET foreign_key_checks = 1")
         transaction.commit()
 
     # NOTE(sulo): as a part of db setup, we bootstrap user and project
@@ -238,3 +240,72 @@ class TestCase(testtools.TestCase):
             url, verify=False, headers=headers, json=body,
         )
         return resp
+
+    def create_region(self, name='region-1', variables=None):
+        url = self.url + '/v1/regions'
+        payload = {'name': name}
+        if variables:
+            payload['variables'] = variables
+
+        region = self.post(url, data=payload)
+
+        self.assertEqual(201, region.status_code)
+        self.assertIn('Location', region.headers)
+        self.assertEqual(
+            region.headers['Location'],
+            "{}/{}".format(url, region.json()['id'])
+        )
+        return region.json()
+
+    def create_host(
+            self, name, hosttype, ip_address, region=None, parent_id=None,
+            **variables
+            ):
+        if region is None:
+            region = self.region
+
+        url = self.url + '/v1/hosts'
+        payload = {'name': name, 'device_type': hosttype,
+                   'ip_address': ip_address,
+                   'region_id': region['id']}
+        if parent_id:
+            payload['parent_id'] = parent_id
+        if variables:
+            payload['variables'] = variables
+
+        host = self.post(url, data=payload)
+        self.assertEqual(201, host.status_code)
+        self.assertIn('Location', host.headers)
+        self.assertEqual(
+            host.headers['Location'],
+            "{}/{}".format(url, host.json()['id'])
+        )
+        return host.json()
+
+    def create_network_device(
+            self, name, device_type, ip_address, region=None, parent_id=None,
+            **variables
+            ):
+        if region is None:
+            region = self.region
+
+        url = self.url + '/v1/network-devices'
+        payload = {
+            'name': name,
+            'device_type': device_type,
+            'ip_address': ip_address,
+            'region_id': region['id'],
+        }
+        if parent_id:
+            payload['parent_id'] = parent_id
+        if variables:
+            payload['variables'] = variables
+
+        network_device = self.post(url, data=payload)
+        self.assertEqual(201, network_device.status_code)
+        self.assertIn('Location', network_device.headers)
+        self.assertEqual(
+            network_device.headers['Location'],
+            "{}/{}".format(url, network_device.json()['id'])
+        )
+        return network_device.json()

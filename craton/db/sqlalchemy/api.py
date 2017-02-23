@@ -249,6 +249,31 @@ def variables_delete_by_resource_id(context, resources, resource_id, data):
         return resource
 
 
+def devices_get_all(context, filters, pagination_params):
+    """Get all available devices."""
+    session = get_session()
+    devices = with_polymorphic(models.Device, "*")
+    query = model_query(context, devices, project_only=True, session=session)
+
+    if "parent_id" in filters and filters.get("descendants"):
+        parent = query.filter_by(id=filters["parent_id"]).one()
+        query = query.filter(
+            models.Device.id.in_(device.id for device in parent.descendants)
+        )
+    elif "parent_id" in filters:
+        query = query.filter_by(parent_id=filters["parent_id"])
+
+    if "region_id" in filters:
+        query = query.filter_by(region_id=filters["region_id"])
+    if "cell_id" in filters:
+        query = query.filter_by(cell_id=filters["cell_id"])
+    if "active" in filters:
+        query = query.filter_by(active=filters["active"])
+
+    return _paginate(context, query, models.Device, session, filters,
+                     pagination_params)
+
+
 def _device_labels_update(context, device_type, device_id, labels):
     """Update labels for the given device. Add the label if it is not present
     in host labels list, otherwise do nothing."""
