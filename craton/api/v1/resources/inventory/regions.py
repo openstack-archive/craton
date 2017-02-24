@@ -20,12 +20,15 @@ class Regions(base.Resource):
         """
         region_id = request_args.get("id")
         region_name = request_args.get("name")
+        details = request_args.get("details")
 
         if not (region_id or region_name):
             # Get all regions for this tenant
             regions_obj, link_params = dbapi.regions_get_all(
                 context, request_args, pagination_params,
             )
+            if details:
+                regions_obj = base.get_resource_with_vars(regions_obj)
         else:
             if region_name:
                 region_obj = dbapi.regions_get_by_name(context, region_name)

@@ -18,9 +18,13 @@ class Networks(base.Resource):
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all networks, with optional filtering."""
+        details = request_args.get("details")
         networks_obj, link_params = dbapi.networks_get_all(
             context, request_args, pagination_params,
         )
+        if details:
+            networks_obj = base.get_resource_with_vars(networks_obj)
+
         links = base.links_from(link_params)
         response_body = {'networks': networks_obj, 'links': links}
         return jsonutils.to_primitive(response_body), 200, None
@@ -69,9 +73,13 @@ class NetworkDevices(base.Resource):
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all network devices."""
+        details = request_args.get("details")
         devices_obj, link_params = dbapi.network_devices_get_all(
             context, request_args, pagination_params,
         )
+        if details:
+            devices_obj = base.get_resource_with_vars(devices_obj)
+
         links = base.links_from(link_params)
         response_body = jsonutils.to_primitive(
             {'network_devices': devices_obj, 'links': links}

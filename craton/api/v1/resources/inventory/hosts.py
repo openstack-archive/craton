@@ -17,9 +17,13 @@ class Hosts(base.Resource):
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all hosts for region, with optional filtering."""
+        details = request_args.get("details")
         hosts_obj, link_params = dbapi.hosts_get_all(
             context, request_args, pagination_params,
         )
+        if details:
+            hosts_obj = base.get_resource_with_vars(hosts_obj)
+
         links = base.links_from(link_params)
         response_body = jsonutils.to_primitive(
             {'hosts': hosts_obj, 'links': links}
