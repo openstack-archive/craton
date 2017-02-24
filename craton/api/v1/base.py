@@ -30,6 +30,19 @@ class Resource(restful.Resource):
         return resp
 
 
+def get_resource_with_vars(obj):
+    r_obj = []
+    for resource in obj:
+        r = jsonutils.to_primitive(resource, convert_instances=True)
+        r['variables'] = jsonutils.to_primitive(resource.variables)
+        r_obj.append(r)
+
+    if r_obj:
+        return r_obj
+
+    return obj
+
+
 @decorator.decorator
 def http_codes(f, *args, **kwargs):
     try:

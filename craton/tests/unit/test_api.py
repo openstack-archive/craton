@@ -256,6 +256,15 @@ class APIV1CellsTest(APIV1Test):
         )
 
     @mock.patch.object(dbapi, 'cells_get_all')
+    def test_cells_get_all_with_details(self, mock_cells):
+        mock_cells.return_value = (fake_resources.CELL_LIST, {})
+        resp = self.get('v1/cells?details=all')
+        self.assertEqual(len(resp.json), len(fake_resources.CELL_LIST))
+        print(resp.json)
+        for cell in resp.json['cells']:
+            self.assertTrue('variables' in cell)
+
+    @mock.patch.object(dbapi, 'cells_get_all')
     def test_get_cells_invalid_property(self, mock_cells):
         resp = self.get('v1/cells?foo=isaninvalidproperty')
         self.assertEqual(400, resp.status_code)
@@ -457,6 +466,14 @@ class APIV1RegionsTest(APIV1Test):
         mock_regions.return_value = (fake_resources.REGIONS_LIST, {})
         resp = self.get('v1/regions')
         self.assertEqual(len(resp.json), len(fake_resources.REGIONS_LIST))
+
+    @mock.patch.object(dbapi, 'regions_get_all')
+    def test_regions_get_all_with_details(self, mock_regions):
+        mock_regions.return_value = (fake_resources.REGIONS_LIST, {})
+        resp = self.get('v1/regions?details=all')
+        self.assertEqual(len(resp.json), len(fake_resources.REGIONS_LIST))
+        for region in resp.json['regions']:
+            self.assertTrue('variables' in region)
 
     @mock.patch.object(dbapi, 'regions_get_all')
     def test_regions_get_all_by_invalid_property_name(self, mock_regions):
@@ -705,6 +722,14 @@ class APIV1HostsTest(APIV1Test):
         fake_hosts.return_value = (fake_resources.HOSTS_LIST_R1, {})
         resp = self.get('/v1/hosts?region_id=1')
         self.assertEqual(len(resp.json), 2)
+
+    @mock.patch.object(dbapi, 'hosts_get_all')
+    def test_hosts_get_all_with_details(self, mock_hosts):
+        mock_hosts.return_value = (fake_resources.HOSTS_LIST_R1, {})
+        resp = self.get('v1/hosts?details=all')
+        self.assertEqual(len(resp.json), len(fake_resources.HOSTS_LIST_R1))
+        for host in resp.json['hosts']:
+            self.assertTrue('variables' in host)
 
     @mock.patch.object(dbapi, 'hosts_get_all')
     def test_get_hosts_invalid_property_name(self, fake_hosts):
@@ -1073,6 +1098,14 @@ class APIV1NetworksTest(APIV1Test):
         fake_network.return_value = fake_resources.NETWORKS_LIST
         resp = self.get('/v1/networks?region_id=1')
         self.assertEqual(len(resp.json), 2)
+
+    @mock.patch.object(dbapi, 'networks_get_all')
+    def test_networks_get_all_with_details(self, mock_networks):
+        mock_networks.return_value = (fake_resources.NETWORKS_LIST, {})
+        resp = self.get('v1/networks?details=all')
+        self.assertEqual(len(resp.json), len(fake_resources.NETWORKS_LIST))
+        for network in resp.json['networks']:
+            self.assertTrue('variables' in network)
 
     @mock.patch.object(dbapi, 'networks_get_all')
     def test_get_networks_by_non_existing_region_raises404(self, fake_network):

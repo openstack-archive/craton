@@ -770,6 +770,10 @@ validators = {
                     "type": "string",
                     "description": "name of the region to get",
                 },
+                "details": {
+                    "type": "boolean",
+                    "description": "get detailed information",
+                },
                 "vars": {
                     "type": "string",
                     "description": "variable filters to get a region",
@@ -794,6 +798,10 @@ validators = {
                 "name": {
                     "type": "string",
                     "description": "name of the hosts to get",
+                },
+                "details": {
+                    "type": "boolean",
+                    "description": "get detailed information",
                 },
                 "region_id": {
                     "type": "integer",
@@ -862,6 +870,10 @@ validators = {
                 "vars": {
                     "type": "string",
                     "description": "variable filters to get a cell",
+                },
+                "details": {
+                    "type": "boolean",
+                    "description": "get detailed information",
                 },
                 "name": {
                     "type": "string",
@@ -956,6 +968,10 @@ validators = {
                 "name": {
                     "type": "string",
                     "description": "name of the device to get",
+                },
+                "details": {
+                    "type": "boolean",
+                    "description": "get detailed information",
                 },
                 "device_type": {
                     "type": "string",
@@ -1142,6 +1158,10 @@ validators = {
                 "name": {
                     "type": "string",
                     "description": "name of the network to get",
+                },
+                "details": {
+                    "type": "boolean",
+                    "description": "get detailed information",
                 },
                 "region_id": {
                     "type": "string",
