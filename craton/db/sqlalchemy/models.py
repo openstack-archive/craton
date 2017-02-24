@@ -14,7 +14,7 @@ Craton uses the following related aspects of inventory:
 
 """
 
-from collections import ChainMap
+from collections import ChainMap, deque, OrderedDict
 import itertools
 
 from oslo_db.sqlalchemy import models
@@ -356,6 +356,18 @@ class Device(Base, VariableMixin):
             lineage.append(ancestor)
             ancestor = ancestor.parent
         return lineage
+
+    @property
+    def descendants(self):
+        marked = OrderedDict()
+        descent = deque(self.children)
+        while descent:
+            descendant = descent.popleft()
+            marked[descendant] = True
+            descent.extend(
+                child for child in descendant.children if child not in marked
+            )
+        return list(marked.keys())
 
     @property
     def resolution_order(self):

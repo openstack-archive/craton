@@ -4,6 +4,7 @@ from craton.api.v1.resources import variables
 
 from craton.api.v1.resources.inventory import ansible_inventory
 from craton.api.v1.resources.inventory import cells
+from craton.api.v1.resources.inventory import devices
 from craton.api.v1.resources.inventory import hosts
 from craton.api.v1.resources.inventory import regions
 from craton.api.v1.resources.inventory import networks
@@ -18,6 +19,9 @@ routes = [
     dict(resource=ansible_inventory.AnsibleInventory,
          urls=['/ansible-inventory'],
          endpoint='ansible_inventory'),
+    dict(resource=devices.Devices,
+         urls=['/devices'],
+         endpoint='devices'),
     dict(resource=hosts.HostsLabels,
          urls=['/hosts/<id>/labels'],
          endpoint='hosts_labels'),

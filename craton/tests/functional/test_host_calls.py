@@ -10,39 +10,6 @@ class HostTests(TestCase):
         super(HostTests, self).setUp()
         self.region = self.create_region()
 
-    def create_region(self, region_name='region-1'):
-        url = self.url + '/v1/regions'
-        payload = {'name': region_name}
-        region = self.post(url, data=payload)
-        self.assertEqual(201, region.status_code)
-        self.assertIn('Location', region.headers)
-        self.assertEqual(
-            region.headers['Location'],
-            "{}/{}".format(url, region.json()['id'])
-        )
-        return region.json()
-
-    def create_host(self, name, hosttype, ip_address, region=None,
-                    **variables):
-        if region is None:
-            region = self.region
-
-        url = self.url + '/v1/hosts'
-        payload = {'name': name, 'device_type': hosttype,
-                   'ip_address': ip_address,
-                   'region_id': region['id']}
-        if variables:
-            payload['variables'] = variables
-
-        host = self.post(url, data=payload)
-        self.assertEqual(201, host.status_code)
-        self.assertIn('Location', host.headers)
-        self.assertEqual(
-            host.headers['Location'],
-            "{}/{}".format(url, host.json()['id'])
-        )
-        return host.json()
-
 
 class APIV1HostTest(HostTests, APIV1ResourceWithVariablesTestCase):
 

@@ -688,6 +688,28 @@ def paginated_resource(list_name, schema):
         },
     }
 
+
+DefinitionDevicesPaginated = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "devices": {
+            "type": "object",
+            "properties": {
+                "hosts": {
+                    "type": "array",
+                    "items": DefinitionsHost,
+                },
+                "network-devices": {
+                    "type": "array",
+                    "items": DefinitionNetworkDeviceId,
+                },
+            },
+        },
+        "links": DefinitionsPaginationLinks,
+    },
+}
+
 validators = {
     ("ansible_inventory", "GET"): {
         "args": {
@@ -704,6 +726,30 @@ validators = {
                     "description": "Cell id to generate inventory for",
                 },
             },
+        },
+    },
+    ("devices", "GET"): {
+        "args": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": add_pagination_args("devices", {
+                "region_id": {
+                    "type": "integer",
+                },
+                "cell_id": {
+                    "type": "integer",
+                },
+                "parent_id": {
+                    "type": "integer",
+                },
+                "active": {
+                    "type": "boolean",
+                },
+                "descendants": {
+                    "default": False,
+                    "type": "boolean",
+                },
+            }),
         },
     },
     ("hosts_labels", "PUT"): {
@@ -1224,6 +1270,24 @@ filters = {
                     },
                 },
             },
+        },
+        400: {
+            "headers": None,
+            "schema": None,
+        },
+        404: {
+            "headers": None,
+            "schema": None,
+        },
+        405: {
+            "headers": None,
+            "schema": None,
+        },
+    },
+    ("devices", "GET"): {
+        200: {
+            "headers": None,
+            "schema": DefinitionDevicesPaginated,
         },
         400: {
             "headers": None,

@@ -12,6 +12,7 @@ VALIDATORS = {
         ('cells', 'POST'),
         ('cells_id', 'GET'),
         ('cells_id', 'PUT'),
+        ('devices', 'GET'),
         ('hosts', 'GET'),
         ('hosts', 'POST'),
         ('hosts_id', 'GET'),
