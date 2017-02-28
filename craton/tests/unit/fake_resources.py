@@ -13,6 +13,7 @@ class Project(object):
         self.id = uuid.UUID(id)
         self.name = name
         self.variables = variables
+        self.resolved = copy.copy(variables)
 
     def items(self):
         return iter(self.__dict__.items())
@@ -30,6 +31,7 @@ class Cloud(object):
         self.name = name
         self.project_id = project_id
         self.variables = variables
+        self.resolved = copy.copy(variables)
         self.labels = labels
 
     def items(self):
@@ -72,6 +74,7 @@ class Cell(object):
         self.cloud_id = cloud_id
         self.project_id = project_id
         self.variables = variables
+        self.resolved = copy.copy(variables)
         self.labels = labels
 
     def items(self):
@@ -96,6 +99,7 @@ class Region(object):
         self.project_id = project_id
         self.cloud_id = cloud_id
         self.variables = variables
+        self.resolved = copy.copy(variables)
         self.labels = labels
 
     def items(self):
@@ -151,6 +155,7 @@ class Networks(object):
         self.gateway = gateway
         self.netmask = netmask
         self.variables = variables
+        self.resolved = copy.copy(variables)
         self.labels = labels
         self.cloud_id = cloud_id
         self.region_id = region_id

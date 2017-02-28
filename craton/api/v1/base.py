@@ -9,6 +9,7 @@ import flask
 import flask_restful as restful
 from oslo_serialization import jsonutils
 
+from craton.api.v1.resources import utils
 from craton.api.v1.validators import ensure_project_exists
 from craton.api.v1.validators import request_validate
 from craton.api.v1.validators import response_filter
@@ -31,17 +32,27 @@ class Resource(restful.Resource):
         return resp
 
 
-def get_resource_with_vars(obj):
-    r_obj = []
-    for resource in obj:
-        r = jsonutils.to_primitive(resource, convert_instances=True)
-        r['variables'] = jsonutils.to_primitive(resource.variables)
-        r_obj.append(r)
+def get_resource_with_vars(request_args, obj):
+    # We are doing type assertion here because, devices
+    # endpoint works on per device obj level in order to
+    # separate between hosts and network devices. Therefore,
+    # this function is expected to work for both list of objects
+    # and for a single obj.
+    if isinstance(obj, list):
+        r_obj = []
+        for resource in obj:
+            res = utils.format_variables(request_args, resource)
+            r = jsonutils.to_primitive(resource, convert_instances=True)
+            r['variables'] = jsonutils.to_primitive(res.vars)
+            r_obj.append(r)
 
-    if r_obj:
         return r_obj
-
-    return obj
+    else:
+        # This has to be a single object if not a list of objects
+        res = utils.format_variables(request_args, obj)
+        r = jsonutils.to_primitive(res, convert_instances=True)
+        r['variables'] = jsonutils.to_primitive(res.vars)
+        return r
 
 
 @decorator.decorator

@@ -28,7 +28,10 @@ class Regions(base.Resource):
                 context, request_args, pagination_params,
             )
             if details:
-                regions_obj = base.get_resource_with_vars(regions_obj)
+                # NOTE(sulo): this is not a db object anymore, we have
+                # converted it to json primitives at this point.
+                regions_obj = base.get_resource_with_vars(request_args,
+                                                          regions_obj)
         else:
             if region_name:
                 region_obj = dbapi.regions_get_by_name(context, region_name)

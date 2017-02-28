@@ -20,12 +20,18 @@ class Clouds(base.Resource):
         """
         cloud_id = request_args.get("id")
         cloud_name = request_args.get("name")
+        details = request_args.get("details")
 
         if not (cloud_id or cloud_name):
             # Get all clouds for this project
             clouds_obj, link_params = dbapi.clouds_get_all(
                 context, request_args, pagination_params,
             )
+            if details:
+                # NOTE(sulo): this is not a db object anymore, we have
+                # converted it to json primitives at this point.
+                clouds_obj = base.get_resource_with_vars(request_args,
+                                                         clouds_obj)
         else:
             if cloud_name:
                 cloud_obj = dbapi.clouds_get_by_name(context, cloud_name)

@@ -252,7 +252,8 @@ class APIV1CellsTest(APIV1Test):
         resp = self.get('v1/cells')
         self.assertEqual(len(resp.json), len(fake_resources.CELL_LIST))
         mock_cells.assert_called_once_with(
-            mock.ANY, {}, {'limit': 30, 'marker': None},
+            mock.ANY, {'resolved-values': True},
+            {'limit': 30, 'marker': None},
         )
 
     @mock.patch.object(dbapi, 'cells_get_all')
@@ -932,7 +933,8 @@ class APIV1HostsTest(APIV1Test):
         resp = self.get('/v1/hosts')
         self.assertEqual(len(resp.json['hosts']), 3)
         fake_hosts.assert_called_once_with(
-            mock.ANY, {}, {'limit': 30, 'marker': None},
+            mock.ANY, {'resolved-values': True},
+            {'limit': 30, 'marker': None},
         )
 
     @mock.patch.object(dbapi, 'hosts_get_all')
@@ -949,6 +951,7 @@ class APIV1HostsTest(APIV1Test):
         ip_address = '10.10.0.1'
         filters = {
             'region_id': 1, 'ip_address': ip_address,
+            'resolved-values': True,
         }
         path_query = '/v1/hosts?region_id={}&ip_address={}'.format(
             region_id, ip_address
@@ -1312,7 +1315,8 @@ class APIV1NetworksTest(APIV1Test):
         resp = self.get('/v1/networks')
         self.assertEqual(len(resp.json['networks']), 3)
         fake_networks.assert_called_once_with(
-            mock.ANY, {}, {'limit': 30, 'marker': None},
+            mock.ANY, {'resolved-values': True, 'details': False},
+            {'limit': 30, 'marker': None},
         )
 
     @mock.patch.object(dbapi, 'networks_get_all')
@@ -1511,7 +1515,8 @@ class APIV1NetworkDevicesTest(APIV1Test):
     def test_get_network_devices_by_ip_address_filter(self, fake_devices):
         region_id = '1'
         ip_address = '10.10.0.1'
-        filters = {'region_id': region_id, 'ip_address': ip_address}
+        filters = {'region_id': region_id, 'ip_address': ip_address,
+                   'resolved-values': True}
         path_query = '/v1/network-devices?region_id={}&ip_address={}'.format(
             region_id, ip_address
         )
@@ -1538,7 +1543,8 @@ class APIV1NetworkDevicesTest(APIV1Test):
         resp = self.get('/v1/network-devices')
         self.assertEqual(len(resp.json), 2)
         fake_devices.assert_called_once_with(
-            mock.ANY, {}, {'limit': 30, 'marker': None},
+            mock.ANY, {'resolved-values': True},
+            {'limit': 30, 'marker': None},
         )
 
     @mock.patch.object(dbapi, 'network_devices_get_all')

@@ -23,7 +23,10 @@ class Networks(base.Resource):
             context, request_args, pagination_params,
         )
         if details:
-            networks_obj = base.get_resource_with_vars(networks_obj)
+            # NOTE(sulo): this is not a db object anymore, we have converted
+            # it to json primitives at this point.
+            networks_obj = base.get_resource_with_vars(request_args,
+                                                       networks_obj)
 
         links = base.links_from(link_params)
         response_body = {'networks': networks_obj, 'links': links}
@@ -78,7 +81,10 @@ class NetworkDevices(base.Resource):
             context, request_args, pagination_params,
         )
         if details:
-            devices_obj = base.get_resource_with_vars(devices_obj)
+            # NOTE(sulo): this is not a db object anymore, we have converted
+            # it to json primitives at this point.
+            devices_obj = base.get_resource_with_vars(request_args,
+                                                      devices_obj)
 
         links = base.links_from(link_params)
         response_body = jsonutils.to_primitive(

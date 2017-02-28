@@ -104,3 +104,29 @@ class APIV1NetworkSchemaTest(TestCase):
         msg = ["Additional properties are not allowed ('updated_at' was "
                "unexpected)"]
         self.assertEqual(network.json()['errors'], msg)
+
+    def test_network_get_all_with_details(self):
+        payload = {
+            'cloud_id': self.cloud['id'],
+            'region_id': self.region['id'],
+            'name': 'a',
+            'cidr': self.cidr,
+            'netmask': self.netmask,
+            'gateway': self.gateway,
+            'variables': {'a': 'b'},
+        }
+        resp = self.post(self.networks_url, data=payload)
+        self.assertEqual(201, resp.status_code)
+
+        payload['name'] = 'b'
+        resp = self.post(self.networks_url, data=payload)
+        self.assertEqual(201, resp.status_code)
+
+        url = self.networks_url + '?details=all'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        networks = resp.json()['networks']
+
+        for network in networks:
+            self.assertTrue('variables' in network)
+            self.assertEqual({'a': 'b'}, network['variables'])

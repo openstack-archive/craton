@@ -22,7 +22,9 @@ class Cells(base.Resource):
             context, request_args, pagination_params,
         )
         if details:
-            cells_obj = base.get_resource_with_vars(cells_obj)
+            # NOTE(sulo): this is not a db object anymore, we have converted
+            # it to json primitives at this point.
+            cells_obj = base.get_resource_with_vars(request_args, cells_obj)
 
         links = base.links_from(link_params)
         response_body = {'cells': cells_obj, 'links': links}
