@@ -16,6 +16,7 @@ class Projects(base.Resource):
     def get(self, context, request_args, pagination_params):
         """Get all projects. Requires super admin privileges."""
         project_name = request_args["name"]
+        details = request_args.get("details")
 
         if project_name:
             projects_obj, link_params = dbapi.projects_get_by_name(
@@ -25,6 +26,12 @@ class Projects(base.Resource):
             projects_obj, link_params = dbapi.projects_get_all(
                 context, request_args, pagination_params,
             )
+            if details:
+                # NOTE(sulo): this is not a db object anymore, we have converted
+                # it to json primitives at this point.
+                projects_obj = base.get_resource_with_vars(request_args,
+                                                           projects_obj)
+
         links = base.links_from(link_params)
         response_body = {'projects': projects_obj, 'links': links}
         return jsonutils.to_primitive(response_body), 200, None
