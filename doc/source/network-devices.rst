@@ -73,7 +73,7 @@ Example Network Device Create
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/network-devices" \
+   curl -i "http://${MY_IP}:7780/v1/network-devices" \
       -d '{"hostname": "fooHost", "region_id": 1, "ip_address": "1.1.1.4", "device_type": "NIC"}' \
       -H "Content-Type: application/json" \
       -H "X-Auth-Token: demo" \
@@ -207,7 +207,7 @@ Example Network Device List
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/network-devices?region_id=1" \
+   curl -i "http://${MY_IP}:7780/v1/network-devices?region_id=1" \
       -H "Content-Type: application/json" \
       -H "X-Auth-Token: demo" \
       -H "X-Auth-User: demo" \
@@ -336,7 +336,7 @@ Example Network Device Update
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/network-devices/6" \
+   curl -i "http://${MY_IP}:7780/v1/network-devices/6" \
       -XPUT \
       -d '{"hostname": "newHostName", "ip_address": "0.0.0.0"}' \
       -H "Content-Type: application/json" \
@@ -442,7 +442,7 @@ Example Network Device Variables Update
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/network-devices/6/variables" \
+   curl -i "http://${MY_IP}:7780/v1/network-devices/6/variables" \
       -XPUT \
       -d '{"newVar": "sample variable"}' \
       -H "Content-Type: application/json" \

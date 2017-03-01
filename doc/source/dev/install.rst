@@ -192,7 +192,7 @@ Create a Region
 
 * To create region, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/regions" \
+    # curl -i "http://${MY_IP}:7780/v1/regions" \
            -d '{"name": "DFW", "project_id": "717e9a216e2d44e0bc848398563bda06"}' \
            -H "Content-Type: application/json" \
            -H "X-Auth-Token: demo" \
@@ -205,7 +205,7 @@ Get created Region
 
 * To get the created region, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/regions" \
+    # curl -i "http://${MY_IP}:7780/v1/regions" \
            -H "Content-Type: application/json" \
            -H "X-Auth-Token: demo" \
            -H "X-Auth-User: demo" \
@@ -217,7 +217,7 @@ Get all hosts for Region 1
 
 * To get all hosts for region 1, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/hosts?region_id=1" \
+    # curl -i "http://${MY_IP}:7780/v1/hosts?region_id=1" \
            -H "Content-Type: application/json" \
            -H "X-Auth-Token: demo" \
            -H "X-Auth-User: demo" \
@@ -229,7 +229,7 @@ Get a particular host
 
 * To get a particular host, execute the following command::
 
-    # curl -i "http://${MY_IP}:8080/v1/hosts/33" \
+    # curl -i "http://${MY_IP}:7780/v1/hosts/33" \
            -H "Content-Type: application/json" \
            -H "X-Auth-Token: demo" \
            -H "X-Auth-User: demo" \
