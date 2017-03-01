@@ -217,6 +217,9 @@ class TestCase(testtools.TestCase):
     def assertNoContent(self, response):
         self.assertEqual(requests.codes.NO_CONTENT, response.status_code)
 
+    def assertBadRequest(self, response):
+        self.assertEqual(requests.codes.BAD_REQUEST, response.status_code)
+
     def get(self, url, headers=None, **params):
         resp = self.session.get(
             url, verify=False, headers=headers, params=params,
