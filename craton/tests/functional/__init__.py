@@ -102,7 +102,7 @@ class DockerSetup(threading.Thread):
 @retry(wait_fixed=1000, stop_max_attempt_number=20)
 def ensure_running_endpoint(container_data):
     service_ip = container_data['NetworkSettings']['IPAddress']
-    url = 'http://{}:8080/v1'.format(service_ip)
+    url = 'http://{}:7780/v1'.format(service_ip)
     headers = {"Content-Type": "application/json"}
     requests.get(url, headers=headers)
 
@@ -198,7 +198,7 @@ class TestCase(testtools.TestCase):
         if not self.container_setup_error:
             data = _container.container_data
             self.service_ip = data['NetworkSettings']['IPAddress']
-            self.url = 'http://{}:8080'.format(self.service_ip)
+            self.url = 'http://{}:7780'.format(self.service_ip)
             self.session.headers[HEADER_PROJECT] = FAKE_DATA_GEN_PROJECT_ID
             self.session.headers[HEADER_USERNAME] = FAKE_DATA_GEN_USERNAME
             self.session.headers[HEADER_TOKEN] = FAKE_DATA_GEN_TOKEN

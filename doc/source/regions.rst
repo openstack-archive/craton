@@ -45,7 +45,7 @@ Example Region Create
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/regions" \
+   curl -i "http://${MY_IP}:7780/v1/regions" \
         -d '{"name": "DFW"}' \
         -H "Content-Type: application/json" \
         -H "X-Auth-Token: demo" \
@@ -119,7 +119,7 @@ Example Region List
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/regions" \
+   curl -i "http://${MY_IP}:7780/v1/regions" \
         -H "Content-Type: application/json" \
         -H "X-Auth-Token: demo" \
         -H "X-Auth-User: demo" \
@@ -215,7 +215,7 @@ Example Region Update
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/regions/3" \
+   curl -i "http://${MY_IP}:7780/v1/regions/3" \
         -XPUT \
         -d '{"name": "DFW3"}' \
         -H "Content-Type: application/json" \
@@ -298,7 +298,7 @@ Example Region Variables Update
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/regions/3/variables" \
+   curl -i "http://${MY_IP}:7780/v1/regions/3/variables" \
         -XPUT \
         -d '{“array”: [2]}' \
         -H "Content-Type: application/json" \
