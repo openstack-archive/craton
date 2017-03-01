@@ -1325,7 +1325,7 @@ validators = {
                     "type": "string",
                 },
                 "port": {
-                    "type": "string",
+                    "type": "integer",
                 },
                 "duplex": {
                     "type": "string",
