@@ -310,6 +310,13 @@ class Region(Base, VariableMixin):
     devices = relationship('Device', back_populates='region')
     networks = relationship('Network', back_populates='region')
 
+    @property
+    def resolution_order(self):
+        return list(itertools.chain(
+            [self],
+            [self.cloud],
+            [self.project]))
+
 
 class Cell(Base, VariableMixin):
     __tablename__ = 'cells'
@@ -334,6 +341,14 @@ class Cell(Base, VariableMixin):
     region = relationship('Region', back_populates='cells')
     devices = relationship('Device', back_populates='cell')
     networks = relationship('Network', back_populates='cell')
+
+    @property
+    def resolution_order(self):
+        return list(itertools.chain(
+            [self],
+            [self.region],
+            [self.cloud],
+            [self.project]))
 
 
 class Device(Base, VariableMixin):
