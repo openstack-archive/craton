@@ -52,15 +52,16 @@ class Inventory(object):
         self.project_id = project_id
         self.region = None
         self.cell = None
-        self.ip_addresses = self.generate_ip_addresses(32)
+        self.ip_addresses = self.generate_ip_addresses(32, u'192.168.1.5')
+        self.container_ips = self.generate_ip_addresses(128, u'172.0.0.2')
 
         self.headers = {"Content-Type": "application/json",
                         "X-Auth-Project": self.project_id,
                         "X-Auth-User": self.auth_user,
                         "X-Auth-Token": self.auth_key}
 
-    def generate_ip_addresses(self, num_ips):
-        start_ip_address = ip_address(u'192.168.1.5')
+    def generate_ip_addresses(self, num_ips, starting_ip):
+        start_ip_address = ip_address(starting_ip)
         ips = [str(start_ip_address + i) for i in range(num_ips)]
         return ips
 
@@ -122,7 +123,26 @@ class Inventory(object):
             if resp.status_code != 200:
                 print(resp.text)
 
-    def create_device(self, host, device_type, data=None):
+    def create_container(self, host_obj, data=None):
+        region_url = self.url + "/hosts"
+
+        payload = {"region_id": host_obj.get("region_id"),
+                   "cloud_id": host_obj.get("cloud_id"),
+                   "cell_id": host_obj.get("cell_id"),
+                   "ip_address": self.container_ips.pop(0),
+                   "device_type": "container"}
+
+        payload["parent_id"] = host_obj["id"]
+        name = "container_{}".format(host_obj["name"])
+        payload["name"] = name
+
+        print("Creating container entry %s with data %s" % (payload, data))
+        container_obj = requests.post(region_url, headers=self.headers,
+                                      data=json.dumps(payload), verify=False)
+        if container_obj.status_code != 201:
+            raise Exception(container_obj.text)
+
+    def create_device(self, host, device_type, parent=None, data=None):
         region_url = self.url + "/hosts"
         payload = {"region_id": self.region.get("id"),
                    "cloud_id": self.cloud.get("id"),
@@ -130,6 +150,9 @@ class Inventory(object):
                    "name": host,
                    "ip_address": self.ip_addresses.pop(0),
                    "device_type": device_type}
+
+        if parent is not None:
+            payload["parent_id"] = parent
 
         print("Creating host entry %s with data %s" % (payload, data))
         device_obj = requests.post(region_url, headers=self.headers,
@@ -265,7 +288,10 @@ if __name__ == "__main__":
                 # Get host in the cell
                 hosts = make_hosts(region_name, cell_name)
                 for host in hosts:
-                    host_obj = Inv.create_device(host, 'server')
+                    host_obj = Inv.create_device(host, 'server',
+                                                 parent=switch['id'])
+                    # Create container on each host
+                    Inv.create_container(host_obj)
                     # Create network interface on the host to connect to the
                     # private network, the interfaces allows us to conncet this
                     # host to the switch or other devices, such that we can
