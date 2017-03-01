@@ -3,6 +3,7 @@ from oslo_log import log
 
 from craton.api import v1
 from craton.api.v1 import base
+from craton.api.v1.resources import utils
 from craton import db as dbapi
 from craton import util
 
@@ -50,10 +51,11 @@ class Cells(base.Resource):
 class CellById(base.Resource):
 
     @base.http_codes
-    def get(self, context, id):
+    def get(self, context, id, request_args):
         cell_obj = dbapi.cells_get_by_id(context, id)
-        cell = jsonutils.to_primitive(cell_obj, convert_instances=True)
-        cell['variables'] = jsonutils.to_primitive(cell_obj.variables)
+        cell_obj = utils.format_variables(request_args, cell_obj)
+        cell = jsonutils.to_primitive(cell_obj)
+        cell['variables'] = jsonutils.to_primitive(cell_obj.vars)
         return cell, 200, None
 
     def put(self, context, id, request_data):

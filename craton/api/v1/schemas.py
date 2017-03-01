@@ -997,7 +997,15 @@ validators = {
     ("cells_id", "DELETE"): {
     },
     ("cells_id", "GET"): {
-        "args": DefinitionNoParams,
+        "args": {
+            "additionalProperties": False,
+            "properties": {
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
+                },
+            },
+        },
     },
     ("cells_id", "PUT"): {
         "json": {
@@ -1049,7 +1057,15 @@ validators = {
     ("regions_id", "DELETE"): {
     },
     ("regions_id", "GET"): {
-        "args": DefinitionNoParams,
+        "args": {
+            "additionalProperties": False,
+            "properties": {
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
+                },
+            },
+        },
     },
     ("regions_id", "PUT"): {
         "json": {

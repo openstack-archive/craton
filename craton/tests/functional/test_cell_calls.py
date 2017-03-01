@@ -20,7 +20,8 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
     def create_region(self):
         return super(APIV1CellTest, self).create_region(
             name='region-1',
-            cloud=self.cloud
+            cloud=self.cloud,
+            variables={"region": "one"},
         )
 
     def create_cell(self, name, variables=None):
@@ -123,7 +124,26 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
         resp = self.get(url)
         cell_with_detail = resp.json()
         self.assertEqual('cell1', cell_with_detail['name'])
-        self.assertEqual(cellvars, cell_with_detail['variables'])
+
+    def test_get_cell_resolved_vars(self):
+        cellvars = {"who": "that"}
+        cell = self.create_cell('cell1', variables=cellvars)
+        url = self.url + '/v1/cells/{}'.format(cell['id'])
+        resp = self.get(url)
+        cell_with_detail = resp.json()
+        self.assertEqual('cell1', cell_with_detail['name'])
+        self.assertEqual({"who": "that", "region": "one"},
+                         cell_with_detail['variables'])
+
+    def test_get_cell_unresolved_vars(self):
+        cellvars = {"who": "that"}
+        cell = self.create_cell('cell1', variables=cellvars)
+        cell_id = cell['id']
+        url = self.url + '/v1/cells/{}?resolved-values=false'.format(cell_id)
+        resp = self.get(url)
+        cell_with_detail = resp.json()
+        self.assertEqual('cell1', cell_with_detail['name'])
+        self.assertEqual({"who": "that"}, cell_with_detail['variables'])
 
     def test_cell_update(self):
         cell = self.create_cell('cell-1')

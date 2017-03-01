@@ -72,6 +72,7 @@ class Cell(object):
         self.cloud_id = cloud_id
         self.project_id = project_id
         self.variables = variables
+        self.resolved = variables
         self.labels = labels
 
     def items(self):
@@ -96,6 +97,7 @@ class Region(object):
         self.project_id = project_id
         self.cloud_id = cloud_id
         self.variables = variables
+        self.resolved = variables
         self.labels = labels
 
     def items(self):

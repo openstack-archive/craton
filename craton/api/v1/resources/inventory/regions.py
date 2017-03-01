@@ -3,6 +3,7 @@ from oslo_log import log
 
 from craton.api import v1
 from craton.api.v1 import base
+from craton.api.v1.resources import utils
 from craton import db as dbapi
 from craton import util
 
@@ -66,10 +67,11 @@ class Regions(base.Resource):
 class RegionsById(base.Resource):
 
     @base.http_codes
-    def get(self, context, id):
+    def get(self, context, id, request_args):
         region_obj = dbapi.regions_get_by_id(context, id)
+        region_obj = utils.format_variables(request_args, region_obj)
         region = jsonutils.to_primitive(region_obj)
-        region['variables'] = jsonutils.to_primitive(region_obj.variables)
+        region['variables'] = jsonutils.to_primitive(region_obj.vars)
         return region, 200, None
 
     def put(self, context, id, request_data):

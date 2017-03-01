@@ -9,7 +9,10 @@ class RegionTests(TestCase):
         self.cloud = self.create_cloud()
 
     def create_cloud(self):
-        return super(RegionTests, self).create_cloud(name='cloud-1')
+        return super(RegionTests, self).create_cloud(
+                name='cloud-1',
+                variables={'version': 'x'},
+        )
 
     def create_region(self, name, variables=None):
         return super(RegionTests, self).create_region(
@@ -145,6 +148,25 @@ class APIV1RegionTest(RegionTests):
         regvars = {"a": "b", "one": "two"}
         region = self.create_region("ORD1", variables=regvars)
         url = self.url + '/v1/regions/{}'.format(region['id'])
+        resp = self.get(url)
+        region = resp.json()
+        self.assertEqual(region['name'], 'ORD1')
+
+    def test_region_get_details_has_resolved_vars(self):
+        regvars = {"a": "b", "one": "two"}
+        region = self.create_region("ORD1", variables=regvars)
+        url = self.url + '/v1/regions/{}'.format(region['id'])
+        resp = self.get(url)
+        region = resp.json()
+        self.assertEqual(region['name'], 'ORD1')
+        expected = {"a": "b", "one": "two", "version": "x"}
+        self.assertEqual(expected, region['variables'])
+
+    def test_region_get_details_with_unresolved_vars(self):
+        regvars = {"a": "b", "one": "two"}
+        region = self.create_region("ORD1", variables=regvars)
+        r_id = region['id']
+        url = self.url + '/v1/regions/{}?resolved-values=false'.format(r_id)
         resp = self.get(url)
         region = resp.json()
         self.assertEqual(region['name'], 'ORD1')
