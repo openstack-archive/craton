@@ -7,7 +7,6 @@ import decorator
 
 import flask
 import flask_restful as restful
-from oslo_serialization import jsonutils
 
 from craton.api.v1.validators import ensure_project_exists
 from craton.api.v1.validators import request_validate
@@ -29,19 +28,6 @@ class Resource(restful.Resource):
             })
         resp.status_code = status_code
         return resp
-
-
-def get_resource_with_vars(obj):
-    r_obj = []
-    for resource in obj:
-        r = jsonutils.to_primitive(resource, convert_instances=True)
-        r['variables'] = jsonutils.to_primitive(resource.variables)
-        r_obj.append(r)
-
-    if r_obj:
-        return r_obj
-
-    return obj
 
 
 @decorator.decorator

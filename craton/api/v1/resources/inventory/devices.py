@@ -17,6 +17,7 @@ class Devices(base.Resource):
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all devices, with optional filtering."""
+        details = request_args.get("details")
         device_objs, link_params = dbapi.devices_get_all(
             context, request_args, pagination_params,
         )
@@ -24,7 +25,12 @@ class Devices(base.Resource):
 
         devices = {"hosts": [], "network-devices": []}
         for device_obj in device_objs:
-            device = jsonutils.to_primitive(device_obj)
+            if details:
+                device = utils.get_resource_with_vars(request_args,
+                                                      device_obj)
+            else:
+                device = jsonutils.to_primitive(device_obj)
+
             utils.add_up_link(context, device)
 
             if isinstance(device_obj, models.Host):

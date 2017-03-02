@@ -22,7 +22,8 @@ class Hosts(base.Resource):
             context, request_args, pagination_params,
         )
         if details:
-            hosts_obj = base.get_resource_with_vars(hosts_obj)
+            hosts_obj = [utils.get_resource_with_vars(request_args, h)
+                         for h in hosts_obj]
 
         links = base.links_from(link_params)
         response_body = jsonutils.to_primitive(
@@ -61,9 +62,7 @@ class HostById(base.Resource):
     def get(self, context, id, request_args):
         """Get host by given id"""
         host_obj = dbapi.hosts_get_by_id(context, id)
-        host_obj = utils.format_variables(request_args, host_obj)
-        host = jsonutils.to_primitive(host_obj)
-        host['variables'] = jsonutils.to_primitive(host_obj.vars)
+        host = utils.get_resource_with_vars(request_args, host_obj)
 
         utils.add_up_link(context, host)
 

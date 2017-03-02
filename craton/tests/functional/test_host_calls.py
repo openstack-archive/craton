@@ -96,6 +96,23 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                "('updated_at' was unexpected)"]
         self.assertEqual(host.json()['errors'], msg)
 
+    def test_get_all_hosts_with_details(self):
+        region_vars = {'x': 'y'}
+        region = self.create_region(name='region1', variables=region_vars)
+        variables = {"a": "b"}
+        self.create_host('host1', 'server', '192.168.1.1', region=region,
+                         **variables)
+        self.create_host('host2', 'server', '192.168.1.2', region=region,
+                         **variables)
+        url = self.url + '/v1/hosts?details=all'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        hosts = resp.json()['hosts']
+        self.assertEqual(2, len(hosts))
+        for host in hosts:
+            self.assertTrue('variables' in host)
+            self.assertEqual({'a': 'b'}, host['variables'])
+
     def test_host_get_by_ip_filter(self):
         self.create_host('host1', 'server', '192.168.1.1')
         self.create_host('host2', 'server', '192.168.1.2')

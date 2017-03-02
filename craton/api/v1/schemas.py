@@ -833,6 +833,14 @@ validators = {
                     "default": False,
                     "type": "boolean",
                 },
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
+                },
+                "details": {
+                    "default": False,
+                    "type": "boolean",
+                },
             }),
         },
     },
@@ -916,6 +924,10 @@ validators = {
                     "type": "integer",
                     "description": "ID of the region to get",
                 },
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
+                },
             }),
         },
     },
@@ -937,6 +949,10 @@ validators = {
                 "id": {
                     "type": "integer",
                     "description": "ID of the cloud to get",
+                },
+                "details": {
+                    "default": False,
+                    "type": "boolean",
                 },
             }),
         },
@@ -990,6 +1006,10 @@ validators = {
                 "id": {
                     "type": "integer",
                     "description": "ID of host to get",
+                },
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
                 },
             }),
         },
@@ -1051,6 +1071,10 @@ validators = {
                     "type": "string",
                     "description": "name of the cell to get",
                 },
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
+                },
             }),
         },
     },
@@ -1110,6 +1134,10 @@ validators = {
                 "vars": {
                     "type": "string",
                     "description": "variable filters to get a project",
+                },
+                "details": {
+                    "default": False,
+                    "type": "boolean",
                 },
             }, marker_type="string"),
         },
@@ -1186,6 +1214,10 @@ validators = {
                 "cell_id": {
                     "type": "string",
                     "description": "cell id of the device to get",
+                },
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
                 },
             }),
         },
@@ -1376,6 +1408,14 @@ validators = {
                 "cell_id": {
                     "type": "string",
                     "description": "cell idof the network to get",
+                },
+                "resolved-values": {
+                    "default": True,
+                    "type": "boolean",
+                },
+                "details": {
+                    "default": False,
+                    "type": "boolean",
                 },
             }),
         },

@@ -89,6 +89,24 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
                "('updated_at' was unexpected)"]
         self.assertEqual(cell.json()['errors'], msg)
 
+    def test_cells_get_all_with_details(self):
+        self.create_cell('cell1', variables={'a': 'b'})
+        self.create_cell('cell2', variables={'c': 'd'})
+        url = self.url + '/v1/cells?details=all'
+        resp = self.get(url)
+        cells = resp.json()['cells']
+        self.assertEqual(2, len(cells))
+        for cell in cells:
+            self.assertTrue('variables' in cell)
+
+        for cell in cells:
+            if cell['name'] == 'cell1':
+                expected = {'a': 'b', "region": "one"}
+                self.assertEqual(expected, cell['variables'])
+            if cell['name'] == 'cell2':
+                expected = {'c': 'd', "region": "one"}
+                self.assertEqual(expected, cell['variables'])
+
     def test_cells_get_all_for_region(self):
         # Create a cell first
         self.create_cell('cell-1')

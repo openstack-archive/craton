@@ -118,6 +118,24 @@ class APIV1RegionTest(RegionTests):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(2, len(resp.json()))
 
+    def test_regions_get_all_with_details(self):
+        self.create_region('ORD1', variables={'a': 'b'})
+        self.create_region('ORD2', variables={'c': 'd'})
+        url = self.url + '/v1/regions?details=all'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        regions = resp.json()['regions']
+        self.assertEqual(2, len(regions))
+        for region in regions:
+            self.assertTrue('variables' in region)
+        for region in regions:
+            if region['name'] == 'ORD1':
+                self.assertEqual({'a': 'b', 'version': 'x'},
+                                 region['variables'])
+            if region['name'] == 'ORD2':
+                self.assertEqual({'c': 'd', 'version': 'x'},
+                                 region['variables'])
+
     def test_regions_get_all_with_name_filter(self):
         self.create_region("ORD1")
         self.create_region("ORD2")
