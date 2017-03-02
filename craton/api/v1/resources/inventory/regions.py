@@ -29,7 +29,8 @@ class Regions(base.Resource):
                 context, request_args, pagination_params,
             )
             if details:
-                regions_obj = base.get_resource_with_vars(regions_obj)
+                regions_obj = [utils.get_resource_with_vars(request_args, r)
+                               for r in regions_obj]
         else:
             if region_name:
                 region_obj = dbapi.regions_get_by_name(context, region_name)
@@ -69,9 +70,7 @@ class RegionsById(base.Resource):
     @base.http_codes
     def get(self, context, id, request_args):
         region_obj = dbapi.regions_get_by_id(context, id)
-        region_obj = utils.format_variables(request_args, region_obj)
-        region = jsonutils.to_primitive(region_obj)
-        region['variables'] = jsonutils.to_primitive(region_obj.vars)
+        region = utils.get_resource_with_vars(request_args, region_obj)
         return region, 200, None
 
     def put(self, context, id, request_data):
