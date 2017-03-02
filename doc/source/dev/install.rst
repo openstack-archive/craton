@@ -190,10 +190,19 @@ Create a Region
 
     # export MY_IP=xxx.xxx.xxx.xxx
 
+* Next create a cloud to which the region is associated to::
+
+    # curl -i "http://${MY_IP}:7780/v1/clouds" \
+           -d '{"name": "Cloud_Sample"}' \
+           -H "Content-Type: application/json" \
+           -H "X-Auth-Token: demo" \
+           -H "X-Auth-User: demo" \
+           -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
+
 * To create region, execute the following command::
 
     # curl -i "http://${MY_IP}:7780/v1/regions" \
-           -d '{"name": "DFW", "project_id": "717e9a216e2d44e0bc848398563bda06"}' \
+           -d '{"name": "DFW", "project_id": "717e9a216e2d44e0bc848398563bda06", "cloud_id": 1}' \
            -H "Content-Type: application/json" \
            -H "X-Auth-Token: demo" \
            -H "X-Auth-User: demo" \
