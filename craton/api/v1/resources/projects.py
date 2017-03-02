@@ -3,6 +3,7 @@ from oslo_log import log
 
 from craton.api import v1
 from craton.api.v1 import base
+from craton.api.v1.resources import utils
 from craton import db as dbapi
 
 
@@ -16,6 +17,7 @@ class Projects(base.Resource):
     def get(self, context, request_args, pagination_params):
         """Get all projects. Requires super admin privileges."""
         project_name = request_args["name"]
+        details = request_args.get("details")
 
         if project_name:
             projects_obj, link_params = dbapi.projects_get_by_name(
@@ -25,6 +27,10 @@ class Projects(base.Resource):
             projects_obj, link_params = dbapi.projects_get_all(
                 context, request_args, pagination_params,
             )
+            if details:
+                projects_obj = [utils.get_resource_with_vars(request_args, p)
+                                for p in projects_obj]
+
         links = base.links_from(link_params)
         response_body = {'projects': projects_obj, 'links': links}
         return jsonutils.to_primitive(response_body), 200, None

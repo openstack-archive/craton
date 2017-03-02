@@ -3,6 +3,7 @@ from oslo_log import log
 
 from craton.api import v1
 from craton.api.v1 import base
+from craton.api.v1.resources import utils
 from craton import db as dbapi
 from craton import util
 
@@ -20,12 +21,16 @@ class Clouds(base.Resource):
         """
         cloud_id = request_args.get("id")
         cloud_name = request_args.get("name")
+        details = request_args.get("details")
 
         if not (cloud_id or cloud_name):
             # Get all clouds for this project
             clouds_obj, link_params = dbapi.clouds_get_all(
                 context, request_args, pagination_params,
             )
+            if details:
+                clouds_obj = [utils.get_resource_with_vars(request_args, c)
+                              for c in clouds_obj]
         else:
             if cloud_name:
                 cloud_obj = dbapi.clouds_get_by_name(context, cloud_name)

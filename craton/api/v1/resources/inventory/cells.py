@@ -23,7 +23,8 @@ class Cells(base.Resource):
             context, request_args, pagination_params,
         )
         if details:
-            cells_obj = base.get_resource_with_vars(cells_obj)
+            cells_obj = [utils.get_resource_with_vars(request_args, cell)
+                         for cell in cells_obj]
 
         links = base.links_from(link_params)
         response_body = {'cells': cells_obj, 'links': links}
@@ -53,9 +54,7 @@ class CellById(base.Resource):
     @base.http_codes
     def get(self, context, id, request_args):
         cell_obj = dbapi.cells_get_by_id(context, id)
-        cell_obj = utils.format_variables(request_args, cell_obj)
-        cell = jsonutils.to_primitive(cell_obj)
-        cell['variables'] = jsonutils.to_primitive(cell_obj.vars)
+        cell = utils.get_resource_with_vars(request_args, cell_obj)
         return cell, 200, None
 
     def put(self, context, id, request_data):

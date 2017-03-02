@@ -363,10 +363,11 @@ class DeviceTestBase(TestCase):
     def create_cloud(self, name='cloud-1'):
         return super(DeviceTestBase, self).create_cloud(name=name)
 
-    def create_region(self, name='region-1', cloud=None):
+    def create_region(self, name='region-1', cloud=None, variables=None):
         return super(DeviceTestBase, self).create_region(
             name=name,
-            cloud=cloud if cloud else self.cloud
+            cloud=cloud if cloud else self.cloud,
+            variables=variables,
         )
 
     def create_network_device(self, name, device_type, ip_address, region=None,

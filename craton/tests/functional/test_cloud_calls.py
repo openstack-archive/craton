@@ -85,6 +85,23 @@ class APIV1CloudTest(TestCase):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(2, len(resp.json()))
 
+    def test_clouds_get_all_with_details_filter(self):
+        c1 = self.create_cloud("ORD1", variables={'a': 'b'})
+        c2 = self.create_cloud("ORD2", variables={'c': 'd'})
+        url = self.url + '/v1/clouds?details=all'
+        resp = self.get(url)
+        self.assertEqual(200, resp.status_code)
+        clouds = resp.json()['clouds']
+        self.assertEqual(2, len(clouds))
+        for cloud in clouds:
+            self.assertTrue('variables' in cloud)
+
+        for cloud in clouds:
+            if cloud['name'] == 'ORD1':
+                self.assertEqual(c1['variables'], {'a': 'b'})
+            if cloud['name'] == 'ORD2':
+                self.assertEqual(c2['variables'], {'c': 'd'})
+
     def test_clouds_get_all_with_name_filter(self):
         self.create_cloud("ORD1")
         self.create_cloud("ORD2")
