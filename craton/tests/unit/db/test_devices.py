@@ -538,7 +538,7 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
             self.context, "hosts", host_id, variables
         )
         filters = {
-            "region_id": "region_1",
+            "region_id": 1,
             "vars": "key1:value5",
         }
         res, _ = dbapi.hosts_get_all(self.context, filters,
@@ -672,3 +672,33 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
                 'parent_id': grandchild.id,
             }
         )
+
+    def test_hosts_get_all_with_resolved_var_filters(self):
+        project_id = self.make_project('project_1', foo='P1', zoo='P2')
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(
+            project_id, cloud_id, 'region_1', foo='R1')
+        switch_id = self.make_network_device(
+            project_id, cloud_id, region_id,
+            'switch1.example.com', IPAddress('10.1.2.101'), 'switch',
+            zoo='S1', bar='S2')
+        self.make_host(
+            project_id, cloud_id, region_id,
+            'www.example.xyz', IPAddress(u'10.1.2.101'), 'server',
+            parent_id=switch_id,
+            key1="value1", key2="value2")
+        self.make_host(
+            project_id, cloud_id, region_id,
+            'www2.example.xyz', IPAddress(u'10.1.2.102'), 'server',
+            parent_id=switch_id,
+            key1="value-will-not-match", key2="value2")
+
+        filters = {
+            "region_id": 1,
+            "vars": "key1:value1,zoo:S1,foo:R1",
+            "resolved-values": True,
+        }
+        res, _ = dbapi.hosts_get_all(
+            self.context, filters, default_pagination)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0].name, 'www.example.xyz')
