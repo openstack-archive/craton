@@ -833,6 +833,10 @@ validators = {
                     "default": False,
                     "type": "boolean",
                 },
+                "vars": {
+                    "type": "string",
+                    "description": "variable filters to get matching devices",
+                },
             }),
         },
     },
