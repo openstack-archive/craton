@@ -2,6 +2,7 @@
 
 import enum
 import functools
+from operator import attrgetter
 import sys
 import uuid
 
@@ -14,6 +15,7 @@ from oslo_log import log
 
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
+from sqlalchemy.sql.expression import tuple_
 
 from craton import exceptions
 from craton.db.sqlalchemy import models
@@ -154,17 +156,82 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
-def add_var_filters_to_query(query, filters):
-    # vars filters are of form ?vars=a:b
-    query = query.join(models.VariableAssociation)
-    query = query.join(models.Variable)
-    var_filters = filters['vars'].split(',')
-    for filters in var_filters:
-        k, v = filters.split(':', 1)
-        query = query.filter_by(key=k)
-        query = query.filter_by(value=v)
+# FIXME(jimbaker) add some overall docs on how this algorithm works:
+#
+# 1 .computes the generalized descendants for each k:v var in the query;
+# 2. computes their intersection;
+# 3. then adds to the overall query
 
-    return query
+def _matching_resources(query, resource_cls, get_descendants, kv):
+    kv_pairs = list(kv.items())
+    matches = dict((kv_pair, set()) for kv_pair in kv_pairs)
+    
+    # NOTE(jimbaker) this query can be readily generalized. Some
+    # options could include:
+    #
+    # * Key existence (good for treating vars as if they are labels)
+    # * JSON matches on the values
+    # 
+    # But for now, simply find all variables that explicitly match
+    # one or more key value pairs
+    q = query.session.query(models.Variable).\
+        filter(
+            tuple_(models.Variable.key, models.Variable.value).in_(kv_pairs))
+
+    for variable in q:
+        match = matches[(variable.key, variable.value)]
+        if isinstance(variable.parent, resource_cls):
+            match.add(variable.parent)
+        match.update(get_descendants(variable.parent))
+
+    # NOTE(jimbaker) For now, we simply match for the conjunction
+    # ("and") of all the supplied kv pairs we are matching
+    # against. Generalize as desired with other boolean logic.
+    _, first_match = matches.popitem()
+    if matches:
+        return first_match.intersection(*matches.values())
+    else:
+        return first_match
+
+
+def _get_devices(parent):
+    if isinstance(parent, models.Device):
+        return parent.descendants
+    else: 
+        return parent.devices
+
+
+_resource_mapping = {
+    models.Project: ([], None),
+    models.Cloud:   ([models.Project], attrgetter('clouds')),
+    models.Region:  ([models.Project, models.Cloud], attrgetter('regions')),
+    models.Cell:    (
+        [models.Project, models.Cloud, models.Region],
+        attrgetter('cells')),
+    models.Device:  (
+        [models.Project, models.Cloud, models.Region, models.Cell],
+        _get_devices),
+}
+
+
+def matching_resources(query, resource_cls, kv):
+    def get_desc(parent):
+        parent_classes, getter = _resource_mapping[resource_cls]
+        if any(isinstance(parent, cls) for cls in parent_classes):
+            return getter(parent)
+        else:
+            return []
+    return _matching_resources(query, resource_cls, get_desc, kv)
+
+
+def add_var_filters_to_query(query, model, filters):
+    # vars filters are of form ?vars=a:b[,c:d,...] - the filters in
+    # this case are intersecting ("and" queries)
+    kv = dict(pairing.split(':', 1) for pairing in filters['vars'].split(','))
+    return query.filter(
+        model.id.in_(
+            resource.id for resource in matching_resources(query,  model, kv))
+    )
 
 
 def get_user_info(context, username):
@@ -333,7 +400,7 @@ def cells_get_all(context, filters, pagination_params):
     if "name" in filters:
         query = query.filter_by(name=filters["name"])
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Cell, filters)
 
     return _paginate(context, query, models.Cell, session, filters,
                      pagination_params)
@@ -392,7 +459,7 @@ def regions_get_all(context, filters, pagination_params):
                         session=session)
 
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Region, filters)
     if "cloud_id" in filters:
         query = query.filter_by(cloud_id=filters["cloud_id"])
 
@@ -464,7 +531,7 @@ def clouds_get_all(context, filters, pagination_params):
                         session=session)
 
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Cloud, filters)
 
     return _paginate(context, query, models.Cloud, session, filters,
                      pagination_params)
@@ -558,7 +625,7 @@ def hosts_get_all(context, filters, pagination_params):
         query = query.filter(models.Device.related_labels.any(
             models.Label.label == filters["label"]))
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Device, filters)
 
     return _paginate(context, query, models.Host, session, filters,
                      pagination_params)
@@ -639,7 +706,7 @@ def projects_get_all(context, filters, pagination_params):
     session = get_session()
     query = model_query(context, models.Project, session=session)
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Project, filters)
     return _paginate(context, query, models.Project, session, filters,
                      pagination_params)
 
@@ -650,7 +717,7 @@ def projects_get_by_name(context, project_name, filters, pagination_params):
     query = model_query(context, models.Project)
     query = query.filter(models.Project.name.like(project_name))
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Project, filters)
     try:
         return _paginate(context, query, models.Project, session, filters,
                          pagination_params)
@@ -783,7 +850,7 @@ def networks_get_all(context, filters, pagination_params):
     if "name" in filters:
         query = query.filter_by(name=filters["name"])
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Network, filters)
 
     return _paginate(context, query, models.Network, session, filters,
                      pagination_params)
@@ -860,7 +927,7 @@ def network_devices_get_all(context, filters, pagination_params):
     if "device_type" in filters:
         query = query.filter_by(device_type=filters["device_type"])
     if "vars" in filters:
-        query = add_var_filters_to_query(query, filters)
+        query = add_var_filters_to_query(query, models.Device, filters)
 
     return _paginate(context, query, models.Device, session, filters,
                      pagination_params)
