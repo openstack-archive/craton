@@ -320,6 +320,72 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
         self.assertEqual(sorted([host['id'] for host in test_hosts]),
                          sorted([host['id'] for host in hosts]))
 
+    def test_host_get_all_vars_filter_resolved_region(self):
+        region_vars = {'foo': 'bar'}
+        region = self.create_region(name='region-2', variables=region_vars)
+        host_vars = {'baz': 'zoo'}
+        self.create_host('host1', 'server', '192.168.1.1', **host_vars)
+        host2 = self.create_host('host2', 'server', '192.168.1.2',
+                                 region=region, **host_vars)
+        url = self.url + '/v1/hosts'
+
+        resp = self.get(url, vars="foo:bar,baz:zoo")
+        hosts = resp.json()['hosts']
+        self.assertEqual(1, len(hosts))
+        self.assertEqual(host2['id'], hosts[0]['id'])
+
+    def test_host_get_all_vars_filter_resolved_region_and_host(self):
+        region_vars = {'foo': 'bar'}
+        region = self.create_region(name='region-2', variables=region_vars)
+        host_vars = {'baz': 'zoo'}
+        host1 = self.create_host('host1', 'server', '192.168.1.1',
+                                 **region_vars)
+        host2 = self.create_host('host2', 'server', '192.168.1.2',
+                                 region=region, **host_vars)
+        url = self.url + '/v1/hosts'
+
+        resp = self.get(url, vars='foo:bar')
+        hosts = resp.json()['hosts']
+        self.assertEqual(2, len(hosts))
+        self.assertListEqual(sorted([host1['id'], host2['id']]),
+                             sorted([host['id'] for host in hosts]))
+
+    def test_host_get_all_vars_filter_resolved_region_child_override(self):
+        region_vars = {'foo': 'bar'}
+        region = self.create_region(name='region-2', variables=region_vars)
+        host1 = self.create_host('host1', 'server', '192.168.1.1',
+                                 region=region, foo='baz')
+        host2 = self.create_host('host2', 'server', '192.168.1.2',
+                                 region=region)
+        url = self.url + '/v1/hosts'
+
+        resp = self.get(url, vars='foo:baz')
+        hosts = resp.json()['hosts']
+        self.assertEqual(1, len(hosts))
+        self.assertEqual(host1['id'], hosts[0]['id'])
+
+        resp = self.get(url, vars='foo:bar')
+        hosts = resp.json()['hosts']
+        self.assertEqual(1, len(hosts))
+        self.assertEqual(host2['id'], hosts[0]['id'])
+
+    def test_host_get_all_vars_filter_resolved_host_child_override(self):
+        host1 = self.create_host('host1', 'server', '192.168.1.1',
+                                 baz='zoo')
+        host2 = self.create_host('host2', 'server', '192.168.1.2',
+                                 parent_id=host1['id'], baz='boo')
+        url = self.url + '/v1/hosts'
+
+        resp = self.get(url, vars='baz:zoo')
+        hosts = resp.json()['hosts']
+        self.assertEqual(1, len(hosts))
+        self.assertEqual(host1['id'], hosts[0]['id'])
+
+        resp = self.get(url, vars='baz:boo')
+        hosts = resp.json()['hosts']
+        self.assertEqual(1, len(hosts))
+        self.assertEqual(host2['id'], hosts[0]['id'])
+
     def test_host_delete(self):
         host = self.create_host('host1', 'server', '192.168.1.1')
         url = self.url + '/v1/hosts/{}'.format(host['id'])
