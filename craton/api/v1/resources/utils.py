@@ -1,4 +1,5 @@
 from flask import url_for
+from oslo_serialization import jsonutils
 
 from craton import db as dbapi
 
@@ -6,7 +7,7 @@ from craton import db as dbapi
 def format_variables(args, obj):
     """Update resource response with requested type of variables."""
     if args:
-        resolved_values = args["resolved-values"]
+        resolved_values = args.get("resolved-values", None)
     else:
         resolved_values = None
 
@@ -15,6 +16,14 @@ def format_variables(args, obj):
     else:
         obj.vars = obj.variables
     return obj
+
+
+def get_resource_with_vars(args, obj):
+    """Get resource in json primitive with variables."""
+    obj = format_variables(args, obj)
+    res = jsonutils.to_primitive(obj)
+    res['variables'] = jsonutils.to_primitive(obj.vars)
+    return res
 
 
 def get_device_type(context, device_id):

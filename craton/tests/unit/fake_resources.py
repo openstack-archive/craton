@@ -153,6 +153,7 @@ class Networks(object):
         self.gateway = gateway
         self.netmask = netmask
         self.variables = variables
+        self.resolved = copy.copy(variables)
         self.labels = labels
         self.cloud_id = cloud_id
         self.region_id = region_id

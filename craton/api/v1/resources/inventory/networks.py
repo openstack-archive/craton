@@ -23,7 +23,8 @@ class Networks(base.Resource):
             context, request_args, pagination_params,
         )
         if details:
-            networks_obj = base.get_resource_with_vars(networks_obj)
+            networks_obj = [utils.get_resource_with_vars(request_args, n)
+                            for n in networks_obj]
 
         links = base.links_from(link_params)
         response_body = {'networks': networks_obj, 'links': links}
@@ -78,7 +79,8 @@ class NetworkDevices(base.Resource):
             context, request_args, pagination_params,
         )
         if details:
-            devices_obj = base.get_resource_with_vars(devices_obj)
+            devices_obj = [utils.get_resource_with_vars(request_args, d)
+                           for d in devices_obj]
 
         links = base.links_from(link_params)
         response_body = jsonutils.to_primitive(
