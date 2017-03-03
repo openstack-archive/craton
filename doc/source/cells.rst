@@ -46,7 +46,7 @@ Example Cell Create
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/cells" \
+   curl -i "http://${MY_IP}:7780/v1/cells" \
         -d '{"name": "myCell", "region_id": 1}' \
         -H "Content-Type: application/json" \
         -H "X-Auth-Token: demo" \
@@ -126,7 +126,7 @@ Example Cell List
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/cells?region_id=1" \
+   curl -i "http://${MY_IP}:7780/v1/cells?region_id=1" \
         -H "Content-Type: application/json" \
         -H "X-Auth-Token: demo" \
         -H "X-Auth-User: demo" \
@@ -216,7 +216,7 @@ Example Cell Update
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/cells/1" \
+   curl -i "http://${MY_IP}:7780/v1/cells/1" \
         -XPUT \
         -d '{"name": "changedName"}' \
         -H "Content-Type: application/json" \
@@ -300,7 +300,7 @@ Example Cell Update Variables
 
 .. code-block:: bash
 
-   curl -i "http://${MY_IP}:8080/v1/cells/1/variables" \
+   curl -i "http://${MY_IP}:7780/v1/cells/1/variables" \
         -XPUT \
         -d '{"newKey": "sampleKey"}' \
         -H "Content-Type: application/json" \

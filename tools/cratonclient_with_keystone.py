@@ -65,7 +65,7 @@ craton_session = session.Session(
 )
 craton = client.Client(
     session=craton_session,
-    url='http://127.0.0.1:8080/',
+    url='http://127.0.0.1:7780/',
 )
 
 inventory = craton.inventory(1)

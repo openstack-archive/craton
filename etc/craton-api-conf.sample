@@ -8,7 +8,7 @@ log_file=craton-api.log
 # Host IP to use for API service
 host=0.0.0.0
 # Port to use for API service
-port=8080
+port=7780
 # Paste Config file to use
 api_paste_config=/craton/etc/craton-api-paste.ini
 # The name of the Paste pipeline to use for Craton.
