@@ -38,12 +38,23 @@ PROJECT_DISCRIMINATOR='project'
 ####################################
 # Create initial project and users #
 ####################################
-PROJECT_VA_ID=$(mysql -u root craton -e "INSERT into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), '$PROJECT_DISCRIMINATOR'); SELECT LAST_INSERT_ID();" | grep -Eo '[0-9]+')
-mysql -u root craton -e "INSERT into projects (created_at, updated_at, name, variable_association_id, id) values (NOW(), NOW(), '$USERNAME', $PROJECT_VA_ID, '$PROJECT')"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$BOOTSTRAP_USERNAME', '$BOOTSTRAP_TOKEN', True, False)"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$USERNAME', '$TOKEN', False, False)"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$ADMIN_USERNAME', '$ADMIN_TOKEN', False, True)"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$ROOT_USERNAME', '$ROOT_TOKEN', True, True)"
+
+# TODO(jimbaker) should do this via SQLAlchemy models to construct
+# bootstrap project/user (use models to ensure constraints are
+# satisfied); then add other users via REST API
+
+cat <<EOF | mysql  --user=root craton
+insert into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), 'project');
+insert into projects (created_at, updated_at, name, variable_association_id, id) values (NOW(), NOW(), '$USERNAME', LAST_INSERT_ID(), '$PROJECT');
+insert into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), 'user');
+INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin, variable_association_id) values (NOW(), NOW(), '$PROJECT', '$BOOTSTRAP_USERNAME', '$BOOTSTRAP_TOKEN', True, False, LAST_INSERT_ID());
+insert into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), 'user');
+INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin, variable_association_id) values (NOW(), NOW(), '$PROJECT', '$USERNAME', '$TOKEN', False, False, LAST_INSERT_ID());
+insert into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), 'user');
+INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin, variable_association_id) values (NOW(), NOW(), '$PROJECT', '$ADMIN_USERNAME', '$ADMIN_TOKEN', False, True, LAST_INSERT_ID());
+insert into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), 'user');
+INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin, variable_association_id) values (NOW(), NOW(), '$PROJECT', '$ROOT_USERNAME', '$ROOT_TOKEN', True, True, LAST_INSERT_ID());
+EOF
 
 #########################
 # Start the API service #
