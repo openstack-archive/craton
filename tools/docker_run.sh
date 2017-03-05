@@ -19,7 +19,6 @@ mysqladmin flush-privileges
 ##############
 /craton/bin/craton-dbsync --config-file=/craton/etc/craton-api-conf.sample upgrade
 
-
 ####################################
 # Create initial project and users #
 ####################################
