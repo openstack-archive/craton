@@ -1,15 +1,18 @@
 import contextlib
-import docker
 import json
+import threading
+
+import docker
+from oslo_log import log as logging
+from oslo_utils import uuidutils
 import requests
 from retrying import retry
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData
+from sqlalchemy.orm import sessionmaker
 import testtools
-import threading
 
-from oslo_log import log as logging
-from oslo_utils import uuidutils
+from craton.db.sqlalchemy import models
 
 
 LOG = logging.getLogger(__name__)
@@ -153,6 +156,9 @@ def setup_database(container_ip):
     meta = MetaData()
     meta.reflect(engine)
 
+    # NOTE(sulo, jimbaker): First clean the db up for tests, and do
+    # our own bootstrapping to isolate all test from any external
+    # scripts.
     with contextlib.closing(engine.connect()) as conn:
         transaction = conn.begin()
         conn.execute("SET foreign_key_checks = 0")
@@ -161,34 +167,35 @@ def setup_database(container_ip):
         conn.execute("SET foreign_key_checks = 1")
         transaction.commit()
 
-    # NOTE(sulo): as a part of db setup, we bootstrap user and project
-    # Although, project and user might have been bootstrapped externally
-    # we clean the db up for tests, and do our own bootstrapping to
-    # isolate all test from any external scripts.
-    projects = meta.tables['projects']
-    users = meta.tables['users']
-    variable_assn = meta.tables['variable_association']
+    # NOTE(sulo, jimbaker): now bootstrap user and project; using the
+    # SA model allows us to respect the additional constraints in the
+    # model, vs having to duplicate logic if working against the
+    # database directly.
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    project = models.Project(
+        name=FAKE_DATA_GEN_USERNAME,
+        id=FAKE_DATA_GEN_PROJECT_ID)
+    bootstrap_user = models.User(
+        project=project,
+        username=FAKE_DATA_GEN_BOOTSTRAP_USERNAME,
+        api_key=FAKE_DATA_GEN_BOOTSTRAP_TOKEN,
+        is_admin=True,
+        is_root=True)
+    demo_user = models.User(
+        project=project,
+        username=FAKE_DATA_GEN_USERNAME,
+        api_key=FAKE_DATA_GEN_TOKEN,
+        is_admin=True)
 
-    with contextlib.closing(engine.connect()) as conn:
-        transaction = conn.begin()
-        result = conn.execute(variable_assn.insert(),
-                              discriminator='project')
-        conn.execute(projects.insert(),
-                     name=FAKE_DATA_GEN_USERNAME,
-                     id=FAKE_DATA_GEN_PROJECT_ID,
-                     variable_association_id=result.inserted_primary_key[0])
-        conn.execute(users.insert(),
-                     project_id=FAKE_DATA_GEN_PROJECT_ID,
-                     username=FAKE_DATA_GEN_USERNAME,
-                     api_key=FAKE_DATA_GEN_TOKEN,
-                     is_admin=True)
-        conn.execute(users.insert(),
-                     project_id=FAKE_DATA_GEN_PROJECT_ID,
-                     username=FAKE_DATA_GEN_BOOTSTRAP_USERNAME,
-                     api_key=FAKE_DATA_GEN_BOOTSTRAP_TOKEN,
-                     is_admin=True,
-                     is_root=True)
-        transaction.commit()
+    session.add(project)
+    session.add(bootstrap_user)
+    session.add(demo_user)
+
+    # NOTE(jimbaker) simple assumption: either this commit succeeds,
+    # or we need to fail fast - there's no recovery allowed in this
+    # testing setup.
+    session.commit()
 
 
 class TestCase(testtools.TestCase):
