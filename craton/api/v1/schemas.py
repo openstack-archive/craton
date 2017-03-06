@@ -1393,10 +1393,6 @@ validators = {
                     "type": "string",
                     "description": "name of the network to get",
                 },
-                "details": {
-                    "type": "boolean",
-                    "description": "get detailed information",
-                },
                 "region_id": {
                     "type": "string",
                     "description": "region id of the network to get",
@@ -1416,6 +1412,7 @@ validators = {
                 "details": {
                     "default": False,
                     "type": "boolean",
+                    "description": "get detailed information",
                 },
             }),
         },
