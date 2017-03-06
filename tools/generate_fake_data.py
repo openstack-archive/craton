@@ -142,6 +142,15 @@ class Inventory(object):
         if container_obj.status_code != 201:
             raise Exception(container_obj.text)
 
+        label_url = self.url + "/hosts/%s/labels" % container_obj.json()['id']
+        labels = {"labels": ["container"]}
+        resp = requests.put(label_url, headers=self.headers,
+                            data=json.dumps(labels), verify=False)
+
+        if resp.status_code != 200:
+            print("Failed to create label for host %s" % name)
+            print(resp.text)
+
     def create_device(self, host, device_type, parent=None, data=None):
         region_url = self.url + "/hosts"
         payload = {"region_id": self.region.get("id"),
@@ -168,6 +177,15 @@ class Inventory(object):
                                 data=json.dumps(data), verify=False)
             if resp.status_code != 200:
                 print(resp.text)
+
+        label_url = self.url + "/hosts/%s/labels" % device_obj.json()["id"]
+        labels = {"labels": [device_type]}
+        resp = requests.put(label_url, headers=self.headers,
+                            data=json.dumps(labels), verify=False)
+
+        if resp.status_code != 200:
+            print("Failed to create label for host %s" % host)
+            print(resp.text)
 
         return device_obj.json()
 
