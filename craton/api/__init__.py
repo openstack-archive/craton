@@ -1,6 +1,7 @@
+from datetime import date
 import os
 from paste import deploy
-from flask import Flask
+from flask import Flask, json
 
 
 from oslo_config import cfg
@@ -48,10 +49,27 @@ def create_app(global_config, **local_config):
     return setup_app()
 
 
+class JSONEncoder(json.JSONEncoder):
+
+    def default(self, o):
+        if isinstance(o, date):
+            return o.isoformat()
+        return json.JSONEncoder.default(self, o)
+
+
+RESTFUL_JSON = {
+    "indent": 2,
+    "sort_keys": True,
+    "cls": JSONEncoder,
+    "separators": (",", ": "),
+}
+
+
 def setup_app(config=None):
     app = Flask(__name__, static_folder=None)
     app.config.update(
-        PROPAGATE_EXCEPTIONS=True
+        PROPAGATE_EXCEPTIONS=True,
+        RESTFUL_JSON=RESTFUL_JSON,
     )
     app.register_blueprint(v1.bp, url_prefix='/v1')
     return app

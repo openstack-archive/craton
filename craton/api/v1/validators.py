@@ -1,11 +1,10 @@
 # The code is auto generated, your change will be overwritten by
 # code generating.
 
-from datetime import date
 from functools import wraps
 
 from werkzeug.datastructures import MultiDict, Headers
-from flask import request, current_app, json
+from flask import request, current_app
 from flask_restful import abort
 from flask_restful.utils import unpack
 from jsonschema import Draft4Validator
@@ -143,14 +142,6 @@ def normalize(schema, data, required_defaults=None):
     return _normalize(schema, data), errors
 
 
-class JSONEncoder(json.JSONEncoder):
-
-    def default(self, o):
-        if isinstance(o, date):
-            return o.isoformat()
-        return json.JSONEncoder.default(self, o)
-
-
 class FlaskValidatorAdaptor(object):
 
     def __init__(self, schema):
@@ -282,13 +273,7 @@ def response_filter(view):
         if errors:
             abort(500, message='Expectation Failed', errors=errors)
 
-        return current_app.response_class(
-            json.dumps(resp, cls=JSONEncoder) + '\n',
-            status=status,
-            headers=headers,
-            mimetype='application/json'
-        )
-
+        return resp, status, headers
     return wrapper
 
 

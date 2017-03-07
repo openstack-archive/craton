@@ -1,5 +1,6 @@
 import contextlib
 import docker
+import json
 import requests
 from retrying import retry
 from sqlalchemy import create_engine
@@ -220,28 +221,49 @@ class TestCase(testtools.TestCase):
     def assertBadRequest(self, response):
         self.assertEqual(requests.codes.BAD_REQUEST, response.status_code)
 
+    def assertJSON(self, response):
+        if response.text:
+            try:
+                data = json.loads(response.text)
+            except json.JSONDecodeError:
+                self.fail("Response data is not JSON.")
+            else:
+                reference = "{formatted_data}\n".format(
+                    formatted_data=json.dumps(
+                        data, indent=2, sort_keys=True, separators=(',', ': ')
+                    )
+                )
+                self.assertEqual(
+                    reference,
+                    response.text
+                )
+
     def get(self, url, headers=None, **params):
         resp = self.session.get(
             url, verify=False, headers=headers, params=params,
         )
+        self.assertJSON(resp)
         return resp
 
     def post(self, url, headers=None, data=None):
         resp = self.session.post(
             url, verify=False, headers=headers, json=data,
         )
+        self.assertJSON(resp)
         return resp
 
     def put(self, url, headers=None, data=None):
         resp = self.session.put(
             url, verify=False, headers=headers, json=data,
         )
+        self.assertJSON(resp)
         return resp
 
     def delete(self, url, headers=None, body=None):
         resp = self.session.delete(
             url, verify=False, headers=headers, json=body,
         )
+        self.assertJSON(resp)
         return resp
 
     def create_cloud(self, name, variables=None):

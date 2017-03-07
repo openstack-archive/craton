@@ -1,5 +1,6 @@
 import functools
 import inspect
+import json
 import re
 import urllib.parse as urllib
 
@@ -8,6 +9,7 @@ import decorator
 import flask
 import flask_restful as restful
 
+from craton import api
 from craton.api.v1.validators import ensure_project_exists
 from craton.api.v1.validators import request_validate
 from craton.api.v1.validators import response_filter
@@ -22,10 +24,14 @@ class Resource(restful.Resource):
                          response_filter]
 
     def error_response(self, status_code, message):
-        resp = flask.jsonify({
-            'status': status_code,
-            'message': message
-            })
+        body = json.dumps(
+            {
+                'status': status_code,
+                'message': message
+            },
+            **api.RESTFUL_JSON,
+        )
+        resp = flask.make_response("{body}\n".format(body=body))
         resp.status_code = status_code
         return resp
 
