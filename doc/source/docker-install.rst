@@ -63,21 +63,21 @@ Run the Craton Docker Image
 Calling into Craton
 -------------------
 
+* Let's get container Id::
+
+    $ ContainerId=$(sudo docker ps | grep craton-api:latest | awk '{print $1}')
+
+* We need the container IP, so we can run an API call against Craton running in the container::
+
+    $ ContainerIP=$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${ContainerId})
+
 * To generate a sample data set, use the following command::
 
-    $ python tools/generate_fake_data.py --url http://{Container_IP}:7780/v1 --user demo --project b9f10eca66ac4c279c139d01e65f96b4 --key demo
+    $ python tools/generate_fake_data.py --url http://${ContainerIP}:8080/v1 --user demo --project b9f10eca66ac4c279c139d01e65f96b4 --key demo
 
-* Now, let's run an API call against Craton running in the container. First, we need to enumerate the running Docker images::
+* Now you can run a curl command like the one below to query Craton::
 
-    $ sudo docker ps
-
-* Use the container id from that command in this next command to find the container's IP address::
-
-    $ sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${ContainerId}
-
-* Now that you know the IP address, you can run a curl command like the one below to query Craton::
-
-    $ curl -i "http://{Container_IP}:7780/v1/hosts?region_id=1" -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: b9f10eca66ac4c279c139d01e65f96b4"
+    $ curl -i "http://${ContainerIP}:8080/v1/hosts?region_id=1" -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: b9f10eca66ac4c279c139d01e65f96b4"
 
 
 -------------------
