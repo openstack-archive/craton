@@ -40,11 +40,15 @@ ADD https://bootstrap.pypa.io/get-pip.py /root/get-pip.py
 # Install pip
 RUN python3.5 /root/get-pip.py
 
-# Install Mariadb
-RUN apt-get install -y mariadb-server mariadb-client
+# Install MySQL 5.7
+ENV MYSQL_ROOTPW root
+RUN echo "mysql-server mysql-server/root_password password $MYSQL_ROOTPW" | debconf-set-selections && \
+    echo "mysql-server mysql-server/root_password_again password $MYSQL_ROOTPW" | debconf-set-selections
+RUN apt-get install -y mysql-server-5.7 mysql-client-5.7
+RUN service mysql start && mysqladmin -u root -p"$MYSQL_ROOTPW" password '' && service mysql stop
 
 # Change mysql bind address
-RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf
+RUN sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
 
 # Install MySQL-python
 RUN apt-get install -y libmysqlclient-dev python-mysqldb
