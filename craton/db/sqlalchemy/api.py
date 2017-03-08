@@ -15,7 +15,7 @@ from oslo_log import log
 
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
-from sqlalchemy.sql.expression import tuple_
+from sqlalchemy.sql.expression import or_, tuple_
 
 from craton import exceptions
 from craton.db.sqlalchemy import models
@@ -165,7 +165,14 @@ def model_query(context, model, *args, **kwargs):
 def _matching_resources(query, resource_cls, get_descendants, kv):
     kv_pairs = list(kv.items())
     matches = dict((kv_pair, set()) for kv_pair in kv_pairs)
-    
+
+    # NOTE(thomasem): Unfortunately MySQL 5.7 doesn't fully support the
+    # IN operation for JSON values, so we'll need to use an OR instead.
+    or_clauses = [
+        tuple_(models.Variable.key, models.Variable.value) == kv_pair
+        for kv_pair in kv_pairs
+    ]
+
     # NOTE(jimbaker) this query can be readily generalized. Some
     # options could include:
     #
@@ -174,9 +181,7 @@ def _matching_resources(query, resource_cls, get_descendants, kv):
     # 
     # But for now, simply find all variables that explicitly match
     # one or more key value pairs
-    q = query.session.query(models.Variable).\
-        filter(
-            tuple_(models.Variable.key, models.Variable.value).in_(kv_pairs))
+    q = query.session.query(models.Variable).filter(or_(*or_clauses))
 
     for variable in q:
         match = matches[(variable.key, variable.value)]
