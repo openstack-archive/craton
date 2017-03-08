@@ -8,6 +8,8 @@ Installation
 
 .. note:: *This is a Python3 project.*
 
+.. note:: *This project requires MySQL 5.7, until a stable release of MariaDB with JSON function support is available*
+
 ---------------------
 Ubuntu 16.04 (Xenial)
 ---------------------

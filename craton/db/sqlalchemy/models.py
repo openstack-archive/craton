@@ -19,14 +19,13 @@ import itertools
 
 from oslo_db.sqlalchemy import models
 from sqlalchemy import (
-    Boolean, Column, ForeignKey, Integer, String, Text, UniqueConstraint)
+    Boolean, Column, ForeignKey, Integer, String, Text, UniqueConstraint, JSON)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.declarative.api import _declarative_constructor
 from sqlalchemy.orm import backref, object_mapper, relationship, validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils.types.ip_address import IPAddressType
-from sqlalchemy_utils.types.json import JSONType
 from sqlalchemy_utils.types.uuid import UUIDType
 
 from craton import exceptions
@@ -110,7 +109,7 @@ class Variable(Base):
     # MySQL.  This difference in naming is only visible in the use of
     # raw SQL.
     key = Column('key_', String(255), primary_key=True)
-    value = Column('value_', JSONType)
+    value = Column('value_', JSON)
     association = relationship(
         VariableAssociation, back_populates='variables',
     )
@@ -263,7 +262,7 @@ class User(Base, VariableMixin):
     is_root = Column(Boolean, default=False)
     # admin = project context admin
     is_admin = Column(Boolean, default=False)
-    roles = Column(JSONType)
+    roles = Column(JSON)
 
     project = relationship('Project', back_populates='users')
 
@@ -529,7 +528,7 @@ class NetworkDevice(Device):
     # network device specific properties
     model_name = Column(String(255), nullable=True)
     os_version = Column(String(255), nullable=True)
-    vlans = Column(JSONType)
+    vlans = Column(JSON)
 
     __mapper_args__ = {
         'polymorphic_identity': 'network_devices',
