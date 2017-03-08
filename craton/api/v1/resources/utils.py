@@ -1,3 +1,5 @@
+import binascii
+import os
 from flask import url_for
 from oslo_serialization import jsonutils
 
@@ -57,3 +59,11 @@ def add_up_link(context, device):
 
     links = device.setdefault("links", [])
     links.append(link)
+
+
+def gen_api_key():
+    """Generates crypto strong 16 bytes api key."""
+    # NOTE(sulo): this implementation is taken from secrets
+    # moudule available in python 3.6
+    tbytes = os.urandom(16)
+    return binascii.hexlify(tbytes).decode('ascii')
