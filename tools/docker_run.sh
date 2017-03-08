@@ -19,6 +19,15 @@ mysqladmin flush-privileges
 ##############
 /craton/bin/craton-dbsync --config-file=/craton/etc/craton-api-conf.sample upgrade
 
+
+####################################
+# Create initial project and users #
+####################################
+
+# Project and Users created as a part of this script is meant
+# for testing purposes only. Users can try out craton service
+# by using these credentials along with Dockerfile.
+
 PROJECT="b9f10eca66ac4c279c139d01e65f96b4"
 
 BOOTSTRAP_USERNAME="bootstrap"
@@ -35,15 +44,11 @@ ROOT_TOKEN="demo_root"
 
 PROJECT_DISCRIMINATOR='project'
 
-####################################
-# Create initial project and users #
-####################################
-PROJECT_VA_ID=$(mysql -u root craton -e "INSERT into variable_association (created_at, updated_at, discriminator) values (NOW(), NOW(), '$PROJECT_DISCRIMINATOR'); SELECT LAST_INSERT_ID();" | grep -Eo '[0-9]+')
-mysql -u root craton -e "INSERT into projects (created_at, updated_at, name, variable_association_id, id) values (NOW(), NOW(), '$USERNAME', $PROJECT_VA_ID, '$PROJECT')"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$BOOTSTRAP_USERNAME', '$BOOTSTRAP_TOKEN', True, False)"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$USERNAME', '$TOKEN', False, False)"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$ADMIN_USERNAME', '$ADMIN_TOKEN', False, True)"
-mysql -u root craton -e "INSERT into users (created_at, updated_at, project_id, username, api_key, is_root, is_admin) values (NOW(), NOW(), '$PROJECT', '$ROOT_USERNAME', '$ROOT_TOKEN', True, True)"
+/craton/bin/craton-dbsync --config-file=etc/craton-api-conf.sample bootstrap-project --projectname $USERNAME --id $PROJECT
+/craton/bin/craton-dbsync --config-file=etc/craton-api-conf.sample bootstrap-user --project $PROJECT --username $USERNAME --project $PROJECT --key $TOKEN
+/craton/bin/craton-dbsync --config-file=etc/craton-api-conf.sample bootstrap-user --project $PROJECT --username $BOOTSTRAP_USERNAME --key $BOOTSTRAP_TOKEN --root true
+/craton/bin/craton-dbsync --config-file=etc/craton-api-conf.sample bootstrap-user --project $PROJECT --username $ADMIN_USERNAME --project $PROJECT --key $ADMIN_TOKEN --admin true
+/craton/bin/craton-dbsync --config-file=etc/craton-api-conf.sample bootstrap-user --project $PROJECT --username $ROOT_USERNAME --project $PROJECT --key $ROOT_TOKEN --admin ture --root true
 
 #########################
 # Start the API service #

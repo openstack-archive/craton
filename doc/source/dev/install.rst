@@ -143,31 +143,18 @@ Run dbsync
     # craton-dbsync --config-file=etc/craton
     -api-conf.sample upgrade
 
------------------------
-Create Project and User
------------------------
+* Make sure to run dbsync --bootstrap-project to create initial project::
+  # craton-dbsync --config-file=etc/craton-api-conf.sample --bootstrap-project
+  --name demo
 
-.. note:: These goes away once the API has been setup
+  Note the project id output of this command.
 
-* Connect to database server as root user::
+  # craton-dbsync --config-file=etc/craton-api-conf.sample --bootstrap-user
+  --username demo --project <project id from above> --admin=True/False
+  --root=True/False
 
-    # mysql -u root -p
-
-* Use the database craton::
-
-    # use craton;
-
-* Modify the projects and users as following::
-
-    # insert into projects (created_at, updated_at, name, id) values
-    (NOW(), NOW(), "osic", "717e9a216e2d44e0bc848398563bda06");
-    # insert into users (created_at, updated_at, project_id, username
-    , api_key, is_admin)
-    values (NOW(), NOW(), "717e9a216e2d44e0bc848398563bda06", "demo", "demo", False);
-
-* Logout from the database server::
-
-    # exit
+  Note the user and project ids and API key to use with python-cratonclient
+  to interact with craton server.
 
 ---------------------
 Start the API Service
