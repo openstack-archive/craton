@@ -23,6 +23,25 @@ class DBCommand(object):
     def create_schema(self):
         migration.create_schema()
 
+    def project_create(self):
+        project = migration.create_project(CONF.command.projectname,
+                                           project_id=CONF.command.id,
+                                           db_uri=CONF.database.connection)
+        print("\nProject ID: {}\nProject Name: {}".format(project.id,
+                                                          project.name))
+
+    def user_create(self):
+        user = migration.create_user(CONF.command.project,
+                                     CONF.command.username,
+                                     api_key=CONF.command.key,
+                                     admin=CONF.command.admin,
+                                     root=CONF.command.root,
+                                     db_uri=CONF.database.connection)
+
+        msg = ("\nProject Id: %s\nUsername: %s\nAPI Key: %s"
+               %(user.project_id, user.username, user.api_key))
+        print(msg)
+
 
 def add_command_parsers(subparsers):
     command_object = DBCommand()
@@ -56,6 +75,19 @@ def add_command_parsers(subparsers):
         'create_schema',
         help=("Create the database schema."))
     parser.set_defaults(func=command_object.create_schema)
+
+    parser = subparsers.add_parser('bootstrap-project')
+    parser.add_argument('--projectname', nargs='?', required=True)
+    parser.add_argument('--id', nargs='?')
+    parser.set_defaults(func=command_object.project_create)
+
+    parser = subparsers.add_parser('bootstrap-user')
+    parser.add_argument('--username', nargs='?', required=True)
+    parser.add_argument('--project', nargs='?', required=True)
+    parser.add_argument('--key', nargs='?')
+    parser.add_argument('--admin', nargs='?')
+    parser.add_argument('--root', nargs='?')
+    parser.set_defaults(func=command_object.user_create)
 
 
 def main():
