@@ -32,7 +32,7 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime, nullable=True),
         sa.Column('association_id', sa.Integer),
         sa.Column('key_', sa.String(length=255), nullable=False),
-        sa.Column('value_', sqlalchemy_utils.types.json.JSONType,
+        sa.Column('value_', sa.JSON,
                   nullable=True),
         sa.PrimaryKeyConstraint('association_id', 'key_'),
         sa.ForeignKeyConstraint(
@@ -118,7 +118,7 @@ def upgrade():
         sa.Column('api_key', sa.String(length=36), nullable=True),
         sa.Column('is_root', sa.Boolean, nullable=True),
         sa.Column('is_admin', sa.Boolean, nullable=True),
-        sa.Column('roles', sqlalchemy_utils.types.json.JSONType,
+        sa.Column('roles', sa.JSON,
                   nullable=True),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint(
@@ -263,7 +263,7 @@ def upgrade():
             primary_key=True),
         sa.Column('model_name', sa.String(length=255), nullable=True),
         sa.Column('os_version', sa.String(length=255), nullable=True),
-        sa.Column('vlans', sqlalchemy_utils.types.json.JSONType,
+        sa.Column('vlans', sa.JSON,
                   nullable=True)
     )
     op.create_table(
