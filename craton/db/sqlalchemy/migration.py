@@ -50,3 +50,48 @@ def revision(message=None, autogenerate=False, config=None):
     config = config or _alembic_config()
     return alembic.command.revision(config, message=message,
                                     autogenerate=autogenerate)
+
+def create_project(name, db_uri=None):
+    """Creates a new project.
+    :param name: Name of the new project
+    """
+    project_id = str(uuid.uuid4())
+    engine = create_engine(db_uri)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    project = models.Project(name=name,
+                             id=project_id)
+    session.add(project)
+    session.commit()
+    return project
+
+
+def create_user(project_id, username, admin=False, root=False, db_uri=None):
+    """Creates a new project.
+    :param name: Name of the new project
+    :param project_id: Project ID for the user
+    :param admin: User is an admin user
+    :param root: User is a root user
+    """
+    engine = create_engine(db_uri)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    if admin:
+        is_admin = 1
+    else:
+        is_admin = 0
+
+    if root:
+        is_root = 1
+    else:
+        is_root = 0
+
+    user = models.User(project_id=project_id,
+                       username=username,
+                       api_key=str(uuid.uuid4()),
+                       is_admin=is_admin,
+                       is_root=is_root)
+    session.add(user)
+    session.commit()
+    return user
