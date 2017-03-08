@@ -11,12 +11,13 @@
 #    under the License.
 
 ############################################################################
-# Usage:
-# docker build --pull -t craton-api:latest .
-# docker run -t --name craton-api -p 127.0.0.1:7780:7780 -d craton-api:latest
-# python tools/generate_fake_data.py --url http://127.0.0.1:7780/v1 --user demo --project b9f10eca66ac4c279c139d01e65f96b4 --key demo
-# curl http://127.0.0.1:7780/v1/regions -H "Content-Type: application/json" -H "X-Auth-Token: demo" -H "X-Auth-User: demo" -H "X-Auth-Project: b9f10eca66ac4c279c139d01e65f96b4"
-#############################################################################
+## Usage:
+## docker build --pull -t craton-api:latest .
+## docker run -t --name craton-api -p 127.0.0.1:7780:7780 -d craton-api:latest
+## docker logs <container> and copy the username, api_key, and project_id
+## python tools/generate_fake_data.py --url http://127.0.0.1:7780/v1 --user bootstrap --project <project-id from above> --key <api_key from above>
+## Use the credentials from above to try different commands using python-cratonclient.
+##############################################################################
 
 # Get Ubuntu base image
 FROM ubuntu:16.04
