@@ -6,6 +6,8 @@ from operator import attrgetter
 import sys
 import uuid
 
+import jsonpath_rw as jspath
+
 from oslo_config import cfg
 from oslo_db import exception as db_exc
 from oslo_db import options as db_options
@@ -13,7 +15,8 @@ from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
 
-from sqlalchemy import or_, sql
+from sqlalchemy import and_, sql
+from sqlalchemy import func as sa_func
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
 
@@ -31,6 +34,14 @@ _FACADE = None
 _DEFAULT_SQL_CONNECTION = 'sqlite://'
 db_options.set_defaults(cfg.CONF,
                         connection=_DEFAULT_SQL_CONNECTION)
+
+MYSQL_INVALID_JSONPATH_EXPRESSION = 3143
+MYSQL_INVALID_JSON_TEXT = 3141
+
+JSON_EXCEPTIONS = {
+    MYSQL_INVALID_JSONPATH_EXPRESSION: exceptions.InvalidJSONPath(),
+    MYSQL_INVALID_JSON_TEXT: exceptions.InvalidJSONValue(),
+}
 
 
 def _create_facade_lazily():
@@ -156,58 +167,152 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
-def _generate_or_clauses(kv_pairs):
-    or_clauses = []
-    for k, v in kv_pairs:
-        or_clauses.append(
-            ((models.Variable.key == k) & (models.Variable.value == v)))
-    return or_clauses
+def _find_first_key_fragment(root):
+    """Finds element where first key Field exists."""
+    desired = jspath.Fields
+    if isinstance(root, desired):
+        return root
+    while not isinstance(root.left, desired):
+        root = root.left
+    return root
+
+
+def _split_key_path_prefix(root):
+    """Extract first key and initial path from parsed JSON Path.
+
+    This is necessitated by us not actually including the top-most Key
+    component in the JSON column (Variables.value) in the database, so we only
+    need a parser to extract the first Key from the expression. The rest can be
+    handled in the database.
+
+    This essentially takes a parsed JSON Path, finds the first field and
+    optional Slice or Index.  It then uses the value of the first field's value
+    (fields[0]) as the key and, if a Slice of Index exist on the right
+    side of the expression, it builds an Array specifier as the initial part of
+    the path and then returns them.
+    """
+    # NOTE(thomasem): Because of how keys work and our data model, the first
+    # element should not be anything other than a Fields or a Child fragment.
+    if not isinstance(root, (jspath.Fields, jspath.Child)):
+        raise exceptions.InvalidJSONPath()
+
+    path = ''
+    fragment = _find_first_key_fragment(root)
+    right = getattr(fragment, 'right', None)
+    left = getattr(fragment, 'left', None) or fragment
+
+    if isinstance(right, jspath.Slice) and any([right.start, right.end]):
+        # NOTE(thomasem): MySQL 5.7 does not support arbitrary slices, only
+        # '[*]'.
+        raise exceptions.InvalidJSONPath()
+    elif isinstance(right, jspath.Slice):
+        path = '[*]'
+    elif isinstance(right, jspath.Index):
+        path = '[{}]'.format(right.index)
+
+    key = left.fields[0]
+    return key, path
+
+
+def _parse_path_expr(path_expression):
+    """Split into the first key and the path used for querying MySQL."""
+    try:
+        parsed = jspath.parse(path_expression)
+    except Exception:
+        # NOTE(thomasem): Unfortunately, this library raises an Exception
+        # instead of something more specific.
+        raise exceptions.InvalidJSONPath()
+
+    # NOTE(thomasem): Get the first key from the parsed JSON Path expression
+    # and initial path for the Variables.value JSON column, if there is any.
+    # There would only be an initial path if there's an Array specifier
+    # immediately adjacent to the first key, for example: 'foo[5]' or 'foo[*]'.
+    key, path = _split_key_path_prefix(parsed)
+
+    # NOTE(thomasem): Remove the key we found from the original expression
+    # since that's not included in the Variables.value JSON column.
+    key_removed = path_expression[len(key):]
+
+    # NOTE(thomasem): Because the first key could have been wrapped in quotes
+    # to denote it as a JSON string for handling special characters in the
+    # key, we will want to find the first delimiter ('.') if one exists to
+    # know where to slice off the remainder of the path and combine prefix
+    # and suffix.
+    path_suffix_start = key_removed.find('.')
+    if path_suffix_start > -1:
+        path = '{}{}'.format(path, key_removed[path_suffix_start:])
+    return key, '${}'.format(path)
+
+
+def _json_path_clause(kv_pair):
+    path_expr, value = kv_pair
+    key, path = _parse_path_expr(path_expr)
+
+    json_match = sa_func.json_contains(
+        sa_func.json_extract(models.Variable.value, path), value)
+
+    # NOTE(thomasem): Order is important here. MySQL will short-circuit and
+    # not properly validate the JSON Path expression when the key doesn't exist
+    # if the key match is first int he and_(...) expression. So, let's put
+    # the json_match first.
+    return and_(json_match, models.Variable.key == key)
+
+
+def _get_variables(query):
+    try:
+        return set(query)
+    except db_exc.DBError as e:
+        orig = getattr(e.inner_exception, 'orig', None)
+        if orig:
+            raise JSON_EXCEPTIONS.get(orig.args[0], e)
+        raise
 
 
 def _matching_resources(query, resource_cls, get_descendants, kv):
-    # NOTE(jimbaker) The below algorithm works as follows:
-    #
-    # 1. Computes the generalized descendants for each k:v var in the query;
-    #
-    # 2. Computes their intersection, returning a set of matching
-    #    resources (empty set if conjunction of kv matches does not
-    #    match)
+
+    # NOTE(jimbaker) Build a query that determine all resources that
+    # match this key/value, taking in account variable
+    # resolution. Note that this value is generalized to be a JSON
+    # path; and the resolution is inverted by finding any possible
+    # descendants.
 
     kv_pairs = list(kv.items())
-    matches = dict((kv_pair, set()) for kv_pair in kv_pairs)
+    matches = {}
+    for kv_pair in kv_pairs:
+        match = matches[kv_pair] = set()
+        kv_clause = _json_path_clause(kv_pair)
+        matching_variables = _get_variables(
+            query.session.query(models.Variable).filter(kv_clause))
 
-    # NOTE(jimbaker) this query can be readily generalized. Some
-    # options could include:
-    #
-    # * Key existence (good for treating vars as if they are labels)
-    # * JSON path matches on the values
-    # * Nested queries that use JSON paths for the underlying implementation
-    #
-    # But for now, simply find all variables that explicitly match one
-    # or more key value pairs.
-    #
-    # Regardless of any generalization, this means at this point we
-    # need to construct the disjunction ("or") of all the supplied kv
-    # pairs.  (The next step will then compute the conjunction, but
-    # with respect to resolution.)
-    q = query.session.query(models.Variable)
-    q = q.filter(or_(*_generate_or_clauses(kv_pairs)))
-    variables = set(q)
-    for variable in variables:
-        match = matches[(variable.key, variable.value)]
-        if isinstance(variable.parent, resource_cls):
-            match.add(variable.parent)
-        for descendant in get_descendants(variable.parent):
-            for level in descendant.resolution_order:
-                desc_variable = level._variables.get(variable.key)
-                if desc_variable is not None:
-                    if desc_variable in variables:
-                        match.add(descendant)
-                    break
+        for variable in matching_variables:
+            if isinstance(variable.parent, resource_cls):
+                match.add(variable.parent)
+
+            # NOTE(jimbaker) now check for descendent overrides; in
+            # particular, it's possible that a chain of overrides
+            # could occur such that the original top value was
+            # restored.
+            #
+            # Because all of the matching variables were returned by
+            # the query; and SQLAlchemy guarantees that within the
+            # scope of a transaction ("unit of work") that a given
+            # object will have the same identity, we can check with
+            # respect to matching_variables. Do note that arbitrary
+            # additional object graph queries may be done to check the
+            # resolution ordering.
+
+            for descendant in get_descendants(variable.parent):
+                for level in descendant.resolution_order:
+                    desc_variable = level._variables.get(variable.key)
+                    if desc_variable is not None:
+                        if desc_variable in matching_variables:
+                            match.add(descendant)
+                        break
 
     # NOTE(jimbaker) For now, we simply match for the conjunction
     # ("and") of all the supplied kv pairs we are matching
-    # against. Generalize as desired with other boolean logic.
+    # against. Generalize in the future as desired with other boolean
+    # logic.
     _, first_match = matches.popitem()
     if matches:
         resources = first_match.intersection(*matches.values())
@@ -230,6 +335,9 @@ _resource_mapping = {
     models.Cell: (
         [models.Project, models.Cloud, models.Region],
         attrgetter('cells')),
+    models.Network: (
+        [models.Project, models.Cloud, models.Region, models.Cell],
+        attrgetter('networks')),
     models.Device: (
         [models.Project, models.Cloud, models.Region, models.Cell,
          models.Device],
@@ -246,6 +354,7 @@ def matching_resources(query, resource_cls, kv, resolved):
             return getter(parent)
         else:
             return []
+
     return _matching_resources(query, resource_cls, get_desc, kv)
 
 
@@ -259,7 +368,7 @@ def _add_var_filters_to_query(query, model, var_filters, resolved=True):
     )
     if not resource_ids:
         # short circuit; this also avoids SQLAlchemy reporting that it is
-        # working with an empty in clause
+        # working with an empty "in" clause
         return query.filter(sql.false())
     return query.filter(model.id.in_(resource_ids))
 
