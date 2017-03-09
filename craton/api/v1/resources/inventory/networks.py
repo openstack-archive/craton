@@ -55,6 +55,7 @@ class NetworkById(base.Resource):
         device['variables'] = jsonutils.to_primitive(obj.variables)
         return device, 200, None
 
+    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing network values."""
         net_obj = dbapi.networks_update(context, id, request_data)
@@ -124,6 +125,7 @@ class NetworkDeviceById(base.Resource):
 
         return device, 200, None
 
+    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing device values."""
         net_obj = dbapi.network_devices_update(context, id, request_data)
@@ -203,6 +205,7 @@ class NetworkInterfaceById(base.Resource):
         interface['variables'] = jsonutils.to_primitive(obj.variables)
         return interface, 200, None
 
+    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing network interface values."""
         net_obj = dbapi.network_interfaces_update(context, id, request_data)

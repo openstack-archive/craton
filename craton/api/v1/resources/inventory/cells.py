@@ -57,6 +57,7 @@ class CellById(base.Resource):
         cell = utils.get_resource_with_vars(request_args, cell_obj)
         return cell, 200, None
 
+    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing cell."""
         cell_obj = dbapi.cells_update(context, id, request_data)

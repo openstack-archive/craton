@@ -73,6 +73,7 @@ class RegionsById(base.Resource):
         region = utils.get_resource_with_vars(request_args, region_obj)
         return region, 200, None
 
+    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing region."""
         region_obj = dbapi.regions_update(context, id, request_data)

@@ -68,6 +68,7 @@ class HostById(base.Resource):
 
         return host, 200, None
 
+    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing host data, or create if it does not exist."""
         host_obj = dbapi.hosts_update(context, id, request_data)
