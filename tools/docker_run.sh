@@ -10,6 +10,7 @@ while [[ RET -ne 0 ]]; do
     RET=$?
 done
 
+mysql -uroot -e "SET GLOBAL log_output = 'TABLE';SET GLOBAL general_log = 'ON';"
 mysql -uroot -e "CREATE DATABASE craton CHARACTER SET = 'utf8'"
 mysql -uroot -e "GRANT ALL PRIVILEGES ON craton.* TO 'craton'@'%' IDENTIFIED BY 'craton'"
 mysqladmin flush-privileges

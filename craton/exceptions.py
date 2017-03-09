@@ -79,6 +79,14 @@ class BadRequest(Base):
     code = 400
 
 
+class InvalidJSONPath(BadRequest):
+    msg = "The query contains an invalid JSON Path expression."
+
+
+class InvalidJSONValue(BadRequest):
+    msg = "An invalid JSON value was specified."
+
+
 class NotFound(Base):
     code = 404
     msg = "Not Found"

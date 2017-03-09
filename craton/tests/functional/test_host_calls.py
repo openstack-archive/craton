@@ -22,7 +22,7 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
         self.create_host('host2', 'server', '192.168.1.2', **vars2)
 
         url = self.url + '/v1/hosts'
-        resp = self.get(url, vars='a:b')
+        resp = self.get(url, vars='a:"b"')
         self.assertEqual(200, resp.status_code)
         hosts = resp.json()['hosts']
         self.assertEqual(2, len(hosts))
@@ -30,7 +30,7 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                          {host['ip_address'] for host in hosts})
 
         url = self.url + '/v1/hosts'
-        resp = self.get(url, vars='host:one')
+        resp = self.get(url, vars='host:"one"')
         self.assertEqual(200, resp.status_code)
         hosts = resp.json()['hosts']
         self.assertEqual(1, len(hosts))
@@ -352,7 +352,7 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                                  region=region, **host_vars)
         url = self.url + '/v1/hosts'
 
-        resp = self.get(url, vars="foo:bar,baz:zoo")
+        resp = self.get(url, vars='foo:"bar",baz:"zoo"')
         hosts = resp.json()['hosts']
         self.assertEqual(1, len(hosts))
         self.assertEqual(host2['id'], hosts[0]['id'])
@@ -367,7 +367,7 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                                  region=region, **host_vars)
         url = self.url + '/v1/hosts'
 
-        resp = self.get(url, vars='foo:bar')
+        resp = self.get(url, vars='foo:"bar"')
         hosts = resp.json()['hosts']
         self.assertEqual(2, len(hosts))
         self.assertListEqual(sorted([host1['id'], host2['id']]),
@@ -382,12 +382,12 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                                  region=region)
         url = self.url + '/v1/hosts'
 
-        resp = self.get(url, vars='foo:baz')
+        resp = self.get(url, vars='foo:"baz"')
         hosts = resp.json()['hosts']
         self.assertEqual(1, len(hosts))
         self.assertEqual(host1['id'], hosts[0]['id'])
 
-        resp = self.get(url, vars='foo:bar')
+        resp = self.get(url, vars='foo:"bar"')
         hosts = resp.json()['hosts']
         self.assertEqual(1, len(hosts))
         self.assertEqual(host2['id'], hosts[0]['id'])
@@ -399,12 +399,12 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                                  parent_id=host1['id'], baz='boo')
         url = self.url + '/v1/hosts'
 
-        resp = self.get(url, vars='baz:zoo')
+        resp = self.get(url, vars='baz:"zoo"')
         hosts = resp.json()['hosts']
         self.assertEqual(1, len(hosts))
         self.assertEqual(host1['id'], hosts[0]['id'])
 
-        resp = self.get(url, vars='baz:boo')
+        resp = self.get(url, vars='baz:"boo"')
         hosts = resp.json()['hosts']
         self.assertEqual(1, len(hosts))
         self.assertEqual(host2['id'], hosts[0]['id'])
@@ -417,7 +417,8 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
         # NOTE(thomasem): Unfortunately, we use resolved-values instead of
         # resolved_values, so we can't pass this in as kwargs to self.get(...),
         # see https://bugs.launchpad.net/craton/+bug/1672880.
-        url = self.url + '/v1/hosts?resolved-values=false&vars=foo:bar,baz:zoo'
+        url = self.url + \
+            '/v1/hosts?resolved-values=false&vars=foo:"bar",baz:"zoo"'
 
         resp = self.get(url)
         hosts = resp.json()['hosts']
