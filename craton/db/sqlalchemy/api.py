@@ -15,7 +15,7 @@ from oslo_log import log
 
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
-from sqlalchemy.sql.expression import or_, tuple_
+from sqlalchemy.sql.expression import and_, or_, tuple_
 
 from craton import exceptions
 from craton.db.sqlalchemy import models
@@ -156,6 +156,31 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
+def _json_path_clause(kv_pair, kfield, vfield):
+    delimiter = '.'
+    key, value = kv_pair
+    tokens = key.split(delimiter)
+    key, path = (tokens[0], delimiter.join(tokens[1:]))
+    json_match = func.json_contains(
+        func.json_extract(vfield, '$.{}'.format(path)), value
+    )
+    return _and(kfield == key, json_match)
+
+
+def _tuple_clause(kv_pair, kfield, vfield):
+    return tuple_(models.Variable.key, models.Variable.value) == kv_pair
+
+
+def _generate_or_clauses(kv_pairs, kfield, vfield):
+    clauses = set()
+    for kv_pair in kv_pairs:
+        if any(v in kv_pair[0] for v in ('.', '[', ']')):
+            clauses.add(_json_path_clause(kv_pair, kfield, vfield))
+        else:
+            clauses.add(_tuple_clause(kv_pair, kfield, vfield))
+    return clauses
+
+
 # FIXME(jimbaker) add some overall docs on how this algorithm works:
 #
 # 1 .computes the generalized descendants for each k:v var in the query;
@@ -168,10 +193,8 @@ def _matching_resources(query, resource_cls, get_descendants, kv):
 
     # NOTE(thomasem): Unfortunately MySQL 5.7 doesn't fully support the
     # IN operation for JSON values, so we'll need to use an OR instead.
-    or_clauses = [
-        tuple_(models.Variable.key, models.Variable.value) == kv_pair
-        for kv_pair in kv_pairs
-    ]
+    or_clauses = _generate_or_clauses(
+        kv_pairs, models.Variable.key, models.Variable.value)
 
     # NOTE(jimbaker) this query can be readily generalized. Some
     # options could include:
