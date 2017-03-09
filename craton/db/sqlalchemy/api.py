@@ -2,7 +2,9 @@
 
 import enum
 import functools
+import json
 from operator import attrgetter
+import re
 import sys
 import uuid
 
@@ -12,8 +14,10 @@ from oslo_db import options as db_options
 from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
+from oslo_utils import strutils
 
-from sqlalchemy import or_, sql
+from sqlalchemy import and_, or_, sql
+from sqlalchemy import func as sa_func
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
 
@@ -31,6 +35,10 @@ _FACADE = None
 _DEFAULT_SQL_CONNECTION = 'sqlite://'
 db_options.set_defaults(cfg.CONF,
                         connection=_DEFAULT_SQL_CONNECTION)
+
+# NOTE(thomasem): Matches strings like foo[1], foo[24][*], foo[*], föö[*],
+# but not like foo[], foo[a], foo[**], foo[1]bar[2]
+ROOT_ARRAY_RE = re.compile('^[\w]+(\[([0-9]+|\*)\])+$')
 
 
 def _create_facade_lazily():
@@ -156,6 +164,58 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
+def _approximate_json(v):
+    lower_v = v.lower()
+
+    if strutils.is_int_like(v):
+        return v
+
+    if strutils.is_valid_boolstr(lower_v):
+        return json.dumps(strutils.bool_from_string(lower_v))
+
+    if lower_v == 'null' or lower_v == 'none':
+        return 'null'
+
+    try:
+        float(v)
+        return v
+    except ValueError:
+        pass
+
+    if lower_v.startswith('"') and lower_v.endswith('"'):
+        return v
+
+    return json.dumps(v)
+
+
+def _json_path_clause(kv_pair, kfield, vfield):
+    delimiter = '.'
+    key, value = kv_pair
+    tokens = key.split(delimiter)
+    key, path = (tokens[0], delimiter.join(tokens[1:]))
+
+    if path:
+        path = '.{}'.format(path)
+
+    if ROOT_ARRAY_RE.match(key):
+        index = key.index('[')
+        prefix, key = (key[index:], key[:index])
+        path = '{}{}'.format(prefix, path)
+
+    json_match = sa_func.json_contains(
+        sa_func.json_extract(vfield, '${}'.format(path)),
+        _approximate_json(value)
+    )
+    return and_(kfield == key, json_match)
+
+
+def _generate_or_clauses(kv_pairs, kfield, vfield):
+    clauses = set()
+    for kv_pair in kv_pairs:
+        clauses.add(_json_path_clause(kv_pair, kfield, vfield))
+    return clauses
+
+
 def _matching_resources(query, resource_cls, get_descendants, kv):
     # NOTE(jimbaker) The below algorithm works as follows:
     #
@@ -165,8 +225,8 @@ def _matching_resources(query, resource_cls, get_descendants, kv):
     #    resources (empty set if conjunction of kv matches does not
     #    match)
 
-    kv_pairs = list(kv.items())
-    matches = dict((kv_pair, set()) for kv_pair in kv_pairs)
+    kv_pairs = set(kv.items())
+    expected_matches = len(kv_pairs)
 
     # NOTE(jimbaker) this query can be readily generalized. Some
     # options could include:
@@ -182,18 +242,26 @@ def _matching_resources(query, resource_cls, get_descendants, kv):
     # need to construct the disjunction ("or") of all the supplied kv
     # pairs.  (The next step will then compute the conjunction, but
     # with respect to resolution.)
+    or_clauses = _generate_or_clauses(
+        kv_pairs, models.Variable.key, models.Variable.value)
     q = query.session.query(models.Variable)
-    or_clauses = []
-    for k, v in kv_pairs:
-        or_clauses.append(
-            ((models.Variable.key == k) & (models.Variable.value == v)))
     q = q.filter(or_(*or_clauses))
 
+    matches = {}
     for variable in q:
-        match = matches[(variable.key, variable.value)]
+        key = (variable.key, str(variable.value))
+        match = matches.get(key, set())
         if isinstance(variable.parent, resource_cls):
             match.add(variable.parent)
         match.update(get_descendants(variable.parent))
+        matches[key] = match
+
+    # NOTE(thomasem): We want to be sure we got matches for all criteria,
+    # otherwise the computed intersection below may only be the intersection
+    # of what was found, and therefore would not guarantee we matched all
+    # kv_pairs.
+    if len(matches.keys()) != expected_matches:
+        return set()
 
     # NOTE(jimbaker) For now, we simply match for the conjunction
     # ("and") of all the supplied kv pairs we are matching
