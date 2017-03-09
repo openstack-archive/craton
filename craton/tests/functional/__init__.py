@@ -1,4 +1,5 @@
 import contextlib
+import copy
 import docker
 import json
 import requests
@@ -25,6 +26,13 @@ FAKE_DATA_GEN_BOOTSTRAP_TOKEN = 'bootstrap'
 HEADER_TOKEN = 'X-Auth-Token'
 HEADER_USERNAME = 'X-Auth-User'
 HEADER_PROJECT = 'X-Auth-Project'
+
+
+def get_root_headers():
+    return {
+        HEADER_USERNAME: FAKE_DATA_GEN_BOOTSTRAP_USERNAME,
+        HEADER_TOKEN: FAKE_DATA_GEN_BOOTSTRAP_TOKEN
+    }
 
 
 class DockerSetup(threading.Thread):
@@ -198,6 +206,7 @@ class TestCase(testtools.TestCase):
         super(TestCase, self).setUp()
         self.container_setup_error = _container.error
         self.session = requests.Session()
+
         if not self.container_setup_error:
             data = _container.container_data
             self.service_ip = data['NetworkSettings']['IPAddress']
@@ -205,6 +214,9 @@ class TestCase(testtools.TestCase):
             self.session.headers[HEADER_PROJECT] = FAKE_DATA_GEN_PROJECT_ID
             self.session.headers[HEADER_USERNAME] = FAKE_DATA_GEN_USERNAME
             self.session.headers[HEADER_TOKEN] = FAKE_DATA_GEN_TOKEN
+
+        self.root_headers = copy.deepcopy(self.session.headers)
+        self.root_headers.update(get_root_headers())
 
         setup_database(self.service_ip)
 
@@ -268,12 +280,12 @@ class TestCase(testtools.TestCase):
         self.assertJSON(resp)
         return resp
 
-    def create_project(self, name, headers=None, variables=None):
+    def create_project(self, name, variables=None):
         url = self.url + '/v1/projects'
         payload = {'name': name}
         if variables:
             payload['variables'] = variables
-        response = self.post(url, headers=headers, data=payload)
+        response = self.post(url, headers=self.root_headers, data=payload)
         self.assertEqual(201, response.status_code)
         self.assertIn('Location', response.headers)
         project = response.json()
@@ -344,6 +356,31 @@ class TestCase(testtools.TestCase):
             "{}/{}".format(url, cell.json()['id'])
         )
         return cell.json()
+
+    def create_network(
+            self, name, cloud, region, cidr, gateway, netmask, variables=None
+            ):
+
+        url = self.url + '/v1/networks'
+        payload = {
+            'name': name,
+            'cidr': cidr,
+            'gateway': gateway,
+            'netmask': netmask,
+            'region_id': region['id'],
+            'cloud_id': cloud['id'],
+        }
+        if variables:
+            payload['variables'] = variables
+
+        network = self.post(url, data=payload)
+        self.assertEqual(201, network.status_code)
+        self.assertIn('Location', network.headers)
+        self.assertEqual(
+            network.headers['Location'],
+            "{}/{}".format(url, network.json()['id'])
+        )
+        return network.json()
 
     def create_host(self, name, cloud, region, hosttype, ip_address,
                     parent_id=None, **variables):
