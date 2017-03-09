@@ -2,7 +2,9 @@
 
 import enum
 import functools
+import json
 from operator import attrgetter
+import re
 import sys
 import uuid
 
@@ -12,8 +14,10 @@ from oslo_db import options as db_options
 from oslo_db.sqlalchemy import session
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_log import log
+from oslo_utils import strutils
 
-from sqlalchemy import or_, sql
+from sqlalchemy import and_, sql
+from sqlalchemy import func as sa_func
 import sqlalchemy.orm.exc as sa_exc
 from sqlalchemy.orm import with_polymorphic
 
@@ -31,6 +35,10 @@ _FACADE = None
 _DEFAULT_SQL_CONNECTION = 'sqlite://'
 db_options.set_defaults(cfg.CONF,
                         connection=_DEFAULT_SQL_CONNECTION)
+
+# NOTE(thomasem): Matches strings like foo[1], foo[24][*], foo[*], föö[*],
+# but not like foo[], foo[a], foo[**], foo[1]bar[2]
+ROOT_ARRAY_RE = re.compile('^[\w]+(\[([0-9]+|\*)\])+$')
 
 
 def _create_facade_lazily():
@@ -156,58 +164,96 @@ def model_query(context, model, *args, **kwargs):
         model=model, session=session, args=args, **kwargs)
 
 
-def _generate_or_clauses(kv_pairs):
-    or_clauses = []
-    for k, v in kv_pairs:
-        or_clauses.append(
-            ((models.Variable.key == k) & (models.Variable.value == v)))
-    return or_clauses
+def _approximate_json(v):
+    lower_v = v.lower()
+
+    if strutils.is_int_like(v):
+        return v
+
+    if strutils.is_valid_boolstr(lower_v):
+        return json.dumps(strutils.bool_from_string(lower_v))
+
+    if lower_v == 'null' or lower_v == 'none':
+        return 'null'
+
+    try:
+        float(v)
+        return v
+    except ValueError:
+        pass
+
+    if lower_v.startswith('"') and lower_v.endswith('"'):
+        return v
+
+    return json.dumps(v)
+
+
+def _json_path_clause(kv_pair):
+    delimiter = '.'
+    key, value = kv_pair
+    tokens = key.split(delimiter)
+    key, path = (tokens[0], delimiter.join(tokens[1:]))
+
+    if path:
+        path = '.{}'.format(path)
+
+    if ROOT_ARRAY_RE.match(key):
+        index = key.index('[')
+        prefix, key = (key[index:], key[:index])
+        path = '{}{}'.format(prefix, path)
+
+    json_match = sa_func.json_contains(
+        sa_func.json_extract(models.Variable.value, '${}'.format(path)),
+        _approximate_json(value)
+    )
+    return and_(models.Variable.key == key, json_match)
 
 
 def _matching_resources(query, resource_cls, get_descendants, kv):
-    # NOTE(jimbaker) The below algorithm works as follows:
-    #
-    # 1. Computes the generalized descendants for each k:v var in the query;
-    #
-    # 2. Computes their intersection, returning a set of matching
-    #    resources (empty set if conjunction of kv matches does not
-    #    match)
+
+    # NOTE(jimbaker) Build a query that determine all resources that
+    # match this key/value, taking in account variable
+    # resolution. Note that this value is generalized to be a JSON
+    # path; and the resolution is inverted by finding any possible
+    # descendants.
 
     kv_pairs = list(kv.items())
-    matches = dict((kv_pair, set()) for kv_pair in kv_pairs)
+    matches = {}
+    for kv_pair in kv_pairs:
+        match = matches[kv_pair] = set()
+        kv_clause = _json_path_clause(kv_pair)
+        matching_variables = set(
+            query.session.query(models.Variable).filter(kv_clause))
 
-    # NOTE(jimbaker) this query can be readily generalized. Some
-    # options could include:
-    #
-    # * Key existence (good for treating vars as if they are labels)
-    # * JSON path matches on the values
-    # * Nested queries that use JSON paths for the underlying implementation
-    #
-    # But for now, simply find all variables that explicitly match one
-    # or more key value pairs.
-    #
-    # Regardless of any generalization, this means at this point we
-    # need to construct the disjunction ("or") of all the supplied kv
-    # pairs.  (The next step will then compute the conjunction, but
-    # with respect to resolution.)
-    q = query.session.query(models.Variable)
-    q = q.filter(or_(*_generate_or_clauses(kv_pairs)))
-    variables = set(q)
-    for variable in variables:
-        match = matches[(variable.key, variable.value)]
-        if isinstance(variable.parent, resource_cls):
-            match.add(variable.parent)
-        for descendant in get_descendants(variable.parent):
-            for level in descendant.resolution_order:
-                desc_variable = level._variables.get(variable.key)
-                if desc_variable is not None:
-                    if desc_variable in variables:
-                        match.add(descendant)
-                    break
+        for variable in matching_variables:
+            if isinstance(variable.parent, resource_cls):
+                match.add(variable.parent)
+
+            # NOTE(jimbaker) now check for descendent overrides; in
+            # particular, it's possible that a chain of overrides
+            # could occur such that the original top value was
+            # restored.
+            #
+            # Because all of the matching variables were returned by
+            # the query; and SQLAlchemy guarantees that within the
+            # scope of a transaction ("unit of work") that a given
+            # object will have the same identity, we can check with
+            # respect to matching_variables. Do note that arbitrary
+            # additional object graph queries may be done to check the
+            # resolution ordering.
+
+            for descendant in get_descendants(variable.parent):
+                for level in descendant.resolution_order:
+                    desc_variable = level._variables.get(variable.key)
+                    if desc_variable is not None:
+                        if desc_variable in matching_variables:
+                            match.add(descendant)
+                        break
 
     # NOTE(jimbaker) For now, we simply match for the conjunction
     # ("and") of all the supplied kv pairs we are matching
-    # against. Generalize as desired with other boolean logic.
+    # against. Generalize in the future as desired with other boolean
+    # logic.
     _, first_match = matches.popitem()
     if matches:
         resources = first_match.intersection(*matches.values())
@@ -230,6 +276,9 @@ _resource_mapping = {
     models.Cell: (
         [models.Project, models.Cloud, models.Region],
         attrgetter('cells')),
+    models.Network: (
+        [models.Project, models.Cloud, models.Region, models.Cell],
+        attrgetter('networks')),
     models.Device: (
         [models.Project, models.Cloud, models.Region, models.Cell,
          models.Device],
@@ -246,6 +295,7 @@ def matching_resources(query, resource_cls, kv, resolved):
             return getter(parent)
         else:
             return []
+
     return _matching_resources(query, resource_cls, get_desc, kv)
 
 
@@ -259,7 +309,7 @@ def _add_var_filters_to_query(query, model, var_filters, resolved=True):
     )
     if not resource_ids:
         # short circuit; this also avoids SQLAlchemy reporting that it is
-        # working with an empty in clause
+        # working with an empty "in" clause
         return query.filter(sql.false())
     return query.filter(model.id.in_(resource_ids))
 
