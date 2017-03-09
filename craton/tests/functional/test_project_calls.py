@@ -1,44 +1,9 @@
-import copy
-
-from oslo_utils import uuidutils
-
 from craton.tests import functional
 from craton.tests.functional.test_variable_calls import \
     APIV1ResourceWithVariablesTestCase
 
 
-class ProjectTests(functional.TestCase):
-
-    def setUp(self):
-        super(ProjectTests, self).setUp()
-        self.root_headers = copy.deepcopy(self.session.headers)
-        self.root_headers[functional.HEADER_USERNAME] = \
-            functional.FAKE_DATA_GEN_BOOTSTRAP_USERNAME
-        self.root_headers[functional.HEADER_TOKEN] = \
-            functional.FAKE_DATA_GEN_BOOTSTRAP_TOKEN
-
-    def tearDown(self):
-        super(ProjectTests, self).tearDown()
-
-    def create_project(self, name, variables=None):
-        url = self.url + '/v1/projects'
-        payload = {'name': name}
-        if variables:
-            payload['variables'] = variables
-        response = self.post(url, headers=self.root_headers, data=payload)
-        self.assertEqual(201, response.status_code)
-        self.assertIn('Location', response.headers)
-        project = response.json()
-        self.assertTrue(uuidutils.is_uuid_like(project['id']))
-        self.assertEqual(
-            response.headers['Location'],
-            "{}/{}".format(url, project['id'])
-        )
-
-        return project
-
-
-class TestPaginationOfProjects(ProjectTests):
+class TestPaginationOfProjects(functional.TestCase):
     def setUp(self):
         super(TestPaginationOfProjects, self).setUp()
         self.projects = [
@@ -66,7 +31,7 @@ class TestPaginationOfProjects(ProjectTests):
         self.assertEqual(2, len(projects))
 
 
-class APIV1ProjectTest(ProjectTests, APIV1ResourceWithVariablesTestCase):
+class APIV1ProjectTest(APIV1ResourceWithVariablesTestCase):
 
     resource = 'projects'
 
