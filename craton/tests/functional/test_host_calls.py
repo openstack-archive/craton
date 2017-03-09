@@ -96,6 +96,101 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                "('updated_at' was unexpected)"]
         self.assertEqual(host.json()['errors'], msg)
 
+    def test_create_with_parent_id(self):
+        parent = self.create_host(
+            name='test1',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.1',
+        )
+        child = self.create_host(
+            name='test2',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.2',
+            parent_id=parent['id'],
+        )
+        self.assertEqual(parent['id'], child['parent_id'])
+
+    def test_update_with_parent_id(self):
+        parent = self.create_host(
+            name='test1',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.1',
+        )
+
+        child = self.create_host(
+            name='test2',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.2',
+        )
+        self.assertIsNone(child['parent_id'])
+
+        url = '{}/v1/hosts/{}'.format(self.url, child['id'])
+        child_update_resp = self.put(
+            url, data={'parent_id': parent['id']}
+        )
+        self.assertEqual(200, child_update_resp.status_code)
+        child_update = child_update_resp.json()
+        self.assertEqual(parent['id'], child_update['parent_id'])
+
+    def test_update_with_parent_id_equal_id_fails(self):
+        host = self.create_host(
+            name='test1',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.1',
+        )
+
+        url = '{}/v1/hosts/{}'.format(self.url, host['id'])
+        host_update_resp = self.put(
+            url, data={'parent_id': host['id']}
+        )
+        self.assertEqual(400, host_update_resp.status_code)
+
+    def test_update_with_parent_id_equal_descendant_id_fails(self):
+        parent = self.create_host(
+            name='test1',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.1',
+        )
+        self.assertIsNone(parent['parent_id'])
+
+        child = self.create_host(
+            name='test2',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.2',
+            parent_id=parent['id'],
+        )
+        self.assertEqual(parent['id'], child['parent_id'])
+
+        grandchild = self.create_host(
+            name='test3',
+            cloud=self.cloud,
+            region=self.region,
+            hosttype='server',
+            ip_address='192.168.1.3',
+            parent_id=child['id'],
+        )
+        self.assertEqual(child['id'], grandchild['parent_id'])
+
+        url = '{}/v1/hosts/{}'.format(self.url, parent['id'])
+        parent_update_resp = self.put(
+            url, data={'parent_id': grandchild['id']}
+        )
+        self.assertEqual(400, parent_update_resp.status_code)
+
     def test_get_all_hosts_with_details(self):
         region_vars = {'x': 'y'}
         region = self.create_region(name='region1', variables=region_vars)

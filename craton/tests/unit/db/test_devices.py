@@ -544,3 +544,131 @@ class HostsDBTestCase(BaseDevicesDBTestCase):
         res, _ = dbapi.hosts_get_all(self.context, filters,
                                      default_pagination)
         self.assertEqual(len(res), 0)
+
+    def test_hosts_create_sets_parent_id(self):
+        project_id = self.make_project('project_1')
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1')
+        parent_id = self.make_host(
+            project_id, cloud_id, region_id, '1.www.example.com',
+            IPAddress(u'10.1.2.101'), 'server'
+        )
+        child = dbapi.hosts_create(
+            self.context,
+            {
+                'project_id': project_id,
+                'cloud_id': cloud_id,
+                'region_id': region_id,
+                'hostname': '2.www.example.com',
+                'ip_address': IPAddress(u'10.1.2.102'),
+                'device_type': 'server',
+                'parent_id': parent_id,
+            }
+        )
+        self.assertEqual(parent_id, child.parent_id)
+
+    def test_hosts_update_sets_parent_id(self):
+        project_id = self.make_project('project_1')
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1')
+        parent_id = self.make_host(
+            project_id, cloud_id, region_id, '1.www.example.com',
+            IPAddress(u'10.1.2.101'), 'server'
+        )
+        child = dbapi.hosts_create(
+            self.context,
+            {
+                'project_id': project_id,
+                'cloud_id': cloud_id,
+                'region_id': region_id,
+                'hostname': '2.www.example.com',
+                'ip_address': IPAddress(u'10.1.2.102'),
+                'device_type': 'server',
+                'parent_id': None,
+            }
+        )
+        self.assertIsNone(child.parent_id)
+        child_update = dbapi.hosts_update(
+            self.context,
+            child.id,
+            {
+                'parent_id': parent_id,
+            }
+        )
+        self.assertEqual(parent_id, child_update.parent_id)
+
+    def test_hosts_update_fails_when_parent_id_set_to_own_id(self):
+        project_id = self.make_project('project_1')
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1')
+        host1 = dbapi.hosts_create(
+            self.context,
+            {
+                'project_id': project_id,
+                'cloud_id': cloud_id,
+                'region_id': region_id,
+                'hostname': '1.www.example.com',
+                'ip_address': IPAddress(u'10.1.2.101'),
+                'device_type': 'server',
+                'parent_id': None,
+            }
+        )
+        self.assertRaises(
+            exceptions.BadRequest,
+            dbapi.hosts_update,
+            self.context,
+            host1.id,
+            {
+                'parent_id': host1.id,
+            }
+        )
+
+    def test_hosts_update_fails_when_parent_set_to_descendant(self):
+        project_id = self.make_project('project_1')
+        cloud_id = self.make_cloud(project_id, 'cloud_1')
+        region_id = self.make_region(project_id, cloud_id, 'region_1')
+        parent = dbapi.hosts_create(
+            self.context,
+            {
+                'project_id': project_id,
+                'cloud_id': cloud_id,
+                'region_id': region_id,
+                'hostname': '1.www.example.com',
+                'ip_address': IPAddress(u'10.1.2.101'),
+                'device_type': 'server',
+                'parent_id': None,
+            }
+        )
+        child = dbapi.hosts_create(
+            self.context,
+            {
+                'project_id': project_id,
+                'cloud_id': cloud_id,
+                'region_id': region_id,
+                'hostname': '2.www.example.com',
+                'ip_address': IPAddress(u'10.1.2.102'),
+                'device_type': 'server',
+                'parent_id': parent.id,
+            }
+        )
+        grandchild = dbapi.hosts_create(
+            self.context,
+            {
+                'project_id': project_id,
+                'cloud_id': cloud_id,
+                'region_id': region_id,
+                'hostname': '3.www.example.com',
+                'ip_address': IPAddress(u'10.1.2.103'),
+                'device_type': 'server',
+                'parent_id': child.id,
+            }
+        )
+        self.assertRaises(
+            exceptions.BadRequest,
+            dbapi.hosts_update,
+            self.context,
+            parent.id,
+            {
+                'parent_id': grandchild.id,
+            }
+        )

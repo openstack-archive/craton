@@ -603,7 +603,10 @@ def hosts_update(context, host_id, values):
                             project_only=True)
         query = query.filter_by(id=host_id)
         host_ref = query.with_for_update().one()
-        host_ref.update(values)
+        try:
+            host_ref.update(values)
+        except exceptions.ParentIDError as e:
+            raise exceptions.BadRequest(message=str(e))
         host_ref.save(session)
         return host_ref
 
@@ -900,7 +903,10 @@ def network_devices_update(context, network_device_id, values):
         query = query.filter_by(type='network_devices')
         query = query.filter_by(id=network_device_id)
         network_device_ref = query.with_for_update().one()
-        network_device_ref.update(values)
+        try:
+            network_device_ref.update(values)
+        except exceptions.ParentIDError as e:
+            raise exceptions.BadRequest(message=str(e))
         network_device_ref.save(session)
         return network_device_ref
 

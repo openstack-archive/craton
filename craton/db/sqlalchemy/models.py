@@ -23,12 +23,13 @@ from sqlalchemy import (
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.ext.declarative.api import _declarative_constructor
-from sqlalchemy.orm import backref, object_mapper, relationship
+from sqlalchemy.orm import backref, object_mapper, relationship, validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy_utils.types.ip_address import IPAddressType
 from sqlalchemy_utils.types.json import JSONType
 from sqlalchemy_utils.types.uuid import UUIDType
 
+from craton import exceptions
 from craton.db.api import Blame
 
 
@@ -393,6 +394,25 @@ class Device(Base, VariableMixin):
     interfaces = relationship('NetworkInterface', back_populates='device')
     children = relationship(
         'Device', backref=backref('parent', remote_side=[id]))
+
+    @validates("parent_id")
+    def validate_parent_id(self, _, parent_id):
+        if parent_id is None:
+            return parent_id
+        elif parent_id == self.id:
+            msg = (
+                "A device cannot be its own parent. The id for '{name}'"
+                " cannot be used as its parent_id."
+            ).format(name=self.name)
+            raise exceptions.ParentIDError(msg)
+        elif parent_id in (descendant.id for descendant in self.descendants):
+            msg = (
+                "A device cannot have a descendant as its parent. The"
+                " parent_id for '{name}' cannot be set to the id '{bad_id}'."
+            ).format(name=self.name, bad_id=parent_id)
+            raise exceptions.ParentIDError(msg)
+        else:
+            return parent_id
 
     @property
     def ancestors(self):

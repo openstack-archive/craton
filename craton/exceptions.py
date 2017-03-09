@@ -81,3 +81,7 @@ class NotFound(Base):
 
 class UnknownException(Base):
     code = 500
+
+
+class ParentIDError(ValueError):
+    pass

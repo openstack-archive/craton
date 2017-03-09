@@ -327,6 +327,136 @@ class NetworkDevicesDBTestCase(base.DBTestCase):
         ndevice = dbapi.network_devices_get_by_id(self.context, ndevice.id)
         self.assertEqual(ndevice.labels, {"jerry"})
 
+    def test_network_devices_create_sets_parent_id(self):
+        parent = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '1.www.example.com',
+                'ip_address': '10.1.2.102',
+                'device_type': 'switch',
+            }
+        )
+        child = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '2.www.example.com',
+                'ip_address': '10.1.2.102',
+                'device_type': 'switch',
+                'parent_id': parent.id,
+            }
+        )
+        self.assertEqual(parent.id, child.parent_id)
+
+    def test_network_devices_update_sets_parent_id(self):
+        parent = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '1.www.example.com',
+                'ip_address': '10.1.2.102',
+                'device_type': 'switch',
+            }
+        )
+        child = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '2.www.example.com',
+                'ip_address': '10.1.2.102',
+                'device_type': 'switch',
+                'parent_id': None,
+            }
+        )
+        self.assertIsNone(child.parent_id)
+        child_update = dbapi.network_devices_update(
+            self.context,
+            child.id,
+            {
+                'parent_id': parent.id,
+            }
+        )
+        self.assertEqual(parent.id, child_update.parent_id)
+
+    def test_network_devices_update_fails_when_parent_id_set_to_own_id(self):
+        network_device1 = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '1.www.example.com',
+                'ip_address': '10.1.2.101',
+                'device_type': 'switch',
+                'parent_id': None,
+            }
+        )
+        self.assertRaises(
+            exceptions.BadRequest,
+            dbapi.network_devices_update,
+            self.context,
+            network_device1.id,
+            {
+                'parent_id': network_device1.id,
+            }
+        )
+
+    def test_network_devices_update_fails_when_parent_set_to_descendant(self):
+        parent = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '1.www.example.com',
+                'ip_address': '10.1.2.101',
+                'device_type': 'switch',
+                'parent_id': None,
+            }
+        )
+        child = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '2.www.example.com',
+                'ip_address': '10.1.2.102',
+                'device_type': 'switch',
+                'parent_id': parent.id,
+            }
+        )
+        grandchild = dbapi.network_devices_create(
+            self.context,
+            {
+                'project_id': project_id1,
+                'cloud_id': cloud_id1,
+                'region_id': 1,
+                'name': '3.www.example.com',
+                'ip_address': '10.1.2.103',
+                'device_type': 'switch',
+                'parent_id': child.id,
+            }
+        )
+        self.assertRaises(
+            exceptions.BadRequest,
+            dbapi.network_devices_update,
+            self.context,
+            parent.id,
+            {
+                'parent_id': grandchild.id,
+            }
+        )
+
 
 class NetworkInterfacesDBTestCase(base.DBTestCase):
 
