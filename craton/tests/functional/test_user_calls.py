@@ -16,7 +16,7 @@ class UserTests(functional.TestCase):
         super(UserTests, self).tearDown()
 
     def test_create_user(self):
-        project = self.create_project('test', headers=self.root_headers)
+        project = self.create_project('test')
         url = self.url + '/v1/users'
         payload = {'username': 'testuser', 'project_id': project['id']}
         user = self.post(url, data=payload)
@@ -25,7 +25,7 @@ class UserTests(functional.TestCase):
         self.assertEqual(payload['project_id'], user.json()['project_id'])
 
     def test_create_user_with_admin_priv(self):
-        project = self.create_project('test', headers=self.root_headers)
+        project = self.create_project('test')
         url = self.url + '/v1/users'
         payload = {'username': 'testuser', 'project_id': project['id'],
                    'is_admin': True}
