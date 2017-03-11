@@ -1,11 +1,10 @@
-import uuid
-
 from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
+from oslo_utils import uuidutils
 
-project_id1 = uuid.uuid4().hex
-cloud_id1 = uuid.uuid4().hex
+project_id1 = uuidutils.generate_uuid(dashed=False)
+cloud_id1 = uuidutils.generate_uuid(dashed=False)
 
 cell1 = {'region_id': 1, 'project_id': project_id1, 'name': 'cell1',
          "cloud_id": cloud_id1}

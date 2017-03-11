@@ -1,14 +1,13 @@
-import uuid
-
 from craton import exceptions
 from craton.db import api as dbapi
-from craton.tests.unit.db import base
+from craton.tests.unit.db import bas
+from oslo_utils import uuidutilse
 
 
 default_pagination = {'limit': 30, 'marker': None}
 
-project_id1 = uuid.uuid4().hex
-cloud_id1 = uuid.uuid4().hex
+project_id1 = uuidutils.generate_uuid(dashed=False)
+cloud_id1 = uuidutils.generate_uuid(dashed=False)
 network1 = {"name": "test network",
             "cidr": "192.168.1.0/24",
             "gateway": "192.168.1.1",

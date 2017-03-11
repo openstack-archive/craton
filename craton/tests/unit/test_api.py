@@ -1,6 +1,5 @@
 import copy
 import mock
-import uuid
 
 from oslo_serialization import jsonutils
 
@@ -10,8 +9,9 @@ from craton.api import middleware
 from craton.db.sqlalchemy import api as dbapi
 from craton.tests import TestCase
 from craton.tests.unit import fake_resources
+from oslo_utils import uuidutils
 
-project_id1 = uuid.uuid4().hex
+project_id1 = uuidutils.generate_uuid(dashed=False)
 
 
 class APIV1Test(TestCase):

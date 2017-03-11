@@ -1,13 +1,12 @@
-import uuid
-
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
 from craton import exceptions
+from oslo_utils import uuidutils
 
 default_pagination = {'limit': 30, 'marker': None}
 
-project_id1 = uuid.uuid4().hex
-cloud_id1 = uuid.uuid4().hex
+project_id1 = uuidutils.generate_uuid(dashed=False)
+cloud_id1 = uuidutils.generate_uuid(dashed=False)
 region1 = {'project_id': project_id1, 'cloud_id': cloud_id1, 'name': 'region1'}
 
 

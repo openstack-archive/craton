@@ -1,13 +1,12 @@
-import uuid
-
 from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
+from oslo_utils import uuidutils
 
 default_pagination = {'limit': 30, 'marker': None}
 
-project_id1 = uuid.uuid4().hex
-project_id2 = uuid.uuid4().hex
+project_id1 = uuidutils.generate_uuid(dashed=False)
+project_id2 = uuidutils.generate_uuid(dashed=False)
 root = {'project_id': project_id1, 'username': 'root', "is_admin": True,
         "is_root": True}
 user1 = {'project_id': project_id2, 'username': 'user1', "is_admin": True}
@@ -47,7 +46,7 @@ class UsersDBTestCase(base.DBTestCase):
         # Ensure when request has no root context and the request
         # is not for the same project no user info is given back.
         self.make_user(user1)
-        self.context.tenant = uuid.uuid4().hex
+        self.context.tenant = uuidutils.generate_uuid(dashed=False)
         res, _ = dbapi.users_get_all(self.context, {}, default_pagination)
         self.assertEqual(len(res), 0)
 
