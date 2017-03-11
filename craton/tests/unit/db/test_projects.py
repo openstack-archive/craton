@@ -1,9 +1,9 @@
 import copy
-import uuid
 
 from craton import exceptions
 from craton.db import api as dbapi
 from craton.tests.unit.db import base
+from oslo_utils import uuidutils
 
 default_pagination = {'limit': 30, 'marker': None}
 
@@ -61,12 +61,12 @@ class ProjectsDBTestCase(base.DBTestCase):
 
     def test_project_create_id_uuid_type(self):
         project = dbapi.projects_create(self.context, project1)
-        self.assertEqual(type(project['id']), uuid.UUID)
+        self.assertEqual(type(project['id']), uuidutils)
 
     def test_project_get_id_uuid_type(self):
         project = dbapi.projects_create(self.context, project1)
         res = dbapi.projects_get_by_id(self.context, project['id'])
-        self.assertEqual(type(res['id']), uuid.UUID)
+        self.assertEqual(type(res['id']), uuidutils)
 
     def test_project_variables_update_does_update_variables(self):
         create_res = dbapi.projects_create(self.context, project1)
