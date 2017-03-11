@@ -1,8 +1,8 @@
 """Tests for craton.util module."""
-import uuid
 
 from craton import tests
 from craton import util
+from oslo_utils import uuidutils
 
 
 class TestProjectIdUtilities(tests.TestCase):
@@ -10,7 +10,7 @@ class TestProjectIdUtilities(tests.TestCase):
 
     def test_adds_project_id_to_json(self):
         """Verify we add the project_id to the json body."""
-        project_id = uuid.uuid4().hex
+        project_id = uuidutils.generate_uuid(dashed=False)
         self.context.tenant = project_id
         json = util.copy_project_id_into_json(self.context, {})
         self.assertDictEqual({'project_id': project_id}, json)

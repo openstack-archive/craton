@@ -3,7 +3,6 @@
 import enum
 import functools
 import sys
-import uuid
 
 from oslo_config import cfg
 from oslo_db import exception as db_exc
@@ -17,6 +16,7 @@ from sqlalchemy.orm import with_polymorphic
 
 from craton import exceptions
 from craton.db.sqlalchemy import models
+from oslo_utils import uuidutils
 
 
 CONF = cfg.CONF
@@ -682,7 +682,7 @@ def projects_create(context, values):
     session = get_session()
     project = models.Project()
     if not values.get('id'):
-        values['id'] = uuid.uuid4()
+        values['id'] = uuidutils.generate_uuid(dashed=False)
     with session.begin():
         project.update(values)
         project.save(session)
