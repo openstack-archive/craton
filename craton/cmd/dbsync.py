@@ -23,6 +23,20 @@ class DBCommand(object):
     def create_schema(self):
         migration.create_schema()
 
+    def bootstrap_project(self):
+        name = 'bootstrap'
+        project = migration.create_bootstrap_project(
+            name,
+            db_uri=CONF.database.connection)
+        user = migration.create_bootstrap_user(
+            project.id,
+            name,
+            db_uri=CONF.database.connection)
+
+        msg = ("\nProjectId: %s\nUsername: %s\nAPIKey: %s"
+               % (user.project_id, user.username, user.api_key))
+        print(msg)
+
 
 def add_command_parsers(subparsers):
     command_object = DBCommand()
@@ -56,6 +70,9 @@ def add_command_parsers(subparsers):
         'create_schema',
         help=("Create the database schema."))
     parser.set_defaults(func=command_object.create_schema)
+
+    parser = subparsers.add_parser('bootstrap')
+    parser.set_defaults(func=command_object.bootstrap_project)
 
 
 def main():
