@@ -261,16 +261,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if not args.url:
-        print("--url is requred. This is your craton api endpoint")
+        print("--url is required. This is your craton api endpoint")
         sys.exit(1)
     if not args.user:
-        print("--user is requred. This is your craton user id.")
+        print("--user is required. This is your craton user id.")
         sys.exit(1)
     if not args.project:
-        print("--project is requred. This is your craton project id.")
+        print("--project is required. This is your craton project id.")
         sys.exit(1)
     if not args.key:
-        print("--key is requred. This is your craton auth key.")
+        print("--key is required. This is your craton auth key.")
         sys.exit(1)
 
     Inv = Inventory(args.url, args.project, args.user, args.key)
