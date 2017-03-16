@@ -99,7 +99,7 @@ hosts:
   type: array
 ip_address:
   description: |
-    IP adress
+    IP address
   in: body
   type: string
 labels:
