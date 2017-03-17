@@ -182,7 +182,7 @@ Create a Region
 * To create region, execute the following command::
 
     # curl -i "http://${MY_IP}:7780/v1/regions" \
-           -d '{"name": "DFW", "project_id": "717e9a216e2d44e0bc848398563bda06", "cloud_id": 1}' \
+           -d '{"name": "DFW", "cloud_id": 1}' \
            -H "Content-Type: application/json" \
            -H "X-Auth-Token: demo" \
            -H "X-Auth-User: demo" \
