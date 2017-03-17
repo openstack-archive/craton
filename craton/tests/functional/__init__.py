@@ -9,6 +9,8 @@ import testtools
 import threading
 
 from oslo_log import log as logging
+from oslo_utils import uuidutils
+
 
 LOG = logging.getLogger(__name__)
 
@@ -265,6 +267,22 @@ class TestCase(testtools.TestCase):
         )
         self.assertJSON(resp)
         return resp
+
+    def create_project(self, name, headers=None, variables=None):
+        url = self.url + '/v1/projects'
+        payload = {'name': name}
+        if variables:
+            payload['variables'] = variables
+        response = self.post(url, headers=headers, data=payload)
+        self.assertEqual(201, response.status_code)
+        self.assertIn('Location', response.headers)
+        project = response.json()
+        self.assertTrue(uuidutils.is_uuid_like(project['id']))
+        self.assertEqual(
+            response.headers['Location'],
+            "{}/{}".format(url, project['id'])
+        )
+        return project
 
     def create_cloud(self, name, variables=None):
         url = self.url + '/v1/clouds'

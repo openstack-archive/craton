@@ -1241,7 +1241,8 @@ class APIV1UsersTest(APIV1Test):
     def test_create_users(self, mock_project, mock_user):
         mock_project.return_value = {'id': project_id1, 'name': 'project1'}
         mock_user.return_value = fake_resources.USER1
-        data = {'username': 'user1', 'is_admin': False}
+        data = {'username': 'user1', 'is_admin': False,
+                'project_id': project_id1}
         resp = self.post('v1/users', data=data)
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.json['id'], 1)

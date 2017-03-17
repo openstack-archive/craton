@@ -399,6 +399,7 @@ DefinitionUser = {
 DefinitionUserCreate = {
     "required": [
         "username",
+        "project_id",
     ],
     "type": "object",
     "additionalProperties": False,
