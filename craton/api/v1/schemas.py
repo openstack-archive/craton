@@ -68,6 +68,15 @@ def _remove_properties(properties, remove_list):
         props.pop(prop)
     return props
 
+
+def _add_properties(properties, add_list):
+    props = copy.copy(properties)
+    for prop in add_list:
+        print("PROPERTY IS: ", prop)
+        props.update(prop)
+    return props
+
+
 DefinitionsLabel = {
     "type": "object",
     "additionalProperties": False,
@@ -123,9 +132,6 @@ HostProperties = {
     "cell_id": {
         "type": "integer",
     },
-    "project_id": {
-        "type": "string",
-    },
     "parent_id": {
         "type": "integer",
         "description": "Parent Id of this host",
@@ -161,13 +167,15 @@ DefinitionsHost = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": HostProperties,
+    "properties": _add_properties(HostProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionsHostId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": HostProperties,
+    "properties": _add_properties(HostProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionHostCreate = {
@@ -203,9 +211,6 @@ CellProperties = {
     "cloud_id": {
         "type": "integer",
     },
-    "project_id": {
-        "type": "string",
-    },
     "id": {
         "type": "integer",
         "description": "Unique ID of the cell",
@@ -221,13 +226,15 @@ DefinitionsCell = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": CellProperties,
+    "properties": _add_properties(CellProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionsCellId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": CellProperties,
+    "properties": _add_properties(CellProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionsCellCreate = {
@@ -262,9 +269,6 @@ RegionProperties = {
         "type": "array",
         "description": "List of cells in this region",
     },
-    "project_id": {
-        "type": "string",
-    },
     "cloud_id": {
         "type": "integer",
     },
@@ -282,13 +286,15 @@ DefinitionsRegion = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": RegionProperties,
+    "properties": _add_properties(RegionProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionsRegionId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": RegionProperties,
+    "properties": _add_properties(RegionProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionsRegionCreate = {
@@ -322,9 +328,6 @@ CloudProperties = {
         "type": "array",
         "description": "List of regions in this cloud",
     },
-    "project_id": {
-        "type": "string",
-    },
     "id": {
         "type": "integer",
         "description": "Unique ID for the cloud",
@@ -338,13 +341,15 @@ DefinitionsCloud = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": CloudProperties,
+    "properties": _add_properties(CloudProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionsCloudId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": CloudProperties,
+    "properties": _add_properties(CloudProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionsCloudCreate = {
@@ -454,9 +459,6 @@ NetworkProperties = {
     "cell_id": {
         "type": "integer",
     },
-    "project_id": {
-        "type": "string",
-    },
     "name": {
         "type": "string",
     },
@@ -489,13 +491,15 @@ DefinitionNetwork = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": NetworkProperties,
+    "properties": _add_properties(NetworkProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionNetworkId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": NetworkProperties,
+    "properties": _add_properties(NetworkProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionNetworkCreate = {
@@ -538,9 +542,6 @@ NetworkInterfaceProperties = {
     "interface_type": {
         "type": "string",
     },
-    "project_id": {
-        "type": "string",
-    },
     "vlan_id": {
         "type": "integer",
     },
@@ -580,13 +581,15 @@ DefinitionNetworkInterface = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": NetworkInterfaceProperties,
+    "properties": _add_properties(NetworkInterfaceProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionNetworkInterfaceId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": NetworkInterfaceProperties,
+    "properties": _add_properties(NetworkInterfaceProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 
@@ -624,9 +627,6 @@ NetworkDeviceProperties = {
     },
     "parent_id": {
         "type": "integer",
-    },
-    "project_id": {
-        "type": "string",
     },
     "ip_address": {
         "type": "string",
@@ -672,13 +672,15 @@ DefinitionNetworkDevice = {
     ],
     "type": "object",
     "additionalProperties": False,
-    "properties": NetworkDeviceProperties,
+    "properties": _add_properties(NetworkDeviceProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionNetworkDeviceId = {
     "type": "object",
     "additionalProperties": False,
-    "properties": NetworkDeviceProperties,
+    "properties": _add_properties(NetworkDeviceProperties,
+                                  [{"project_id": {"type": "string"}}]),
 }
 
 DefinitionNetworkDeviceCreate = {
