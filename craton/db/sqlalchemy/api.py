@@ -751,6 +751,7 @@ def users_create(context, values):
     """Create a new user with given values."""
     session = get_session()
     user = models.User()
+
     with session.begin():
         user.update(values)
         user.save(session)

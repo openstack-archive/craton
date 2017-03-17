@@ -8,10 +8,12 @@ default_pagination = {'limit': 30, 'marker': None}
 
 project_id1 = uuid.uuid4().hex
 project_id2 = uuid.uuid4().hex
-root = {'project_id': project_id1, 'username': 'root', "is_admin": True,
-        "is_root": True}
-user1 = {'project_id': project_id2, 'username': 'user1', "is_admin": True}
-user2 = {'project_id': project_id2, 'username': 'user2', "is_admin": False}
+root = {'user_project_id': project_id1, 'project_id': project_id1,
+                'username': 'root', "is_admin": True, "is_root": True}
+user1 = {'user_project_id': project_id2, 'project_id': project_id2,
+                 'username': 'user1', "is_admin": True}
+user2 = {'user_project_id': project_id2, 'project_id': project_id2,
+                 'username': 'user2', "is_admin": False}
 
 
 class UsersDBTestCase(base.DBTestCase):
