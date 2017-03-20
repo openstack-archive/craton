@@ -69,8 +69,11 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                    'cloud_id': self.cloud['id'], 'name': 'a', 'id': 1}
         host = self.post(url, data=payload)
         self.assertEqual(400, host.status_code)
-        msg = ["Additional properties are not allowed ('id' was unexpected)"]
-        self.assertEqual(host.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed ('id' was unexpected)"
+        )
+        self.assertEqual(host.json()['message'], msg)
 
     def test_create_with_extra_created_at_property_fails(self):
         url = self.url + '/v1/hosts'
@@ -80,9 +83,12 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                    'created_at': 'some date'}
         host = self.post(url, data=payload)
         self.assertEqual(400, host.status_code)
-        msg = ["Additional properties are not allowed "
-               "('created_at' was unexpected)"]
-        self.assertEqual(host.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('created_at' was unexpected)"
+        )
+        self.assertEqual(host.json()['message'], msg)
 
     def test_create_with_extra_updated_at_property_fails(self):
         url = self.url + '/v1/hosts'
@@ -92,9 +98,12 @@ class APIV1HostTest(DeviceTestBase, APIV1ResourceWithVariablesTestCase):
                    'updated_at': 'some date'}
         host = self.post(url, data=payload)
         self.assertEqual(400, host.status_code)
-        msg = ["Additional properties are not allowed "
-               "('updated_at' was unexpected)"]
-        self.assertEqual(host.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('updated_at' was unexpected)"
+        )
+        self.assertEqual(host.json()['message'], msg)
 
     def test_create_with_parent_id(self):
         parent = self.create_host(

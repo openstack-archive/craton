@@ -14,7 +14,6 @@ LOG = log.getLogger(__name__)
 
 class Variables(base.Resource):
 
-    @base.http_codes
     def get(self, context, resources, id, request_args=None):
         """Get variables for given resource."""
         obj = dbapi.resource_get_by_id(context, resources, id)
@@ -22,7 +21,6 @@ class Variables(base.Resource):
         resp = {"variables": jsonutils.to_primitive(obj.vars)}
         return resp, 200, None
 
-    @base.http_codes
     def put(self, context, resources, id, request_data):
         """
         Update existing resource variables, or create if it does
@@ -34,7 +32,6 @@ class Variables(base.Resource):
         resp = {"variables": jsonutils.to_primitive(obj.variables)}
         return resp, 200, None
 
-    @base.http_codes
     def delete(self, context, resources, id, request_data):
         """Delete resource variables."""
         # NOTE(sulo): this is not that great. Find a better way to do this.

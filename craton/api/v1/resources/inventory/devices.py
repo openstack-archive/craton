@@ -13,7 +13,6 @@ LOG = log.getLogger(__name__)
 
 class Devices(base.Resource):
 
-    @base.http_codes
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all devices, with optional filtering."""

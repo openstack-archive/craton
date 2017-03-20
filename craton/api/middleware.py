@@ -4,11 +4,9 @@ from oslo_context import context
 from oslo_log import log
 from oslo_utils import uuidutils
 
-import flask
-import json
-
 from craton.db import api as dbapi
 from craton import exceptions
+from craton.util import handle_all_exceptions_decorator
 
 
 LOG = log.getLogger(__name__)
@@ -34,20 +32,13 @@ class ContextMiddleware(base.Middleware):
         request.environ['context'] = ctxt
         return ctxt
 
-    def _invalid_project_id(self, project_id):
-        err_msg = json.dumps({
-            "message": "Project ID ('{}') is not a valid UUID".format(
-                project_id)
-        })
-        return flask.Response(response=err_msg, status=401,
-                              headers={'Content-Type': 'application/json'})
-
 
 class NoAuthContextMiddleware(ContextMiddleware):
 
     def __init__(self, application):
         self.application = application
 
+    @handle_all_exceptions_decorator
     def process_request(self, request):
         # Simply insert some dummy context info
         self.make_context(
@@ -72,11 +63,16 @@ class LocalAuthContextMiddleware(ContextMiddleware):
     def __init__(self, application):
         self.application = application
 
+    @handle_all_exceptions_decorator
     def process_request(self, request):
         headers = request.headers
         project_id = headers.get('X-Auth-Project')
         if not uuidutils.is_uuid_like(project_id):
-            return self._invalid_project_id(project_id)
+            raise exceptions.AuthenticationError(
+                message="Project ID ('{}') is not a valid UUID".format(
+                    project_id
+                )
+            )
 
         ctx = self.make_context(
             request,
@@ -91,7 +87,7 @@ class LocalAuthContextMiddleware(ContextMiddleware):
             user_info = dbapi.get_user_info(ctx,
                                             headers.get('X-Auth-User', None))
             if user_info.api_key != headers.get('X-Auth-Token', None):
-                return flask.Response(status=401)
+                raise exceptions.AuthenticationError
             if user_info.is_root:
                 ctx.is_admin = True
                 ctx.is_admin_project = True
@@ -102,10 +98,7 @@ class LocalAuthContextMiddleware(ContextMiddleware):
                 ctx.is_admin = False
                 ctx.is_admin_project = False
         except exceptions.NotFound:
-            return flask.Response(status=401)
-        except Exception as err:
-            LOG.error(err)
-            return flask.Response(status=500)
+            raise exceptions.AuthenticationError
 
     @classmethod
     def factory(cls, global_config, **local_config):
@@ -116,11 +109,12 @@ class LocalAuthContextMiddleware(ContextMiddleware):
 
 class KeystoneContextMiddleware(ContextMiddleware):
 
+    @handle_all_exceptions_decorator
     def process_request(self, request):
         headers = request.headers
         environ = request.environ
         if headers.get('X-Identity-Status', '').lower() != 'confirmed':
-            return flask.Response(status=401)
+            raise exceptions.AuthenticationError
 
         token_info = environ['keystone.token_info']['token']
         roles = (role['name'] for role in token_info['roles'])
