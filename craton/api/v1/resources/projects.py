@@ -12,7 +12,6 @@ LOG = log.getLogger(__name__)
 
 class Projects(base.Resource):
 
-    @base.http_codes
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all projects. Requires super admin privileges."""
@@ -35,7 +34,6 @@ class Projects(base.Resource):
         response_body = {'projects': projects_obj, 'links': links}
         return jsonutils.to_primitive(response_body), 200, None
 
-    @base.http_codes
     def post(self, context, request_data):
         """Create a new project. Requires super admin privileges."""
         project_obj = dbapi.projects_create(context, request_data)
@@ -56,7 +54,6 @@ class Projects(base.Resource):
 
 class ProjectById(base.Resource):
 
-    @base.http_codes
     def get(self, context, id):
         """Get a project details by id. Requires super admin privileges."""
         project_obj = dbapi.projects_get_by_id(context, id)
@@ -64,7 +61,6 @@ class ProjectById(base.Resource):
         project['variables'] = jsonutils.to_primitive(project_obj.variables)
         return project, 200, None
 
-    @base.http_codes
     def delete(self, context, id):
         """Delete existing project. Requires super admin privileges."""
         dbapi.projects_delete(context, id)

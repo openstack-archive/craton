@@ -40,8 +40,11 @@ class APIV1CloudTest(TestCase):
         url = self.url + '/v1/clouds'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        err_msg = ["'name' is a required property"]
-        self.assertEqual(resp.json()['errors'], err_msg)
+        err_msg = (
+            "The request included the following errors:\n"
+            "- 'name' is a required property"
+        )
+        self.assertEqual(resp.json()['message'], err_msg)
 
     def test_create_cloud_with_duplicate_name_fails(self):
         self.create_cloud("ORD135")
@@ -56,26 +59,35 @@ class APIV1CloudTest(TestCase):
         url = self.url + '/v1/clouds'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        msg = ["Additional properties are not allowed ('id' was unexpected)"]
-        self.assertEqual(resp.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed ('id' was unexpected)"
+        )
+        self.assertEqual(resp.json()['message'], msg)
 
     def test_create_region_with_extra_created_at_property_fails(self):
         values = {"name": "test", "created_at": "some date"}
         url = self.url + '/v1/clouds'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        msg = ["Additional properties are not allowed "
-               "('created_at' was unexpected)"]
-        self.assertEqual(resp.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('created_at' was unexpected)"
+        )
+        self.assertEqual(resp.json()['message'], msg)
 
     def test_create_region_with_extra_updated_at_property_fails(self):
         values = {"name": "test", "updated_at": "some date"}
         url = self.url + '/v1/clouds'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        msg = ["Additional properties are not allowed "
-               "('updated_at' was unexpected)"]
-        self.assertEqual(resp.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('updated_at' was unexpected)"
+        )
+        self.assertEqual(resp.json()['message'], msg)
 
     def test_clouds_get_all(self):
         self.create_cloud("ORD1")
