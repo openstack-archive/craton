@@ -5,7 +5,6 @@ from functools import wraps
 
 from werkzeug.datastructures import MultiDict, Headers
 from flask import request, current_app
-from flask_restful import abort
 from flask_restful.utils import unpack
 from jsonschema import Draft4Validator
 from oslo_log import log
@@ -184,7 +183,10 @@ class FlaskValidatorAdaptor(object):
         value = self.type_convert(value)
         errors = list(e.message for e in self.validator.iter_errors(value))
         if errors:
-            abort(400, message='Bad Request', errors=errors)
+            msg = "The request included the following errors:\n- {}".format(
+                "\n - ".join(errors)
+            )
+            raise exceptions.BadRequest(message=msg)
         return merge_default(self.validator.schema, value)
 
 
@@ -248,7 +250,7 @@ def response_filter(view):
                 'filters.',
                 {"endpoint": endpoint, "method": method}
             )
-            abort(500)
+            raise exceptions.UnknownException
 
         headers = None
         status = None
@@ -263,7 +265,7 @@ def response_filter(view):
                 'filter "(%(endpoint)s, %(method)s)".',
                 {"status": status, "endpoint": endpoint, "method": method}
             )
-            abort(500)
+            raise exceptions.UnknownException
 
         resp, errors = normalize(schemas['schema'], resp)
         if schemas['headers']:
@@ -271,7 +273,8 @@ def response_filter(view):
                 {'properties': schemas['headers']}, headers)
             errors.extend(header_errors)
         if errors:
-            abort(500, message='Expectation Failed', errors=errors)
+            LOG.error('Expectation Failed: %s', errors)
+            raise exceptions.UnknownException
 
         return resp, status, headers
     return wrapper
