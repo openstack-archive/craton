@@ -45,12 +45,55 @@ Installing Environment from packages: Ubuntu
 
     # sudo apt-get install python3-mysqldb
 
---------------------------------------------------------
-Installing Environment from packages: Fedora/CentOS etc.
---------------------------------------------------------
+--------
+CentOS 7
+--------
 
 
-* Install a fresh Fedora/CentOS image
+* Install a fresh CentOS 7 image
+
+* Make sure we have git installed::
+
+    # yum update
+    # yum install git -y
+
+* Clone the repository::
+
+    # git clone https://github.com/openstack/craton.git
+
+* Install the prerequisite packages::
+
+    # yum install python34-devel python34-pip python34-setuptools gcc
+    # pip3 install --upgrade pip setuptools
+
+* Goto craton directory and install the following::
+
+    # pip3 install -r requirements.txt
+    # python3 setup.py install
+
+* Install mysql-server community release from `MySQL Community Page`_::
+
+    # wget https://dev.mysql.com/get/mysql57-community-release-el7-9.noarch.rpm
+    # rpm -ivh mysql57-community-release-el7-9.noarch.rpm
+    # yum install mysql-server
+    # systemctl enable mysqld
+    # systemctl start mysqld
+
+* Ensure you have MySQL-python installed::
+
+    # yum install MySQL-python
+
+* Setup Database User and secure installation::
+
+    # grep 'temporary password' /var/log/mysqld.log
+    # mysql_secure_installation
+
+--------------------------------------------
+Installing Environment from packages: Fedora
+--------------------------------------------
+
+
+* Install a fresh Fedora 25 image
 
 * Make sure we have git installed::
 
@@ -235,3 +278,6 @@ Running Tests
 * To run functional tests, execute the following command::
 
     # tox -e functional
+
+.. _MySql Community Page:
+   https://dev.mysql.com/downloads/repo/yum/
