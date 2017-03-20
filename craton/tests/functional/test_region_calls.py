@@ -63,16 +63,22 @@ class APIV1RegionTest(RegionTests):
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        err_msg = ["'name' is a required property"]
-        self.assertEqual(resp.json()['errors'], err_msg)
+        err_msg = (
+            "The request included the following errors:\n"
+            "- 'name' is a required property"
+        )
+        self.assertEqual(resp.json()['message'], err_msg)
 
     def test_create_region_with_no_cloud_id_fails(self):
         values = {"name": "I don't work at all, you know."}
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        err_msg = ["'cloud_id' is a required property"]
-        self.assertEqual(resp.json()['errors'], err_msg)
+        err_msg = (
+            "The request included the following errors:\n"
+            "- 'cloud_id' is a required property"
+        )
+        self.assertEqual(resp.json()['message'], err_msg)
 
     def test_create_region_with_duplicate_name_fails(self):
         self.create_region("ORD135")
@@ -87,8 +93,11 @@ class APIV1RegionTest(RegionTests):
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        msg = ["Additional properties are not allowed ('id' was unexpected)"]
-        self.assertEqual(resp.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed ('id' was unexpected)"
+        )
+        self.assertEqual(resp.json()['message'], msg)
 
     def test_create_region_with_extra_created_at_property_fails(self):
         values = {"name": "test", 'cloud_id': self.cloud['id'],
@@ -96,9 +105,12 @@ class APIV1RegionTest(RegionTests):
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        msg = ["Additional properties are not allowed "
-               "('created_at' was unexpected)"]
-        self.assertEqual(resp.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('created_at' was unexpected)"
+        )
+        self.assertEqual(resp.json()['message'], msg)
 
     def test_create_region_with_extra_updated_at_property_fails(self):
         values = {"name": "test", 'cloud_id': self.cloud['id'],
@@ -106,9 +118,23 @@ class APIV1RegionTest(RegionTests):
         url = self.url + '/v1/regions'
         resp = self.post(url, data=values)
         self.assertEqual(resp.status_code, 400)
-        msg = ["Additional properties are not allowed "
-               "('updated_at' was unexpected)"]
-        self.assertEqual(resp.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('updated_at' was unexpected)"
+        )
+        self.assertEqual(resp.json()['message'], msg)
+
+    def test_region_create_missing_all_properties_fails(self):
+        url = self.url + '/v1/regions'
+        region = self.post(url, data={})
+        self.assertEqual(400, region.status_code)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'cloud_id' is a required property\n"
+            "- 'name' is a required property"
+        )
+        self.assertEqual(region.json()['message'], msg)
 
     def test_regions_get_all(self):
         self.create_region("ORD1")

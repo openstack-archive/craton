@@ -13,7 +13,6 @@ LOG = log.getLogger(__name__)
 
 class Cells(base.Resource):
 
-    @base.http_codes
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all cells, with optional filtering."""
@@ -30,7 +29,6 @@ class Cells(base.Resource):
         response_body = {'cells': cells_obj, 'links': links}
         return jsonutils.to_primitive(response_body), 200, None
 
-    @base.http_codes
     def post(self, context, request_data):
         """Create a new cell."""
         json = util.copy_project_id_into_json(context, request_data)
@@ -51,19 +49,16 @@ class Cells(base.Resource):
 
 class CellById(base.Resource):
 
-    @base.http_codes
     def get(self, context, id, request_args):
         cell_obj = dbapi.cells_get_by_id(context, id)
         cell = utils.get_resource_with_vars(request_args, cell_obj)
         return cell, 200, None
 
-    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing cell."""
         cell_obj = dbapi.cells_update(context, id, request_data)
         return jsonutils.to_primitive(cell_obj), 200, None
 
-    @base.http_codes
     def delete(self, context, id):
         """Delete existing cell."""
         dbapi.cells_delete(context, id)

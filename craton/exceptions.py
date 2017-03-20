@@ -65,6 +65,11 @@ class DeviceNotFound(Base):
     msg = "%(device_type)s device not found for ID %(id)s."
 
 
+class AuthenticationError(Base):
+    code = 401
+    msg = "The request could not be authenticated."
+
+
 class AdminRequired(Base):
     code = 401
     msg = "This action requires the 'admin' role"

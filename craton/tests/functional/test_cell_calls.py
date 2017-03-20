@@ -64,8 +64,11 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
                    'cloud_id': self.cloud['id'], 'name': 'a', 'id': 3}
         cell = self.post(url, data=payload)
         self.assertEqual(400, cell.status_code)
-        msg = ["Additional properties are not allowed ('id' was unexpected)"]
-        self.assertEqual(cell.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed ('id' was unexpected)"
+        )
+        self.assertEqual(cell.json()['message'], msg)
 
     def test_cell_create_with_extra_created_at_property_fails(self):
         url = self.url + '/v1/cells'
@@ -74,9 +77,12 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
                    'created_at': "some date"}
         cell = self.post(url, data=payload)
         self.assertEqual(400, cell.status_code)
-        msg = ["Additional properties are not allowed "
-               "('created_at' was unexpected)"]
-        self.assertEqual(cell.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('created_at' was unexpected)"
+        )
+        self.assertEqual(cell.json()['message'], msg)
 
     def test_cell_create_with_extra_updated_at_property_fails(self):
         url = self.url + '/v1/cells'
@@ -85,9 +91,24 @@ class APIV1CellTest(APIV1ResourceWithVariablesTestCase):
                    'updated_at': "some date"}
         cell = self.post(url, data=payload)
         self.assertEqual(400, cell.status_code)
-        msg = ["Additional properties are not allowed "
-               "('updated_at' was unexpected)"]
-        self.assertEqual(cell.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed "
+            "('updated_at' was unexpected)"
+        )
+        self.assertEqual(cell.json()['message'], msg)
+
+    def test_cell_create_missing_all_properties_fails(self):
+        url = self.url + '/v1/cells'
+        cell = self.post(url, data={})
+        self.assertEqual(400, cell.status_code)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'cloud_id' is a required property\n"
+            "- 'name' is a required property\n"
+            "- 'region_id' is a required property"
+        )
+        self.assertEqual(cell.json()['message'], msg)
 
     def test_cells_get_all_with_details(self):
         self.create_cell('cell1', variables={'a': 'b'})

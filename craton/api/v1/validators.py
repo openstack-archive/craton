@@ -4,9 +4,7 @@
 from functools import wraps
 
 from werkzeug.datastructures import MultiDict, Headers
-from flask import request, current_app
-from flask_restful import abort
-from flask_restful.utils import unpack
+from flask import request
 from jsonschema import Draft4Validator
 from oslo_log import log
 
@@ -182,9 +180,12 @@ class FlaskValidatorAdaptor(object):
 
     def validate(self, value):
         value = self.type_convert(value)
-        errors = list(e.message for e in self.validator.iter_errors(value))
+        errors = sorted(e.message for e in self.validator.iter_errors(value))
         if errors:
-            abort(400, message='Bad Request', errors=errors)
+            msg = "The request included the following errors:\n- {}".format(
+                "\n- ".join(errors)
+            )
+            raise exceptions.BadRequest(message=msg)
         return merge_default(self.validator.schema, value)
 
 
@@ -233,9 +234,6 @@ def response_filter(view):
     def wrapper(*args, **kwargs):
         resp = view(*args, **kwargs)
 
-        if isinstance(resp, current_app.response_class):
-            return resp
-
         endpoint = request.endpoint.partition('.')[-1]
         method = request.method
         if method == 'HEAD':
@@ -248,12 +246,9 @@ def response_filter(view):
                 'filters.',
                 {"endpoint": endpoint, "method": method}
             )
-            abort(500)
+            raise exceptions.UnknownException
 
-        headers = None
-        status = None
-        if isinstance(resp, tuple):
-            resp, status, headers = unpack(resp)
+        body, status, headers = resp
 
         try:
             schemas = resp_filter[status]
@@ -263,17 +258,18 @@ def response_filter(view):
                 'filter "(%(endpoint)s, %(method)s)".',
                 {"status": status, "endpoint": endpoint, "method": method}
             )
-            abort(500)
+            raise exceptions.UnknownException
 
-        resp, errors = normalize(schemas['schema'], resp)
+        body, errors = normalize(schemas['schema'], body)
         if schemas['headers']:
             headers, header_errors = normalize(
                 {'properties': schemas['headers']}, headers)
             errors.extend(header_errors)
         if errors:
-            abort(500, message='Expectation Failed', errors=errors)
+            LOG.error('Expectation Failed: %s', errors)
+            raise exceptions.UnknownException
 
-        return resp, status, headers
+        return body, status, headers
     return wrapper
 
 
