@@ -6,9 +6,11 @@ Installing and Setting up a Development Environment
 Installation
 ============
 
---------------------------------------------
-Installing Environment from packages: Ubuntu
---------------------------------------------
+.. note:: *This is a Python3 project.*
+
+---------------------
+Ubuntu 16.04 (Xenial)
+---------------------
 
 
 * Install a fresh Ubuntu image
@@ -22,35 +24,34 @@ Installing Environment from packages: Ubuntu
 
     # git clone https://github.com/openstack/craton.git
 
-.. note:: This is a Python3 project only, the minimum support version is Python 3.5.
-
 * Install the prerequisite packages::
 
-    # sudo apt-get install python3.5 python3.5-dev
-    # sudo apt-get install python3-pip python3-setuptools
-    # sudo pip3 install --upgrade pip
-    # sudo pip3 install --upgrade setuptools
+    # apt-get install python3.5 python3.5-dev
+    # apt-get install python3-pip python3-setuptools
+    # pip3 install --upgrade pip
+    # pip3 install --upgrade setuptools
 
 * Goto craton directory and install the following::
 
-    # sudo pip3 install -r requirements.txt
-    # sudo python3 setup.py install
+    # pip3 install -r requirements.txt
+    # python3 setup.py install
 
-* Install mariadb and make sure mysql is running::
+* Install mysql-server and make sure mysql is running::
 
-    # sudo apt-get install mariadb-server
-    # sudo service mysql start
+    # apt-get install mysql-server-5.7 mysql-client-5.7
+    # systemctl enable mysql
+    # systemctl start mysql
 
 * Ensure you have python3-mysqldb installed::
 
     # sudo apt-get install python3-mysqldb
 
---------------------------------------------------------
-Installing Environment from packages: Fedora/CentOS etc.
---------------------------------------------------------
+--------
+CentOS 7
+--------
 
 
-* Install a fresh Fedora/CentOS image
+* Install a fresh CentOS 7 image
 
 * Make sure we have git installed::
 
@@ -63,25 +64,66 @@ Installing Environment from packages: Fedora/CentOS etc.
 
 * Install the prerequisite packages::
 
-    # sudo yum install python3-devel
-    # sudo yum install python3-pip
-    # sudo yum install python3-setuptools
-    # sudo pip3 install --upgrade pip
-    # sudo pip3 install --upgrade setuptools
+    # yum install python34-devel python34-pip python34-setuptools gcc
+    # pip3 install --upgrade pip setuptools
 
 * Goto craton directory and install the following::
 
-    # sudo pip3 install -r requirements.txt
-    # sudo python3 setup.py install
+    # pip3 install -r requirements.txt
+    # python3 setup.py install
 
-* Install mariadb and make sure mysql is running::
+* Install mysql-server community release from `MySQL Community Page`_::
 
-    # sudo yum install mariadb-server
-    # sudo service mysql start
+    # wget https://dev.mysql.com/get/mysql57-community-release-el7-9.noarch.rpm
+    # rpm -ivh mysql57-community-release-el7-9.noarch.rpm
+    # yum install mysql-server
+    # systemctl enable mysqld
+    # systemctl start mysqld
+
+* Ensure you have MySQL-python installed::
+
+    # yum install MySQL-python
+
+* Setup Database User and secure installation::
+
+    # grep 'temporary password' /var/log/mysqld.log
+    # mysql_secure_installation
+
+---------
+Fedora 25
+---------
+
+
+* Install a fresh Fedora 25 image
+
+* Make sure we have git installed::
+
+    # dnf update
+    # dnf install git -y
+
+* Clone the repository::
+
+    # git clone https://github.com/openstack/craton.git
+
+* Install the prerequisite packages::
+
+    # dnf install python3-devel python3-pip python3-setuptools gcc redhat-rpm-config
+    # pip3 install --upgrade pip setuptools
+
+* Goto craton directory and install the following::
+
+    # pip3 install -r requirements.txt
+    # python3 setup.py install
+
+* Install mysql-server and make sure mysql is running::
+
+    # dnf install mysql-server
+    # systemctl enable mysqld
+    # systemctl start mysqld
 
 * Ensure you have python3-mysql installed::
 
-    # sudo yum install python3-mysql
+    # dnf install python3-mysql
 
 --------------
 Database Setup
@@ -235,3 +277,6 @@ Running Tests
 * To run functional tests, execute the following command::
 
     # tox -e functional
+
+.. _MySql Community Page:
+   https://dev.mysql.com/downloads/repo/yum/
