@@ -9,7 +9,6 @@ from taskflow.jobs import backends as boards
 from taskflow.persistence import backends as persistence_backends
 from zake import fake_client
 
-from craton._i18n import _LI
 
 
 LOG = logging.getLogger(__name__)
@@ -55,11 +54,11 @@ def start(conf):
 
     if conf.taskflow.db_upgrade:
         with contextlib.closing(persistence.get_connection()) as conn:
-            LOG.info(_LI('Checking for database schema upgrade'))
+            LOG.info('Checking for database schema upgrade')
             conn.upgrade()
 
     my_name = uuidutils.generate_uuid()
-    LOG.info(_LI('I am %s'), my_name)
+    LOG.info('I am %s', my_name)
 
     board = _get_jobboard_backend(conf, persistence=persistence)
 
