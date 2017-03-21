@@ -58,7 +58,7 @@ Example Host Create
 .. code-block:: bash
 
    curl -i "http://${MY_IP}:7780/v1/hosts" \
-        -d '{"name": "fooHost", "region_id": 1, "ip_address": "11.11.11.14", "device_type": "Phone", "project_id": "717e9a216e2d44e0bc848398563bda06"}' \
+        -d '{"name": "fooHost", "region_id": 1, "ip_address": "11.11.11.14", "device_type": "Phone"}' \
         -H "Content-Type: application/json" \
         -H "X-Auth-Token: demo" \
         -H "X-Auth-User: demo" \

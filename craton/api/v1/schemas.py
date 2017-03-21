@@ -61,6 +61,9 @@ DefinitionLinks = {
 # such that a resource can not be created with these in request body.
 blacklisted_create_properties = ["id", "created_at", "updated_at"]
 
+# Blacklisted create properties with project_id addition
+blacklisted_with_project_id = blacklisted_create_properties + ["project_id"]
+
 
 def _remove_properties(properties, remove_list):
     props = copy.copy(properties)
@@ -181,7 +184,7 @@ DefinitionHostCreate = {
     "type": "object",
     "additionalProperties": False,
     "properties": _remove_properties(HostProperties,
-                                     blacklisted_create_properties),
+                                     blacklisted_with_project_id),
 }
 
 CellProperties = {
@@ -239,7 +242,7 @@ DefinitionsCellCreate = {
     "type": "object",
     "additionalProperties": False,
     "properties": _remove_properties(CellProperties,
-                                     blacklisted_create_properties),
+                                     blacklisted_with_project_id),
 }
 
 RegionProperties = {
@@ -299,7 +302,7 @@ DefinitionsRegionCreate = {
     "type": "object",
     "additionalProperties": False,
     "properties": _remove_properties(RegionProperties,
-                                     blacklisted_create_properties),
+                                     blacklisted_with_project_id),
 }
 
 CloudProperties = {
@@ -354,7 +357,7 @@ DefinitionsCloudCreate = {
     "type": "object",
     "additionalProperties": False,
     "properties": _remove_properties(CloudProperties,
-                                     blacklisted_create_properties),
+                                     blacklisted_with_project_id),
 }
 
 UserProperties = {
@@ -510,7 +513,7 @@ DefinitionNetworkCreate = {
     "type": "object",
     "additionalProperties": False,
     "properties": _remove_properties(NetworkProperties,
-                                     blacklisted_create_properties),
+                                     blacklisted_with_project_id),
 }
 
 
@@ -600,7 +603,7 @@ DefinitionNetworkInterfaceCreate = {
     "type": "object",
     "additionalProperties": False,
     "properties": _remove_properties(NetworkInterfaceProperties,
-                                     blacklisted_create_properties),
+                                     blacklisted_with_project_id),
 }
 
 NetworkDeviceProperties = {
@@ -692,7 +695,7 @@ DefinitionNetworkDeviceCreate = {
     "type": "object",
     "additionalProperties": False,
     "properties": _remove_properties(NetworkDeviceProperties,
-                                     blacklisted_create_properties),
+                                     blacklisted_with_project_id),
 }
 
 DefinitionNoParams = {
