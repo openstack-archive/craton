@@ -35,13 +35,19 @@ class Networks(base.Resource):
         """Create a new network."""
         json = util.copy_project_id_into_json(context, request_data)
         network_obj = dbapi.networks_create(context, json)
+        network = jsonutils.to_primitive(network_obj)
+        if 'variables' in json:
+            network["variables"] = jsonutils.to_primitive(
+                network_obj.variables)
+        else:
+            network["variables"] = {}
 
         location = v1.api.url_for(
             NetworkById, id=network_obj.id, _external=True
         )
         headers = {'Location': location}
 
-        return jsonutils.to_primitive(network_obj), 201, headers
+        return network, 201, headers
 
 
 class NetworkById(base.Resource):

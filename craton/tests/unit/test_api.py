@@ -1346,6 +1346,25 @@ class APIV1NetworksTest(APIV1Test):
         )
 
     @mock.patch.object(dbapi, 'networks_create')
+    def test_create_network_returns_network_obj(self, mock_network):
+        mock_network.return_value = fake_resources.NETWORK1
+        data = {
+            'name': 'PrivateNetwork',
+            'cidr': '192.168.1.0/24',
+            'gateway': '192.168.1.1',
+            'netmask': '255.255.255.0',
+            'variables': {'key1': 'value1'},
+            'region_id': 1,
+            'cloud_id': 1,
+        }
+        expected_result = copy.deepcopy(data)
+        expected_result.update({'id': 1, 'project_id': 1})
+
+        resp = self.post('/v1/networks', data=data)
+        self.assertEqual(201, resp.status_code)
+        self.assertEqual(expected_result, resp.json)
+
+    @mock.patch.object(dbapi, 'networks_create')
     def test_create_networks_with_invalid_data(self, mock_network):
         mock_network.return_value = None
         # data is missing entries
