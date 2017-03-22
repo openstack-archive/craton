@@ -30,13 +30,12 @@ Ubuntu 16.04 (Xenial)
 
     # apt-get install python3.5 python3.5-dev
     # apt-get install python3-pip python3-setuptools
-    # pip3 install --upgrade pip
-    # pip3 install --upgrade setuptools
+    # python3 -m pip install --upgrade pip setuptools
 
 * Goto craton directory and install the following::
 
-    # pip3 install -r requirements.txt
-    # python3 setup.py install
+    # python3 -m pip install -r requirements.txt
+    # python3 -m pip install .
 
 * Install mysql-server and make sure mysql is running::
 
@@ -67,12 +66,12 @@ CentOS 7
 * Install the prerequisite packages::
 
     # yum install python34-devel python34-pip python34-setuptools gcc
-    # pip3 install --upgrade pip setuptools
+    # python3 -m pip install --upgrade pip setuptools
 
 * Goto craton directory and install the following::
 
-    # pip3 install -r requirements.txt
-    # python3 setup.py install
+    # python3 -m pip install -r requirements.txt
+    # python3 -m pip install .
 
 * Install mysql-server community release from `MySQL Community Page`_::
 
@@ -110,12 +109,12 @@ Fedora 25
 * Install the prerequisite packages::
 
     # dnf install python3-devel python3-pip python3-setuptools gcc redhat-rpm-config
-    # pip3 install --upgrade pip setuptools
+    # python3 -m pip install --upgrade pip setuptools
 
 * Goto craton directory and install the following::
 
-    # pip3 install -r requirements.txt
-    # python3 setup.py install
+    # python3 -m pip install -r requirements.txt
+    # python3 -m pip install .
 
 * Install mysql-server and make sure mysql is running::
 
