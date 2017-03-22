@@ -169,7 +169,7 @@ Modify etc/craton-api-conf.sample
 
 * Add the following line to the [database] section:
 
-    # connection = mysql://craton:craton@localhost/craton
+    # connection = mysql+pymysql://craton:craton@localhost/craton
 
 * Update the host in the [api] section to match your IP:
 
