@@ -105,6 +105,10 @@ class NetworkDevices(base.Resource):
         json = util.copy_project_id_into_json(context, request_data)
         obj = dbapi.network_devices_create(context, json)
         device = jsonutils.to_primitive(obj)
+        if 'variables' in json:
+            device["variables"] = jsonutils.to_primitive(obj.variables)
+        else:
+            device["variables"] = {}
 
         utils.add_up_link(context, device)
 

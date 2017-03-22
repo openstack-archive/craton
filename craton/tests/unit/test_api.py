@@ -1593,6 +1593,25 @@ class APIV1NetworkDevicesTest(APIV1Test):
         )
 
     @mock.patch.object(dbapi, 'network_devices_create')
+    def test_create_network_devices_returns_netdev_obj(self, mock_devices):
+        mock_devices.return_value = fake_resources.NETWORK_DEVICE1
+        data = {'name': 'NetDevices1', 'region_id': 1, 'cloud_id': 1,
+                'device_type': 'Server', 'ip_address': '10.10.0.1',
+                'variables': {"key1": "value1", "key2": "value2"}}
+        expected_result = copy.deepcopy(data)
+        expected_result.update({
+            'id': 1,
+            'project_id': 1,
+            'cell_id': None,
+            'parent_id': None,
+            'links': [{'href': 'http://localhost/v1/regions/1', 'rel': 'up'}],
+            })
+        resp = self.post('/v1/network-devices', data=data)
+
+        self.assertEqual(201, resp.status_code)
+        self.assertEqual(expected_result, resp.json)
+
+    @mock.patch.object(dbapi, 'network_devices_create')
     def test_create_netdevices_with_invalid_data(self, mock_devices):
         mock_devices.return_value = None
         # data is missing entry

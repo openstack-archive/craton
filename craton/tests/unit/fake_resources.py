@@ -173,7 +173,7 @@ NETWORKS_LIST2 = [NETWORK1, NETWORK2, NETWORK3]
 
 
 class NetworkDevice():
-    def __init__(self, id, name, project_id, region_id, device_type,
+    def __init__(self, id, name, project_id, cloud_id, region_id, device_type,
                  ip_address, variables, labels=None, cell_id=None,
                  parent_id=None):
         self.name = name
@@ -185,6 +185,7 @@ class NetworkDevice():
         self.variables = variables
         self.resolved = copy.copy(variables)
         self.labels = labels
+        self.cloud_id = cloud_id
         self.cell_id = cell_id
         self.parent_id = parent_id
 
@@ -192,10 +193,12 @@ class NetworkDevice():
         return iter(self.__dict__.items())
 
 
-NETWORK_DEVICE1 = NetworkDevice(1, "NetDevices1", 1, 1, "Server", "10.10.0.1",
+NETWORK_DEVICE1 = NetworkDevice(1, "NetDevices1", 1, 1, 1, "Server",
+                                "10.10.0.1",
                                 {"key1": "value1", "key2": "value2"},
                                 labels=["a", "b"])
-NETWORK_DEVICE2 = NetworkDevice(2, "NetDevices2", 1, 2, "Server", "10.10.0.2",
+NETWORK_DEVICE2 = NetworkDevice(2, "NetDevices2", 1, 1, 2, "Server",
+                                "10.10.0.2",
                                 {"key1": "value1", "key2": "value2"},
                                 labels=["a", "b"])
 
