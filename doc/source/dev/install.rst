@@ -157,13 +157,16 @@ Database Setup
     # exit
 
 ------------------------------------
-Modify etc/craton-api-conf.sample
+Create etc/craton-api-conf.dev
 ------------------------------------
+* Copy the sample config in the etc directory to make a development config file.
+
+    # cp craton-api-conf.sample craton-api-conf.dev
 
 * Make api_paste_config use a fully qualified path (not relative).
   This will be specific for your machine
 
-.. note:: Make sure you have the proper path for craton-api-conf.sample
+.. note:: Make sure you have the proper path for craton-api-conf.dev
 
     # api_paste_config=/home/cratonuser/craton/etc/craton-api-paste.ini
 
@@ -181,13 +184,11 @@ Run dbsync
 
 * Make sure to run dbsync to get the db tables created::
 
-    # craton-dbsync --config-file=etc/craton
-    -api-conf.sample version
-    # craton-dbsync --config-file=etc/craton
-    -api-conf.sample upgrade
+    # craton-dbsync --config-file=etc/craton-api-conf.dev version
+    # craton-dbsync --config-file=etc/craton-api-conf.dev upgrade
 
 * Make sure to run dbsync bootstrap to create initial project and root user::
-  # craton-dbsync --config-file=etc/craton-api-conf.sample bootstrap
+  # craton-dbsync --config-file=etc/craton-api-conf.dev bootstrap
 
   Note: The above command outputs user, project-id and API key to use with
   python-cratonclient to interact with craton server.
@@ -198,8 +199,7 @@ Start the API Service
 
 * To start the API service, run the following command::
 
-    # craton-api --config-file=etc/
-    craton-api-conf.sample
+    # craton-api --config-file=etc/craton-api-conf.dev
 
 
 * Some examples of API calls are as below:
@@ -209,7 +209,7 @@ Create a Region
 ---------------
 
 * In order to create the region, export the IP address you set in
-  /etc/craton-api-conf.sample::
+  /etc/craton-api-conf.dev::
 
     # export MY_IP=xxx.xxx.xxx.xxx
 
@@ -266,6 +266,44 @@ Get a particular host
            -H "X-Auth-Token: demo" \
            -H "X-Auth-User: demo" \
            -H "X-Auth-Project: 717e9a216e2d44e0bc848398563bda06"
+
+-----------------------
+Using wrapper functions
+-----------------------
+
+Some wrapper functions have been included in craton/tools to quickly build, reload, populate, and query craton.
+
+* To load the wrapper functions, run the following in the craton parent directory::
+
+    # source tools/wrapper-functions.sh
+
+* To start craton directly, run the following from the craton parent directory::
+
+    # craton-direct-start
+
+* The following environment variables must be exported for working with the craton API server::
+
+  * CRATON_URL
+  * OS_PROJECT_ID
+  * OS_USERNAME
+  * OS_PASSWORD
+
+* You can search the logs for these values or run::
+
+    # export eval $(craton-direct-env)
+
+* Populate craton with fake data by running::
+
+    # craton-fake-data
+
+* Run API calls against craton with the following wrappers::
+.. note:: *Requires the installation of httpie*
+
+    # craton-post v1/regions name=HKG
+    # craton-get v1/hosts
+    # craton-put v1/hosts/3 device_type=container
+    # craton-put v1/hosts/3/variables foo=47 bar:='["a", "b", "c"]'
+    # craton-delete v1/hosts/4
 
 -------------
 Running Tests
