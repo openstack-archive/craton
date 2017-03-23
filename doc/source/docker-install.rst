@@ -89,6 +89,35 @@ Calling into Craton
 
     $ curl -i "http://${ContainerIP}:7780/v1/hosts?region_id=1" -H "Content-Type: application/json" -H "X-Auth-Token: ${CRATON_API_KEY}" -H "X-Auth-User: ${CRATON_USERNAME}" -H "X-Auth-Project: ${CRATON_PROJECT_ID}"
 
+-----------------------
+Using wrapper functions
+-----------------------
+
+*Some wrapper functions have been included in craton/tools to quickly build, reload, populate, and query craton.
+* To load the wrapper functions, run the following in the craton parent directory::
+
+    # source tools/wrapper-functions.sh
+
+* To quick start and populate craton in docker, run the following from the craton parent directory::
+
+    # craton-docker-start
+
+* In order to interact with craton, export the bootstrap credentials by running::
+
+    # eval $(craton-docker-env)
+
+* Populate craton with fake data by running::
+
+    # craton-fake-data
+
+* Run API calls against craton with the following wrappers::
+.. note:: *Requires the installation of httpie*
+
+    # craton-post v1/regions name=HKG
+    # craton-get v1/hosts
+    # craton-put v1/hosts/3 device_type=container
+    # craton-put v1/hosts/3/variables foo=47 bar:='["a", "b", "c"]'
+    # craton-delete v1/hosts/4
 
 -------------------
 Command Cheat-Sheet
