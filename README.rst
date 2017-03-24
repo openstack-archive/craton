@@ -14,7 +14,7 @@ Support for workflows, CLI, and the Python client is in progress.
 For more information, please refer to the following project resources:
 
 * **Free software:** under the `Apache license <http://www.apache.org/licenses/LICENSE-2.0>`_
-* **Documentation:** http://craton.readthedocs.org
+* **Documentation:** https://craton.readthedocs.io
 * **Source:** https://github.com/openstack/craton
 * **Blueprints:** https://blueprints.launchpad.net/craton
 * **Bugs:** https://bugs.launchpad.net/craton
