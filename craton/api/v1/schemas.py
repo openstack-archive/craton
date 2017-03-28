@@ -1488,35 +1488,11 @@ filters = {
                 },
             },
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("devices", "GET"): {
         200: {
             "headers": None,
             "schema": DefinitionDevicesPaginated,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("hosts_id", "GET"): {
@@ -1524,51 +1500,15 @@ filters = {
             "headers": None,
             "schema": DefinitionsHostId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("hosts_id", "PUT"): {
         200: {
             "headers": None,
             "schema": DefinitionsHostId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("hosts_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -1578,35 +1518,11 @@ filters = {
             "headers": None,
             "schema": None,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("hosts_labels", "GET"): {
         200: {
             "headers": None,
             "schema": DefinitionsLabel,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("hosts_labels", "PUT"): {
@@ -1614,31 +1530,11 @@ filters = {
             "headers": None,
             "schema": DefinitionsLabel,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("hosts", "POST"): {
         201: {
             "headers": None,
             "schema": DefinitionsHost,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("hosts", "GET"): {
@@ -1646,35 +1542,11 @@ filters = {
             "headers": None,
             "schema": paginated_resource("hosts", DefinitionsHost),
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("cells_id", "GET"): {
         200: {
             "headers": None,
             "schema": DefinitionsCellId,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("cells_id", "PUT"): {
@@ -1682,33 +1554,9 @@ filters = {
             "headers": None,
             "schema": DefinitionsCellId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("cells_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -1718,31 +1566,11 @@ filters = {
             "headers": None,
             "schema": DefinitionsCell,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("cells", "GET"): {
         200: {
             "headers": None,
             "schema": paginated_resource("cells", DefinitionsCell),
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("regions", "POST"): {
@@ -1750,31 +1578,11 @@ filters = {
             "headers": None,
             "schema": DefinitionsRegion,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("regions", "GET"): {
         200: {
             "headers": None,
             "schema": paginated_resource("regions", DefinitionsRegion),
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("regions_id", "GET"): {
@@ -1782,51 +1590,15 @@ filters = {
             "headers": None,
             "schema": DefinitionsRegionId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("regions_id", "PUT"): {
         200: {
             "headers": None,
             "schema": DefinitionsRegionId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("regions_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -1836,31 +1608,11 @@ filters = {
             "headers": None,
             "schema": DefinitionsCloud,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("clouds", "GET"): {
         200: {
             "headers": None,
             "schema": paginated_resource("clouds", DefinitionsCloud),
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("clouds_id", "GET"): {
@@ -1868,51 +1620,15 @@ filters = {
             "headers": None,
             "schema": DefinitionsCloudId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("clouds_id", "PUT"): {
         200: {
             "headers": None,
             "schema": DefinitionsCloudId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("clouds_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -1922,35 +1638,11 @@ filters = {
             "headers": None,
             "schema": paginated_resource("projects", DefinitionProject),
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("projects", "POST"): {
         201: {
             "headers": None,
             "schema": DefinitionProject,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("users", "GET"): {
@@ -1958,35 +1650,11 @@ filters = {
             "headers": None,
             "schema": paginated_resource("users", DefinitionUser),
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("users", "POST"): {
         201: {
             "headers": None,
             "schema": DefinitionUser,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("projects_id", "GET"): {
@@ -1994,33 +1662,9 @@ filters = {
             "headers": None,
             "schema": DefinitionProject,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("projects_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -2030,33 +1674,9 @@ filters = {
             "headers": None,
             "schema": DefinitionUser,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("users_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -2067,51 +1687,15 @@ filters = {
             "schema": paginated_resource("network_devices",
                                          DefinitionNetworkDeviceId),
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("network_devices", "POST"): {
         201: {
             "headers": None,
             "schema": DefinitionNetworkDeviceId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("network_devices_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -2121,33 +1705,9 @@ filters = {
             "headers": None,
             "schema": DefinitionNetworkDeviceId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("network_devices_labels", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -2157,35 +1717,11 @@ filters = {
             "headers": None,
             "schema": DefinitionsLabel,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("network_devices_labels", "PUT"): {
         200: {
             "headers": None,
             "schema": DefinitionsLabel,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("network_devices_id", "PUT"): {
@@ -2193,35 +1729,11 @@ filters = {
             "headers": None,
             "schema": DefinitionNetworkDeviceId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("networks", "GET"): {
         200: {
             "headers": None,
             "schema": paginated_resource("networks", DefinitionNetwork),
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("networks", "POST"): {
@@ -2229,33 +1741,9 @@ filters = {
             "headers": None,
             "schema": DefinitionNetwork,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("networks_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -2265,35 +1753,11 @@ filters = {
             "headers": None,
             "schema": DefinitionNetworkId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("networks_id", "PUT"): {
         200: {
             "headers": None,
             "schema": DefinitionNetworkId,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("network_interfaces", "GET"): {
@@ -2302,51 +1766,15 @@ filters = {
             "schema": paginated_resource("network_interfaces",
                                          DefinitionNetworkInterface),
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("network_interfaces", "POST"): {
         201: {
             "headers": None,
             "schema": DefinitionNetworkInterface,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("network_interfaces_id", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -2356,35 +1784,11 @@ filters = {
             "headers": None,
             "schema": DefinitionNetworkInterfaceId,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("network_interfaces_id", "PUT"): {
         200: {
             "headers": None,
             "schema": DefinitionNetworkInterfaceId,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
     ("variables_with_resolve", "GET"): {
@@ -2398,18 +1802,6 @@ filters = {
                 },
             },
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("variables_with_resolve", "PUT"): {
         200: {
@@ -2422,51 +1814,15 @@ filters = {
                 },
             },
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("variables_with_resolve", "DELETE"): {
         204: {
             "headers": None,
             "schema": None,
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("variables_without_resolve", "DELETE"): {
         204: {
-            "headers": None,
-            "schema": None,
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
             "headers": None,
             "schema": None,
         },
@@ -2482,18 +1838,6 @@ filters = {
                 },
             },
         },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
-        },
     },
     ("variables_without_resolve", "PUT"): {
         200: {
@@ -2505,18 +1849,6 @@ filters = {
                     "variables": DefinitionVariablesSource,
                 },
             },
-        },
-        400: {
-            "headers": None,
-            "schema": None,
-        },
-        404: {
-            "headers": None,
-            "schema": None,
-        },
-        405: {
-            "headers": None,
-            "schema": None,
         },
     },
 }

@@ -99,3 +99,17 @@ class APIV1NetworkDeviceTest(DeviceTestBase):
             url, data={'parent_id': grandchild['id']}
         )
         self.assertEqual(400, parent_update_resp.status_code)
+
+    def test_network_device_create_missing_all_properties_fails(self):
+        url = self.url + '/v1/network-devices'
+        network_device = self.post(url, data={})
+        self.assertEqual(400, network_device.status_code)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'cloud_id' is a required property\n"
+            "- 'device_type' is a required property\n"
+            "- 'ip_address' is a required property\n"
+            "- 'name' is a required property\n"
+            "- 'region_id' is a required property"
+        )
+        self.assertEqual(network_device.json()['message'], msg)

@@ -240,11 +240,19 @@ class TestCase(testtools.TestCase):
                     response.text
                 )
 
+    def assertFailureFormat(self, response):
+        if response.status_code >= 400:
+            body = response.json()
+            self.assertEqual(2, len(body))
+            self.assertEqual(response.status_code, body["status"])
+            self.assertIn("message", body)
+
     def get(self, url, headers=None, **params):
         resp = self.session.get(
             url, verify=False, headers=headers, params=params,
         )
         self.assertJSON(resp)
+        self.assertFailureFormat(resp)
         return resp
 
     def post(self, url, headers=None, data=None):
@@ -252,6 +260,7 @@ class TestCase(testtools.TestCase):
             url, verify=False, headers=headers, json=data,
         )
         self.assertJSON(resp)
+        self.assertFailureFormat(resp)
         return resp
 
     def put(self, url, headers=None, data=None):
@@ -259,6 +268,7 @@ class TestCase(testtools.TestCase):
             url, verify=False, headers=headers, json=data,
         )
         self.assertJSON(resp)
+        self.assertFailureFormat(resp)
         return resp
 
     def delete(self, url, headers=None, body=None):
@@ -266,6 +276,7 @@ class TestCase(testtools.TestCase):
             url, verify=False, headers=headers, json=body,
         )
         self.assertJSON(resp)
+        self.assertFailureFormat(resp)
         return resp
 
     def create_project(self, name, headers=None, variables=None):

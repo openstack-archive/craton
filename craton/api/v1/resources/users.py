@@ -12,7 +12,6 @@ LOG = log.getLogger(__name__)
 
 class Users(base.Resource):
 
-    @base.http_codes
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all users. Requires project admin privileges."""
@@ -37,7 +36,6 @@ class Users(base.Resource):
         response_body = {'users': users_obj, 'links': links}
         return jsonutils.to_primitive(response_body), 200, None
 
-    @base.http_codes
     def post(self, context, request_data):
         """Create a new user. Requires project admin privileges."""
         # NOTE(sulo): Instead of using context project_id from
@@ -59,13 +57,11 @@ class Users(base.Resource):
 
 class UserById(base.Resource):
 
-    @base.http_codes
     def get(self, context, id):
         """Get a user details by id. Requires project admin privileges."""
         user_obj = dbapi.users_get_by_id(context, id)
         return jsonutils.to_primitive(user_obj), 200, None
 
-    @base.http_codes
     def delete(self, context, id):
         """Delete existing user. Requires project admin privileges."""
         dbapi.users_delete(context, id)

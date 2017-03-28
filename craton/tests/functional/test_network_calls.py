@@ -42,8 +42,11 @@ class APIV1NetworkSchemaTest(TestCase):
         }
         network = self.post(self.networks_url, data=payload)
         self.assertEqual(400, network.status_code)
-        msg = ["'region_id' is a required property"]
-        self.assertEqual(network.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'region_id' is a required property"
+        )
+        self.assertEqual(network.json()['message'], msg)
 
     def test_network_create_without_cloud_id_fails(self):
         payload = {
@@ -55,8 +58,11 @@ class APIV1NetworkSchemaTest(TestCase):
         }
         network = self.post(self.networks_url, data=payload)
         self.assertEqual(400, network.status_code)
-        msg = ["'cloud_id' is a required property"]
-        self.assertEqual(network.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'cloud_id' is a required property"
+        )
+        self.assertEqual(network.json()['message'], msg)
 
     def test_network_create_with_extra_id_property_fails(self):
         payload = {
@@ -70,8 +76,11 @@ class APIV1NetworkSchemaTest(TestCase):
         }
         network = self.post(self.networks_url, data=payload)
         self.assertEqual(400, network.status_code)
-        msg = ["Additional properties are not allowed ('id' was unexpected)"]
-        self.assertEqual(network.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed ('id' was unexpected)"
+        )
+        self.assertEqual(network.json()['message'], msg)
 
     def test_network_create_with_extra_created_at_property_fails(self):
         payload = {
@@ -85,9 +94,12 @@ class APIV1NetworkSchemaTest(TestCase):
         }
         network = self.post(self.networks_url, data=payload)
         self.assertEqual(400, network.status_code)
-        msg = ["Additional properties are not allowed ('created_at' was "
-               "unexpected)"]
-        self.assertEqual(network.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed ('created_at' was "
+            "unexpected)"
+        )
+        self.assertEqual(network.json()['message'], msg)
 
     def test_network_create_with_extra_updated_at_property_fails(self):
         payload = {
@@ -101,9 +113,27 @@ class APIV1NetworkSchemaTest(TestCase):
         }
         network = self.post(self.networks_url, data=payload)
         self.assertEqual(400, network.status_code)
-        msg = ["Additional properties are not allowed ('updated_at' was "
-               "unexpected)"]
-        self.assertEqual(network.json()['errors'], msg)
+        msg = (
+            "The request included the following errors:\n"
+            "- Additional properties are not allowed ('updated_at' was "
+            "unexpected)"
+        )
+        self.assertEqual(network.json()['message'], msg)
+
+    def test_network_create_missing_all_properties_fails(self):
+        url = self.url + '/v1/networks'
+        network = self.post(url, data={})
+        self.assertEqual(400, network.status_code)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'cidr' is a required property\n"
+            "- 'cloud_id' is a required property\n"
+            "- 'gateway' is a required property\n"
+            "- 'name' is a required property\n"
+            "- 'netmask' is a required property\n"
+            "- 'region_id' is a required property"
+        )
+        self.assertEqual(network.json()['message'], msg)
 
     def test_network_get_all_with_details(self):
         payload = {

@@ -139,3 +139,13 @@ class APIV1ProjectTest(ProjectTests, APIV1ResourceWithVariablesTestCase):
                                       variables=variables)
         self.assert_vars_get_expected(project['id'], variables)
         self.assert_vars_can_be_deleted(project['id'])
+
+    def test_project_create_missing_all_properties_fails(self):
+        url = self.url + '/v1/projects'
+        project = self.post(url, data={})
+        self.assertEqual(400, project.status_code)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'name' is a required property"
+        )
+        self.assertEqual(project.json()['message'], msg)

@@ -13,7 +13,6 @@ LOG = log.getLogger(__name__)
 
 class Clouds(base.Resource):
 
-    @base.http_codes
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get cloud(s) for the project. Get cloud details if
@@ -46,7 +45,6 @@ class Clouds(base.Resource):
         response_body = {'clouds': clouds_obj, 'links': links}
         return jsonutils.to_primitive(response_body), 200, None
 
-    @base.http_codes
     def post(self, context, request_data):
         """Create a new cloud."""
         json = util.copy_project_id_into_json(context, request_data)
@@ -67,20 +65,17 @@ class Clouds(base.Resource):
 
 class CloudsById(base.Resource):
 
-    @base.http_codes
     def get(self, context, id):
         cloud_obj = dbapi.clouds_get_by_id(context, id)
         cloud = jsonutils.to_primitive(cloud_obj)
         cloud['variables'] = jsonutils.to_primitive(cloud_obj.variables)
         return cloud, 200, None
 
-    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing cloud."""
         cloud_obj = dbapi.clouds_update(context, id, request_data)
         return jsonutils.to_primitive(cloud_obj), 200, None
 
-    @base.http_codes
     def delete(self, context, id):
         """Delete existing cloud."""
         dbapi.clouds_delete(context, id)

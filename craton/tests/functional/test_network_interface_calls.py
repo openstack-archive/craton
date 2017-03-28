@@ -55,3 +55,16 @@ class APIv1NetworkInterfacesTest(functional.DeviceTestBase):
         payload = {'port': 'asdf'}
         response = self.put(url, data=payload)
         self.assertBadRequest(response)
+
+    def test_network_interface_create_missing_all_properties_fails(self):
+        url = self.url + '/v1/network-interfaces'
+        network_interface = self.post(url, data={})
+        self.assertEqual(400, network_interface.status_code)
+        msg = (
+            "The request included the following errors:\n"
+            "- 'device_id' is a required property\n"
+            "- 'interface_type' is a required property\n"
+            "- 'ip_address' is a required property\n"
+            "- 'name' is a required property"
+        )
+        self.assertEqual(network_interface.json()['message'], msg)

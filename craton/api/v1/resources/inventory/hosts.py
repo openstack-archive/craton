@@ -13,7 +13,6 @@ LOG = log.getLogger(__name__)
 
 class Hosts(base.Resource):
 
-    @base.http_codes
     @base.pagination_context
     def get(self, context, request_args, pagination_params):
         """Get all hosts for region, with optional filtering."""
@@ -35,7 +34,6 @@ class Hosts(base.Resource):
 
         return response_body, 200, None
 
-    @base.http_codes
     def post(self, context, request_data):
         """Create a new host."""
         json = util.copy_project_id_into_json(context, request_data)
@@ -58,7 +56,6 @@ class Hosts(base.Resource):
 
 class HostById(base.Resource):
 
-    @base.http_codes
     def get(self, context, id, request_args):
         """Get host by given id"""
         host_obj = dbapi.hosts_get_by_id(context, id)
@@ -68,7 +65,6 @@ class HostById(base.Resource):
 
         return host, 200, None
 
-    @base.http_codes
     def put(self, context, id, request_data):
         """Update existing host data, or create if it does not exist."""
         host_obj = dbapi.hosts_update(context, id, request_data)
@@ -79,7 +75,6 @@ class HostById(base.Resource):
 
         return host, 200, None
 
-    @base.http_codes
     def delete(self, context, id):
         """Delete existing host."""
         dbapi.hosts_delete(context, id)
@@ -88,14 +83,12 @@ class HostById(base.Resource):
 
 class HostsLabels(base.Resource):
 
-    @base.http_codes
     def get(self, context, id):
         """Get labels for given host device."""
         host_obj = dbapi.hosts_get_by_id(context, id)
         response = {"labels": list(host_obj.labels)}
         return response, 200, None
 
-    @base.http_codes
     def put(self, context, id, request_data):
         """
         Update existing device label entirely, or add if it does
@@ -105,7 +98,6 @@ class HostsLabels(base.Resource):
         response = {"labels": list(resp.labels)}
         return response, 200, None
 
-    @base.http_codes
     def delete(self, context, id, request_data):
         """Delete device label entirely."""
         dbapi.hosts_labels_delete(context, id, request_data)
