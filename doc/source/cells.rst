@@ -22,7 +22,7 @@ Request
 +------------+------+---------+-------------------------+
 | Name       | In   | Type    | Description             |
 +============+======+=========+=========================+
-| name       | boody| string  | Unique name of the cell |
+| name       | body | string  | Unique name of the cell |
 +------------+------+---------+-------------------------+
 | region_id  | body | integer | Unique ID of the region |
 +------------+------+---------+-------------------------+
