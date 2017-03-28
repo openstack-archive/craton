@@ -1,6 +1,6 @@
 Craton's API Reference Guide
 ============================
-Contents:
+Resources:
 
 .. toctree::
    :maxdepth: 2
@@ -12,3 +12,11 @@ Contents:
    net-devices
    net-interfaces
    regions
+   variable-filtering
+
+API Usage:
+
+.. toctree::
+   :maxdepth: 2
+
+   filtering-by-variables
