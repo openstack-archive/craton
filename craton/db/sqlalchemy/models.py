@@ -244,6 +244,7 @@ class Project(Base, VariableMixin):
     devices = relationship('Device', back_populates='project')
     users = relationship('User', back_populates='project')
     networks = relationship('Network', back_populates='project')
+    interfaces = relationship('NetworkInterface', back_populates='project')
 
 
 class User(Base, VariableMixin):
@@ -258,11 +259,11 @@ class User(Base, VariableMixin):
         nullable=False)
     username = Column(String(255))
     api_key = Column(String(36))
-    # root = craton admin that can create other pojects/usrs
+    # root = craton admin that can create other projects/users
     is_root = Column(Boolean, default=False)
     # admin = project context admin
     is_admin = Column(Boolean, default=False)
-    roles = Column(JSON)
+    _repr_columns = [id, username]
 
     project = relationship('Project', back_populates='users')
 
@@ -371,7 +372,6 @@ class Device(Base, VariableMixin):
     project_id = Column(
         UUIDType(binary=False), ForeignKey('projects.id'), index=True,
         nullable=False)
-    access_secret_id = Column(Integer, ForeignKey('access_secrets.id'))
     parent_id = Column(Integer, ForeignKey('devices.id'))
     ip_address = Column(IPAddressType, nullable=False)
     device_type = Column(String(255), nullable=False)
@@ -389,7 +389,6 @@ class Device(Base, VariableMixin):
         'Label', back_populates='device', collection_class=set,
         cascade='all, delete-orphan', lazy='joined')
     labels = association_proxy('related_labels', 'label')
-    access_secret = relationship('AccessSecret', back_populates='devices')
     interfaces = relationship('NetworkInterface', back_populates='device')
     children = relationship(
         'Device', backref=backref('parent', remote_side=[id]))
@@ -462,7 +461,7 @@ class Host(Device):
     }
 
 
-class NetworkInterface(Base):
+class NetworkInterface(Base, VariableMixin):
     __tablename__ = 'network_interfaces'
     __table_args__ = (
         UniqueConstraint("device_id", "name",
@@ -485,10 +484,12 @@ class NetworkInterface(Base):
     device_id = Column(Integer, ForeignKey('devices.id'))
     network_id = Column(Integer, ForeignKey('networks.id'), nullable=True)
 
-    network = relationship('Network', back_populates="devices",
-                           cascade='all', lazy='joined')
-    device = relationship('Device', back_populates="interfaces",
-                          cascade='all', lazy='joined')
+    project = relationship(
+        'Project', back_populates='interfaces', cascade='all', lazy='joined')
+    network = relationship(
+        'Network', back_populates='interfaces', cascade='all', lazy='joined')
+    device = relationship(
+        'Device', back_populates='interfaces', cascade='all', lazy='joined')
 
 
 class Network(Base, VariableMixin):
@@ -518,7 +519,7 @@ class Network(Base, VariableMixin):
     cloud = relationship('Cloud', back_populates='networks')
     region = relationship('Region', back_populates='networks')
     cell = relationship('Cell', back_populates='networks')
-    devices = relationship('NetworkInterface', back_populates='network')
+    interfaces = relationship('NetworkInterface', back_populates='network')
 
 
 class NetworkDevice(Device):
@@ -550,21 +551,3 @@ class Label(Base):
         self.label = label
 
     device = relationship("Device", back_populates="related_labels")
-
-
-class AccessSecret(Base):
-    """Represents a secret for accessing a host. It may be shared.
-    For now we assume a PEM-encoded certificate that wraps the private
-    key. Such certs may or may not be encrypted; if encrypted, the
-    configuration specifies how to interact with other systems, such
-    as Barbican or Hashicorp Vault, to retrieve secret data to unlock
-    this cert.
-    Note that this does not include secrets such as Ansible vault
-    files; those are stored outside the inventory database as part of
-    the configuration.
-    """
-    __tablename__ = 'access_secrets'
-    id = Column(Integer, primary_key=True)
-    cert = Column(Text)
-
-    devices = relationship('Device', back_populates='access_secret')
