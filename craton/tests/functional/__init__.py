@@ -52,9 +52,9 @@ class DockerSetup(threading.Thread):
         """Build a docker container from the given Dockerfile and start
         the container in a separate thread."""
         try:
-            self.client = docker.Client(version='auto')
+            self.client = docker.APIClient(version='auto')
             is_ok = self.client.ping()
-            if is_ok != 'OK':
+            if not is_ok:
                 msg = 'Docker daemon ping failed.'
                 self.error = msg
                 LOG.error(self.error)
