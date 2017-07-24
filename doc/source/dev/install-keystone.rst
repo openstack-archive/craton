@@ -49,4 +49,4 @@ the service catalog when it needs to talk to the admin identity endpoint.
 
 
 .. _Quick Start:
-    http://docs.openstack.org/developer/openstack-ansible/developer-docs/quickstart-aio.html
+    https://docs.openstack.org/openstack-ansible/latest/contributor/quickstart-aio.html
