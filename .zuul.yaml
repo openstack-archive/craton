@@ -1,0 +1,17 @@
+- project:
+    name: openstack/craton
+    check:
+      jobs:
+        - craton-tox-functional
+    gate:
+      jobs:
+        - craton-tox-functional
+
+- job:
+    name: craton-tox-functional
+    parent: legacy-base
+    run: playbooks/legacy/craton-tox-functional/run
+    post-run: playbooks/legacy/craton-tox-functional/post
+    timeout: 2400
+    required-projects:
+      - openstack/requirements
