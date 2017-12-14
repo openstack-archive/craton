@@ -1,0 +1,4 @@
+- project:
+    name: openstack/craton
+    templates:
+       - nodejs4-jobs
