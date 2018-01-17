@@ -23,7 +23,7 @@ api_paste_config=/craton/etc/craton-api-paste.ini
 paste_pipeline = local-auth
 
 
-# Keystone Middlewre settings
+# Keystone Middleware settings
 [keystone_authtoken]
 #auth_uri = https://127.0.0.1:5000
 #auth_url = https://127.0.0.1:35357/v3
