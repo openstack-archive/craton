@@ -1,29 +1,10 @@
-Craton
-======
+This project is no longer maintained.
 
-Craton is a new project we plan to propose for OpenStack inclusion.
-Craton supports deploying and operating OpenStack clouds by providing
-scalable fleet management:
+The contents of this repository are still available in the Git
+source code management system.  To see the contents of this
+repository before it reached its end of life, please check out the
+previous commit with "git checkout HEAD^1".
 
-* Inventory of configurable physical devices/hosts (the fleet)
-* Audit and remediation workflows against this inventory
-* REST APIs, CLI, and Python client to manage
-
-Support for workflows, CLI, and the Python client is in progress.
-
-For more information, please refer to the following project resources:
-
-* **Free software:** under the `Apache license <http://www.apache.org/licenses/LICENSE-2.0>`_
-* **Documentation:** https://craton.readthedocs.io
-* **Source:** https://github.com/openstack/craton
-* **Blueprints:** https://blueprints.launchpad.net/craton
-* **Bugs:** https://bugs.launchpad.net/craton
-
-For information on how to contribute to Craton, please see the
-contents of the `CONTRIBUTING.rst file <CONTRIBUTING.rst>`_.
-
-For information on how to setup a Developer's Environment, please
-see the contents of `INSTALL.RST file <doc/source/dev/install.rst>`_.
-
-For more information on Craton distribution license, please see
-the contents of the `LICENSE file <LICENSE>`_.
+For any further questions, please email
+openstack-dev@lists.openstack.org or join #openstack-dev on
+Freenode.
